@@ -1,14 +1,25 @@
 package httpapi
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"testing/synctest"
+	"time"
 )
 
 var discardLogger = slog.New(slog.DiscardHandler)
+
+// pingFunc adapts a function to Pinger.
+type pingFunc func(context.Context) error
+
+func (f pingFunc) Ping(ctx context.Context) error { return f(ctx) }
+
+var dbUp = pingFunc(func(context.Context) error { return nil })
 
 func TestRoutes(t *testing.T) {
 	t.Parallel()
@@ -35,7 +46,7 @@ func TestRoutes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			rec := record(New(discardLogger), newRequest(t, tt.method, tt.target))
+			rec := record(New(discardLogger, dbUp), newRequest(t, tt.method, tt.target))
 
 			if rec.Code != tt.wantStatus {
 				t.Errorf("status = %d, want %d", rec.Code, tt.wantStatus)
@@ -63,10 +74,59 @@ func TestRoutes(t *testing.T) {
 	}
 }
 
+func TestReadyz(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name        string
+		db          pingFunc
+		wantStatus  int
+		wantCode    string
+		wantElapsed time.Duration
+	}{
+		{name: "database up", db: dbUp, wantStatus: http.StatusOK},
+		{
+			name:       "database down",
+			db:         func(context.Context) error { return errors.New("connection refused") },
+			wantStatus: http.StatusServiceUnavailable, wantCode: "not_ready",
+		},
+		{
+			name: "database hangs",
+			db: func(ctx context.Context) error {
+				<-ctx.Done()
+				return ctx.Err()
+			},
+			wantStatus: http.StatusServiceUnavailable, wantCode: "not_ready", wantElapsed: readyTimeout,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			synctest.Test(t, func(t *testing.T) {
+				start := time.Now()
+				rec := record(New(discardLogger, tt.db), newRequest(t, http.MethodGet, "/readyz"))
+
+				if elapsed := time.Since(start); elapsed != tt.wantElapsed {
+					t.Errorf("answered after %v, want %v", elapsed, tt.wantElapsed)
+				}
+				if rec.Code != tt.wantStatus {
+					t.Errorf("status = %d, want %d", rec.Code, tt.wantStatus)
+				}
+				if tt.wantCode != "" {
+					if got := decodeError(t, rec).Code; got != tt.wantCode {
+						t.Errorf("error code = %q, want %q", got, tt.wantCode)
+					}
+				}
+			})
+		})
+	}
+}
+
 func TestNewServerSetsLimits(t *testing.T) {
 	t.Parallel()
 
-	srv := NewServer(New(discardLogger), discardLogger)
+	srv := NewServer(New(discardLogger, dbUp), discardLogger)
 
 	limits := map[string]int64{
 		"ReadHeaderTimeout": int64(srv.ReadHeaderTimeout),

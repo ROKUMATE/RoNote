@@ -2,9 +2,27 @@ package config
 
 import (
 	"log/slog"
+	"maps"
 	"strings"
 	"testing"
 )
+
+// leakMarker stands in for a database password; no error may contain it.
+const leakMarker = "s3cret"
+
+var testDatabaseURL = dbURL("postgres", "db.internal:5432/ronote?sslmode=disable")
+
+// dbURL returns scheme://ronote:<leakMarker>@rest.
+func dbURL(scheme, rest string) string {
+	return scheme + "://ronote:" + leakMarker + "@" + rest
+}
+
+// validEnv is a complete, valid environment; cases change one thing at a time.
+func validEnv(overrides map[string]string) map[string]string {
+	env := map[string]string{"RONOTE_ENV": "dev", "RONOTE_DATABASE_URL": testDatabaseURL}
+	maps.Copy(env, overrides)
+	return env
+}
 
 func TestLoad(t *testing.T) {
 	t.Parallel()
@@ -17,65 +35,97 @@ func TestLoad(t *testing.T) {
 	}{
 		{
 			name: "defaults",
-			env:  map[string]string{"RONOTE_ENV": "dev"},
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo},
+			env:  validEnv(nil),
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL},
 		},
 		{
 			name: "all set",
-			env: map[string]string{
-				"RONOTE_ENV":       "prod",
-				"RONOTE_HTTP_ADDR": "0.0.0.0:9000",
-				"RONOTE_LOG_LEVEL": "debug",
-			},
-			want: Config{Env: EnvProd, HTTPAddr: "0.0.0.0:9000", LogLevel: slog.LevelDebug},
+			env: validEnv(map[string]string{
+				"RONOTE_ENV":          "prod",
+				"RONOTE_HTTP_ADDR":    "0.0.0.0:9000",
+				"RONOTE_LOG_LEVEL":    "debug",
+				"RONOTE_DATABASE_URL": "postgresql://db/ronote",
+			}),
+			want: Config{Env: EnvProd, HTTPAddr: "0.0.0.0:9000", LogLevel: slog.LevelDebug, DatabaseURL: "postgresql://db/ronote"},
 		},
 		{
 			name: "empty host",
-			env:  map[string]string{"RONOTE_ENV": "staging", "RONOTE_HTTP_ADDR": ":8080", "RONOTE_LOG_LEVEL": "warn"},
-			want: Config{Env: EnvStaging, HTTPAddr: ":8080", LogLevel: slog.LevelWarn},
+			env:  validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_HTTP_ADDR": ":8080", "RONOTE_LOG_LEVEL": "warn"}),
+			want: Config{Env: EnvStaging, HTTPAddr: ":8080", LogLevel: slog.LevelWarn, DatabaseURL: testDatabaseURL},
 		},
 		{
 			name:    "missing env",
-			env:     map[string]string{},
+			env:     validEnv(map[string]string{"RONOTE_ENV": ""}),
 			wantErr: []string{"RONOTE_ENV: not set; want one of dev, test, staging, prod"},
 		},
 		{
 			name:    "bad env",
-			env:     map[string]string{"RONOTE_ENV": "qa"},
+			env:     validEnv(map[string]string{"RONOTE_ENV": "qa"}),
 			wantErr: []string{`RONOTE_ENV: "qa" is not one of dev, test, staging, prod`},
 		},
 		{
 			name:    "addr without port",
-			env:     map[string]string{"RONOTE_ENV": "test", "RONOTE_HTTP_ADDR": "localhost"},
+			env:     validEnv(map[string]string{"RONOTE_HTTP_ADDR": "localhost"}),
 			wantErr: []string{`RONOTE_HTTP_ADDR: "localhost" is not host:port`},
 		},
 		{
 			name:    "non-numeric port",
-			env:     map[string]string{"RONOTE_ENV": "test", "RONOTE_HTTP_ADDR": "localhost:http"},
+			env:     validEnv(map[string]string{"RONOTE_HTTP_ADDR": "localhost:http"}),
 			wantErr: []string{`RONOTE_HTTP_ADDR: "localhost:http" has port "http"; want 1-65535`},
 		},
 		{
 			name:    "port out of range",
-			env:     map[string]string{"RONOTE_ENV": "test", "RONOTE_HTTP_ADDR": "localhost:65536"},
+			env:     validEnv(map[string]string{"RONOTE_HTTP_ADDR": "localhost:65536"}),
 			wantErr: []string{`RONOTE_HTTP_ADDR: "localhost:65536" has port "65536"; want 1-65535`},
 		},
 		{
 			name:    "port zero",
-			env:     map[string]string{"RONOTE_ENV": "test", "RONOTE_HTTP_ADDR": ":0"},
+			env:     validEnv(map[string]string{"RONOTE_HTTP_ADDR": ":0"}),
 			wantErr: []string{`RONOTE_HTTP_ADDR: ":0" has port "0"; want 1-65535`},
 		},
 		{
 			name:    "bad log level",
-			env:     map[string]string{"RONOTE_ENV": "test", "RONOTE_LOG_LEVEL": "loud"},
+			env:     validEnv(map[string]string{"RONOTE_LOG_LEVEL": "loud"}),
 			wantErr: []string{`RONOTE_LOG_LEVEL: "loud" is not one of debug, info, warn, error`},
 		},
 		{
+			name:    "missing database URL",
+			env:     validEnv(map[string]string{"RONOTE_DATABASE_URL": ""}),
+			wantErr: []string{"RONOTE_DATABASE_URL: not set; want postgres://user:password@host:port/dbname"},
+		},
+		{
+			name:    "database URL with another scheme",
+			env:     validEnv(map[string]string{"RONOTE_DATABASE_URL": dbURL("mysql", "db/ronote")}),
+			wantErr: []string{"RONOTE_DATABASE_URL: not a postgres:// or postgresql:// URL"},
+		},
+		{
+			name:    "database URL in keyword/value form",
+			env:     validEnv(map[string]string{"RONOTE_DATABASE_URL": "host=db user=ronote password=" + leakMarker + " dbname=ronote"}),
+			wantErr: []string{"RONOTE_DATABASE_URL: not a postgres:// or postgresql:// URL"},
+		},
+		{
+			name:    "database URL without host",
+			env:     validEnv(map[string]string{"RONOTE_DATABASE_URL": dbURL("postgres", "/ronote")}),
+			wantErr: []string{"RONOTE_DATABASE_URL: URL has no host"},
+		},
+		{
+			name:    "database URL without database name",
+			env:     validEnv(map[string]string{"RONOTE_DATABASE_URL": dbURL("postgres", "db:5432/")}),
+			wantErr: []string{"RONOTE_DATABASE_URL: URL has no database name"},
+		},
+		{
 			name: "every bad variable reported",
-			env:  map[string]string{"RONOTE_ENV": "qa", "RONOTE_HTTP_ADDR": "nope", "RONOTE_LOG_LEVEL": "loud"},
+			env: map[string]string{
+				"RONOTE_ENV":          "qa",
+				"RONOTE_HTTP_ADDR":    "nope",
+				"RONOTE_LOG_LEVEL":    "loud",
+				"RONOTE_DATABASE_URL": dbURL("mysql", "db/ronote"),
+			},
 			wantErr: []string{
 				"RONOTE_ENV:",
 				"RONOTE_HTTP_ADDR:",
 				"RONOTE_LOG_LEVEL:",
+				"RONOTE_DATABASE_URL:",
 			},
 		},
 	}
@@ -102,6 +152,9 @@ func TestLoad(t *testing.T) {
 				if !strings.Contains(err.Error(), want) {
 					t.Errorf("Load() error = %q, want it to contain %q", err, want)
 				}
+			}
+			if strings.Contains(err.Error(), leakMarker) {
+				t.Errorf("Load() error = %q leaks the database password", err)
 			}
 		})
 	}

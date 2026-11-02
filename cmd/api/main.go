@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/rokumate/ronote/internal/config"
+	"github.com/rokumate/ronote/internal/db"
 	"github.com/rokumate/ronote/internal/httpapi"
 )
 
@@ -36,12 +37,18 @@ func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	pool, err := db.Open(ctx, cfg.DatabaseURL, logger)
+	if err != nil {
+		return err
+	}
+	defer pool.Close()
+
 	var lc net.ListenConfig
 	ln, err := lc.Listen(ctx, "tcp", cfg.HTTPAddr)
 	if err != nil {
 		return fmt.Errorf("listen: %w", err)
 	}
-	srv := httpapi.NewServer(httpapi.New(logger), logger)
+	srv := httpapi.NewServer(httpapi.New(logger, pool), logger)
 
 	serveErr := make(chan error, 1)
 	go func() { serveErr <- srv.Serve(ln) }()

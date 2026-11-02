@@ -2,15 +2,26 @@
 package httpapi
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
+	"time"
 )
 
-// New returns the API handler. Requests and panics are logged through logger.
-func New(logger *slog.Logger) http.Handler {
+// readyTimeout bounds the database ping behind /readyz.
+const readyTimeout = time.Second
+
+// Pinger reports whether the database answers. *pgxpool.Pool implements it.
+type Pinger interface {
+	Ping(ctx context.Context) error
+}
+
+// New returns the API handler. Requests and panics are logged through logger;
+// /readyz pings db.
+func New(logger *slog.Logger, db Pinger) http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /healthz", ok)
-	mux.HandleFunc("GET /readyz", ok)
+	mux.HandleFunc("GET /healthz", healthz)
+	mux.HandleFunc("GET /readyz", readyz(logger, db))
 	return withMiddleware(logger, router{mux: mux})
 }
 
@@ -54,8 +65,29 @@ type statusBody struct {
 	Status string `json:"status"`
 }
 
-// ok reports that the API is up. /healthz and /readyz share it while
-// readiness has no dependencies to check.
-func ok(w http.ResponseWriter, _ *http.Request) {
+// healthz reports that the process is up. It checks no dependencies.
+func healthz(w http.ResponseWriter, _ *http.Request) {
+	writeOK(w)
+}
+
+// readyz reports whether the API can serve traffic: the database has to
+// answer a ping within readyTimeout.
+func readyz(logger *slog.Logger, db Pinger) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(r.Context(), readyTimeout)
+		defer cancel()
+		if err := db.Ping(ctx); err != nil {
+			logger.LogAttrs(ctx, slog.LevelWarn, "not ready",
+				slog.String("error", err.Error()),
+				slog.String("request_id", requestID(ctx)),
+			)
+			writeError(w, r, http.StatusServiceUnavailable, "not_ready", "database unavailable")
+			return
+		}
+		writeOK(w)
+	}
+}
+
+func writeOK(w http.ResponseWriter) {
 	writeJSON(w, http.StatusOK, statusBody{Status: "ok"})
 }

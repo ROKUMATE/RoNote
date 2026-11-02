@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"net/url"
 	"slices"
 	"strconv"
 	"strings"
@@ -25,9 +26,10 @@ const (
 
 // Config is the validated service configuration.
 type Config struct {
-	Env      Env
-	HTTPAddr string
-	LogLevel slog.Level
+	Env         Env
+	HTTPAddr    string
+	LogLevel    slog.Level
+	DatabaseURL string
 }
 
 const (
@@ -56,11 +58,13 @@ func Load(getenv func(string) string) (Config, error) {
 	check("RONOTE_HTTP_ADDR", validateAddr(addr))
 	level, err := parseLogLevel(withDefault(getenv("RONOTE_LOG_LEVEL"), defaultLogLevel))
 	check("RONOTE_LOG_LEVEL", err)
+	dbURL := getenv("RONOTE_DATABASE_URL")
+	check("RONOTE_DATABASE_URL", validateDatabaseURL(dbURL))
 
 	if len(errs) > 0 {
 		return Config{}, fmt.Errorf("invalid config:\n%w", errors.Join(errs...))
 	}
-	return Config{Env: env, HTTPAddr: addr, LogLevel: level}, nil
+	return Config{Env: env, HTTPAddr: addr, LogLevel: level, DatabaseURL: dbURL}, nil
 }
 
 func parseEnv(s string) (Env, error) {
@@ -80,6 +84,25 @@ func validateAddr(s string) error {
 	}
 	if n, err := strconv.Atoi(port); err != nil || n < 1 || n > 65535 {
 		return fmt.Errorf("%q has port %q; want 1-65535", s, port)
+	}
+	return nil
+}
+
+// validateDatabaseURL never puts the value in its errors: it holds the
+// password.
+func validateDatabaseURL(s string) error {
+	if s == "" {
+		return errors.New("not set; want postgres://user:password@host:port/dbname")
+	}
+	u, err := url.Parse(s)
+	if err != nil || (u.Scheme != "postgres" && u.Scheme != "postgresql") {
+		return errors.New("not a postgres:// or postgresql:// URL")
+	}
+	if u.Hostname() == "" {
+		return errors.New("URL has no host")
+	}
+	if strings.TrimPrefix(u.Path, "/") == "" {
+		return errors.New("URL has no database name")
 	}
 	return nil
 }

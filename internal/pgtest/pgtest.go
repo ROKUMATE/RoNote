@@ -2,7 +2,7 @@
 
 // Package pgtest starts throwaway, migrated Postgres containers for
 // integration tests. Ryuk is off on podman, so nothing reaps containers for
-// us: Main always closes what it starts.
+// us: Main and New always close what they start.
 package pgtest
 
 import (
@@ -98,6 +98,22 @@ func Main(m *testing.M, db **DB) {
 	os.Exit(code)
 }
 
+// New starts a DB for one test and closes it when the test ends, even if it
+// fails or panics.
+func New(t testing.TB) *DB {
+	t.Helper()
+	d, err := Start(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := d.Close(); err != nil {
+			t.Errorf("pgtest: %v", err)
+		}
+	})
+	return d
+}
+
 // Reset empties every table except goose's version table, so a test starts
 // from the migrated schema with no rows.
 func (d *DB) Reset(t testing.TB) {
@@ -117,6 +133,12 @@ func (d *DB) Reset(t testing.TB) {
 	if err != nil {
 		t.Fatalf("pgtest: reset: %v", err)
 	}
+}
+
+// Stop stops the container but keeps it for Close, so a test can watch the
+// database go away.
+func (d *DB) Stop(ctx context.Context) error {
+	return d.container.Stop(ctx, nil)
 }
 
 // Close closes the pool and removes the container with its anonymous volumes.

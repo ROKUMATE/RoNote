@@ -53,6 +53,8 @@ Create a directory when its first file needs it, not before.
 
 Targets marked (P0x) do not exist yet. The phase that adds a target removes its tag.
 
+Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`.
+
 ## Commits
 
 - One line: `Type: Summary`.

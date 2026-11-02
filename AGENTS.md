@@ -41,7 +41,7 @@ Create a directory when its first file needs it, not before.
 | Command | What it does |
 |---|---|
 | `make help` | list targets (default target) |
-| `make setup` | point git at `.githooks` and make the hook executable; run once per clone |
+| `make setup` | point git at `.githooks`, make the hook executable, set `pull.rebase true`; run once per clone |
 | `make hooks-test` | test the commit message hook |
 | `make lint` (P0x) | Go and TypeScript linters |
 | `make test` (P0x) | unit tests; Go runs with `-race` |

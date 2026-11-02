@@ -56,7 +56,8 @@ Create a directory when its first file needs it, not before.
 | `make dev-logs` | follow the dev stack logs |
 | `make db-shell` | psql on the dev database |
 | `make build` (P0x) | build the Go binaries and the web bundle |
-| `make migrate` (P0x) | apply database migrations |
+| `make migrate-up` / `migrate-down` / `migrate-status` | apply, roll back the latest, or list goose migrations against `RONOTE_DATABASE_URL` |
+| `make migrate-new name=...` | create the next sequential SQL migration in `migrations/` |
 
 Targets marked (P0x) do not exist yet. The phase that adds a target removes its tag.
 
@@ -66,7 +67,7 @@ Targets marked (P0x) do not exist yet. The phase that adds a target removes its 
 - `podman compose` needs a compose provider: `brew install docker-compose` (or podman-compose). `make dev-up` fails with a clear message when neither `podman compose` nor `docker compose` works.
 - `.env.example` lists every variable. Copy it to `.env.dev` (gitignored); the Makefile loads it, its values override the shell environment, and `make VAR=value` still wins.
 
-Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`. golangci-lint is the exception: `make tools` installs the version pinned in the Makefile into `./bin`.
+Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`: deadcode, goose, sqlc. golangci-lint is the exception: `make tools` installs the version pinned in the Makefile into `./bin`.
 
 ## Commits
 

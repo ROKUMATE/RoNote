@@ -10,6 +10,8 @@ GOLANGCI_LINT := bin/golangci-lint
 golangci_lint_current = [ "$$($(GOLANGCI_LINT) version --short 2>/dev/null)" = "$(GOLANGCI_LINT_VERSION)" ]
 golangci_lint_required = $(golangci_lint_current) || { echo "$(GOLANGCI_LINT) $(GOLANGCI_LINT_VERSION) not found; run make tools" >&2; exit 1; }
 COMPOSE := sh scripts/container.sh compose
+GOOSE := go tool goose -dir migrations postgres "$$RONOTE_DATABASE_URL"
+db_url_required = test -n "$$RONOTE_DATABASE_URL" || { echo "RONOTE_DATABASE_URL is not set; copy .env.example to .env.dev" >&2; exit 1; }
 
 help: ## Show available targets
 	@awk 'BEGIN { FS = ":.*## " } /^[a-z][a-z-]*:.*## / { printf "  %-18s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
@@ -58,4 +60,21 @@ dev-logs: ## Follow the dev stack logs
 db-shell: ## Open psql on the dev database
 	$(COMPOSE) exec postgres psql -U ronote -d ronote
 
+migrate-up: ## Apply all pending migrations
+	@$(db_url_required)
+	$(GOOSE) up
+
+migrate-down: ## Roll back the latest migration
+	@$(db_url_required)
+	$(GOOSE) down
+
+migrate-status: ## Show which migrations are applied
+	@$(db_url_required)
+	$(GOOSE) status
+
+migrate-new: ## Create a SQL migration: make migrate-new name=add_documents
+	@test -n "$(name)" || { echo "usage: make migrate-new name=add_documents" >&2; exit 1; }
+	go tool goose -dir migrations -s create $(name) sql
+
 .PHONY: help setup hooks-test tools test run-api lint fmt dev-up dev-down dev-logs db-shell
+.PHONY: migrate-up migrate-down migrate-status migrate-new

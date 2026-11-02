@@ -15,6 +15,29 @@ import (
 	"time"
 )
 
+// serve starts a test server that answers /robots.txt with robots, or 404
+// when robots is nil, and every other path with h.
+func serve(t *testing.T, robots, h http.Handler) *httptest.Server {
+	t.Helper()
+	if robots == nil {
+		robots = http.NotFoundHandler()
+	}
+	mux := http.NewServeMux()
+	mux.Handle("/robots.txt", robots)
+	mux.Handle("/", h)
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+	return srv
+}
+
+// testFetcher is New without the per-host rate limit, which tests that are
+// not about it would only wait on.
+func testFetcher(opts Options) *Fetcher {
+	f := New(opts)
+	f.limiter = newHostLimiter(0)
+	return f
+}
+
 // mapResolver answers lookups from a fixed table, so tests never use DNS.
 type mapResolver map[string][]netip.Addr
 
@@ -102,7 +125,7 @@ func TestFetchRefusesBlockedAddresses(t *testing.T) {
 		{name: "user info in the URL", url: "http://user@docs.example.org/", wantErr: ErrInvalidURL},
 	}
 
-	f := New(Options{Resolver: mapResolver{"docs.internal.example": {netip.MustParseAddr("10.1.2.3")}}})
+	f := testFetcher(Options{Resolver: mapResolver{"docs.internal.example": {netip.MustParseAddr("10.1.2.3")}}})
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
@@ -121,12 +144,11 @@ func TestRedirectToPrivateAddressIsRefused(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	t.Cleanup(private.Close)
-	public := httptest.NewServer(http.RedirectHandler(private.URL+"/secret", http.StatusFound))
-	t.Cleanup(public.Close)
+	public := serve(t, nil, http.RedirectHandler(private.URL+"/secret", http.StatusFound))
 
 	// Production rules, except that the test's "public" server counts as
 	// public and may use its random port.
-	f := New(Options{})
+	f := testFetcher(Options{})
 	f.allowAnyPort = true
 	publicAddr := netip.MustParseAddrPort(strings.TrimPrefix(public.URL, "http://"))
 	strict := f.guard
@@ -291,14 +313,13 @@ func TestFetch(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			srv := httptest.NewServer(tt.handler)
-			t.Cleanup(srv.Close)
+			srv := serve(t, nil, tt.handler)
 			req := Request{URL: srv.URL}
 			if tt.request != nil {
 				req = tt.request(srv.URL)
 			}
 
-			res, err := New(Options{AllowPrivateNetworks: true}).Fetch(t.Context(), req)
+			res, err := testFetcher(Options{AllowPrivateNetworks: true}).Fetch(t.Context(), req)
 
 			if tt.wantStatus != 0 {
 				var status *StatusError
@@ -333,14 +354,13 @@ func redirects(n int32, final http.HandlerFunc) http.HandlerFunc {
 
 func TestFetchTimesOut(t *testing.T) {
 	t.Parallel()
-	srv := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+	srv := serve(t, nil, http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 		select {
 		case <-r.Context().Done():
 		case <-time.After(5 * time.Second):
 		}
 	}))
-	t.Cleanup(srv.Close)
-	f := New(Options{AllowPrivateNetworks: true})
+	f := testFetcher(Options{AllowPrivateNetworks: true})
 	f.totalTimeout = 100 * time.Millisecond
 
 	_, err := f.Fetch(t.Context(), Request{URL: srv.URL})

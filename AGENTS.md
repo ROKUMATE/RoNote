@@ -45,7 +45,7 @@ Create a directory when its first file needs it, not before.
 | `make hooks-test` | test the commit message hook |
 | `make tools` | install the pinned golangci-lint into `./bin` |
 | `make lint` (P0x) | Go and TypeScript linters |
-| `make test` (P0x) | unit tests; Go runs with `-race` |
+| `make test` | unit tests; Go runs with `-race` |
 | `make test-integration` (P0x) | integration tests (`integration` build tag, testcontainers) |
 | `make e2e` (P0x) | Playwright end-to-end tests |
 | `make dev` (P0x) | run API, worker and web locally |

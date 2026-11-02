@@ -20,4 +20,7 @@ tools: ## Install the pinned golangci-lint into ./bin
 		$(golangci_lint_current) || { echo "make tools: failed to install golangci-lint $(GOLANGCI_LINT_VERSION)" >&2; exit 1; }; \
 	}
 
-.PHONY: help setup hooks-test tools
+test: ## Run unit tests with the race detector
+	go test -race -count=1 ./...
+
+.PHONY: help setup hooks-test tools test

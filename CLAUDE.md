@@ -1,0 +1,3 @@
+@AGENTS.md
+@CONTEXT.md
+@DESIGN.md

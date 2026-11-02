@@ -42,7 +42,7 @@ Create a directory when its first file needs it, not before.
 |---|---|
 | `make help` | list targets (default target) |
 | `make setup` | point git at `.githooks`, make the hook executable, set `pull.rebase true`; run once per clone |
-| `make hooks-test` | test the commit message hook |
+| `make hooks-test` | test the commit message hook (normal and strict mode) and `scripts/check-commits.sh` |
 | `make tools` | install the pinned golangci-lint into `./bin` |
 | `make lint` | Go: golangci-lint (`.golangci.yml`, includes `integration` files), then `go tool deadcode -test -tags integration ./...`, which must print nothing. Web: `biome check --error-on-warnings`, `tsc -b`, `knip`, all with zero findings |
 | `make fmt` | format Go code with gofumpt and goimports |
@@ -85,7 +85,7 @@ Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with 
 - No body. No trailers of any kind.
 - One logical change per commit. Tests go in the same commit as the code they test.
 - Never use `--no-verify`, never amend, never push.
-- `.githooks/commit-msg` enforces the format (docs/adr/0003-commit-convention.md).
+- `.githooks/commit-msg` enforces the format (docs/adr/0003-commit-convention.md). With `COMMIT_MSG_STRICT=1` it checks a stored message without stripping anything; `scripts/check-commits.sh RANGE` runs it that way over every commit in a range.
 
 ## Code
 

@@ -24,8 +24,9 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook
+hooks-test: ## Test the commit message hook and scripts/check-commits.sh
 	sh scripts/test-commit-msg.sh
+	sh scripts/test-check-commits.sh
 
 tools: ## Install the pinned golangci-lint into ./bin
 	@$(golangci_lint_current) || { \

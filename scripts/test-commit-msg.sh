@@ -8,14 +8,15 @@ work=$(mktemp -d "${TMPDIR:-/tmp}/commit-msg-test.XXXXXX")
 trap 'rm -rf "$work"' EXIT
 passed=0
 failed=0
+hook_env=
 
-# check NAME STATUS INPUT EXPECTED REASON: runs the hook on INPUT and wants
-# exit STATUS, EXPECTED left in the message file and REASON (if not empty)
-# somewhere in stderr.
+# check NAME STATUS INPUT EXPECTED REASON: runs the hook on INPUT (with
+# $hook_env, if set) and wants exit STATUS, EXPECTED left in the message file
+# and REASON (if not empty) somewhere in stderr.
 check() {
   printf '%s\n' "$3" >"$work/msg"
   printf '%s\n' "$4" >"$work/want"
-  "$hook" "$work/msg" 2>"$work/stderr"
+  env ${hook_env:+"$hook_env"} "$hook" "$work/msg" 2>"$work/stderr"
   status=$?
   if [ "$status" -eq "$2" ] && cmp -s "$work/msg" "$work/want" &&
     { [ -z "$5" ] || grep -qF -- "$5" "$work/stderr"; }; then
@@ -37,6 +38,20 @@ accepts() {
 # rejects NAME INPUT REASON: the message file must be left unchanged.
 rejects() {
   check "$1" 1 "$2" "$2" "$3"
+}
+
+# strict_accepts NAME INPUT: strict mode accepts INPUT and never rewrites it.
+strict_accepts() {
+  hook_env=COMMIT_MSG_STRICT=1
+  check "strict: $1" 0 "$2" "$2" ''
+  hook_env=
+}
+
+# strict_rejects NAME INPUT REASON
+strict_rejects() {
+  hook_env=COMMIT_MSG_STRICT=1
+  check "strict: $1" 1 "$2" "$2" "$3"
+  hook_env=
 }
 
 merge_msg="Merge branch 'import-links' into main
@@ -108,6 +123,31 @@ accepts 'git merge message' "Merge branch 'p02'" "Merge branch 'p02'"
 rejects 'git merge message with body' "Merge branch 'p02'
 
 Resolve conflicts" 'expected 1 line'
+
+strict_accepts 'valid line' 'Feat: Add page importer'
+strict_accepts 'trailing blank lines' 'Feat: Add page importer
+
+'
+strict_accepts 'git merge subject' "Merge branch 'p02'"
+strict_accepts 'git revert subject' 'Revert "Feat: Add x"'
+strict_rejects 'Co-Authored-By trailer' 'Feat: Add x
+
+Co-Authored-By: Claude <noreply@anthropic.com>' 'extra line: Co-Authored-By: Claude'
+strict_rejects 'Claude-Session trailer' 'Feat: Add x
+Claude-Session: https://claude.ai/code/session_abc' 'extra line: Claude-Session:'
+strict_rejects 'Generated with footer' 'Feat: Add x
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)' 'extra line: 🤖 Generated with'
+strict_rejects 'body' 'Fix: Retry slow fetches
+
+The server drops idle connections after 30s.' 'extra line: The server drops idle'
+strict_rejects 'git default revert message' 'Revert "Feat: Add x"
+
+This reverts commit 1a2b3c4.' 'extra line: This reverts commit 1a2b3c4.'
+strict_rejects 'hash line' 'Feat: Add x
+# not a comment once committed' 'extra line: # not a comment'
+strict_rejects 'lowercase summary' 'Feat: add x' 'capital letter'
+strict_rejects 'merge without git format' 'Merge stuff' 'not one of the allowed types'
 
 printf '\n%s passed, %s failed\n' "$passed" "$failed"
 [ "$failed" -eq 0 ]

@@ -30,3 +30,6 @@ test-results/
 ._*
 Thumbs.db
 Desktop.ini
+
+# Claude Code
+.claude/settings.local.json

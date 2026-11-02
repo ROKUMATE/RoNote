@@ -25,12 +25,16 @@ Site crawling, AI summaries, chat, handwritten OCR, pseudocode conversion. Do no
 |---|---|
 | `cmd/api/` | HTTP API server |
 | `cmd/worker/` | background job runner |
+| `cmd/extract/` | dev tool: fetch one page and print its IR (`make extract`) |
 | `internal/<pkg>/` | Go packages, one concern each |
 | `migrations/` | Postgres schema migrations |
 | `apps/web/` | React + TypeScript + Tailwind v4 frontend |
 | `deploy/` | deployment config |
 | `scripts/` | repo scripts |
-| `testdata/golden/` | source pages and PDFs with their expected output |
+| `internal/ir/` | the document model every importer produces (docs/adr/0004-ir-and-links.md) |
+| `internal/fetch/` | the only way to fetch a user-supplied URL: SSRF guard, limits, robots.txt, rate limit |
+| `internal/extract/` | generic HTML to IR extractor |
+| `testdata/golden/` | extractor fixtures: `input.html`, `meta.json`, `expected.json`; third-party excerpts are listed in `SOURCES.md` |
 | `docs/adr/` | architecture decision records |
 | `.githooks/` | git hooks, installed by `make setup` |
 
@@ -127,12 +131,13 @@ Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with 
 - Go tests are table-driven and run with `-race`.
 - Integration tests live behind the `integration` build tag and use testcontainers through `internal/pgtest`: `pgtest.Main` in TestMain starts one migrated Postgres per package and `DB.Reset` truncates every table before a test, so DB tests in a package run serially.
 - Ryuk is off on podman, so nothing reaps containers: every container a test starts must be terminated in cleanup, failures included. `make test-clean` removes leftovers.
-- Unit tests never touch the network or paid APIs.
+- Unit tests never touch the network or paid APIs. Loopback `httptest` servers are fine; DNS lookups and outside hosts are not.
+- Extractor changes: `go test ./internal/extract -update` rewrites `testdata/golden/*/expected.json`; review that diff like code. `TestCodeIsVerbatim` must stay green, and run `go test -run '^$' -fuzz=FuzzExtract -fuzztime=60s ./internal/extract` before committing.
 - Web: Vitest + Testing Library for units and components; Playwright (Chromium) with `@axe-core/playwright` for end-to-end and accessibility. Pages must have zero axe violations in light and dark. No screenshot assertions: they differ between macOS and Linux CI.
 
 ## Verbatim rule
 
-Source text is never rewritten. Code blocks stay byte-identical, enforced by TestCodeIsVerbatim from P06 (docs/adr/0002-verbatim-source.md).
+Source text is never rewritten. Code blocks stay byte-identical, enforced by `TestCodeIsVerbatim` in `internal/extract` (docs/adr/0002-verbatim-source.md, docs/adr/0004-ir-and-links.md).
 
 ## CI
 
@@ -148,6 +153,8 @@ Source text is never rewritten. Code blocks stay byte-identical, enforced by Tes
 | integration | `make check-go-version`, `make test-integration` on the runner's Docker with Ryuk on | `make test-integration` |
 | web | `make check-node-version`, `make web-deps`, `make lint-web`, `make test-web`, `make web-build` (styleguide guard and bundle budget) | the same targets |
 | e2e, after web | `make web-browsers WITH_DEPS=1`, `make web-e2e`; uploads `apps/web/playwright-report` for 7 days when it fails | `make web-install`, `make web-e2e` |
+
+Pull requests merge by rebase only (a repository setting). A merge commit would carry the PR title as a second line, which `check-commits` rejects.
 
 Each job checks the toolchain it uses against its pin: Go against go.mod's `toolchain`, Node against `.nvmrc`. `make check` covers the commits, go and web jobs except `check-generated` and `web-build`. Run it before pushing.
 

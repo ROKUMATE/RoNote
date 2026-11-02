@@ -40,7 +40,7 @@ run-api: ## Run the API locally (RONOTE_ENV defaults to dev)
 lint: ## Run golangci-lint, then fail if deadcode reports anything
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) run
-	@dead=$$(go tool deadcode -test ./...) && [ -z "$$dead" ] || \
+	@dead=$$(go tool deadcode -test -tags integration ./...) && [ -z "$$dead" ] || \
 		{ printf '%s\n' "$$dead" >&2; echo "make lint: deadcode failed or found unreachable functions" >&2; exit 1; }
 
 fmt: ## Format Go code with gofumpt and goimports
@@ -76,5 +76,14 @@ migrate-new: ## Create a SQL migration: make migrate-new name=add_documents
 	@test -n "$(name)" || { echo "usage: make migrate-new name=add_documents" >&2; exit 1; }
 	go tool goose -dir migrations -s create $(name) sql
 
+sqlc: ## Regenerate internal/store/sqlcdb from migrations and queries
+	go tool sqlc generate
+
+test-integration: ## Run unit and integration tests against throwaway Postgres containers
+	sh scripts/container.sh test go test -race -count=1 -tags integration ./...
+
+test-clean: ## Remove leftover testcontainers containers
+	sh scripts/container.sh clean
+
 .PHONY: help setup hooks-test tools test run-api lint fmt dev-up dev-down dev-logs db-shell
-.PHONY: migrate-up migrate-down migrate-status migrate-new
+.PHONY: migrate-up migrate-down migrate-status migrate-new sqlc test-integration test-clean

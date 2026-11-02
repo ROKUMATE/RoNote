@@ -44,10 +44,11 @@ Create a directory when its first file needs it, not before.
 | `make setup` | point git at `.githooks`, make the hook executable, set `pull.rebase true`; run once per clone |
 | `make hooks-test` | test the commit message hook |
 | `make tools` | install the pinned golangci-lint into `./bin` |
-| `make lint` | golangci-lint (`.golangci.yml`), then `go tool deadcode -test ./...`, which must print nothing |
+| `make lint` | golangci-lint (`.golangci.yml`, includes `integration` files), then `go tool deadcode -test -tags integration ./...`, which must print nothing |
 | `make fmt` | format Go code with gofumpt and goimports |
 | `make test` | unit tests; Go runs with `-race` |
-| `make test-integration` (P0x) | integration tests (`integration` build tag, testcontainers) |
+| `make test-integration` | unit and integration tests (`integration` build tag, testcontainers); fails if a test container is left behind |
+| `make test-clean` | remove leftover testcontainers containers |
 | `make e2e` (P0x) | Playwright end-to-end tests |
 | `make run-api` | run the API on `127.0.0.1:8080`; `RONOTE_ENV` defaults to `dev` |
 | `make dev` (P0x) | run API, worker and web locally |
@@ -58,6 +59,7 @@ Create a directory when its first file needs it, not before.
 | `make build` (P0x) | build the Go binaries and the web bundle |
 | `make migrate-up` / `migrate-down` / `migrate-status` | apply, roll back the latest, or list goose migrations against `RONOTE_DATABASE_URL` |
 | `make migrate-new name=...` | create the next sequential SQL migration in `migrations/` |
+| `make sqlc` | regenerate `internal/store/sqlcdb` from `migrations/` and `internal/store/queries/`; commit the result |
 
 Targets marked (P0x) do not exist yet. The phase that adds a target removes its tag.
 
@@ -93,7 +95,8 @@ Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with 
 - Every Feat ships tests.
 - Every Fix starts with a failing test.
 - Go tests are table-driven and run with `-race`.
-- Integration tests live behind the `integration` build tag and use testcontainers.
+- Integration tests live behind the `integration` build tag and use testcontainers through `internal/pgtest`: `pgtest.Main` in TestMain starts one migrated Postgres per package and `DB.Reset` truncates every table before a test, so DB tests in a package run serially.
+- Ryuk is off on podman, so nothing reaps containers: every container a test starts must be terminated in cleanup, failures included. `make test-clean` removes leftovers.
 - Unit tests never touch the network or paid APIs.
 
 ## Verbatim rule

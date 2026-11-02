@@ -9,6 +9,7 @@ GOLANGCI_LINT_VERSION := 2.15.0
 GOLANGCI_LINT := bin/golangci-lint
 golangci_lint_current = [ "$$($(GOLANGCI_LINT) version --short 2>/dev/null)" = "$(GOLANGCI_LINT_VERSION)" ]
 golangci_lint_required = $(golangci_lint_current) || { echo "$(GOLANGCI_LINT) $(GOLANGCI_LINT_VERSION) not found; run make tools" >&2; exit 1; }
+go_toolchain = sed -n 's/^toolchain //p' go.mod
 COMPOSE := sh scripts/container.sh compose
 GOOSE := go tool goose -dir migrations postgres "$$RONOTE_DATABASE_URL"
 db_url_required = test -n "$$RONOTE_DATABASE_URL" || { echo "RONOTE_DATABASE_URL is not set; copy .env.example to .env.dev" >&2; exit 1; }
@@ -102,6 +103,21 @@ migrate-new: ## Create a SQL migration: make migrate-new name=add_documents
 sqlc: ## Regenerate internal/store/sqlcdb from migrations and queries
 	go tool sqlc generate
 
+check-generated: ## Fail if sqlc output or go.mod/go.sum need regenerating
+	go tool sqlc generate
+	@test -z "$$(git status --porcelain -- internal/store/sqlcdb)" || \
+		{ git status --short -- internal/store/sqlcdb; echo "make check-generated: sqlc output is stale; run make sqlc and commit it" >&2; exit 1; }
+	go mod tidy -diff
+
+check-go-version: ## Print the Go toolchain; fail unless it is the one go.mod pins
+	@want=$$($(go_toolchain)); have=$$(go env GOVERSION); \
+		[ "$$have" = "$$want" ] || { echo "Go toolchain $$want is required (go.mod), found $$have" >&2; exit 1; }; \
+		echo "Go toolchain $$have, as pinned in go.mod"
+
+ci-cache-keys: ## (CI) Write tool versions used in cache keys to GITHUB_OUTPUT
+	@: "$${GITHUB_OUTPUT:?ci-cache-keys writes to GITHUB_OUTPUT, which only GitHub Actions sets}"
+	@echo "golangci_lint=$(GOLANGCI_LINT_VERSION)" >>"$$GITHUB_OUTPUT"
+
 test-integration: ## Run unit and integration tests against throwaway Postgres containers
 	sh scripts/container.sh test go test -race -count=1 -tags integration ./...
 
@@ -130,4 +146,5 @@ web-e2e: ## Run web end-to-end tests (Playwright, Chromium)
 
 .PHONY: help setup hooks-test check-commits tools check test test-go test-web run-api lint lint-go lint-web fmt
 .PHONY: dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new sqlc
+.PHONY: check-generated check-go-version ci-cache-keys
 .PHONY: test-integration test-clean web-install web-dev web-build web-e2e

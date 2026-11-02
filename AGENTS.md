@@ -69,6 +69,8 @@ Create a directory when its first file needs it, not before.
 | `make migrate-up` / `migrate-down` / `migrate-status` | apply, roll back the latest, or list goose migrations against `RONOTE_DATABASE_URL` |
 | `make migrate-new name=...` | create the next sequential SQL migration in `migrations/` |
 | `make sqlc` | regenerate `internal/store/sqlcdb` from `migrations/` and `internal/store/queries/`; commit the result |
+| `make check-generated` | regenerate sqlc output and fail if it differs from what is committed, then `go mod tidy -diff` |
+| `make check-go-version` | print the Go toolchain and fail unless it is go.mod's `toolchain` |
 
 Targets marked (P0x) do not exist yet. The phase that adds a target removes its tag.
 

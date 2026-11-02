@@ -33,3 +33,35 @@ jobs:
           PUSH_SHA: ${{ github.sha }}
       - name: Test the commit message hook with dash and GNU tools
         run: make hooks-test
+
+  go:
+    name: Go lint, tests and generated code
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+          cache-dependency-path: go.sum
+      - name: Check the Go toolchain
+        run: make check-go-version
+      - name: Read tool versions for cache keys
+        id: versions
+        run: make ci-cache-keys
+      - name: Cache golangci-lint
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: bin
+          key: golangci-lint-${{ runner.os }}-${{ runner.arch }}-${{ steps.versions.outputs.golangci_lint }}
+      - name: Install golangci-lint
+        run: make tools
+      - name: Lint Go code and workflows
+        run: make lint-go
+      - name: Run Go unit tests
+        run: make test-go
+      - name: Check generated code is up to date
+        run: make check-generated

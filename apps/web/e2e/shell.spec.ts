@@ -44,4 +44,19 @@ test.describe("at 375px", () => {
     await expectNoHorizontalScroll(page);
     await expect(page.getByRole("complementary", { name: "Notes" })).toBeHidden();
   });
+
+  test("collapses the sidebar into a top bar", async ({ page }) => {
+    await page.goto("/");
+    const banner = await page.getByRole("banner").boundingBox();
+    const main = await page.getByRole("main").boundingBox();
+
+    expect(banner, "banner box").not.toBeNull();
+    expect(main, "main box").not.toBeNull();
+    if (!banner || !main) {
+      return;
+    }
+    expect(banner.width, "top bar spans the viewport").toBe(375);
+    expect(banner.height, "top bar is one row").toBeLessThan(100);
+    expect(banner.y + banner.height, "top bar sits above main").toBeLessThanOrEqual(main.y);
+  });
 });

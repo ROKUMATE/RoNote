@@ -28,6 +28,10 @@ hooks-test: ## Test the commit message hook and scripts/check-commits.sh
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
 
+check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
+	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
+		sh scripts/check-commits.sh "$$range"
+
 tools: ## Install the pinned golangci-lint into ./bin
 	@$(golangci_lint_current) || { \
 		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v$(GOLANGCI_LINT_VERSION)/install.sh | \
@@ -51,11 +55,12 @@ run-api: ## Run the API locally (RONOTE_ENV defaults to dev)
 
 lint: lint-go lint-web ## Lint Go and web code
 
-lint-go: ## Lint Go code (golangci-lint, deadcode)
+lint-go: ## Lint Go code and CI workflows (golangci-lint, deadcode, actionlint)
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) run
 	@dead=$$(go tool deadcode -test -tags integration ./...) && [ -z "$$dead" ] || \
 		{ printf '%s\n' "$$dead" >&2; echo "make lint-go: deadcode failed or found unreachable functions" >&2; exit 1; }
+	go tool actionlint
 
 lint-web: ## Lint web code (Biome, tsc, knip)
 	@$(node_required)
@@ -123,6 +128,6 @@ web-e2e: ## Run web end-to-end tests (Playwright, Chromium)
 	@$(node_required)
 	$(WEB) e2e
 
-.PHONY: help setup hooks-test tools check test test-go test-web run-api lint lint-go lint-web fmt
+.PHONY: help setup hooks-test check-commits tools check test test-go test-web run-api lint lint-go lint-web fmt
 .PHONY: dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new sqlc
 .PHONY: test-integration test-clean web-install web-dev web-build web-e2e

@@ -1,6 +1,6 @@
 #!/bin/sh
-# Runs scripts/check-commits.sh against a throwaway repository. Exits non-zero
-# if any case fails.
+# Runs scripts/check-commits.sh and scripts/commit-range.sh against a throwaway
+# repository. Exits non-zero if any case fails.
 set -u
 
 scripts=$(cd "$(dirname "$0")" && pwd)
@@ -75,6 +75,38 @@ commit 'Feat: Add tags' >/dev/null
 git_ checkout -q main
 git_ merge -q --no-ff -m "Merge branch 'feature'" feature
 expect 'one-line git merge' 0 "$base..HEAD" 'ok (2 commits'
+
+# range_is NAME WANT VAR=VALUE...: commit-range.sh run with only VARs set
+# prints WANT.
+range_is() {
+  name=$1
+  want=$2
+  shift 2
+  got=$(cd "$repo" && env -i PATH="$PATH" "$@" sh "$scripts/commit-range.sh" 2>&1)
+  if [ "$got" = "$want" ]; then
+    passed=$((passed + 1))
+    printf 'ok    range: %s\n' "$name"
+  else
+    failed=$((failed + 1))
+    printf 'FAIL  range: %s\n      got:  %s\n      want: %s\n' "$name" "$got" "$want"
+  fi
+}
+
+zeros=0000000000000000000000000000000000000000
+first=$(git_ rev-list --max-parents=0 HEAD)
+head=$(git_ rev-parse HEAD)
+prev=$(git_ rev-parse HEAD~2)
+git_ checkout -q --orphan rewritten
+commit 'Chore: Rewrite history' >/dev/null
+unrelated=$(git_ rev-parse HEAD)
+git_ checkout -q main
+
+range_is 'pull request' "$prev..$head" PR_BASE_SHA="$prev" PR_HEAD_SHA="$head" PUSH_SHA="$head"
+range_is 'push' "$prev..$head" PUSH_BEFORE_SHA="$prev" PUSH_SHA="$head"
+range_is 'push of a new branch' "$head~1..$head" PUSH_BEFORE_SHA="$zeros" PUSH_SHA="$head"
+range_is 'force push' "$head~1..$head" PUSH_BEFORE_SHA="$unrelated" PUSH_SHA="$head"
+range_is 'push of a root commit' "$first" PUSH_BEFORE_SHA="$zeros" PUSH_SHA="$first"
+range_is 'no event' 'commit-range: set PR_BASE_SHA and PR_HEAD_SHA, or PUSH_SHA'
 
 printf '\n%s passed, %s failed\n' "$passed" "$failed"
 [ "$failed" -eq 0 ]

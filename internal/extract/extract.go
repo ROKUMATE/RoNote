@@ -44,6 +44,10 @@ var removedTags = map[atom.Atom]bool{
 // Without one, Extract uses <body> minus header and footer and adds a
 // low_confidence warning; it does not guess further.
 //
+// A page the HTML parser rejects, such as one nested deeper than it allows,
+// gives a document with no blocks and a parse_failed warning; Extract only
+// fails for a bad src or a read error.
+//
 // A code block's text is the exact text content of its <pre>. Two changes
 // come from HTML parsing itself: the parser drops one newline right after
 // <pre>, and it turns CR LF and lone CR into LF.
@@ -56,10 +60,16 @@ func Extract(r io.Reader, src ir.Source) (*ir.Doc, error) {
 	if err != nil || (page.Scheme != "http" && page.Scheme != "https") || page.Host == "" {
 		return nil, fmt.Errorf("final URL %q is not an absolute http(s) URL", src.FinalURL)
 	}
+	out := &ir.Doc{
+		IRVersion: ir.Version,
+		Source:    src,
+		Extractor: ir.Extractor{Name: extractorName, Version: extractorVersion},
+	}
 	// Invalid UTF-8 becomes U+FFFD, as browsers decode it.
-	doc, err := html.Parse(bytes.NewReader(bytes.ToValidUTF8(raw, []byte("�"))))
+	doc, err := html.Parse(bytes.NewReader(bytes.ToValidUTF8(raw, []byte("\uFFFD"))))
 	if err != nil {
-		return nil, fmt.Errorf("parse page: %w", err)
+		out.Warnings = append(out.Warnings, ir.Warning{Code: ir.WarningParseFailed, Message: err.Error()})
+		return out, nil
 	}
 
 	e := &extractor{links: newLinker(doc, page), anchors: map[string]bool{}}
@@ -69,11 +79,6 @@ func Extract(r io.Reader, src ir.Source) (*ir.Doc, error) {
 	}
 	if root == nil {
 		root = findFirst(doc, func(n *html.Node) bool { return strings.EqualFold(attr(n, "role"), "main") })
-	}
-	out := &ir.Doc{
-		IRVersion: ir.Version,
-		Source:    src,
-		Extractor: ir.Extractor{Name: extractorName, Version: extractorVersion},
 	}
 	if root == nil {
 		root = findFirst(doc, func(n *html.Node) bool { return n.DataAtom == atom.Body })

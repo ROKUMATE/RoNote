@@ -1,3 +1,7 @@
+GOLANGCI_LINT_VERSION := 2.15.0
+GOLANGCI_LINT := bin/golangci-lint
+golangci_lint_current = [ "$$($(GOLANGCI_LINT) version --short 2>/dev/null)" = "$(GOLANGCI_LINT_VERSION)" ]
+
 help: ## Show available targets
 	@awk 'BEGIN { FS = ":.*## " } /^[a-z][a-z-]*:.*## / { printf "  %-12s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
@@ -9,4 +13,11 @@ setup: ## Install the commit hook and rebase on pull
 hooks-test: ## Test the commit message hook
 	sh scripts/test-commit-msg.sh
 
-.PHONY: help setup hooks-test
+tools: ## Install the pinned golangci-lint into ./bin
+	@$(golangci_lint_current) || { \
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v$(GOLANGCI_LINT_VERSION)/install.sh | \
+			sh -s -- -b bin v$(GOLANGCI_LINT_VERSION); \
+		$(golangci_lint_current) || { echo "make tools: failed to install golangci-lint $(GOLANGCI_LINT_VERSION)" >&2; exit 1; }; \
+	}
+
+.PHONY: help setup hooks-test tools

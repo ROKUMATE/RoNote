@@ -43,6 +43,7 @@ Create a directory when its first file needs it, not before.
 | `make help` | list targets (default target) |
 | `make setup` | point git at `.githooks`, make the hook executable, set `pull.rebase true`; run once per clone |
 | `make hooks-test` | test the commit message hook |
+| `make tools` | install the pinned golangci-lint into `./bin` |
 | `make lint` (P0x) | Go and TypeScript linters |
 | `make test` (P0x) | unit tests; Go runs with `-race` |
 | `make test-integration` (P0x) | integration tests (`integration` build tag, testcontainers) |
@@ -53,7 +54,7 @@ Create a directory when its first file needs it, not before.
 
 Targets marked (P0x) do not exist yet. The phase that adds a target removes its tag.
 
-Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`.
+Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`. golangci-lint is the exception: `make tools` installs the version pinned in the Makefile into `./bin`.
 
 ## Commits
 

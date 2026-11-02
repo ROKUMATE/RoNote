@@ -1,0 +1,468 @@
+{
+  "ir_version": 1,
+  "title": "Pods",
+  "source": {
+    "url": "https://kubernetes.io/docs/concepts/workloads/pods/",
+    "final_url": "https://kubernetes.io/docs/concepts/workloads/pods/",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "2ae19910b3dc2aeaacd97bbb40c597ef5ca5163d11daafe6b3dfaff99426c10c"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "c89d33fa15a6",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "pods",
+      "content": [
+        {
+          "text": "Pods"
+        }
+      ]
+    },
+    {
+      "id": "9e49553671dd",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Pods",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " are the smallest deployable units of computing that you can create and manage in Kubernetes."
+        }
+      ]
+    },
+    {
+      "id": "759ba93809b7",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A "
+        },
+        {
+          "text": "Pod",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " (as in a pod of whales or pea pod) is a group of one or more "
+        },
+        {
+          "text": "containers",
+          "link": {
+            "href": "https://kubernetes.io/docs/concepts/containers/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", with shared storage and network resources, and a specification for how to run the containers. A Pod's contents are always co-located and co-scheduled, and run in a shared context. A Pod models an application-specific \"logical host\": it contains one or more application containers which are relatively tightly coupled. In non-cloud contexts, applications executed on the same physical or virtual machine are analogous to cloud applications executed on the same logical host."
+        }
+      ]
+    },
+    {
+      "id": "11d67a29888e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "As well as application containers, a Pod can contain "
+        },
+        {
+          "text": "init containers",
+          "link": {
+            "href": "https://kubernetes.io/docs/concepts/workloads/pods/init-containers/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " that run during Pod startup. You can also inject "
+        },
+        {
+          "text": "ephemeral containers",
+          "link": {
+            "href": "https://kubernetes.io/docs/concepts/workloads/pods/ephemeral-containers/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " for debugging a running Pod."
+        }
+      ]
+    },
+    {
+      "id": "04d7c32b0cdf",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "what-is-a-pod",
+      "content": [
+        {
+          "text": "What is a Pod?"
+        }
+      ]
+    },
+    {
+      "id": "0eef277766e5",
+      "kind": "callout",
+      "variant": "info",
+      "title": "Note:",
+      "children": [
+        {
+          "id": "a4eea05fe242",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "You need to install a "
+            },
+            {
+              "text": "container runtime",
+              "link": {
+                "href": "https://kubernetes.io/docs/setup/production-environment/container-runtimes/",
+                "kind": "same_domain"
+              }
+            },
+            {
+              "text": " into each node in the cluster so that Pods can run there."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3291b409e7b8",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The shared context of a Pod is a set of Linux namespaces, cgroups, and potentially other facets of isolation - the same things that isolate a "
+        },
+        {
+          "text": "container",
+          "link": {
+            "href": "https://kubernetes.io/docs/concepts/containers/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ". Within a Pod's context, the individual applications may have further sub-isolations applied."
+        }
+      ]
+    },
+    {
+      "id": "94ffeffa6e54",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A Pod is similar to a set of containers with shared namespaces and shared filesystem volumes."
+        }
+      ]
+    },
+    {
+      "id": "20adfa582dd1",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Pods in a Kubernetes cluster are used in two main ways:"
+        }
+      ]
+    },
+    {
+      "id": "fcd0e4e01317",
+      "kind": "list",
+      "items": [
+        [
+          {
+            "id": "007e9553d7d3",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "Pods that run a single container",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "text": ". The \"one-container-per-Pod\" model is the most common Kubernetes use case; in this case, you can think of a Pod as a wrapper around a single container; Kubernetes manages Pods rather than managing the containers directly."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "id": "95f14d0bd52b",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "Pods that run multiple containers that need to work together",
+                "marks": [
+                  "bold"
+                ]
+              },
+              {
+                "text": ". A Pod can encapsulate an application composed of "
+              },
+              {
+                "text": "multiple co-located containers",
+                "link": {
+                  "href": "#how-pods-manage-multiple-containers",
+                  "kind": "anchor"
+                }
+              },
+              {
+                "text": " that are tightly coupled and need to share resources. These co-located containers form a single cohesive unit."
+              }
+            ]
+          },
+          {
+            "id": "089be3d015cd",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "Grouping multiple co-located and co-managed containers in a single Pod is a relatively advanced use case. You should use this pattern only in specific instances in which your containers are tightly coupled."
+              }
+            ]
+          },
+          {
+            "id": "d23619064515",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "You don't need to run multiple containers to provide replication (for resilience or capacity); if you need multiple replicas, see "
+              },
+              {
+                "text": "Workload management",
+                "link": {
+                  "href": "https://kubernetes.io/docs/concepts/workloads/controllers/",
+                  "kind": "same_domain"
+                }
+              },
+              {
+                "text": "."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "id": "d6d63ebc70c3",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "using-pods",
+      "content": [
+        {
+          "text": "Using Pods"
+        }
+      ]
+    },
+    {
+      "id": "c5aa0b2f0a43",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The following is an example of a Pod which consists of a container running the image "
+        },
+        {
+          "text": "nginx:1.14.2",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "846fc30c5ec8",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "pods/simple-pod.yaml",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/pods/simple-pod.yaml",
+            "kind": "external"
+          }
+        }
+      ]
+    },
+    {
+      "id": "17b9fb26b97e",
+      "kind": "image",
+      "src": "https://kubernetes.io/images/copycode.svg"
+    },
+    {
+      "id": "b12dbc1541fa",
+      "kind": "code",
+      "lang": "yaml",
+      "text": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: nginx\nspec:\n  containers:\n  - name: nginx\n    image: nginx:1.14.2\n    ports:\n    - containerPort: 80\n"
+    },
+    {
+      "id": "15cb8d4af3d5",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "To create the Pod shown above, run the following command:"
+        }
+      ]
+    },
+    {
+      "id": "f5a4a3ae2346",
+      "kind": "code",
+      "lang": "shell",
+      "text": "kubectl apply -f https://k8s.io/examples/pods/simple-pod.yaml\n"
+    },
+    {
+      "id": "b96bed5ecb87",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Pods are generally not created directly and are created using workload resources. See "
+        },
+        {
+          "text": "Working with Pods",
+          "link": {
+            "href": "#working-with-pods",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": " for more information on how Pods are used with workload resources."
+        }
+      ]
+    },
+    {
+      "id": "a732c328c12b",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "workload-resources-for-managing-pods",
+      "content": [
+        {
+          "text": "Workload resources for managing pods"
+        }
+      ]
+    },
+    {
+      "id": "886769f0a774",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Usually you don't need to create Pods directly, even singleton Pods. Instead, create them using workload resources such as "
+        },
+        {
+          "text": "Deployment",
+          "link": {
+            "href": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " or "
+        },
+        {
+          "text": "Job",
+          "link": {
+            "href": "https://kubernetes.io/docs/concepts/workloads/controllers/job/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ". If your Pods need to track state, consider the "
+        },
+        {
+          "text": "StatefulSet",
+          "link": {
+            "href": "https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " resource."
+        }
+      ]
+    },
+    {
+      "id": "7284ad251b4d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Each Pod is meant to run a single instance of a given application. If you want to scale your application horizontally (to provide more overall resources by running more instances), you should use multiple Pods, one for each instance. In Kubernetes, this is typically referred to as "
+        },
+        {
+          "text": "replication",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ". Replicated Pods are usually created and managed as a group by a workload resource and its "
+        },
+        {
+          "text": "controller",
+          "link": {
+            "href": "https://kubernetes.io/docs/concepts/architecture/controller/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "e2e9614db8db",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "See "
+        },
+        {
+          "text": "Pods and controllers",
+          "link": {
+            "href": "#pods-and-controllers",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": " for more information on how Kubernetes uses workload resources, and their controllers, to implement application scaling and auto-healing."
+        }
+      ]
+    },
+    {
+      "id": "44e3588426d1",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Pods natively provide two kinds of shared resources for their constituent containers: "
+        },
+        {
+          "text": "networking",
+          "link": {
+            "href": "#pod-networking",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "storage",
+          "link": {
+            "href": "#pod-storage",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "ir_version": 1,
+  "title": "Escaping & entities",
+  "source": {
+    "url": "https://docs.example.com/fixtures/entities",
+    "final_url": "https://docs.example.com/fixtures/entities",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "97725999791d09dfb49d8cb7a2d3d8c61932989dd01406c805a43bd87788abc6"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "7bb7e29d646c",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "escaping-entities",
+      "content": [
+        {
+          "text": "Escaping & entities"
+        }
+      ]
+    },
+    {
+      "id": "a9b3e4027aa6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Use <div> and \"quotes\", 'apostrophes', arrows → and © signs; write &lt; to show <."
+        }
+      ]
+    },
+    {
+      "id": "24abf8373a2e",
+      "kind": "code",
+      "lang": "html",
+      "text": "<a href=\"/x?a=1&b=2\">link</a>\n<p>&lt;not a tag&gt;</p>\n<< ©—\n"
+    }
+  ]
+}

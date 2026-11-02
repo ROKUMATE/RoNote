@@ -1,0 +1,47 @@
+{
+  "ir_version": 1,
+  "title": "Plain page",
+  "source": {
+    "url": "https://docs.example.com/fixtures/no-main",
+    "final_url": "https://docs.example.com/fixtures/no-main",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "7629223d15ed5dfdb3f2095a7e739fcdda2dd4e921849916e4fa78655638ab36"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "de408e99732e",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "plain-page",
+      "content": [
+        {
+          "text": "Plain page"
+        }
+      ]
+    },
+    {
+      "id": "dd05e232c4e9",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This page has no main, article or role=main element."
+        }
+      ]
+    },
+    {
+      "id": "53bf0f3bbed5",
+      "kind": "code",
+      "text": "body code\n"
+    }
+  ],
+  "warnings": [
+    {
+      "code": "low_confidence",
+      "message": "no main, article or [role=main] element; used the body without its header and footer"
+    }
+  ]
+}

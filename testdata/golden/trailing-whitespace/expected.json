@@ -1,0 +1,47 @@
+{
+  "ir_version": 1,
+  "title": "Trailing whitespace",
+  "source": {
+    "url": "https://docs.example.com/fixtures/trailing-whitespace",
+    "final_url": "https://docs.example.com/fixtures/trailing-whitespace",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "6be3b474fc4664764f4f4e35f53125065cad5031128f6a3d9fea61258f4d3531"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "ce55be98e3a4",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "trailing-whitespace",
+      "content": [
+        {
+          "text": "Trailing whitespace"
+        }
+      ]
+    },
+    {
+      "id": "9fa02c592c7e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Markdown line breaks need two trailing spaces, and they must survive."
+        }
+      ]
+    },
+    {
+      "id": "ffcbc444b081",
+      "kind": "code",
+      "text": "first line with two spaces  \nsecond line with a tab\t\n   \nlast line   "
+    },
+    {
+      "id": "09c9859e7dee",
+      "kind": "code",
+      "lang": "yaml",
+      "text": "key: value    \nlist:\n  - item\t\t\n"
+    }
+  ]
+}

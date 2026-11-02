@@ -1,0 +1,128 @@
+{
+  "ir_version": 1,
+  "title": "Setup",
+  "source": {
+    "url": "https://docs.example.com/fixtures/nested-lists",
+    "final_url": "https://docs.example.com/fixtures/nested-lists",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "fb46ac3c2a70f1cabe81168c789d4b45d2661beef11f622912365ac69f2a75e8"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "e8201933be27",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "setup",
+      "content": [
+        {
+          "text": "Setup"
+        }
+      ]
+    },
+    {
+      "id": "70ee657103f1",
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        [
+          {
+            "id": "78c0a44a6a93",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "Install Go."
+              }
+            ]
+          },
+          {
+            "id": "ebfafc14928d",
+            "kind": "list",
+            "items": [
+              [
+                {
+                  "id": "f85a61afd765",
+                  "kind": "paragraph",
+                  "content": [
+                    {
+                      "text": "macOS: use the package installer."
+                    }
+                  ]
+                }
+              ],
+              [
+                {
+                  "id": "c223a59f82e5",
+                  "kind": "paragraph",
+                  "content": [
+                    {
+                      "text": "Linux:"
+                    }
+                  ]
+                },
+                {
+                  "id": "e40969a3c924",
+                  "kind": "list",
+                  "ordered": true,
+                  "items": [
+                    [
+                      {
+                        "id": "fec09a99ad7b",
+                        "kind": "paragraph",
+                        "content": [
+                          {
+                            "text": "Download the archive."
+                          }
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "id": "cd56465c5ffd",
+                        "kind": "paragraph",
+                        "content": [
+                          {
+                            "text": "Extract it:"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "9c382dd4d90d",
+                        "kind": "code",
+                        "lang": "shell",
+                        "text": "tar -C /usr/local -xzf go.tar.gz\n"
+                      }
+                    ]
+                  ]
+                }
+              ]
+            ]
+          }
+        ],
+        [
+          {
+            "id": "ff1e4a1292f4",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "Check the version with "
+              },
+              {
+                "text": "go version",
+                "marks": [
+                  "code"
+                ]
+              },
+              {
+                "text": "."
+              }
+            ]
+          }
+        ]
+      ]
+    }
+  ]
+}

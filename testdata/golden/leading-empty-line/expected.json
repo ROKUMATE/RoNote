@@ -1,0 +1,51 @@
+{
+  "ir_version": 1,
+  "title": "Leading newlines",
+  "source": {
+    "url": "https://docs.example.com/fixtures/leading-empty-line",
+    "final_url": "https://docs.example.com/fixtures/leading-empty-line",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "3b2517e9e89512f066972d3b1587f1774c875b928c44d1bdda61f65493a793d7"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "c477707bb9ec",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "leading-newlines",
+      "content": [
+        {
+          "text": "Leading newlines"
+        }
+      ]
+    },
+    {
+      "id": "ffce6331eb1c",
+      "kind": "code",
+      "text": "one newline dropped"
+    },
+    {
+      "id": "1d1af3f5c553",
+      "kind": "code",
+      "text": "\none of two newlines dropped"
+    },
+    {
+      "id": "81533383c22d",
+      "kind": "code",
+      "text": "\nkept, because it follows code, not pre"
+    },
+    {
+      "id": "e25042a6ff36",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The empty pre above produces no code block."
+        }
+      ]
+    }
+  ]
+}

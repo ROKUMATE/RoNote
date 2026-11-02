@@ -1,0 +1,154 @@
+{
+  "ir_version": 1,
+  "title": "Options",
+  "source": {
+    "url": "https://docs.example.com/fixtures/table",
+    "final_url": "https://docs.example.com/fixtures/table",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "36623953a4023c4d19d4fa1d4d10bacbbfe0b9f85719f9ba5af6e19e5a64b99a"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "90485919ee1a",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "options",
+      "content": [
+        {
+          "text": "Options"
+        }
+      ]
+    },
+    {
+      "id": "6448b7173af0",
+      "kind": "table",
+      "head": [
+        [
+          [
+            {
+              "text": "Flag"
+            }
+          ],
+          [
+            {
+              "text": "Default"
+            }
+          ],
+          [
+            {
+              "text": "Meaning"
+            }
+          ]
+        ]
+      ],
+      "rows": [
+        [
+          [
+            {
+              "text": "-v",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "off",
+              "marks": [
+                "italic"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "Print "
+            },
+            {
+              "text": "every",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "text": " test name."
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "-run",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          null,
+          [
+            {
+              "text": "Run tests matching a "
+            },
+            {
+              "text": "regexp",
+              "link": {
+                "href": "https://docs.example.com/ref/regexp",
+                "kind": "same_domain"
+              }
+            },
+            {
+              "text": "."
+            }
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "a5b7769a6c7c",
+      "kind": "table",
+      "head": [
+        [
+          [
+            {
+              "text": "Type"
+            }
+          ],
+          [
+            {
+              "text": "Size"
+            }
+          ]
+        ]
+      ],
+      "rows": [
+        [
+          [
+            {
+              "text": "int32"
+            }
+          ],
+          [
+            {
+              "text": "4 bytes"
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "int64"
+            }
+          ],
+          [
+            {
+              "text": "8 bytes"
+            }
+          ]
+        ]
+      ]
+    }
+  ]
+}

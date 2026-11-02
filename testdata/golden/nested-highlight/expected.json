@@ -1,0 +1,39 @@
+{
+  "ir_version": 1,
+  "title": "Highlighted code",
+  "source": {
+    "url": "https://docs.example.com/fixtures/nested-highlight",
+    "final_url": "https://docs.example.com/fixtures/nested-highlight",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "1d1b115731722b47d658a2408309e7c33debe82a3208d4e8e10a0a34408c5a3d"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "2f7493edcd03",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "highlighted-code",
+      "content": [
+        {
+          "text": "Highlighted code"
+        }
+      ]
+    },
+    {
+      "id": "070632a19a29",
+      "kind": "code",
+      "lang": "python",
+      "text": "import os\n\ndef home():\n    return os.environ[\"HOME\"]\n"
+    },
+    {
+      "id": "80376a363794",
+      "kind": "code",
+      "lang": "shell",
+      "text": "$ go test ./...\n"
+    }
+  ]
+}

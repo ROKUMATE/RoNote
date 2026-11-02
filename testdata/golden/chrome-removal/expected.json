@@ -1,0 +1,41 @@
+{
+  "ir_version": 1,
+  "title": "Content",
+  "source": {
+    "url": "https://docs.example.com/fixtures/chrome-removal",
+    "final_url": "https://docs.example.com/fixtures/chrome-removal",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "dbee005eb07cddc91fc5b5ec3554fa77813b9cf260fde4a26feca9be456b93e4"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "4adedb94a12a",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "content",
+      "content": [
+        {
+          "text": "Content"
+        }
+      ]
+    },
+    {
+      "id": "b8b90cb0a6f3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Kept paragraph."
+        }
+      ]
+    },
+    {
+      "id": "b86c5f05a045",
+      "kind": "code",
+      "text": "kept code\n"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tabs in Go code</title>
+</head>
+<body>
+<header class="site"><a href="/">Docs</a></header>
+<nav aria-label="Site"><ul><li><a href="/guide/">Guide</a></li><li><a href="/api/">API</a></li></ul></nav>
+<main>
+<h1>Formatting</h1>
+<p>gofmt indents with tabs, and so does this example.</p>
+<pre><code class="language-go">package main
+
+import "fmt"
+
+func main() {
+	for i := 0; i &lt; 3; i++ {
+		if i%2 == 0 {
+			fmt.Println(i)	// even
+		}
+	}
+}
+</code></pre>
+</main>
+<footer class="site"><p>Example docs footer</p></footer>
+</body>
+</html>

@@ -1,0 +1,125 @@
+{
+  "ir_version": 1,
+  "title": "Callouts",
+  "source": {
+    "url": "https://docs.example.com/fixtures/callouts",
+    "final_url": "https://docs.example.com/fixtures/callouts",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "41a5c8184adffb86bbbf1c5bd7116a4257324a17930c477d91ea01ce71e09b11"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "38d9e8c40495",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "callouts",
+      "content": [
+        {
+          "text": "Callouts"
+        }
+      ]
+    },
+    {
+      "id": "216511824c36",
+      "kind": "callout",
+      "variant": "warning",
+      "title": "Warning",
+      "children": [
+        {
+          "id": "5085a8992d50",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Do not run this in production."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "afcd4ec37243",
+      "kind": "callout",
+      "variant": "tip",
+      "title": "Tip",
+      "children": [
+        {
+          "id": "450d49e898b7",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Use "
+            },
+            {
+              "text": "go vet",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "10408c0618c2",
+      "kind": "callout",
+      "variant": "info",
+      "children": [
+        {
+          "id": "d2fc8d84c7ff",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Builds are cached."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7867a3d6196a",
+      "kind": "callout",
+      "variant": "danger",
+      "title": "Danger",
+      "children": [
+        {
+          "id": "034c6dc4aed0",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "This deletes data:"
+            }
+          ]
+        },
+        {
+          "id": "e1c4aae3a6b6",
+          "kind": "code",
+          "lang": "sql",
+          "text": "DROP TABLE users;\n"
+        }
+      ]
+    },
+    {
+      "id": "a6274181d744",
+      "kind": "callout",
+      "variant": "note",
+      "children": [
+        {
+          "id": "25a5b6785808",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "A plain note."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

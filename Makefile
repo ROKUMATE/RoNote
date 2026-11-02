@@ -23,4 +23,7 @@ tools: ## Install the pinned golangci-lint into ./bin
 test: ## Run unit tests with the race detector
 	go test -race -count=1 ./...
 
-.PHONY: help setup hooks-test tools test
+run-api: ## Run the API locally (RONOTE_ENV defaults to dev)
+	RONOTE_ENV=$${RONOTE_ENV:-dev} go run ./cmd/api
+
+.PHONY: help setup hooks-test tools test run-api

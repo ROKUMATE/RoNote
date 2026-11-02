@@ -48,6 +48,7 @@ Create a directory when its first file needs it, not before.
 | `make test` | unit tests; Go runs with `-race` |
 | `make test-integration` (P0x) | integration tests (`integration` build tag, testcontainers) |
 | `make e2e` (P0x) | Playwright end-to-end tests |
+| `make run-api` | run the API on `127.0.0.1:8080`; `RONOTE_ENV` defaults to `dev` |
 | `make dev` (P0x) | run API, worker and web locally |
 | `make build` (P0x) | build the Go binaries and the web bundle |
 | `make migrate` (P0x) | apply database migrations |

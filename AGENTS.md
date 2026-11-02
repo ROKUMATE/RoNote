@@ -44,7 +44,8 @@ Create a directory when its first file needs it, not before.
 | `make setup` | point git at `.githooks`, make the hook executable, set `pull.rebase true`; run once per clone |
 | `make hooks-test` | test the commit message hook |
 | `make tools` | install the pinned golangci-lint into `./bin` |
-| `make lint` (P0x) | Go and TypeScript linters |
+| `make lint` | golangci-lint (`.golangci.yml`), then `go tool deadcode -test ./...`, which must print nothing |
+| `make fmt` | format Go code with gofumpt and goimports |
 | `make test` | unit tests; Go runs with `-race` |
 | `make test-integration` (P0x) | integration tests (`integration` build tag, testcontainers) |
 | `make e2e` (P0x) | Playwright end-to-end tests |

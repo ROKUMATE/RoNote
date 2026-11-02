@@ -1,6 +1,6 @@
 # 0003: Commit convention
 
-Accepted, 2026-11-02
+Accepted, 2026-11-02. Hook rules tightened in P01.1.
 
 ## Context
 
@@ -8,13 +8,15 @@ Coding agents write many of the commits. Left alone, they add multi-paragraph bo
 
 ## Decision
 
-- Every commit is one line: `Type: Summary`. The types are Feat, Fix, Refactor, Perf, Test, Doc, Style, Build, CI, Chore and Sec.
-- The summary is imperative and capitalized, with no trailing period. The whole line is at most 72 chars. No body, no trailers.
-- `.githooks/commit-msg` enforces the format, and `make setup` installs it through `core.hooksPath`.
-- The hook drops comments, blank lines and known agent trailers, then checks the line that is left. Git's own `Merge ...` and `Revert "..."` messages pass through untouched.
+- Every commit is one line: `Type: Summary`. The types are Feat, Fix, Refactor, Perf, Test, Doc, Style, Build, CI, Chore and Sec. The summary is imperative and capitalized, with no trailing period. The line is at most 72 chars. No body, no trailers.
+- `.githooks/commit-msg` enforces this. `make setup` installs it through `core.hooksPath` and sets `pull.rebase true`, so pulls never create merge commits.
+- The hook drops comments, blank lines and everything below git's scissors line. Line 1, the first line left, is never dropped.
+- From line 2 on, the hook drops only these trailers, case-insensitive: `^co-authored-by:`, `^claude-session:`, lines containing `generated with [claude code` or `generated with claude code`, and `^this reverts commit [0-9a-f]+\.?$`.
+- Exactly one line must remain, and the message file is rewritten to it. That line must match `^(Feat|Fix|Refactor|Perf|Test|Doc|Style|Build|CI|Chore|Sec): [A-Z].*[^. ]$` and be at most 72 chars.
+- Only git's own formats skip the type and length checks: `^Merge (branch|branches|remote-tracking branch|pull request|tag|commit) ` (note the trailing space) and `^Revert ".+"$`.
 
 ## Consequences
 
 - The reasons behind changes live in ADRs and CONTEXT.md, not in commit bodies.
-- Any line containing "generated with" is dropped, so a summary that uses that phrase is rejected.
+- `git revert` works without editing. Reverting a revert (`Reapply "..."`) or a merge needs a hand-written `Type: Summary` message.
 - The hook only runs on clones where `make setup` has run. A CI check can enforce the same rule later.

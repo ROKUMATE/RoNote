@@ -44,15 +44,19 @@ Create a directory when its first file needs it, not before.
 | `make setup` | point git at `.githooks`, make the hook executable, set `pull.rebase true`; run once per clone |
 | `make hooks-test` | test the commit message hook (normal and strict mode) and `scripts/check-commits.sh` |
 | `make tools` | install the pinned golangci-lint into `./bin` |
-| `make lint` | Go: golangci-lint (`.golangci.yml`, includes `integration` files), then `go tool deadcode -test -tags integration ./...`, which must print nothing. Web: `biome check --error-on-warnings`, `tsc -b`, `knip`, all with zero findings |
+| `make check` | `lint`, `test` and `hooks-test`: what CI's fast jobs run. Run it before pushing |
+| `make lint` | `lint-go` and `lint-web` |
+| `make lint-go` | golangci-lint (`.golangci.yml`, includes `integration` files), then `go tool deadcode -test -tags integration ./...`, which must print nothing |
+| `make lint-web` | `biome check --error-on-warnings`, `tsc -b`, `knip`, all with zero findings |
 | `make fmt` | format Go code with gofumpt and goimports |
-| `make test` | Go unit tests with `-race`, then web unit tests (Vitest) |
+| `make test` | `test-go` and `test-web` |
+| `make test-go` | Go unit tests with `-race` |
+| `make test-web` | web unit tests (Vitest, jsdom) |
 | `make test-integration` | unit and integration tests (`integration` build tag, testcontainers); fails if a test container is left behind |
 | `make test-clean` | remove leftover testcontainers containers |
 | `make web-install` | `pnpm install --frozen-lockfile` and the Playwright Chromium build |
 | `make web-dev` | Vite dev server on `127.0.0.1:5173`; the styleguide is at `/_styleguide` |
-| `make web-build` | production build into `apps/web/dist`; fails if styleguide code ends up in it |
-| `make web-test` | web unit tests only (Vitest, jsdom) |
+| `make web-build` | production build into `apps/web/dist`; fails if styleguide code ends up in it or the gzip size passes the budget in `scripts/web-budget.sh` (JS 150 kB, CSS 20 kB) |
 | `make web-e2e` | Playwright end-to-end and axe tests in Chromium against the dev server; kept out of `make test` |
 | `make run-api` | run the API on `127.0.0.1:8080`; `RONOTE_ENV` defaults to `dev` |
 | `make dev` (P0x) | run API, worker and web locally |
@@ -85,6 +89,7 @@ Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with 
 - No body. No trailers of any kind.
 - One logical change per commit. Tests go in the same commit as the code they test.
 - Never use `--no-verify`, never amend, never push.
+- Run `make check` before pushing.
 - `.githooks/commit-msg` enforces the format (docs/adr/0003-commit-convention.md). With `COMMIT_MSG_STRICT=1` it checks a stored message without stripping anything; `scripts/check-commits.sh RANGE` runs it that way over every commit in a range.
 
 ## Code
@@ -124,7 +129,7 @@ Source text is never rewritten. Code blocks stay byte-identical, enforced by Tes
 
 ## Done means
 
-- `make lint` and `make test` are green.
+- `make check` (lint, test, hooks-test) is green.
 - CONTEXT.md is rewritten for the new state.
 - Every commit follows the format above.
 - You end with a 5-line summary of what changed and what's next.

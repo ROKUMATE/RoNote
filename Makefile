@@ -35,19 +35,29 @@ tools: ## Install the pinned golangci-lint into ./bin
 		$(golangci_lint_current) || { echo "make tools: failed to install golangci-lint $(GOLANGCI_LINT_VERSION)" >&2; exit 1; }; \
 	}
 
-test: ## Run Go unit tests with the race detector, then web unit tests
+check: lint test hooks-test ## Run what CI's fast jobs run; do this before pushing
+
+test: test-go test-web ## Run Go and web unit tests
+
+test-go: ## Run Go unit tests with the race detector
 	go test -race -count=1 ./...
+
+test-web: ## Run web unit tests (Vitest)
 	@$(node_required)
 	$(WEB) test
 
 run-api: ## Run the API locally (RONOTE_ENV defaults to dev)
 	RONOTE_ENV=$${RONOTE_ENV:-dev} go run ./cmd/api
 
-lint: ## Lint Go (golangci-lint, deadcode) and web (Biome, tsc, knip)
+lint: lint-go lint-web ## Lint Go and web code
+
+lint-go: ## Lint Go code (golangci-lint, deadcode)
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) run
 	@dead=$$(go tool deadcode -test -tags integration ./...) && [ -z "$$dead" ] || \
-		{ printf '%s\n' "$$dead" >&2; echo "make lint: deadcode failed or found unreachable functions" >&2; exit 1; }
+		{ printf '%s\n' "$$dead" >&2; echo "make lint-go: deadcode failed or found unreachable functions" >&2; exit 1; }
+
+lint-web: ## Lint web code (Biome, tsc, knip)
 	@$(node_required)
 	$(WEB) lint
 
@@ -102,20 +112,17 @@ web-dev: ## Run the web dev server (styleguide at /_styleguide)
 	@$(node_required)
 	$(WEB) dev
 
-web-build: ## Build the web app for production; fails if dev-only code ships
+web-build: ## Build the web app; fails if dev-only code ships or it is over budget
 	@$(node_required)
 	$(WEB) build
 	@! grep -rIil styleguide apps/web/dist || \
 		{ echo "make web-build: dev-only styleguide code found in the files above" >&2; exit 1; }
-
-web-test: ## Run web unit tests (Vitest)
-	@$(node_required)
-	$(WEB) test
+	sh scripts/web-budget.sh
 
 web-e2e: ## Run web end-to-end tests (Playwright, Chromium)
 	@$(node_required)
 	$(WEB) e2e
 
-.PHONY: help setup hooks-test tools test run-api lint fmt dev-up dev-down dev-logs db-shell
-.PHONY: migrate-up migrate-down migrate-status migrate-new sqlc test-integration test-clean
-.PHONY: web-install web-dev web-build web-test web-e2e
+.PHONY: help setup hooks-test tools check test test-go test-web run-api lint lint-go lint-web fmt
+.PHONY: dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new sqlc
+.PHONY: test-integration test-clean web-install web-dev web-build web-e2e

@@ -67,9 +67,16 @@ const (
 // WarningCode identifies a problem an extractor noticed but could live with.
 type WarningCode string
 
-// WarningLowConfidence means the extractor found no main content element and
-// fell back to the whole body.
-const WarningLowConfidence WarningCode = "low_confidence"
+// Warning codes.
+const (
+	// WarningLowConfidence means the extractor found no main content element
+	// and fell back to the whole body.
+	WarningLowConfidence WarningCode = "low_confidence"
+	// WarningParseFailed means the page could not be parsed at all, for
+	// example because it nests elements deeper than the parser allows. The
+	// document has no blocks.
+	WarningParseFailed WarningCode = "parse_failed"
+)
 
 // Doc is one imported page.
 type Doc struct {

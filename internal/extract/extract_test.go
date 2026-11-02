@@ -334,6 +334,13 @@ func TestDocument(t *testing.T) {
 			t.Errorf("Warnings = %+v, want one low_confidence", doc.Warnings)
 		}
 	})
+	t.Run("a page the parser rejects gives an empty doc with a warning", func(t *testing.T) {
+		t.Parallel()
+		doc := extractDoc(t, "<main>"+strings.Repeat("<div>", 600)+"<p>deep</p></main>")
+		if len(doc.Blocks) != 0 || len(doc.Warnings) != 1 || doc.Warnings[0].Code != ir.WarningParseFailed {
+			t.Errorf("blocks = %d, warnings = %+v; want no blocks and one parse_failed", len(doc.Blocks), doc.Warnings)
+		}
+	})
 	t.Run("a relative final URL is refused", func(t *testing.T) {
 		t.Parallel()
 		if _, err := extract.Extract(strings.NewReader("<p>x</p>"), ir.Source{FinalURL: "/x"}); err == nil {

@@ -1,0 +1,69 @@
+#!/bin/sh
+# Enforces the one-line "Type: Summary" commit format (docs/adr/0003).
+# Drops comments, blank lines and agent trailers, then rewrites the message
+# file to the single remaining line. Git's own merge and revert messages
+# pass through untouched.
+set -u
+
+msg_file=$1
+types='Feat Fix Refactor Perf Test Doc Style Build CI Chore Sec'
+type_re=$(printf '%s' "$types" | tr ' ' '|')
+max_len=72
+
+# fail SUBJECT PROBLEM...
+fail() {
+  {
+    printf 'commit-msg: rejected %s\n' "$1"
+    shift
+    printf '  - %s\n' "$@"
+    printf '  format: Type: Summary (one line, max %s chars, capitalized, no trailing period)\n' "$max_len"
+    printf '  types:  %s\n' "$types"
+  } >&2
+  exit 1
+}
+
+first=$(awk '/^#/ || /^[ \t]*$/ { next } { print; exit }' "$msg_file")
+case $first in
+  'Merge '* | 'Revert "'*) exit 0 ;;
+esac
+
+lines=$(awk '
+  /^# -+ >8 -+$/ { exit }
+  /^#/ || /^[ \t]*$/ { next }
+  {
+    lower = tolower($0)
+    if (index(lower, "co-authored-by") || index(lower, "claude-session") || index(lower, "generated with")) next
+    print
+  }
+' "$msg_file")
+
+[ -n "$lines" ] || fail 'empty message' \
+  'nothing left after dropping comments, blank lines and Co-authored-by, Claude-Session and "Generated with" lines'
+
+count=$(printf '%s\n' "$lines" | wc -l | tr -d ' ')
+[ "$count" -eq 1 ] || fail "message with $count lines" 'expected 1 line; bodies and trailers are not allowed'
+
+line=$lines
+len=$(printf '%s' "$line" | wc -m | tr -d ' ')
+
+matches() {
+  printf '%s\n' "$line" | LC_ALL=C grep -Eq "$1"
+}
+
+if matches "^($type_re): [A-Z].*[^. ]\$" && [ "$len" -le "$max_len" ]; then
+  printf '%s\n' "$line" >"$msg_file"
+  exit 0
+fi
+
+set --
+if ! matches "^($type_re):"; then
+  set -- "$@" 'type is missing or not one of the allowed types'
+elif ! matches "^($type_re): [^ ]"; then
+  set -- "$@" 'type must be followed by a colon and exactly one space'
+elif ! matches "^($type_re): [A-Z]"; then
+  set -- "$@" 'summary must start with a capital letter'
+fi
+matches '[^. ]$' || set -- "$@" 'summary must not end with a period or space'
+[ "$len" -le "$max_len" ] || set -- "$@" "line is $len characters, max is $max_len"
+[ "$#" -gt 0 ] || set -- 'summary is too short'
+fail "\"$line\"" "$@"

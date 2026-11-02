@@ -1,6 +1,7 @@
 // Package fetch downloads one HTML page from a user-supplied URL. Users decide
 // where our server connects, so every connection passes an address guard at
-// dial time (guard.go) and every limit is explicit.
+// dial time (guard.go), and every limit is explicit. It honours robots.txt and
+// sends at most one request per second to a host.
 package fetch
 
 import (
@@ -29,12 +30,13 @@ const (
 
 // Errors a fetch can fail with. Test with errors.Is.
 var (
-	ErrInvalidURL       = errors.New("invalid URL")
-	ErrBlockedAddress   = errors.New("blocked address")
-	ErrTooManyRedirects = errors.New("too many redirects")
-	ErrTooLarge         = errors.New("response too large")
-	ErrUnsupportedType  = errors.New("unsupported content type")
-	ErrTimeout          = errors.New("fetch timed out")
+	ErrInvalidURL         = errors.New("invalid URL")
+	ErrBlockedAddress     = errors.New("blocked address")
+	ErrTooManyRedirects   = errors.New("too many redirects")
+	ErrDisallowedByRobots = errors.New("disallowed by robots.txt")
+	ErrTooLarge           = errors.New("response too large")
+	ErrUnsupportedType    = errors.New("unsupported content type")
+	ErrTimeout            = errors.New("fetch timed out")
 )
 
 // StatusError reports a response status that is neither 2xx nor a 304 the
@@ -93,6 +95,9 @@ type Result struct {
 // Fetcher downloads pages. It is safe for concurrent use.
 type Fetcher struct {
 	client       *http.Client
+	robotsClient *http.Client
+	robotsCache  robotsCache
+	limiter      *hostLimiter
 	resolver     Resolver
 	guard        func(netip.AddrPort) error
 	allowAnyPort bool
@@ -108,27 +113,29 @@ func New(opts Options) *Fetcher {
 		allowAnyPort: opts.AllowPrivateNetworks,
 		maxBody:      5 << 20,
 		totalTimeout: 20 * time.Second,
+		robotsCache:  robotsCache{entries: map[string]robotsEntry{}},
+		limiter:      newHostLimiter(time.Second),
 	}
 	if f.resolver == nil {
 		f.resolver = net.DefaultResolver
 	}
-	f.client = &http.Client{
-		Transport: &http.Transport{
-			Proxy:                 nil, // never let the environment route fetches elsewhere
-			DialContext:           f.dial,
-			TLSHandshakeTimeout:   connectTimeout,
-			ResponseHeaderTimeout: 10 * time.Second,
-			MaxIdleConnsPerHost:   2,
-			IdleConnTimeout:       30 * time.Second,
-			ForceAttemptHTTP2:     true,
-		},
-		CheckRedirect: f.checkRedirect,
+	transport := &http.Transport{
+		Proxy:                 nil, // never let the environment route fetches elsewhere
+		DialContext:           f.dial,
+		TLSHandshakeTimeout:   connectTimeout,
+		ResponseHeaderTimeout: 10 * time.Second,
+		MaxIdleConnsPerHost:   2,
+		IdleConnTimeout:       30 * time.Second,
+		ForceAttemptHTTP2:     true,
 	}
+	f.client = &http.Client{Transport: transport, CheckRedirect: f.checkRedirect}
+	f.robotsClient = &http.Client{Transport: transport, CheckRedirect: f.checkRobotsRedirect}
 	return f
 }
 
 // Fetch downloads one HTML page. It follows up to 5 redirects, checking each
-// against the same rules, and gives up after 20 seconds in total.
+// against the same rules, robots.txt included, and gives up after 20 seconds
+// in total.
 func (f *Fetcher) Fetch(ctx context.Context, r Request) (*Result, error) {
 	u, err := url.Parse(r.URL)
 	if err != nil {
@@ -167,6 +174,9 @@ func (f *Fetcher) get(ctx context.Context, u *url.URL, r Request) (*Result, erro
 		req.Header.Set("If-Modified-Since", r.LastModified)
 	}
 
+	if err := f.admit(ctx, u); err != nil {
+		return nil, err
+	}
 	resp, err := f.client.Do(req)
 	if err != nil {
 		return nil, err
@@ -220,11 +230,35 @@ func (f *Fetcher) get(ctx context.Context, u *url.URL, r Request) (*Result, erro
 	return res, nil
 }
 
+// admit lets a request to u go ahead once robots.txt allows it and the host's
+// rate limit has a free slot.
+func (f *Fetcher) admit(ctx context.Context, u *url.URL) error {
+	if err := f.checkRobots(ctx, u); err != nil {
+		return err
+	}
+	return f.limiter.wait(ctx, u.Hostname())
+}
+
 func (f *Fetcher) checkRedirect(req *http.Request, via []*http.Request) error {
 	if len(via) > maxRedirects {
 		return fmt.Errorf("%w: more than %d", ErrTooManyRedirects, maxRedirects)
 	}
-	return f.checkURL(req.URL)
+	if err := f.checkURL(req.URL); err != nil {
+		return err
+	}
+	return f.admit(req.Context(), req.URL)
+}
+
+// checkRobotsRedirect follows a redirected robots.txt under the same address
+// and rate rules, without asking robots.txt about itself.
+func (f *Fetcher) checkRobotsRedirect(req *http.Request, via []*http.Request) error {
+	if len(via) > maxRedirects {
+		return fmt.Errorf("%w: more than %d", ErrTooManyRedirects, maxRedirects)
+	}
+	if err := f.checkURL(req.URL); err != nil {
+		return err
+	}
+	return f.limiter.wait(req.Context(), req.URL.Hostname())
 }
 
 func isTimeout(err error) bool {

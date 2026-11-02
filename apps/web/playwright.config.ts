@@ -5,7 +5,8 @@ const baseURL = "http://127.0.0.1:5173";
 export default defineConfig({
   testDir: "e2e",
   forbidOnly: Boolean(process.env.CI),
-  reporter: process.env.CI ? "github" : "list",
+  // CI also writes the HTML report, which the workflow uploads when a test fails.
+  reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: { baseURL, trace: "retain-on-failure" },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {

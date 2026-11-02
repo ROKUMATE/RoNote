@@ -14,8 +14,8 @@ COMPOSE := sh scripts/container.sh compose
 GOOSE := go tool goose -dir migrations postgres "$$RONOTE_DATABASE_URL"
 db_url_required = test -n "$$RONOTE_DATABASE_URL" || { echo "RONOTE_DATABASE_URL is not set; copy .env.example to .env.dev" >&2; exit 1; }
 WEB := pnpm --dir apps/web
-node_required = want=$$(cat .node-version); have=$$(node --version 2>/dev/null); [ "$$have" = "v$$want" ] || \
-	{ echo "Node $$want is required (.node-version), found $${have:-none}. With nvm: nvm install $$want && nvm use $$want" >&2; exit 1; }
+node_required = want=$$(cat .nvmrc); have=$$(node --version 2>/dev/null); [ "$$have" = "v$$want" ] || \
+	{ echo "Node $$want is required (.nvmrc), found $${have:-none}. With nvm: nvm install && nvm use" >&2; exit 1; }
 
 help: ## Show available targets
 	@awk 'BEGIN { FS = ":.*## " } /^[a-z][a-z0-9-]*:.*## / { printf "  %-18s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
@@ -117,6 +117,7 @@ check-go-version: ## Print the Go toolchain; fail unless it is the one go.mod pi
 ci-cache-keys: ## (CI) Write tool versions used in cache keys to GITHUB_OUTPUT
 	@: "$${GITHUB_OUTPUT:?ci-cache-keys writes to GITHUB_OUTPUT, which only GitHub Actions sets}"
 	@echo "golangci_lint=$(GOLANGCI_LINT_VERSION)" >>"$$GITHUB_OUTPUT"
+	@sed -n 's/.*"@playwright\/test": "\([^"]*\)".*/playwright=\1/p' apps/web/package.json >>"$$GITHUB_OUTPUT"
 
 test-integration: ## Run unit and integration tests against throwaway Postgres containers
 	sh scripts/container.sh test go test -race -count=1 -tags integration ./...
@@ -124,10 +125,18 @@ test-integration: ## Run unit and integration tests against throwaway Postgres c
 test-clean: ## Remove leftover testcontainers containers
 	sh scripts/container.sh clean
 
-web-install: ## Install web dependencies and the Playwright browser
+web-install: web-deps web-browsers ## Install web dependencies and the Playwright browser
+
+web-deps: ## Install web dependencies from the lockfile
 	@$(node_required)
 	pnpm install --frozen-lockfile
-	$(WEB) exec playwright install chromium
+
+web-browsers: ## Install Playwright's Chromium (WITH_DEPS=1 adds its system packages, for CI)
+	@$(node_required)
+	$(WEB) exec playwright install $(if $(WITH_DEPS),--with-deps) chromium
+
+check-node-version: ## Print the Node version; fail unless it is the one .nvmrc pins
+	@$(node_required); echo "Node $$(node --version), as pinned in .nvmrc"
 
 web-dev: ## Run the web dev server (styleguide at /_styleguide)
 	@$(node_required)
@@ -147,4 +156,5 @@ web-e2e: ## Run web end-to-end tests (Playwright, Chromium)
 .PHONY: help setup hooks-test check-commits tools check test test-go test-web run-api lint lint-go lint-web fmt
 .PHONY: dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new sqlc
 .PHONY: check-generated check-go-version ci-cache-keys
-.PHONY: test-integration test-clean web-install web-dev web-build web-e2e
+.PHONY: test-integration test-clean web-install web-deps web-browsers check-node-version
+.PHONY: web-dev web-build web-e2e

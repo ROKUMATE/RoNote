@@ -55,7 +55,10 @@ Create a directory when its first file needs it, not before.
 | `make test-web` | web unit tests (Vitest, jsdom) |
 | `make test-integration` | unit and integration tests (`integration` build tag, testcontainers); fails if a test container is left behind |
 | `make test-clean` | remove leftover testcontainers containers |
-| `make web-install` | `pnpm install --frozen-lockfile` and the Playwright Chromium build |
+| `make web-install` | `web-deps` and `web-browsers` |
+| `make web-deps` | `pnpm install --frozen-lockfile` |
+| `make web-browsers` | Playwright's Chromium; `WITH_DEPS=1` also installs its system packages (CI) |
+| `make check-node-version` | print the Node version and fail unless it is `.nvmrc`'s |
 | `make web-dev` | Vite dev server on `127.0.0.1:5173`; the styleguide is at `/_styleguide` |
 | `make web-build` | production build into `apps/web/dist`; fails if styleguide code ends up in it or the gzip size passes the budget in `scripts/web-budget.sh` (JS 150 kB, CSS 20 kB) |
 | `make web-e2e` | Playwright end-to-end and axe tests in Chromium against the dev server; kept out of `make test` |
@@ -80,7 +83,7 @@ Targets marked (P0x) do not exist yet. The phase that adds a target removes its 
 - `podman compose` needs a compose provider: `brew install docker-compose` (or podman-compose). `make dev-up` fails with a clear message when neither `podman compose` nor `docker compose` works.
 - `.env.example` lists every variable. Copy it to `.env.dev` (gitignored); the Makefile loads it, its values override the shell environment, and `make VAR=value` still wins.
 
-Web targets, `make lint` and `make test` check that `node --version` matches `.node-version` first.
+Web targets, `make lint` and `make test` check that `node --version` matches `.nvmrc` first; with nvm, `nvm install && nvm use` picks it up.
 
 Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`: deadcode, goose, sqlc. golangci-lint is the exception: `make tools` installs the version pinned in the Makefile into `./bin`.
 
@@ -106,7 +109,7 @@ Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with 
 
 ## Frontend (`apps/web`)
 
-- pnpm only. Every version is pinned exactly (`savePrefix: ""`); pnpm is pinned by `packageManager` and Node by `.node-version` and `engines` with `engineStrict`.
+- pnpm only. Every version is pinned exactly (`savePrefix: ""`); pnpm is pinned by `packageManager` and Node by `.nvmrc` and `engines` with `engineStrict`.
 - Browsers: Chrome/Edge 123+, Firefox 125+, Safari 17.5+, the floor for the native popover API and CSS `light-dark()`. This is the Vite build target.
 - Colours, fonts, text sizes, radii and breakpoints come only from `src/styles/tokens.css`. Tailwind's default palette and scales are cleared, so there are no raw colours and no palette classes.
 - Imported documents are styled through `.reader` in `src/styles/reader.css`, not utility classes. Code never shows ligatures.

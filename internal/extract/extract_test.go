@@ -152,8 +152,12 @@ func TestExtract(t *testing.T) {
 		{
 			name: "headings get anchors",
 			html: `<main><h1 id="top">Title</h1><h2>Getting started</h2><h2>Getting started</h2>` +
-				`<h3><a name="old"></a>Named</h3><h2 id="x">Permalink <a class="headerlink" href="#x">¶</a></h2></main>`,
-			want: []string{"h1#top Title", "h2#getting-started Getting started", "h2#getting-started-2 Getting started", "h3#old Named", "h2#x Permalink"},
+				`<h3><a name="old"></a>Named</h3><h2 id="x">Permalink <a class="headerlink" href="#x">¶</a></h2>` +
+				`<section id="setup"><span id="target"></span><h2>Install</h2><p>x</p></section><section id="later"><p>y</p><h2>Not first</h2></section></main>`,
+			want: []string{
+				"h1#top Title", "h2#getting-started Getting started", "h2#getting-started-2 Getting started", "h3#old Named",
+				"h2#x Permalink", "h2#setup Install", "p x", "p y", "h2#not-first Not first",
+			},
 		},
 		{
 			name: "lists",
@@ -296,6 +300,13 @@ func TestDocument(t *testing.T) {
 		t.Parallel()
 		doc := extractDoc(t, `<title>Site title</title><h1>Outside</h1><main><h1>The <code>Page</code></h1></main>`)
 		if doc.Title != "The Page" {
+			t.Errorf("Title = %q", doc.Title)
+		}
+	})
+	t.Run("title leaves out a heading permalink", func(t *testing.T) {
+		t.Parallel()
+		doc := extractDoc(t, `<main><h1>Tools<a class="headerlink" href="#tools">¶</a></h1></main>`)
+		if doc.Title != "Tools" {
 			t.Errorf("Title = %q", doc.Title)
 		}
 	})

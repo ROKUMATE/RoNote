@@ -146,7 +146,7 @@ func isPermalink(n *html.Node) bool {
 // title is the first <h1> in the content, else the page's <title>.
 func (e *extractor) title(doc, root *html.Node) string {
 	if h1 := e.findKept(root, func(n *html.Node) bool { return n.DataAtom == atom.H1 }); h1 != nil {
-		if t := collapse(textContent(h1)); t != "" {
+		if t := strings.TrimSpace(runsText(e.inline(h1))); t != "" {
 			return t
 		}
 	}

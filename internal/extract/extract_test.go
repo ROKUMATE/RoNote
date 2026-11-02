@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/rokumate/ronote/internal/extract"
 	"github.com/rokumate/ronote/internal/ir"
@@ -357,4 +358,33 @@ func TestDocument(t *testing.T) {
 			t.Errorf("IDs %q, %q", doc.Blocks[0].ID, doc.Blocks[1].ID)
 		}
 	})
+}
+
+// TestExtractStaysLinear guards against inputs that made extraction
+// quadratic. Pages come from user-supplied URLs, so a slow path is a denial
+// of service. Linear code needs well under a second here even with -race; the
+// quadratic versions took minutes.
+func TestExtractStaysLinear(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		html string
+	}{
+		{name: "many identical headings", html: "<main>" + strings.Repeat("<h2>Same</h2>", 40000) + "</main>"},
+		{name: "many text nodes in one paragraph", html: "<main><p>" + strings.Repeat("x <span></span>", 300000) + "</p></main>"},
+		{name: "many line breaks in one paragraph", html: "<main><p>" + strings.Repeat("x <br>", 300000) + "</p></main>"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			start := time.Now()
+			if _, err := extract.Extract(strings.NewReader(tt.html), ir.Source{FinalURL: pageURL}); err != nil {
+				t.Fatal(err)
+			}
+			if took := time.Since(start); took > 5*time.Second {
+				t.Errorf("Extract took %v on %d bytes; want well under 5s", took, len(tt.html))
+			}
+		})
+	}
 }

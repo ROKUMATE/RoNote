@@ -231,8 +231,15 @@ func (e *extractor) anchor(n *html.Node, content []ir.Inline) string {
 	}
 	slug := slugify(runsText(content))
 	anchor := slug
-	for i := 2; e.anchors[anchor]; i++ {
-		anchor = slug + "-" + strconv.Itoa(i)
+	if e.anchors[anchor] {
+		// Resume where the last duplicate of this slug stopped, so many equal
+		// headings stay linear.
+		n := max(e.nextSuffix[slug], 2)
+		for e.anchors[slug+"-"+strconv.Itoa(n)] {
+			n++
+		}
+		anchor = slug + "-" + strconv.Itoa(n)
+		e.nextSuffix[slug] = n + 1
 	}
 	e.anchors[anchor] = true
 	return anchor

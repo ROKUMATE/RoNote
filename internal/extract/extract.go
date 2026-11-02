@@ -72,7 +72,7 @@ func Extract(r io.Reader, src ir.Source) (*ir.Doc, error) {
 		return out, nil
 	}
 
-	e := &extractor{links: newLinker(doc, page), anchors: map[string]bool{}}
+	e := &extractor{links: newLinker(doc, page), anchors: map[string]bool{}, nextSuffix: map[string]int{}}
 	root := findFirst(doc, func(n *html.Node) bool { return n.DataAtom == atom.Main })
 	if root == nil {
 		root = findFirst(doc, func(n *html.Node) bool { return n.DataAtom == atom.Article })
@@ -100,8 +100,10 @@ type extractor struct {
 	links *linker
 	// withoutChrome drops header and footer too, when the root is <body>.
 	withoutChrome bool
-	// anchors holds every heading anchor given out, to keep them unique.
-	anchors map[string]bool
+	// anchors holds every heading anchor given out, to keep them unique, and
+	// nextSuffix the next "-n" to try for each slug.
+	anchors    map[string]bool
+	nextSuffix map[string]int
 }
 
 // skip reports whether n and everything inside it stays out of the result.

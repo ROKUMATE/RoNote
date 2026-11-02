@@ -12,14 +12,24 @@ import (
 // render normal text: any run of spaces, tabs and line breaks becomes one
 // space, and spaces at the start and end of a block disappear. Other
 // whitespace, such as a no-break space, is kept.
+//
+// Collapsed whitespace waits as a pending space and is only written before
+// the next visible character, with the marks and link it had where it
+// appeared, so nothing ever has to be trimmed back out. With the open run
+// built in a strings.Builder, every page converts in linear time.
 type inliner struct {
-	runs  []ir.Inline
+	runs     []ir.Inline     // finished runs of the current block
+	buf      strings.Builder // text of the run being built
+	runMarks []ir.Mark
+	runLink  *ir.Link
+
 	marks []ir.Mark // active formatting, innermost last; may repeat
 	link  *ir.Link
-	// spaced is true at the start of a block and after a space or line
-	// break, when a further space would collapse away.
-	started bool
-	spaced  bool
+
+	started    bool // something visible was written since the block or line began
+	space      bool // collapsed whitespace waits to be written as one space
+	spaceMarks []ir.Mark
+	spaceLink  *ir.Link
 }
 
 func isCollapsible(r rune) bool {
@@ -35,16 +45,20 @@ func (in *inliner) text(s string) {
 	var b strings.Builder
 	for _, r := range s {
 		if isCollapsible(r) {
-			if in.started && !in.spaced {
-				b.WriteByte(' ')
-				in.spaced = true
+			if in.started && !in.space {
+				in.space, in.spaceMarks, in.spaceLink = true, in.activeMarks(), in.link
 			}
 			continue
 		}
+		if in.space {
+			in.write(b.String())
+			b.Reset()
+			in.writeSpace()
+		}
 		b.WriteRune(r)
-		in.started, in.spaced = true, false
+		in.started = true
 	}
-	in.append(b.String())
+	in.write(b.String())
 }
 
 // raw adds s exactly as given.
@@ -52,66 +66,78 @@ func (in *inliner) raw(s string) {
 	if s == "" {
 		return
 	}
-	in.append(s)
-	in.started, in.spaced = true, false
+	if in.space {
+		in.writeSpace()
+	}
+	in.write(s)
+	in.started = true
 }
 
-// lineBreak adds a <br>: a "\n" with the spaces around it removed.
+// writeSpace writes the pending space with the marks and link it had.
+func (in *inliner) writeSpace() {
+	in.writeWith(" ", in.spaceMarks, in.spaceLink)
+	in.space = false
+}
+
+// lineBreak adds a <br>: a "\n" with the whitespace around it dropped.
 func (in *inliner) lineBreak() {
-	in.trimTrailingSpace()
-	in.append("\n")
-	in.started, in.spaced = true, true
+	in.space = false
+	in.write("\n")
+	in.started = false
 }
 
-func (in *inliner) append(s string) {
-	if s == "" {
-		return
+func (in *inliner) write(s string) {
+	if s != "" {
+		in.writeWith(s, in.activeMarks(), in.link)
 	}
-	marks := in.activeMarks()
-	if n := len(in.runs); n > 0 && slices.Equal(in.runs[n-1].Marks, marks) && sameLink(in.runs[n-1].Link, in.link) {
-		in.runs[n-1].Text += s
-		return
-	}
-	var link *ir.Link
-	if in.link != nil {
-		l := *in.link
-		link = &l
-	}
-	in.runs = append(in.runs, ir.Inline{Text: s, Marks: marks, Link: link})
 }
 
-func (in *inliner) trimTrailingSpace() {
-	for n := len(in.runs); n > 0; n = len(in.runs) {
-		last := &in.runs[n-1]
-		last.Text = strings.TrimRight(last.Text, " ")
-		if last.Text != "" {
-			return
+func (in *inliner) writeWith(s string, marks []ir.Mark, link *ir.Link) {
+	if in.buf.Len() > 0 && (!slices.Equal(in.runMarks, marks) || !sameLink(in.runLink, link)) {
+		in.closeRun()
+	}
+	if in.buf.Len() == 0 {
+		in.runMarks = marks
+		in.runLink = nil
+		if link != nil {
+			l := *link
+			in.runLink = &l
 		}
-		in.runs = in.runs[:n-1]
 	}
+	in.buf.WriteString(s)
 }
 
-// take returns the runs gathered so far, trimmed, and starts a new block.
-// Marks and link stay active.
+func (in *inliner) closeRun() {
+	if in.buf.Len() == 0 {
+		return
+	}
+	in.runs = append(in.runs, ir.Inline{Text: in.buf.String(), Marks: in.runMarks, Link: in.runLink})
+	in.buf.Reset()
+}
+
+// take returns the runs of the current block without line breaks at its
+// edges, and starts a new block. Marks and link stay active.
 func (in *inliner) take() []ir.Inline {
-	in.trimTrailingSpace()
-	for len(in.runs) > 0 && strings.TrimLeft(in.runs[0].Text, " \n") == "" {
-		in.runs = in.runs[1:]
-	}
-	if len(in.runs) > 0 {
-		in.runs[0].Text = strings.TrimLeft(in.runs[0].Text, " \n")
-	}
-	for n := len(in.runs); n > 0; n = len(in.runs) {
-		trimmed := strings.TrimRight(in.runs[n-1].Text, " \n")
-		if trimmed != "" {
-			in.runs[n-1].Text = trimmed
-			break
-		}
-		in.runs = in.runs[:n-1]
-	}
+	in.closeRun()
 	runs := in.runs
 	in.runs = nil
-	in.started, in.spaced = false, false
+	in.started, in.space = false, false
+
+	for len(runs) > 0 {
+		if text := strings.TrimLeft(runs[0].Text, "\n"); text != "" {
+			runs[0].Text = text
+			break
+		}
+		runs = runs[1:]
+	}
+	for len(runs) > 0 {
+		last := len(runs) - 1
+		if text := strings.TrimRight(runs[last].Text, "\n"); text != "" {
+			runs[last].Text = text
+			break
+		}
+		runs = runs[:last]
+	}
 	return runs
 }
 

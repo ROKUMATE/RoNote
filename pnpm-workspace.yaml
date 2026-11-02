@@ -1,0 +1,8 @@
+packages:
+  - apps/*
+
+# Save exact versions and refuse to install on the wrong Node.
+savePrefix: ""
+engineStrict: true
+minimumReleaseAgeExclude:
+  - "@vitejs/plugin-react@6.2.1"

@@ -30,6 +30,9 @@ type Config struct {
 	HTTPAddr    string
 	LogLevel    slog.Level
 	DatabaseURL string
+	// FetchAllowPrivateNetworks lets the page fetcher reach loopback and
+	// private addresses on any port. Only dev and test may set it.
+	FetchAllowPrivateNetworks bool
 }
 
 const (
@@ -60,11 +63,35 @@ func Load(getenv func(string) string) (Config, error) {
 	check("RONOTE_LOG_LEVEL", err)
 	dbURL := getenv("RONOTE_DATABASE_URL")
 	check("RONOTE_DATABASE_URL", validateDatabaseURL(dbURL))
+	allowPrivate, err := parseAllowPrivate(getenv("RONOTE_FETCH_ALLOW_PRIVATE"), env)
+	check("RONOTE_FETCH_ALLOW_PRIVATE", err)
 
 	if len(errs) > 0 {
 		return Config{}, fmt.Errorf("invalid config:\n%w", errors.Join(errs...))
 	}
-	return Config{Env: env, HTTPAddr: addr, LogLevel: level, DatabaseURL: dbURL}, nil
+	return Config{
+		Env:                       env,
+		HTTPAddr:                  addr,
+		LogLevel:                  level,
+		DatabaseURL:               dbURL,
+		FetchAllowPrivateNetworks: allowPrivate,
+	}, nil
+}
+
+// parseAllowPrivate reads a boolean that may only be true in dev and test:
+// anywhere else, letting user-supplied URLs reach private networks is SSRF.
+func parseAllowPrivate(s string, env Env) (bool, error) {
+	if s == "" {
+		return false, nil
+	}
+	allow, err := strconv.ParseBool(s)
+	if err != nil {
+		return false, fmt.Errorf("%q is not true or false", s)
+	}
+	if allow && env != EnvDev && env != EnvTest {
+		return false, errors.New("may only be true when RONOTE_ENV is dev or test")
+	}
+	return allow, nil
 }
 
 func parseEnv(s string) (Env, error) {

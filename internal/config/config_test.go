@@ -114,6 +114,36 @@ func TestLoad(t *testing.T) {
 			wantErr: []string{"RONOTE_DATABASE_URL: URL has no database name"},
 		},
 		{
+			name: "private fetches allowed in dev",
+			env:  validEnv(map[string]string{"RONOTE_FETCH_ALLOW_PRIVATE": "true"}),
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true},
+		},
+		{
+			name: "private fetches allowed in test",
+			env:  validEnv(map[string]string{"RONOTE_ENV": "test", "RONOTE_FETCH_ALLOW_PRIVATE": "1"}),
+			want: Config{Env: EnvTest, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true},
+		},
+		{
+			name: "private fetches off in prod",
+			env:  validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_FETCH_ALLOW_PRIVATE": "false"}),
+			want: Config{Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL},
+		},
+		{
+			name:    "private fetches refused in prod",
+			env:     validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_FETCH_ALLOW_PRIVATE": "true"}),
+			wantErr: []string{"RONOTE_FETCH_ALLOW_PRIVATE: may only be true when RONOTE_ENV is dev or test"},
+		},
+		{
+			name:    "private fetches refused in staging",
+			env:     validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_FETCH_ALLOW_PRIVATE": "true"}),
+			wantErr: []string{"RONOTE_FETCH_ALLOW_PRIVATE: may only be true when RONOTE_ENV is dev or test"},
+		},
+		{
+			name:    "private fetches not a boolean",
+			env:     validEnv(map[string]string{"RONOTE_FETCH_ALLOW_PRIVATE": "yes"}),
+			wantErr: []string{`RONOTE_FETCH_ALLOW_PRIVATE: "yes" is not true or false`},
+		},
+		{
 			name: "every bad variable reported",
 			env: map[string]string{
 				"RONOTE_ENV":          "qa",

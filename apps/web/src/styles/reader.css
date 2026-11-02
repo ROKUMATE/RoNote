@@ -118,14 +118,27 @@
     padding: 0.75rem 1rem;
   }
 
+  .reader :where(.callout, .generated) > :first-child {
+    margin-top: 0;
+  }
+
+  .reader :where(.callout, .generated) > :last-child {
+    margin-bottom: 0;
+  }
+
   /* Machine-made content: a thin left rule and a small label (DESIGN.md). */
   .reader .generated {
     border-left: 2px solid var(--color-gen);
     padding-left: 1rem;
   }
 
+  .reader .generated-label + * {
+    margin-top: 0;
+  }
+
   .reader .generated-label {
     display: block;
+    margin-bottom: 0.25rem;
     font-family: var(--font-sans);
     font-size: var(--text-ui);
     color: var(--color-gen);

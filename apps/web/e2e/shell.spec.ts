@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { expectNoHorizontalScroll } from "./helpers";
 
 test("renders the shell", async ({ page }) => {
   await page.goto("/");
@@ -40,10 +41,7 @@ test.describe("at 375px", () => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1, name: "Library" })).toBeVisible();
 
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    expect(overflow).toBe(0);
+    await expectNoHorizontalScroll(page);
     await expect(page.getByRole("complementary", { name: "Notes" })).toBeHidden();
   });
 });

@@ -1,0 +1,42 @@
+{
+  "ir_version": 1,
+  "title": "Formatting",
+  "source": {
+    "url": "https://docs.example.com/fixtures/go-tabs",
+    "final_url": "https://docs.example.com/fixtures/go-tabs",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "554b65f27dd836c2e1d480bb67c1a3977d00ce1ae912c0b112015d40254b7f22"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "5b89bc6655ce",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "formatting",
+      "content": [
+        {
+          "text": "Formatting"
+        }
+      ]
+    },
+    {
+      "id": "d096ce5ad5f3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "gofmt indents with tabs, and so does this example."
+        }
+      ]
+    },
+    {
+      "id": "3bc5d6d7a761",
+      "kind": "code",
+      "lang": "go",
+      "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfor i := 0; i < 3; i++ {\n\t\tif i%2 == 0 {\n\t\t\tfmt.Println(i)\t// even\n\t\t}\n\t}\n}\n"
+    }
+  ]
+}

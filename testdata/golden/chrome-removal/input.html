@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chrome removal</title>
+</head>
+<body>
+<header class="site"><a href="/">Docs</a></header>
+<nav aria-label="Site"><ul><li><a href="/guide/">Guide</a></li><li><a href="/api/">API</a></li></ul></nav>
+<main>
+<a class="skip" href="#content">Skip to content</a>
+<nav><pre>nav code</pre></nav>
+<aside><p>Related</p><pre>aside code</pre></aside>
+<h1 id="content">Content</h1>
+<script>var leaked = "script";</script>
+<style>.x { color: red; }</style>
+<noscript><p>Enable JavaScript</p></noscript>
+<form><label>Search <input name="q"></label><button type="submit">Go</button></form>
+<button type="button">Copy</button>
+<iframe src="https://example.com/embed"></iframe>
+<svg viewBox="0 0 1 1"><text>svg text</text></svg>
+<div hidden><pre>hidden code</pre></div>
+<div aria-hidden="true"><pre>aria hidden code</pre></div>
+<p>Kept paragraph.</p>
+<pre><code>kept code
+</code></pre>
+</main>
+<footer class="site"><p>Example docs footer</p></footer>
+</body>
+</html>

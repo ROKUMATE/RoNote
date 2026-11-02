@@ -1,0 +1,180 @@
+{
+  "ir_version": 1,
+  "title": "Marks",
+  "source": {
+    "url": "https://docs.example.com/fixtures/marks",
+    "final_url": "https://docs.example.com/fixtures/marks",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "081210a5228f663380e7e4997e7333e2fcc0cc78817547aa877a4fd614958e53"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "645df8192b51",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "marks",
+      "content": [
+        {
+          "text": "Marks"
+        }
+      ]
+    },
+    {
+      "id": "3285456749f6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "bold",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " "
+        },
+        {
+          "text": "strong",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " "
+        },
+        {
+          "text": "italic",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " "
+        },
+        {
+          "text": "em",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " "
+        },
+        {
+          "text": "code",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " "
+        },
+        {
+          "text": "Ctrl",
+          "marks": [
+            "kbd"
+          ]
+        },
+        {
+          "text": "+"
+        },
+        {
+          "text": "C",
+          "marks": [
+            "kbd"
+          ]
+        },
+        {
+          "text": " "
+        },
+        {
+          "text": "gone",
+          "marks": [
+            "strike"
+          ]
+        },
+        {
+          "text": " "
+        },
+        {
+          "text": "deleted",
+          "marks": [
+            "strike"
+          ]
+        },
+        {
+          "text": " "
+        },
+        {
+          "text": "old",
+          "marks": [
+            "strike"
+          ]
+        },
+        {
+          "text": " H"
+        },
+        {
+          "text": "2",
+          "marks": [
+            "sub"
+          ]
+        },
+        {
+          "text": "O x"
+        },
+        {
+          "text": "2",
+          "marks": [
+            "sup"
+          ]
+        },
+        {
+          "text": " "
+        },
+        {
+          "text": "n",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " "
+        },
+        {
+          "text": "both",
+          "marks": [
+            "bold",
+            "italic"
+          ]
+        },
+        {
+          "text": " "
+        },
+        {
+          "text": "Esc",
+          "marks": [
+            "kbd"
+          ],
+          "link": {
+            "href": "https://docs.example.com/keys",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " key",
+          "link": {
+            "href": "https://docs.example.com/keys",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "ir_version": 1,
+  "title": "Links",
+  "source": {
+    "url": "https://docs.example.com/fixtures/base-href-links",
+    "final_url": "https://docs.example.com/fixtures/base-href-links",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "c3282cfa7a741b4a4cb39cf071f7f2d330c940333f9b517fe1b29a8794c07170"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "c4428a5c043c",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "links",
+      "content": [
+        {
+          "text": "Links"
+        }
+      ]
+    },
+    {
+      "id": "0a27bf7cdcef",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Relative",
+          "link": {
+            "href": "https://docs.example.com/v2/guide/install",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "root-relative",
+          "link": {
+            "href": "https://docs.example.com/api/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "www host",
+          "link": {
+            "href": "https://www.docs.example.com/blog/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "another site",
+          "link": {
+            "href": "https://go.dev/doc/",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "this section",
+          "link": {
+            "href": "#links",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "mail",
+          "link": {
+            "href": "mailto:docs@example.com",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " and a script link."
+        }
+      ]
+    },
+    {
+      "id": "b0a6c277695b",
+      "kind": "image",
+      "src": "https://docs.example.com/v2/guide/img/diagram.png",
+      "alt": "Diagram"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "ir_version": 1,
+  "title": "Windows line endings",
+  "source": {
+    "url": "https://docs.example.com/fixtures/crlf",
+    "final_url": "https://docs.example.com/fixtures/crlf",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "70cddf9cc15faaa7278abacd3f47bec9917afa36322d70b33577e38def55a5e8"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "bcdf602dbbf9",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "windows-line-endings",
+      "content": [
+        {
+          "text": "Windows line endings"
+        }
+      ]
+    },
+    {
+      "id": "b546e7b6d9f6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This file uses CRLF. The text keeps reading as one paragraph."
+        }
+      ]
+    },
+    {
+      "id": "bb5213835a0d",
+      "kind": "code",
+      "lang": "bat",
+      "text": "@echo off\necho one\necho two\nREM after a lone CR\n"
+    }
+  ]
+}

@@ -1,1 +1,4 @@
 * text=auto eol=lf
+
+# Golden inputs are byte-exact test data: no line ending conversion.
+testdata/golden/**/input.html -text

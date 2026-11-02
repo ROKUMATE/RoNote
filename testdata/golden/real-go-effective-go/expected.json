@@ -1,0 +1,526 @@
+{
+  "ir_version": 1,
+  "title": "Effective Go",
+  "source": {
+    "url": "https://go.dev/doc/effective_go",
+    "final_url": "https://go.dev/doc/effective_go",
+    "canonical_url": "https://go.dev/doc/effective_go",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "9c8633e8fc5a1f613ad97bc263488d486767139c77f33d3743b51e874bc2b610"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "84df2f7dc829",
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        [
+          {
+            "id": "91c3e400b6da",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "Documentation",
+                "link": {
+                  "href": "https://go.dev/doc/",
+                  "kind": "same_domain"
+                }
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "id": "8f7fab92f1c3",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "Effective Go",
+                "link": {
+                  "href": "https://go.dev/doc/effective_go",
+                  "kind": "same_domain"
+                }
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "id": "ada36f4c30cb",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "effective-go",
+      "content": [
+        {
+          "text": "Effective Go"
+        }
+      ]
+    },
+    {
+      "id": "e6d4017757ce",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Note:",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " This document was written for Go's release in 2009 and is not actively updated. While it remains a good guide for using the core language, it does not cover significant changes to the language (generics), ecosystem (modules), or libraries added since. See "
+        },
+        {
+          "text": "issue 28782",
+          "link": {
+            "href": "https://go.dev/issue/28782",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " for context. For a complete list of changes, see the "
+        },
+        {
+          "text": "release notes",
+          "link": {
+            "href": "https://go.dev/doc/devel/release",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "cf8ac3a2dcac",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "introduction",
+      "content": [
+        {
+          "text": "Introduction"
+        }
+      ]
+    },
+    {
+      "id": "6ad8658261d7",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Go is an open-source programming language that focuses on simplicity, reliability, and efficiency, specifically designed to make it easy to build software at scale. Although it borrows ideas from existing languages, it has unusual properties that make effective Go programs different in character from programs written in its relatives. A straightforward translation of a C++ or Java program into Go is unlikely to produce a satisfactory result—Java programs are written in Java, not Go. On the other hand, thinking about the problem from a Go perspective could produce a successful but quite different program. In other words, to write Go well, it's important to understand its properties and idioms. It's also important to know the established conventions for programming in Go, such as naming, formatting, program construction, and so on, so that programs you write will be easy for other Go programmers to understand."
+        }
+      ]
+    },
+    {
+      "id": "9e078c1c615d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This document gives tips for writing clear, idiomatic Go code. It augments the "
+        },
+        {
+          "text": "language specification",
+          "link": {
+            "href": "https://go.dev/ref/spec",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", the "
+        },
+        {
+          "text": "Tour of Go",
+          "link": {
+            "href": "https://go.dev/tour/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", and "
+        },
+        {
+          "text": "How to Write Go Code",
+          "link": {
+            "href": "https://go.dev/doc/code.html",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", all of which you should read first."
+        }
+      ]
+    },
+    {
+      "id": "d3611e17c963",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "examples",
+      "content": [
+        {
+          "text": "Examples"
+        }
+      ]
+    },
+    {
+      "id": "8c898302e4b9",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The "
+        },
+        {
+          "text": "Go package sources",
+          "link": {
+            "href": "https://go.dev/src/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " are intended to serve not only as the core library but also as examples of how to use the language. Moreover, many of the packages contain working, self-contained executable examples you can run directly from the "
+        },
+        {
+          "text": "go.dev",
+          "link": {
+            "href": "https://go.dev/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " web site, such as "
+        },
+        {
+          "text": "this one",
+          "link": {
+            "href": "https://go.dev/pkg/strings/#example-Map",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " (if necessary, click on the word \"Example\" to open it up). If you have a question about how to approach a problem or how something might be implemented, the documentation, code and examples in the library can provide answers, ideas and background."
+        }
+      ]
+    },
+    {
+      "id": "d1dda8c40927",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "formatting",
+      "content": [
+        {
+          "text": "Formatting"
+        }
+      ]
+    },
+    {
+      "id": "212159be9439",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Formatting issues are the most contentious but the least consequential. People can adapt to different formatting styles but it's better if they don't have to, and less time is devoted to the topic if everyone adheres to the same style. The problem is how to approach this Utopia without a long prescriptive style guide."
+        }
+      ]
+    },
+    {
+      "id": "69f2ba418e9a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "With Go we take an unusual approach and let the machine take care of most formatting issues. The "
+        },
+        {
+          "text": "gofmt",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " program (also available as "
+        },
+        {
+          "text": "go fmt",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", which operates at the package level rather than source file level) reads a Go program and emits the source in a standard style of indentation and vertical alignment, retaining and if necessary reformatting comments. If you want to know how to handle some new layout situation, run "
+        },
+        {
+          "text": "gofmt",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "; if the answer doesn't seem right, rearrange your program (or file a bug about "
+        },
+        {
+          "text": "gofmt",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "), don't work around it."
+        }
+      ]
+    },
+    {
+      "id": "7e898d49ff0c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "As an example, there's no need to spend time lining up the comments on the fields of a structure. "
+        },
+        {
+          "text": "Gofmt",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " will do that for you. Given the declaration"
+        }
+      ]
+    },
+    {
+      "id": "56d39b81008c",
+      "kind": "code",
+      "text": "type T struct {\n    name string // name of the object\n    value int // its value\n}\n"
+    },
+    {
+      "id": "fe4478ce0107",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "gofmt",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " will line up the columns:"
+        }
+      ]
+    },
+    {
+      "id": "83dcbd4f02a6",
+      "kind": "code",
+      "text": "type T struct {\n    name    string // name of the object\n    value   int    // its value\n}\n"
+    },
+    {
+      "id": "179fe5d2aafd",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "All Go code in the standard packages has been formatted with "
+        },
+        {
+          "text": "gofmt",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "2f7780bb1a4c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Some formatting details remain. Very briefly:"
+        }
+      ]
+    },
+    {
+      "id": "de592245ffa0",
+      "kind": "list",
+      "items": [
+        [
+          {
+            "id": "7e916e4ab15f",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "Indentation",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "fc903c973ab8",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "We use tabs for indentation and "
+              },
+              {
+                "text": "gofmt",
+                "marks": [
+                  "code"
+                ]
+              },
+              {
+                "text": " emits them by default. Use spaces only if you must."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "id": "5ecc79e06888",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "Line length",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "61693d55338f",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "Go has no line length limit. Don't worry about overflowing a punched card. If a line feels too long, wrap it and indent with an extra tab."
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "id": "4591d3bece63",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "Parentheses",
+                "marks": [
+                  "bold"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "2589dd00864a",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "Go needs fewer parentheses than C and Java: control structures ("
+              },
+              {
+                "text": "if",
+                "marks": [
+                  "code"
+                ]
+              },
+              {
+                "text": ", "
+              },
+              {
+                "text": "for",
+                "marks": [
+                  "code"
+                ]
+              },
+              {
+                "text": ", "
+              },
+              {
+                "text": "switch",
+                "marks": [
+                  "code"
+                ]
+              },
+              {
+                "text": ") do not have parentheses in their syntax. Also, the operator precedence hierarchy is shorter and clearer, so"
+              }
+            ]
+          },
+          {
+            "id": "5c31c89f2244",
+            "kind": "code",
+            "text": "x<<8 + y<<16\n"
+          },
+          {
+            "id": "d1ac74b3712a",
+            "kind": "paragraph",
+            "content": [
+              {
+                "text": "means what the spacing implies, unlike in the other languages."
+              }
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "id": "090f073cb7b2",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "commentary",
+      "content": [
+        {
+          "text": "Commentary"
+        }
+      ]
+    },
+    {
+      "id": "51316e6d955c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Go provides C-style "
+        },
+        {
+          "text": "/* */",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " block comments and C++-style "
+        },
+        {
+          "text": "//",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " line comments. Line comments are the norm; block comments appear mostly as package comments, but are useful within an expression or to disable large swaths of code."
+        }
+      ]
+    },
+    {
+      "id": "e19fa4a2fe6b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Comments that appear before top-level declarations, with no intervening newlines, are considered to document the declaration itself. These “doc comments” are the primary documentation for a given Go package or command. For more about doc comments, see “"
+        },
+        {
+          "text": "Go Doc Comments",
+          "link": {
+            "href": "https://go.dev/doc/comment",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "”."
+        }
+      ]
+    }
+  ]
+}

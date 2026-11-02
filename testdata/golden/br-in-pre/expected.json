@@ -1,0 +1,37 @@
+{
+  "ir_version": 1,
+  "title": "br in pre",
+  "source": {
+    "url": "https://docs.example.com/fixtures/br-in-pre",
+    "final_url": "https://docs.example.com/fixtures/br-in-pre",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "34c90c6f92c21445933132bc81b4704e8cbe2685e6a5266f9547e3b0d0366e77"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "cfcd11ee6434",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "br-in-pre",
+      "content": [
+        {
+          "text": "br in pre"
+        }
+      ]
+    },
+    {
+      "id": "d03c0dfd2056",
+      "kind": "code",
+      "text": "first\nsecond\nthird\n\nfourth"
+    },
+    {
+      "id": "4c55d388ded0",
+      "kind": "code",
+      "text": "// one\nreturn x\n"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "ir_version": 1,
+  "title": "Unicode text 文字",
+  "source": {
+    "url": "https://docs.example.com/fixtures/unicode",
+    "final_url": "https://docs.example.com/fixtures/unicode",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "9f173c9f6277db176aeb1b901fea8f1e2d2855d6745106f64ca0becd09e793c2"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "17a4a0276ec5",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "unicode-text-文字",
+      "content": [
+        {
+          "text": "Unicode text 文字"
+        }
+      ]
+    },
+    {
+      "id": "3446f7bd599c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Café, naïve, Ångström; 日本語のテキスト; مرحبا بالعالم; 👩‍💻 developer; é combining."
+        }
+      ]
+    },
+    {
+      "id": "4f732091f1d2",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "No-break spaces  stay."
+        }
+      ]
+    },
+    {
+      "id": "ba198bc90084",
+      "kind": "code",
+      "lang": "python",
+      "text": "# -*- coding: utf-8 -*-\ngreeting = \"こんにちは\"  # 挨拶\nemoji = \"👩‍💻🚀\"\nname = \"Zoë Ångström\"\narabic = \"مرحبا\"\n"
+    }
+  ]
+}

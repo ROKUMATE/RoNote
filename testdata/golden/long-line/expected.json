@@ -1,0 +1,42 @@
+{
+  "ir_version": 1,
+  "title": "Long lines",
+  "source": {
+    "url": "https://docs.example.com/fixtures/long-line",
+    "final_url": "https://docs.example.com/fixtures/long-line",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "8d3e721215ebe2660ecf20998d3befae0dc45ab32e5e196793f1c90e359995f1"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "c58d81cee701",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "long-lines",
+      "content": [
+        {
+          "text": "Long lines"
+        }
+      ]
+    },
+    {
+      "id": "fbb5fc37488a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Long lines must scroll, not wrap, and stay one line."
+        }
+      ]
+    },
+    {
+      "id": "69727d522b26",
+      "kind": "code",
+      "lang": "js",
+      "text": "const message = \"abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghij\";x\n"
+    }
+  ]
+}

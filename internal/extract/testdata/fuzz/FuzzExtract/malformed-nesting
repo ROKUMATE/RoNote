@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("<main><p><b><i>x</b></i></p><pre><code>a</pre></code><ul><li>one<li>two</ul></table></main>")

@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"log/slog"
+	"math"
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestRequestID(t *testing.T) {
@@ -148,8 +150,34 @@ func TestAccessLog(t *testing.T) {
 			t.Errorf("log %s = %v, want %v", k, line[k], v)
 		}
 	}
-	if _, ok := line["duration"].(float64); !ok {
-		t.Errorf("log duration = %v, want a number", line["duration"])
+	ms, ok := line["duration_ms"].(float64)
+	if !ok || ms < 0 || math.Abs(ms*1000-math.Round(ms*1000)) > 1e-6 {
+		t.Errorf("log duration_ms = %v, want milliseconds with at most 3 decimals", line["duration_ms"])
+	}
+	if d, ok := line["duration"]; ok {
+		t.Errorf("log has duration = %v, want only duration_ms", d)
+	}
+}
+
+func TestDurationMS(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		in   time.Duration
+		want float64
+	}{
+		{in: 0, want: 0},
+		{in: 253 * time.Microsecond, want: 0.253},
+		{in: 253400 * time.Nanosecond, want: 0.253},
+		{in: 253500 * time.Nanosecond, want: 0.254},
+		{in: 1500 * time.Microsecond, want: 1.5},
+		{in: 2*time.Second + 345678*time.Nanosecond, want: 2000.346},
+	}
+
+	for _, tt := range tests {
+		if got := durationMS(tt.in); got != tt.want {
+			t.Errorf("durationMS(%v) = %v, want %v", tt.in, got, tt.want)
+		}
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"errors"
 	"log/slog"
+	"math"
 	"net/http"
 	"regexp"
 	"runtime/debug"
@@ -56,10 +57,16 @@ func withAccessLog(logger *slog.Logger, next http.Handler) http.Handler {
 			slog.String("method", r.Method),
 			slog.String("path", r.URL.Path),
 			slog.Int("status", status),
-			slog.Duration("duration", time.Since(start)),
+			slog.Float64("duration_ms", durationMS(time.Since(start))),
 			slog.String("request_id", requestID(r.Context())),
 		)
 	})
+}
+
+// durationMS returns d in milliseconds rounded to 3 decimals, so logs read
+// the same in every handler instead of JSON printing raw nanoseconds.
+func durationMS(d time.Duration) float64 {
+	return math.Round(float64(d)/float64(time.Microsecond)) / 1000
 }
 
 // withRecovery logs a panic and answers with a 500 envelope if no response

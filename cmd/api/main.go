@@ -54,7 +54,7 @@ func run() error {
 	}
 	stop()
 
-	logger.Info("api shutting down", "timeout", shutdownTimeout)
+	logger.Info("api shutting down", "timeout_ms", shutdownTimeout.Milliseconds())
 	shutdownCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), shutdownTimeout)
 	defer cancel()
 	if err := srv.Shutdown(shutdownCtx); err != nil {

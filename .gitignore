@@ -1,0 +1,32 @@
+# Go
+/bin/
+*.exe
+*.test
+*.out
+*.prof
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env*
+!.env.example
+
+# Coverage
+coverage/
+*.coverprofile
+
+# Playwright
+playwright-report/
+test-results/
+
+# OS
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini

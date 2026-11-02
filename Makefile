@@ -1,10 +1,18 @@
+# Local settings: plain KEY=value lines. They override the shell environment;
+# make VAR=value still wins.
+ifneq ($(wildcard .env.dev),)
+include .env.dev
+export $(shell sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p' .env.dev)
+endif
+
 GOLANGCI_LINT_VERSION := 2.15.0
 GOLANGCI_LINT := bin/golangci-lint
 golangci_lint_current = [ "$$($(GOLANGCI_LINT) version --short 2>/dev/null)" = "$(GOLANGCI_LINT_VERSION)" ]
 golangci_lint_required = $(golangci_lint_current) || { echo "$(GOLANGCI_LINT) $(GOLANGCI_LINT_VERSION) not found; run make tools" >&2; exit 1; }
+COMPOSE := sh scripts/container.sh compose
 
 help: ## Show available targets
-	@awk 'BEGIN { FS = ":.*## " } /^[a-z][a-z-]*:.*## / { printf "  %-12s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+	@awk 'BEGIN { FS = ":.*## " } /^[a-z][a-z-]*:.*## / { printf "  %-18s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 setup: ## Install the commit hook and rebase on pull
 	git config core.hooksPath .githooks
@@ -37,4 +45,17 @@ fmt: ## Format Go code with gofumpt and goimports
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) fmt
 
-.PHONY: help setup hooks-test tools test run-api lint fmt
+dev-up: ## Start the dev stack (Postgres) and wait until it is healthy
+	@[ -f .env.dev ] || { cp .env.example .env.dev; echo "make dev-up: created .env.dev from .env.example"; }
+	$(COMPOSE) up -d --wait
+
+dev-down: ## Stop the dev stack; the data volume is kept
+	$(COMPOSE) down
+
+dev-logs: ## Follow the dev stack logs
+	$(COMPOSE) logs -f
+
+db-shell: ## Open psql on the dev database
+	$(COMPOSE) exec postgres psql -U ronote -d ronote
+
+.PHONY: help setup hooks-test tools test run-api lint fmt dev-up dev-down dev-logs db-shell

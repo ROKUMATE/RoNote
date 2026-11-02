@@ -1,0 +1,23 @@
+name: ronote
+
+services:
+  postgres:
+    # pgvector 0.8.7 on Postgres 18 (built-in uuidv7). The digest covers arm64 and amd64.
+    image: pgvector/pgvector:0.8.7-pg18-trixie@sha256:5895949dfcdf308eb0cd31c950c93c14895c77f33fbedfecf1fa511ab1d4bcd2
+    environment:
+      POSTGRES_USER: ronote
+      POSTGRES_PASSWORD: ronote
+      POSTGRES_DB: ronote
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      # Postgres 18 images keep data under /var/lib/postgresql/18/docker.
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ronote -d ronote"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  pgdata:

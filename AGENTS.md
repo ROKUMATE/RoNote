@@ -51,10 +51,20 @@ Create a directory when its first file needs it, not before.
 | `make e2e` (P0x) | Playwright end-to-end tests |
 | `make run-api` | run the API on `127.0.0.1:8080`; `RONOTE_ENV` defaults to `dev` |
 | `make dev` (P0x) | run API, worker and web locally |
+| `make dev-up` | start the dev stack (`deploy/compose.dev.yml`) and wait until healthy; creates `.env.dev` if missing |
+| `make dev-down` | stop the dev stack; the data volume is kept |
+| `make dev-logs` | follow the dev stack logs |
+| `make db-shell` | psql on the dev database |
 | `make build` (P0x) | build the Go binaries and the web bundle |
 | `make migrate` (P0x) | apply database migrations |
 
 Targets marked (P0x) do not exist yet. The phase that adds a target removes its tag.
+
+### Local containers
+
+- macOS uses podman machine (rootless); Linux and CI use Docker. `scripts/container.sh` picks whichever answers.
+- `podman compose` needs a compose provider: `brew install docker-compose` (or podman-compose). `make dev-up` fails with a clear message when neither `podman compose` nor `docker compose` works.
+- `.env.example` lists every variable. Copy it to `.env.dev` (gitignored); the Makefile loads it, its values override the shell environment, and `make VAR=value` still wins.
 
 Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`. golangci-lint is the exception: `make tools` installs the version pinned in the Makefile into `./bin`.
 

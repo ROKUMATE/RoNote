@@ -1,5 +1,6 @@
 import { BooksIcon } from "@phosphor-icons/react/Books";
 import { Link, Outlet } from "@tanstack/react-router";
+import { Settings } from "./Settings";
 
 const navLink =
   "flex items-center gap-2 rounded-sm px-2 py-1 text-ui-lg text-ink-2 hover:bg-paper-2 hover:text-ink aria-[current=page]:bg-paper-2 aria-[current=page]:text-ink";
@@ -32,6 +33,7 @@ export function AppShell() {
             </li>
           </ul>
         </nav>
+        <Settings />
       </header>
       <div className="min-w-0 notes:grid notes:grid-cols-[minmax(0,1fr)_280px]">
         <main id="main" tabIndex={-1} className="min-w-0 px-4 py-8 sidebar:px-12 sidebar:py-12">

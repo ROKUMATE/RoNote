@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>RoNote</title>
+    <script id="boot-preferences">
+      // Applies saved preferences before first paint. Keys and values mirror src/preferences.ts.
+      try {
+        const root = document.documentElement;
+        const theme = localStorage.getItem("ronote.theme");
+        if (theme === "light" || theme === "dark") root.setAttribute("data-theme", theme);
+        if (localStorage.getItem("ronote.readerFont") === "sans") root.setAttribute("data-reader-font", "sans");
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

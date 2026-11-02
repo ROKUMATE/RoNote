@@ -1,13 +1,14 @@
 #!/bin/sh
 # Enforces the one-line "Type: Summary" commit format (docs/adr/0003).
-# Drops comments, blank lines and agent trailers, then rewrites the message
-# file to the single remaining line. Git's own merge and revert messages
-# pass through untouched.
+# Drops comments, blank lines and, after line 1, agent and revert trailers,
+# then rewrites the message file to the single remaining line. Git's own
+# merge and revert subjects skip the type and length checks.
 set -u
 
 msg_file=$1
 types='Feat Fix Refactor Perf Test Doc Style Build CI Chore Sec'
 type_re=$(printf '%s' "$types" | tr ' ' '|')
+git_re='^(Merge (branch|branches|remote-tracking branch|pull request|tag|commit) |Revert ".+"$)'
 max_len=72
 
 # fail SUBJECT PROBLEM...
@@ -22,11 +23,6 @@ fail() {
   exit 1
 }
 
-first=$(awk '/^#/ || /^[ \t]*$/ { next } { print; exit }' "$msg_file")
-case $first in
-  'Merge '* | 'Revert "'*) exit 0 ;;
-esac
-
 lines=$(awk '
   /^# -+ >8 -+$/ { exit }
   /^#/ || /^[ \t]*$/ { next }
@@ -34,7 +30,8 @@ lines=$(awk '
     n++
     lower = tolower($0)
     if (n > 1 && (lower ~ /^(co-authored-by|claude-session):/ ||
-      index(lower, "generated with [claude code") || index(lower, "generated with claude code"))) next
+      index(lower, "generated with [claude code") || index(lower, "generated with claude code") ||
+      lower ~ /^this reverts commit [0-9a-f]+\.?$/)) next
     print
   }
 ' "$msg_file")
@@ -51,7 +48,7 @@ matches() {
   printf '%s\n' "$line" | LC_ALL=C grep -Eq "$1"
 }
 
-if matches "^($type_re): [A-Z].*[^. ]\$" && [ "$len" -le "$max_len" ]; then
+if matches "$git_re" || { matches "^($type_re): [A-Z].*[^. ]\$" && [ "$len" -le "$max_len" ]; }; then
   printf '%s\n' "$line" >"$msg_file"
   exit 0
 fi

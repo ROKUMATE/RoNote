@@ -69,8 +69,8 @@ rejects '73 chars' 'Feat: Import same-domain links on click and keep other-domai
   'line is 73 characters'
 rejects 'unknown type' 'Feature: Add page importer' 'Feat Fix Refactor Perf Test Doc Style Build CI Chore Sec'
 rejects 'missing space after colon' 'Feat:Add page importer' 'exactly one space'
-accepts 'merge message untouched' "$merge_msg" "$merge_msg"
-accepts 'revert message untouched' "$revert_msg" "$revert_msg"
+accepts 'merge comments dropped' "$merge_msg" "Merge branch 'import-links' into main"
+accepts 'revert with full hash' "$revert_msg" 'Revert "Feat: Add page importer"'
 accepts '72 chars' 'Fix: Keep code blocks byte-identical when importing printed PDF handouts' \
   'Fix: Keep code blocks byte-identical when importing printed PDF handouts'
 accepts 'git template comments stripped' 'Test: Cover link classification
@@ -99,6 +99,15 @@ accepts 'Generated with Claude Code on line 2 stripped' 'Feat: Add x
 🤖 Generated with [Claude Code](https://claude.com/claude-code)' 'Feat: Add x'
 accepts 'Claude-Session on line 2 stripped' 'Feat: Add x
 Claude-Session: https://claude.ai/code/session_abc' 'Feat: Add x'
+rejects 'Merge without git format' 'Merge stuff' 'not one of the allowed types'
+rejects 'Revert without git format' 'Revert everything' 'not one of the allowed types'
+accepts 'git default revert message' 'Revert "Feat: Add x"
+
+This reverts commit 1a2b3c4.' 'Revert "Feat: Add x"'
+accepts 'git merge message' "Merge branch 'p02'" "Merge branch 'p02'"
+rejects 'git merge message with body' "Merge branch 'p02'
+
+Resolve conflicts" 'expected 1 line'
 
 printf '\n%s passed, %s failed\n' "$passed" "$failed"
 [ "$failed" -eq 0 ]

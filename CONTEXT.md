@@ -4,52 +4,54 @@ Current state of the project. Rewrite this file at the end of each phase; never 
 
 ## Current milestone
 
-P05, CI on GitHub Actions: done locally. `.github/workflows/ci.yml` is in place and actionlint finds nothing, but it has never run, because agents don't push. The first push to github.com/ROKUMATE/RoNote will be its first run.
+P06, fetcher, IR, generic extractor and verbatim golden tests: done.
+- One documentation page can be fetched safely and turned into IR blocks with byte-exact code.
+- It's not wired to the API or DB yet; P08 adds import jobs and persistence.
+- `make extract url=...` shows the pipeline end to end.
 
 ## Decisions so far
 
 Product and process:
-- Stack: Go API and worker, React + TypeScript + Tailwind v4 web app, Postgres + pgvector, one monorepo (docs/adr/0001-stack.md).
-- Source content is verbatim and code blocks are byte-identical. Machine-made content is labelled "generated" (docs/adr/0002-verbatim-source.md).
-- License: MIT. The default branch is `main`. Agents never push. Run `make check` before pushing.
+- Stack: Go API and worker, React + TypeScript + Tailwind v4 web app, Postgres + pgvector, one monorepo (ADR 0001).
+- Source is verbatim and code byte-identical (ADR 0002), enforced by `TestCodeIsVerbatim`.
+- Commits are one line, `Type: Summary`; the hook (strict mode in CI) enforces it (ADR 0003).
+- PRs merge by rebase only, so main's history keeps one-line commits. The red push run after the PR #1 merge commit was the reason; the repository is set to rebase merges only since P06.
+- License: MIT. Agents never push. Run `make check` before pushing.
 
-Commits:
-- One line, `Type: Summary`. `.githooks/commit-msg` enforces it (docs/adr/0003-commit-convention.md).
-- `COMMIT_MSG_STRICT=1` runs the same hook in strict mode: it checks the stored message, strips nothing and rewrites nothing.
-- `scripts/check-commits.sh RANGE` checks every commit in a range in strict mode and names each bad commit by short sha and subject.
-- `scripts/commit-range.sh` picks CI's range: base..head for a PR, before..sha for a push, and `sha~1..sha` when `before` is all zeros or not an ancestor.
+IR (`internal/ir`, ADR 0004):
+- Closed block set: heading, paragraph, list, code, table, callout, image, quote, divider. Inline runs carry marks and links (anchor, same_domain or external).
+- `Validate` checks every rule.
+- Block IDs come from sha256 of heading path, kind and text, with `-n` for repeats.
+- Warnings: `low_confidence` (no main element), `parse_failed` (a page the HTML parser rejects, which gives an empty doc).
 
-CI (`.github/workflows/ci.yml`; AGENTS.md has a table of jobs and how to reproduce each):
-- Runs on push to `main` and on pull requests. Steps only call make targets.
-- Permissions are `contents: read`. Superseded runs for the same ref are cancelled. Every job has a timeout, and checkouts use `persist-credentials: false`.
-- Jobs: commits, go, integration (runner Docker, Ryuk on), web, and e2e after web.
-- **Action pins (full SHAs):**
-  - checkout v7.0.1, setup-go v7.0.0, setup-node v7.1.0
-  - cache v6.1.0, upload-artifact v7.0.2
-  - pnpm/action-setup v6.1.0
-- **Caches:** golangci-lint in `bin/`, keyed on its version. Playwright browsers keyed on the Playwright version. setup-go and setup-node cache Go modules, the Go build cache and the pnpm store.
-- Each job checks the toolchain it uses: go1.26.1 from go.mod's `toolchain`, Node 26.13.0 from `.nvmrc`.
+Fetcher (`internal/fetch`):
+- Rules: http(s) only, ports 80 and 443 only, a 5 MB cap, `text/html` or XHTML only, charset decoded to UTF-8.
+- Timeouts: 5s connect, 20s total.
+- User agent: `RoNoteBot/0.1`.
+- **SSRF guard:** runs at dial time, on redirects too (at most 5).
+  - Always blocked: unspecified, multicast, reserved, IPv4-mapped IPv6 and 169.254.169.254.
+  - Also blocked: loopback, private, link-local, CGNAT, ULA and NAT64, unless `AllowPrivateNetworks`. That option also lifts the port rule, and `RONOTE_FETCH_ALLOW_PRIVATE` may set it only in dev and test.
+- **robots.txt:** RFC 9309 subset, cached per origin for 1h. 404/410 allow everything; 5xx and other statuses deny; 5xx answers are not cached.
+- **Rate limit:** 1 request per second per host.
+- **Conditional GET:** sends ETag and Last-Modified and returns `NotModified`.
+- Typed errors.
+- The config field is not read until P08.
 
-Make targets:
-- `check` = `lint` + `test` + `hooks-test`.
-- `lint` = `lint-go` (golangci-lint, deadcode, actionlint v1.7.12 as a go tool) + `lint-web` (Biome, tsc, knip).
-- `test` = `test-go` + `test-web`.
-- `web-build` runs the styleguide guard and then the bundle budget in `scripts/web-budget.sh`: JS 150 kB, CSS 20 kB gzip. Today the JS is 100.8 kB and the CSS 7.8 kB.
+Extractor (`internal/extract`, generic v1):
+- Root: main, then article, then `[role=main]`, else body without header and footer, plus `low_confidence`.
+- Fixed removal list (nav, aside, script, form, `[hidden]`, skip and permalink links, ...).
+- Callouts come from class or role markers.
+- Heading anchors: the heading's id, the opening section's id, an inner `a[id|name]`, then a slug.
+- Linear time on adversarial input, with a test guarding it.
+- Golden tests: 19 fixtures in `testdata/golden` (16 hand-written, 3 licensed excerpts in `SOURCES.md`).
+- `FuzzExtract`: 10 committed seeds plus the fixtures. 60s runs find nothing.
 
-Go side (unchanged in P05):
-- Go 1.26 (`toolchain go1.26.1`). goose, sqlc and deadcode are go tools; golangci-lint v2.15.0 comes from `make tools`.
-- The API needs `RONOTE_DATABASE_URL`. `/readyz` pings Postgres.
-- `store` returns `ErrNotFound`/`ErrConflict`. Integration tests use `internal/pgtest` with a leak check.
-
-Web side (unchanged in P05 apart from `.nvmrc`):
-- Node 26.13.0 (`.nvmrc`, `engines`), pnpm 12.16.1, Vite 8, React 19, TypeScript 7, Tailwind 4 with the tokens in `src/styles/tokens.css`.
-- Browser floor: Chrome/Edge 123+, Firefox 125+, Safari 17.5+.
-- The styleguide is dev-only. Playwright runs with axe; in CI it also writes the HTML report.
+Unchanged: the API (`/healthz`, `/readyz` with Postgres), the store and migrations, testcontainers integration tests, the web app (P04 tokens, shell, styleguide), and CI (P05).
 
 ## Open questions
 
-- GNU tools for the hook scripts: closed once CI is green. The commits job runs `make hooks-test` on ubuntu with dash and GNU tools.
+- Generic extraction keeps in-page chrome that sits inside the content root, such as go.dev's breadcrumb list. P07's framework adapters are where site-specific cleanup belongs.
 
 ## Next step
 
-P06: the verbatim guarantee (TestCodeIsVerbatim). Detailed scope not yet written.
+P07: framework adapters on top of the generic extractor (detailed scope not yet written).

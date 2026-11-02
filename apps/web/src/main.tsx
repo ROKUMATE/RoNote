@@ -4,9 +4,10 @@ import "@fontsource-variable/ibm-plex-sans/wght.css";
 import "@fontsource-variable/ibm-plex-sans/wght-italic.css";
 import "@fontsource-variable/jetbrains-mono/wght.css";
 import "./styles/app.css";
+import { RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { App } from "./App";
+import { createAppRouter } from "./router";
 
 const root = document.getElementById("root");
 if (!root) {
@@ -14,6 +15,6 @@ if (!root) {
 }
 createRoot(root).render(
   <StrictMode>
-    <App />
+    <RouterProvider router={createAppRouter()} />
   </StrictMode>,
 );

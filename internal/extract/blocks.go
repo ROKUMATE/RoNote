@@ -209,10 +209,15 @@ func (e *extractor) heading(n *html.Node) *ir.Block {
 	return &ir.Block{Kind: ir.KindHeading, Level: level, Anchor: e.anchor(n, content), Content: content}
 }
 
-// anchor is the heading's id, else the id or name of an <a> inside it, else
-// a slug of its text. Slugs are made unique within the page.
+// anchor is the heading's id, else the id of the <section> it opens, else
+// the id or name of an <a> inside it, else a slug of its text. Slugs are made
+// unique within the page.
 func (e *extractor) anchor(n *html.Node, content []ir.Inline) string {
 	if id := strings.TrimSpace(attr(n, "id")); id != "" {
+		e.anchors[id] = true
+		return id
+	}
+	if id := strings.TrimSpace(attr(n.Parent, "id")); id != "" && n.Parent.DataAtom == atom.Section && firstContent(n.Parent) == n {
 		e.anchors[id] = true
 		return id
 	}
@@ -231,6 +236,17 @@ func (e *extractor) anchor(n *html.Node, content []ir.Inline) string {
 	}
 	e.anchors[anchor] = true
 	return anchor
+}
+
+// firstContent is n's first child element that has text, skipping empty
+// link targets such as Sphinx's <span id="..."></span>.
+func firstContent(n *html.Node) *html.Node {
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		if c.Type == html.ElementNode && collapse(textContent(c)) != "" {
+			return c
+		}
+	}
+	return nil
 }
 
 func (e *extractor) list(n *html.Node) *ir.Block {

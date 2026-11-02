@@ -65,3 +65,23 @@ jobs:
         run: make test-go
       - name: Check generated code is up to date
         run: make check-generated
+
+  integration:
+    name: Postgres integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+          cache-dependency-path: go.sum
+      - name: Check the Go toolchain
+        run: make check-go-version
+      # The runner's Docker: scripts/container.sh only changes testcontainers
+      # settings for a running podman machine, so Ryuk stays on here.
+      - name: Run integration tests
+        run: make test-integration

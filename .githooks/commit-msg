@@ -3,9 +3,14 @@
 # Drops comments, blank lines and, after line 1, agent and revert trailers,
 # then rewrites the message file to the single remaining line. Git's own
 # merge and revert subjects skip the type and length checks.
+#
+# COMMIT_MSG_STRICT=1 checks a message as stored (scripts/check-commits.sh):
+# only blank lines are ignored, nothing is dropped, and the file is never
+# rewritten, so a trailer or body fails instead of being stripped.
 set -u
 
 msg_file=$1
+strict=${COMMIT_MSG_STRICT:-}
 types='Feat Fix Refactor Perf Test Doc Style Build CI Chore Sec'
 type_re=$(printf '%s' "$types" | tr ' ' '|')
 git_re='^(Merge (branch|branches|remote-tracking branch|pull request|tag|commit) |Revert ".+"$)'
@@ -23,7 +28,11 @@ fail() {
   exit 1
 }
 
-lines=$(awk '
+lines=$(awk -v strict="$strict" '
+  strict == "1" {
+    if (NF) print
+    next
+  }
   /^# -+ >8 -+$/ { exit }
   /^#/ || /^[ \t]*$/ { next }
   {
@@ -36,10 +45,18 @@ lines=$(awk '
   }
 ' "$msg_file")
 
-[ -n "$lines" ] || fail 'empty message' 'nothing left after dropping comments and blank lines'
+[ -n "$lines" ] || fail 'empty message' 'there is no subject line'
 
 count=$(printf '%s\n' "$lines" | wc -l | tr -d ' ')
-[ "$count" -eq 1 ] || fail "message with $count lines" 'expected 1 line; bodies and trailers are not allowed'
+if [ "$count" -ne 1 ]; then
+  set -- 'expected 1 line; bodies and trailers are not allowed'
+  while IFS= read -r extra; do
+    set -- "$@" "extra line: $extra"
+  done <<EOF
+$(printf '%s\n' "$lines" | sed 1d)
+EOF
+  fail "message with $count lines" "$@"
+fi
 
 line=$lines
 len=$(printf '%s' "$line" | wc -m | tr -d ' ')
@@ -49,7 +66,7 @@ matches() {
 }
 
 if matches "$git_re" || { matches "^($type_re): [A-Z].*[^. ]\$" && [ "$len" -le "$max_len" ]; }; then
-  printf '%s\n' "$line" >"$msg_file"
+  [ "$strict" = 1 ] || printf '%s\n' "$line" >"$msg_file"
   exit 0
 fi
 

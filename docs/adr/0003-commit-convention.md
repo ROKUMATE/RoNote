@@ -19,4 +19,4 @@ Coding agents write many of the commits. Left alone, they add multi-paragraph bo
 
 - The reasons behind changes live in ADRs and CONTEXT.md, not in commit bodies.
 - `git revert` works without editing. Reverting a revert (`Reapply "..."`) or a merge needs a hand-written `Type: Summary` message.
-- The hook only runs on clones where `make setup` has run. A CI check can enforce the same rule later.
+- The hook only runs on clones where `make setup` has run. CI runs the same hook in strict mode (`COMMIT_MSG_STRICT=1`, no stripping) over every pushed or proposed commit.

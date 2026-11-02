@@ -9,12 +9,13 @@ GOLANGCI_LINT_VERSION := 2.15.0
 GOLANGCI_LINT := bin/golangci-lint
 golangci_lint_current = [ "$$($(GOLANGCI_LINT) version --short 2>/dev/null)" = "$(GOLANGCI_LINT_VERSION)" ]
 golangci_lint_required = $(golangci_lint_current) || { echo "$(GOLANGCI_LINT) $(GOLANGCI_LINT_VERSION) not found; run make tools" >&2; exit 1; }
+go_toolchain = sed -n 's/^toolchain //p' go.mod
 COMPOSE := sh scripts/container.sh compose
 GOOSE := go tool goose -dir migrations postgres "$$RONOTE_DATABASE_URL"
 db_url_required = test -n "$$RONOTE_DATABASE_URL" || { echo "RONOTE_DATABASE_URL is not set; copy .env.example to .env.dev" >&2; exit 1; }
 WEB := pnpm --dir apps/web
-node_required = want=$$(cat .node-version); have=$$(node --version 2>/dev/null); [ "$$have" = "v$$want" ] || \
-	{ echo "Node $$want is required (.node-version), found $${have:-none}. With nvm: nvm install $$want && nvm use $$want" >&2; exit 1; }
+node_required = want=$$(cat .nvmrc); have=$$(node --version 2>/dev/null); [ "$$have" = "v$$want" ] || \
+	{ echo "Node $$want is required (.nvmrc), found $${have:-none}. With nvm: nvm install && nvm use" >&2; exit 1; }
 
 help: ## Show available targets
 	@awk 'BEGIN { FS = ":.*## " } /^[a-z][a-z0-9-]*:.*## / { printf "  %-18s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
@@ -24,8 +25,13 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook
+hooks-test: ## Test the commit message hook and scripts/check-commits.sh
 	sh scripts/test-commit-msg.sh
+	sh scripts/test-check-commits.sh
+
+check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
+	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
+		sh scripts/check-commits.sh "$$range"
 
 tools: ## Install the pinned golangci-lint into ./bin
 	@$(golangci_lint_current) || { \
@@ -34,19 +40,30 @@ tools: ## Install the pinned golangci-lint into ./bin
 		$(golangci_lint_current) || { echo "make tools: failed to install golangci-lint $(GOLANGCI_LINT_VERSION)" >&2; exit 1; }; \
 	}
 
-test: ## Run Go unit tests with the race detector, then web unit tests
+check: lint test hooks-test ## Run what CI's fast jobs run; do this before pushing
+
+test: test-go test-web ## Run Go and web unit tests
+
+test-go: ## Run Go unit tests with the race detector
 	go test -race -count=1 ./...
+
+test-web: ## Run web unit tests (Vitest)
 	@$(node_required)
 	$(WEB) test
 
 run-api: ## Run the API locally (RONOTE_ENV defaults to dev)
 	RONOTE_ENV=$${RONOTE_ENV:-dev} go run ./cmd/api
 
-lint: ## Lint Go (golangci-lint, deadcode) and web (Biome, tsc, knip)
+lint: lint-go lint-web ## Lint Go and web code
+
+lint-go: ## Lint Go code and CI workflows (golangci-lint, deadcode, actionlint)
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) run
 	@dead=$$(go tool deadcode -test -tags integration ./...) && [ -z "$$dead" ] || \
-		{ printf '%s\n' "$$dead" >&2; echo "make lint: deadcode failed or found unreachable functions" >&2; exit 1; }
+		{ printf '%s\n' "$$dead" >&2; echo "make lint-go: deadcode failed or found unreachable functions" >&2; exit 1; }
+	go tool actionlint
+
+lint-web: ## Lint web code (Biome, tsc, knip)
 	@$(node_required)
 	$(WEB) lint
 
@@ -86,35 +103,58 @@ migrate-new: ## Create a SQL migration: make migrate-new name=add_documents
 sqlc: ## Regenerate internal/store/sqlcdb from migrations and queries
 	go tool sqlc generate
 
+check-generated: ## Fail if sqlc output or go.mod/go.sum need regenerating
+	go tool sqlc generate
+	@test -z "$$(git status --porcelain -- internal/store/sqlcdb)" || \
+		{ git status --short -- internal/store/sqlcdb; echo "make check-generated: sqlc output is stale; run make sqlc and commit it" >&2; exit 1; }
+	go mod tidy -diff
+
+check-go-version: ## Print the Go toolchain; fail unless it is the one go.mod pins
+	@want=$$($(go_toolchain)); have=$$(go env GOVERSION); \
+		[ "$$have" = "$$want" ] || { echo "Go toolchain $$want is required (go.mod), found $$have" >&2; exit 1; }; \
+		echo "Go toolchain $$have, as pinned in go.mod"
+
+ci-cache-keys: ## (CI) Write tool versions used in cache keys to GITHUB_OUTPUT
+	@: "$${GITHUB_OUTPUT:?ci-cache-keys writes to GITHUB_OUTPUT, which only GitHub Actions sets}"
+	@echo "golangci_lint=$(GOLANGCI_LINT_VERSION)" >>"$$GITHUB_OUTPUT"
+	@sed -n 's/.*"@playwright\/test": "\([^"]*\)".*/playwright=\1/p' apps/web/package.json >>"$$GITHUB_OUTPUT"
+
 test-integration: ## Run unit and integration tests against throwaway Postgres containers
 	sh scripts/container.sh test go test -race -count=1 -tags integration ./...
 
 test-clean: ## Remove leftover testcontainers containers
 	sh scripts/container.sh clean
 
-web-install: ## Install web dependencies and the Playwright browser
+web-install: web-deps web-browsers ## Install web dependencies and the Playwright browser
+
+web-deps: ## Install web dependencies from the lockfile
 	@$(node_required)
 	pnpm install --frozen-lockfile
-	$(WEB) exec playwright install chromium
+
+web-browsers: ## Install Playwright's Chromium (WITH_DEPS=1 adds its system packages, for CI)
+	@$(node_required)
+	$(WEB) exec playwright install $(if $(WITH_DEPS),--with-deps) chromium
+
+check-node-version: ## Print the Node version; fail unless it is the one .nvmrc pins
+	@$(node_required); echo "Node $$(node --version), as pinned in .nvmrc"
 
 web-dev: ## Run the web dev server (styleguide at /_styleguide)
 	@$(node_required)
 	$(WEB) dev
 
-web-build: ## Build the web app for production; fails if dev-only code ships
+web-build: ## Build the web app; fails if dev-only code ships or it is over budget
 	@$(node_required)
 	$(WEB) build
 	@! grep -rIil styleguide apps/web/dist || \
 		{ echo "make web-build: dev-only styleguide code found in the files above" >&2; exit 1; }
-
-web-test: ## Run web unit tests (Vitest)
-	@$(node_required)
-	$(WEB) test
+	sh scripts/web-budget.sh
 
 web-e2e: ## Run web end-to-end tests (Playwright, Chromium)
 	@$(node_required)
 	$(WEB) e2e
 
-.PHONY: help setup hooks-test tools test run-api lint fmt dev-up dev-down dev-logs db-shell
-.PHONY: migrate-up migrate-down migrate-status migrate-new sqlc test-integration test-clean
-.PHONY: web-install web-dev web-build web-test web-e2e
+.PHONY: help setup hooks-test check-commits tools check test test-go test-web run-api lint lint-go lint-web fmt
+.PHONY: dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new sqlc
+.PHONY: check-generated check-go-version ci-cache-keys
+.PHONY: test-integration test-clean web-install web-deps web-browsers check-node-version
+.PHONY: web-dev web-build web-e2e

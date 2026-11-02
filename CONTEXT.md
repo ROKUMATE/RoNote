@@ -4,48 +4,52 @@ Current state of the project. Rewrite this file at the end of each phase; never 
 
 ## Current milestone
 
-P04, web skeleton, design tokens and fonts: done.
-- `apps/web` is a Vite + React + TypeScript app with the design tokens, self-hosted fonts and an app shell.
-- It has a Library page, theme and reader-font preferences, and a dev-only styleguide.
-- It makes no backend calls yet; the API client comes in P08.
+P05, CI on GitHub Actions: done locally. `.github/workflows/ci.yml` is in place and actionlint finds nothing, but it has never run, because agents don't push. The first push to github.com/ROKUMATE/RoNote will be its first run.
 
 ## Decisions so far
 
 Product and process:
 - Stack: Go API and worker, React + TypeScript + Tailwind v4 web app, Postgres + pgvector, one monorepo (docs/adr/0001-stack.md).
 - Source content is verbatim and code blocks are byte-identical. Machine-made content is labelled "generated" (docs/adr/0002-verbatim-source.md).
-- Commits are one line, `Type: Summary`, enforced by `.githooks/commit-msg` after `make setup` (docs/adr/0003-commit-convention.md).
-- License: MIT. The default branch is `main`. Agents never push.
+- License: MIT. The default branch is `main`. Agents never push. Run `make check` before pushing.
 
-Go side (unchanged in P04):
-- Go 1.26 (`toolchain go1.26.1`). Tools are deadcode, goose and sqlc via `go tool`, plus golangci-lint v2.15.0 via `make tools`.
-- The API needs `RONOTE_DATABASE_URL`. `/readyz` pings Postgres (1s timeout, 503 `not_ready`).
-- `store` returns `ErrNotFound`/`ErrConflict`.
-- Integration tests use `internal/pgtest` with testcontainers, and a leak check runs after them.
-- Dev stack: `pgvector/pgvector:0.8.7-pg18-trixie` (digest-pinned) via `scripts/container.sh` (podman machine or Docker).
+Commits:
+- One line, `Type: Summary`. `.githooks/commit-msg` enforces it (docs/adr/0003-commit-convention.md).
+- `COMMIT_MSG_STRICT=1` runs the same hook in strict mode: it checks the stored message, strips nothing and rewrites nothing.
+- `scripts/check-commits.sh RANGE` checks every commit in a range in strict mode and names each bad commit by short sha and subject.
+- `scripts/commit-range.sh` picks CI's range: base..head for a PR, before..sha for a push, and `sha~1..sha` when `before` is all zeros or not an ancestor.
 
-Web toolchain (`apps/web`):
-- **Runtimes:** Node 26.13.0 (`.node-version`, `engines`, `engineStrict`) and pnpm 12.16.1 (`packageManager`). Every dependency is pinned exactly. `make` refuses to run web targets on another Node version.
-- **App libraries:** Vite 8.3.5, React 19.3.1, TypeScript 7.0.2 (the native compiler), Tailwind 4.3.3, TanStack Router 1.170.46 (code-based routes), Phosphor 2.1.10.
-- **Lint and test tools:** Biome 2.6.4 (`--error-on-warnings`), knip 6.44.1, Vitest 5.0.5 + jsdom 30 + Testing Library, Playwright 1.64.1 (Chromium) + @axe-core/playwright 4.14.0.
-- **Browser floor:** Chrome/Edge 123+, Firefox 125+, Safari 17.5+, because of the native popover API and CSS `light-dark()`.
-  - This is also the Vite build target. Tailwind's own optimizer is off, because it would rewrite `light-dark()` into a fallback that breaks per-element theming.
-- **Tokens:** `src/styles/tokens.css` uses `@theme static` with Tailwind's defaults cleared.
-  - Each colour is one `light-dark()` value; `color-scheme` follows the system and `data-theme` on `<html>` overrides it.
-  - Fonts: Source Serif 4, IBM Plex Sans and JetBrains Mono as Fontsource variable packages (`wght`, plus italics for Serif and Plex).
-  - Code never shows ligatures.
-- **Reader typography** lives in `.reader` (`src/styles/reader.css`), because imported documents arrive as HTML.
-- **Preferences:** `src/preferences.ts` (theme system/light/dark, reader font serif/sans), with every storage call guarded.
-  - An inline script in `index.html` applies the saved values before first paint. A Vitest test runs that script, so the two can't drift.
-- **Settings:** a native `popover` in the sidebar footer. The disabled "Import page" button uses a small Tooltip (hover, focus, Escape).
-- **Code blocks:** `CodeBlock` is focusable (`tabIndex=0`), because axe requires scrollable regions to be reachable by keyboard. Biome's suppression for that rule carries the reason.
-- **Styleguide:** `/_styleguide` exists only in dev (`import.meta.env.DEV`). `make web-build` fails if any styleguide code reaches `dist/`.
-- **Production bundle:** about 101 KB gzip JS and 8 KB gzip CSS. Fonts are separate and fetched per unicode-range subset.
+CI (`.github/workflows/ci.yml`; AGENTS.md has a table of jobs and how to reproduce each):
+- Runs on push to `main` and on pull requests. Steps only call make targets.
+- Permissions are `contents: read`. Superseded runs for the same ref are cancelled. Every job has a timeout, and checkouts use `persist-credentials: false`.
+- Jobs: commits, go, integration (runner Docker, Ryuk on), web, and e2e after web.
+- **Action pins (full SHAs):**
+  - checkout v7.0.1, setup-go v7.0.0, setup-node v7.1.0
+  - cache v6.1.0, upload-artifact v7.0.2
+  - pnpm/action-setup v6.1.0
+- **Caches:** golangci-lint in `bin/`, keyed on its version. Playwright browsers keyed on the Playwright version. setup-go and setup-node cache Go modules, the Go build cache and the pnpm store.
+- Each job checks the toolchain it uses: go1.26.1 from go.mod's `toolchain`, Node 26.13.0 from `.nvmrc`.
+
+Make targets:
+- `check` = `lint` + `test` + `hooks-test`.
+- `lint` = `lint-go` (golangci-lint, deadcode, actionlint v1.7.12 as a go tool) + `lint-web` (Biome, tsc, knip).
+- `test` = `test-go` + `test-web`.
+- `web-build` runs the styleguide guard and then the bundle budget in `scripts/web-budget.sh`: JS 150 kB, CSS 20 kB gzip. Today the JS is 100.8 kB and the CSS 7.8 kB.
+
+Go side (unchanged in P05):
+- Go 1.26 (`toolchain go1.26.1`). goose, sqlc and deadcode are go tools; golangci-lint v2.15.0 comes from `make tools`.
+- The API needs `RONOTE_DATABASE_URL`. `/readyz` pings Postgres.
+- `store` returns `ErrNotFound`/`ErrConflict`. Integration tests use `internal/pgtest` with a leak check.
+
+Web side (unchanged in P05 apart from `.nvmrc`):
+- Node 26.13.0 (`.nvmrc`, `engines`), pnpm 12.16.1, Vite 8, React 19, TypeScript 7, Tailwind 4 with the tokens in `src/styles/tokens.css`.
+- Browser floor: Chrome/Edge 123+, Firefox 125+, Safari 17.5+.
+- The styleguide is dev-only. Playwright runs with axe; in CI it also writes the HTML report.
 
 ## Open questions
 
-None right now.
+- GNU tools for the hook scripts: closed once CI is green. The commits job runs `make hooks-test` on ubuntu with dash and GNU tools.
 
 ## Next step
 
-P05: CI on ubuntu-latest (Go, web, integration and e2e), detailed scope not yet written.
+P06: the verbatim guarantee (TestCodeIsVerbatim). Detailed scope not yet written.

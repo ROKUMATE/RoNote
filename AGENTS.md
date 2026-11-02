@@ -42,17 +42,25 @@ Create a directory when its first file needs it, not before.
 |---|---|
 | `make help` | list targets (default target) |
 | `make setup` | point git at `.githooks`, make the hook executable, set `pull.rebase true`; run once per clone |
-| `make hooks-test` | test the commit message hook |
+| `make hooks-test` | test the commit message hook (normal and strict mode) and `scripts/check-commits.sh` |
+| `make check-commits RANGE=main..HEAD` | check every commit message in `RANGE` in strict mode; in CI the event sets the range (`scripts/commit-range.sh`) |
 | `make tools` | install the pinned golangci-lint into `./bin` |
-| `make lint` | Go: golangci-lint (`.golangci.yml`, includes `integration` files), then `go tool deadcode -test -tags integration ./...`, which must print nothing. Web: `biome check --error-on-warnings`, `tsc -b`, `knip`, all with zero findings |
+| `make check` | `lint`, `test` and `hooks-test`: what CI's fast jobs run. Run it before pushing |
+| `make lint` | `lint-go` and `lint-web` |
+| `make lint-go` | golangci-lint (`.golangci.yml`, includes `integration` files), then `go tool deadcode -test -tags integration ./...`, which must print nothing, then `go tool actionlint` on `.github/workflows` |
+| `make lint-web` | `biome check --error-on-warnings`, `tsc -b`, `knip`, all with zero findings |
 | `make fmt` | format Go code with gofumpt and goimports |
-| `make test` | Go unit tests with `-race`, then web unit tests (Vitest) |
+| `make test` | `test-go` and `test-web` |
+| `make test-go` | Go unit tests with `-race` |
+| `make test-web` | web unit tests (Vitest, jsdom) |
 | `make test-integration` | unit and integration tests (`integration` build tag, testcontainers); fails if a test container is left behind |
 | `make test-clean` | remove leftover testcontainers containers |
-| `make web-install` | `pnpm install --frozen-lockfile` and the Playwright Chromium build |
+| `make web-install` | `web-deps` and `web-browsers` |
+| `make web-deps` | `pnpm install --frozen-lockfile` |
+| `make web-browsers` | Playwright's Chromium; `WITH_DEPS=1` also installs its system packages (CI) |
+| `make check-node-version` | print the Node version and fail unless it is `.nvmrc`'s |
 | `make web-dev` | Vite dev server on `127.0.0.1:5173`; the styleguide is at `/_styleguide` |
-| `make web-build` | production build into `apps/web/dist`; fails if styleguide code ends up in it |
-| `make web-test` | web unit tests only (Vitest, jsdom) |
+| `make web-build` | production build into `apps/web/dist`; fails if styleguide code ends up in it or the gzip size passes the budget in `scripts/web-budget.sh` (JS 150 kB, CSS 20 kB) |
 | `make web-e2e` | Playwright end-to-end and axe tests in Chromium against the dev server; kept out of `make test` |
 | `make run-api` | run the API on `127.0.0.1:8080`; `RONOTE_ENV` defaults to `dev` |
 | `make dev` (P0x) | run API, worker and web locally |
@@ -64,6 +72,8 @@ Create a directory when its first file needs it, not before.
 | `make migrate-up` / `migrate-down` / `migrate-status` | apply, roll back the latest, or list goose migrations against `RONOTE_DATABASE_URL` |
 | `make migrate-new name=...` | create the next sequential SQL migration in `migrations/` |
 | `make sqlc` | regenerate `internal/store/sqlcdb` from `migrations/` and `internal/store/queries/`; commit the result |
+| `make check-generated` | regenerate sqlc output and fail if it differs from what is committed, then `go mod tidy -diff` |
+| `make check-go-version` | print the Go toolchain and fail unless it is go.mod's `toolchain` |
 
 Targets marked (P0x) do not exist yet. The phase that adds a target removes its tag.
 
@@ -73,7 +83,7 @@ Targets marked (P0x) do not exist yet. The phase that adds a target removes its 
 - `podman compose` needs a compose provider: `brew install docker-compose` (or podman-compose). `make dev-up` fails with a clear message when neither `podman compose` nor `docker compose` works.
 - `.env.example` lists every variable. Copy it to `.env.dev` (gitignored); the Makefile loads it, its values override the shell environment, and `make VAR=value` still wins.
 
-Web targets, `make lint` and `make test` check that `node --version` matches `.node-version` first.
+Web targets, `make lint` and `make test` check that `node --version` matches `.nvmrc` first; with nvm, `nvm install && nvm use` picks it up.
 
 Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`: deadcode, goose, sqlc. golangci-lint is the exception: `make tools` installs the version pinned in the Makefile into `./bin`.
 
@@ -85,7 +95,8 @@ Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with 
 - No body. No trailers of any kind.
 - One logical change per commit. Tests go in the same commit as the code they test.
 - Never use `--no-verify`, never amend, never push.
-- `.githooks/commit-msg` enforces the format (docs/adr/0003-commit-convention.md).
+- Run `make check` before pushing.
+- `.githooks/commit-msg` enforces the format (docs/adr/0003-commit-convention.md). With `COMMIT_MSG_STRICT=1` it checks a stored message without stripping anything; `scripts/check-commits.sh RANGE` runs it that way over every commit in a range.
 
 ## Code
 
@@ -98,7 +109,7 @@ Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with 
 
 ## Frontend (`apps/web`)
 
-- pnpm only. Every version is pinned exactly (`savePrefix: ""`); pnpm is pinned by `packageManager` and Node by `.node-version` and `engines` with `engineStrict`.
+- pnpm only. Every version is pinned exactly (`savePrefix: ""`); pnpm is pinned by `packageManager` and Node by `.nvmrc` and `engines` with `engineStrict`.
 - Browsers: Chrome/Edge 123+, Firefox 125+, Safari 17.5+, the floor for the native popover API and CSS `light-dark()`. This is the Vite build target.
 - Colours, fonts, text sizes, radii and breakpoints come only from `src/styles/tokens.css`. Tailwind's default palette and scales are cleared, so there are no raw colours and no palette classes.
 - Imported documents are styled through `.reader` in `src/styles/reader.css`, not utility classes. Code never shows ligatures.
@@ -122,9 +133,26 @@ Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with 
 
 Source text is never rewritten. Code blocks stay byte-identical, enforced by TestCodeIsVerbatim from P06 (docs/adr/0002-verbatim-source.md).
 
+## CI
+
+`.github/workflows/ci.yml` runs on every push to `main` and every pull request.
+- Steps only call make targets. Anything CI needs becomes a make target first, so every job can be reproduced locally.
+- Actions are pinned to full commit SHAs with the version in a trailing comment. When you bump one, update the SHA and the comment together; `git ls-remote https://github.com/OWNER/REPO 'refs/tags/TAG^{}'` gives the SHA.
+- The workflow has `contents: read` permissions, cancels superseded runs for the same ref, and sets a timeout on every job. `make lint-go` runs actionlint on it.
+
+| Job | Runs | Reproduce locally |
+|---|---|---|
+| commits | `make check-commits` (the strict hook over a PR's base..head, or a push's before..sha; `sha~1..sha` after a force push or a new branch), then `make hooks-test` with dash and GNU tools | `make check-commits RANGE=main..HEAD`, `make hooks-test` |
+| go | `make check-go-version`, `make tools`, `make lint-go`, `make test-go`, `make check-generated` | the same targets |
+| integration | `make check-go-version`, `make test-integration` on the runner's Docker with Ryuk on | `make test-integration` |
+| web | `make check-node-version`, `make web-deps`, `make lint-web`, `make test-web`, `make web-build` (styleguide guard and bundle budget) | the same targets |
+| e2e, after web | `make web-browsers WITH_DEPS=1`, `make web-e2e`; uploads `apps/web/playwright-report` for 7 days when it fails | `make web-install`, `make web-e2e` |
+
+Each job checks the toolchain it uses against its pin: Go against go.mod's `toolchain`, Node against `.nvmrc`. `make check` covers the commits, go and web jobs except `check-generated` and `web-build`. Run it before pushing.
+
 ## Done means
 
-- `make lint` and `make test` are green.
+- `make check` (lint, test, hooks-test) is green.
 - CONTEXT.md is rewritten for the new state.
 - Every commit follows the format above.
 - You end with a 5-line summary of what changed and what's next.

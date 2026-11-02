@@ -12,9 +12,12 @@ golangci_lint_required = $(golangci_lint_current) || { echo "$(GOLANGCI_LINT) $(
 COMPOSE := sh scripts/container.sh compose
 GOOSE := go tool goose -dir migrations postgres "$$RONOTE_DATABASE_URL"
 db_url_required = test -n "$$RONOTE_DATABASE_URL" || { echo "RONOTE_DATABASE_URL is not set; copy .env.example to .env.dev" >&2; exit 1; }
+WEB := pnpm --dir apps/web
+node_required = want=$$(cat .node-version); have=$$(node --version 2>/dev/null); [ "$$have" = "v$$want" ] || \
+	{ echo "Node $$want is required (.node-version), found $${have:-none}. With nvm: nvm install $$want && nvm use $$want" >&2; exit 1; }
 
 help: ## Show available targets
-	@awk 'BEGIN { FS = ":.*## " } /^[a-z][a-z-]*:.*## / { printf "  %-18s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+	@awk 'BEGIN { FS = ":.*## " } /^[a-z][a-z0-9-]*:.*## / { printf "  %-18s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 setup: ## Install the commit hook and rebase on pull
 	git config core.hooksPath .githooks
@@ -31,17 +34,21 @@ tools: ## Install the pinned golangci-lint into ./bin
 		$(golangci_lint_current) || { echo "make tools: failed to install golangci-lint $(GOLANGCI_LINT_VERSION)" >&2; exit 1; }; \
 	}
 
-test: ## Run unit tests with the race detector
+test: ## Run Go unit tests with the race detector, then web unit tests
 	go test -race -count=1 ./...
+	@$(node_required)
+	$(WEB) test
 
 run-api: ## Run the API locally (RONOTE_ENV defaults to dev)
 	RONOTE_ENV=$${RONOTE_ENV:-dev} go run ./cmd/api
 
-lint: ## Run golangci-lint, then fail if deadcode reports anything
+lint: ## Lint Go (golangci-lint, deadcode) and web (Biome, tsc, knip)
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) run
 	@dead=$$(go tool deadcode -test -tags integration ./...) && [ -z "$$dead" ] || \
 		{ printf '%s\n' "$$dead" >&2; echo "make lint: deadcode failed or found unreachable functions" >&2; exit 1; }
+	@$(node_required)
+	$(WEB) lint
 
 fmt: ## Format Go code with gofumpt and goimports
 	@$(golangci_lint_required)
@@ -85,5 +92,29 @@ test-integration: ## Run unit and integration tests against throwaway Postgres c
 test-clean: ## Remove leftover testcontainers containers
 	sh scripts/container.sh clean
 
+web-install: ## Install web dependencies and the Playwright browser
+	@$(node_required)
+	pnpm install --frozen-lockfile
+	$(WEB) exec playwright install chromium
+
+web-dev: ## Run the web dev server (styleguide at /_styleguide)
+	@$(node_required)
+	$(WEB) dev
+
+web-build: ## Build the web app for production; fails if dev-only code ships
+	@$(node_required)
+	$(WEB) build
+	@! grep -rIil styleguide apps/web/dist || \
+		{ echo "make web-build: dev-only styleguide code found in the files above" >&2; exit 1; }
+
+web-test: ## Run web unit tests (Vitest)
+	@$(node_required)
+	$(WEB) test
+
+web-e2e: ## Run web end-to-end tests (Playwright, Chromium)
+	@$(node_required)
+	$(WEB) e2e
+
 .PHONY: help setup hooks-test tools test run-api lint fmt dev-up dev-down dev-logs db-shell
 .PHONY: migrate-up migrate-down migrate-status migrate-new sqlc test-integration test-clean
+.PHONY: web-install web-dev web-build web-test web-e2e

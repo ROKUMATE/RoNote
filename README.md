@@ -4,6 +4,8 @@ RoNote turns one documentation page or a printed PDF into an editable study doc 
 
 Status: pre-alpha
 
+License: MIT, see [LICENSE](LICENSE).
+
 ## Setup
 
 Not ready yet. After cloning, run `make setup` to install the commit message hook.

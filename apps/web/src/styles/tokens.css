@@ -1,0 +1,62 @@
+/*
+ * Design tokens (DESIGN.md). Tailwind's default palette and scales are
+ * cleared so only these produce utilities. Each colour holds its light and
+ * dark value; light-dark() picks one from the element's color-scheme, which
+ * follows the system unless data-theme is set.
+ */
+@theme static {
+  --color-*: initial;
+  --color-paper: light-dark(#faf8f3, #171613);
+  --color-paper-2: light-dark(#f2efe6, #201e1a);
+  --color-ink: light-dark(#1c1b18, #e9e5da);
+  --color-ink-2: light-dark(#5b584f, #a39e90);
+  --color-rule: light-dark(#e3ded1, #2e2b25);
+  --color-accent: light-dark(#b4532a, #e07a4a);
+  --color-mark: light-dark(#f6e7a8, #5a4b16);
+  --color-gen: light-dark(#3f5f7a, #8fb0cc);
+  --color-selection: color-mix(in oklab, var(--color-accent) 25%, transparent);
+
+  --font-*: initial;
+  --font-serif: "Source Serif 4 Variable", Georgia, "Times New Roman", serif;
+  --font-sans: "IBM Plex Sans Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --text-*: initial;
+  --text-ui: 0.8125rem;
+  --text-ui-lg: 0.875rem;
+  --text-code: 0.875rem;
+  --text-body: 1.125rem;
+  --text-h3: 1.1875rem;
+  --text-h2: 1.5rem;
+  --text-h1: 2rem;
+
+  --radius-*: initial;
+  --radius-sm: 3px;
+  --radius-md: 5px;
+
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+
+  --breakpoint-*: initial;
+  --breakpoint-sidebar: 48rem;
+  --breakpoint-notes: 68.75rem;
+
+  --default-transition-duration: 140ms;
+  --default-transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+
+  --focus-ring: 2px solid var(--color-accent);
+  --focus-ring-offset: 2px;
+}
+
+:root {
+  color-scheme: light dark;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}

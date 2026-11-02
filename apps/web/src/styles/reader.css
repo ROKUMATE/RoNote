@@ -1,0 +1,133 @@
+/*
+ * The reading column. Imported documents arrive as HTML, so these rules
+ * style plain elements inside .reader instead of relying on utility classes.
+ */
+@layer components {
+  .reader {
+    max-width: 68ch;
+    font-family: var(--font-serif);
+    font-size: var(--text-body);
+    line-height: 1.65;
+  }
+
+  :root[data-reader-font="sans"] .reader {
+    font-family: var(--font-sans);
+  }
+
+  .reader :where(h1, h2, h3) {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .reader h1 {
+    font-size: var(--text-h1);
+    margin: 0 0 1rem;
+  }
+
+  .reader h2 {
+    font-size: var(--text-h2);
+    margin: 2.5rem 0 0.75rem;
+  }
+
+  .reader h3 {
+    font-size: var(--text-h3);
+    margin: 2rem 0 0.5rem;
+  }
+
+  .reader :where(p, ul, ol, pre, table, .callout, .generated) {
+    margin: 1rem 0;
+  }
+
+  .reader :where(ul, ol) {
+    padding-left: 1.5em;
+  }
+
+  .reader ul {
+    list-style: disc;
+  }
+
+  .reader ol {
+    list-style: decimal;
+  }
+
+  .reader li + li {
+    margin-top: 0.25em;
+  }
+
+  .reader a {
+    color: var(--color-accent);
+    text-decoration-line: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .reader :not(pre) > code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background-color: var(--color-paper-2);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-sm);
+    padding: 0.05em 0.3em;
+  }
+
+  .reader pre {
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    line-height: 1.55;
+    background-color: var(--color-paper-2);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    overflow-x: auto;
+    white-space: pre;
+    tab-size: 4;
+  }
+
+  .reader pre code {
+    font: inherit;
+  }
+
+  .reader table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+  }
+
+  .reader :where(th, td) {
+    border-bottom: 1px solid var(--color-rule);
+    padding: 0.4em 0.75em;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .reader th {
+    font-family: var(--font-sans);
+    font-weight: 600;
+  }
+
+  .reader mark {
+    background-color: var(--color-mark);
+    color: inherit;
+    border-radius: var(--radius-sm);
+  }
+
+  .reader .callout {
+    background-color: var(--color-paper-2);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+  }
+
+  /* Machine-made content: a thin left rule and a small label (DESIGN.md). */
+  .reader .generated {
+    border-left: 2px solid var(--color-gen);
+    padding-left: 1rem;
+  }
+
+  .reader .generated-label {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: var(--text-ui);
+    color: var(--color-gen);
+  }
+}

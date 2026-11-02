@@ -31,14 +31,15 @@ lines=$(awk '
   /^# -+ >8 -+$/ { exit }
   /^#/ || /^[ \t]*$/ { next }
   {
+    n++
     lower = tolower($0)
-    if (index(lower, "co-authored-by") || index(lower, "claude-session") || index(lower, "generated with")) next
+    if (n > 1 && (lower ~ /^(co-authored-by|claude-session):/ ||
+      index(lower, "generated with [claude code") || index(lower, "generated with claude code"))) next
     print
   }
 ' "$msg_file")
 
-[ -n "$lines" ] || fail 'empty message' \
-  'nothing left after dropping comments, blank lines and Co-authored-by, Claude-Session and "Generated with" lines'
+[ -n "$lines" ] || fail 'empty message' 'nothing left after dropping comments and blank lines'
 
 count=$(printf '%s\n' "$lines" | wc -l | tr -d ' ')
 [ "$count" -eq 1 ] || fail "message with $count lines" 'expected 1 line; bodies and trailers are not allowed'

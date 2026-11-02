@@ -90,6 +90,15 @@ diff --git a/internal/fetch/fetch.go b/internal/fetch/fetch.go
 +Fix: this line is part of the diff' 'Refactor: Split page fetcher'
 rejects 'empty message' '# Please enter the commit message for your changes.' 'empty message'
 rejects 'lowercase type' 'feat: Add page importer' 'not one of the allowed types'
+accepts 'generated with in summary kept' 'Fix: Keep files generated with pandoc' \
+  'Fix: Keep files generated with pandoc'
+accepts 'Co-Authored-By after blank line stripped' 'Feat: Add x
+
+Co-Authored-By: Claude <noreply@anthropic.com>' 'Feat: Add x'
+accepts 'Generated with Claude Code on line 2 stripped' 'Feat: Add x
+🤖 Generated with [Claude Code](https://claude.com/claude-code)' 'Feat: Add x'
+accepts 'Claude-Session on line 2 stripped' 'Feat: Add x
+Claude-Session: https://claude.ai/code/session_abc' 'Feat: Add x'
 
 printf '\n%s passed, %s failed\n' "$passed" "$failed"
 [ "$failed" -eq 0 ]

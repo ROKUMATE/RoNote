@@ -1,14 +1,17 @@
 // Package httpapi serves the RoNote HTTP API.
 package httpapi
 
-import "net/http"
+import (
+	"log/slog"
+	"net/http"
+)
 
-// New returns the API handler.
-func New() http.Handler {
+// New returns the API handler. Requests and panics are logged through logger.
+func New(logger *slog.Logger) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", ok)
 	mux.HandleFunc("GET /readyz", ok)
-	return router{mux: mux}
+	return withMiddleware(logger, router{mux: mux})
 }
 
 // router answers with the error envelope when the mux has no route for a
@@ -29,10 +32,10 @@ func (rt router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fallback.ServeHTTP(rec, r)
 	if rec.status == http.StatusMethodNotAllowed {
 		w.Header().Set("Allow", rec.header.Get("Allow"))
-		writeError(w, http.StatusMethodNotAllowed, "method_not_allowed", "method not allowed")
+		writeError(w, r, http.StatusMethodNotAllowed, "method_not_allowed", "method not allowed")
 		return
 	}
-	writeError(w, http.StatusNotFound, "not_found", "not found")
+	writeError(w, r, http.StatusNotFound, "not_found", "not found")
 }
 
 // headerRecorder keeps the status and headers of a response and drops its body.

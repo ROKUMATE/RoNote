@@ -41,7 +41,7 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("listen: %w", err)
 	}
-	srv := httpapi.NewServer(httpapi.New(), logger)
+	srv := httpapi.NewServer(httpapi.New(logger), logger)
 
 	serveErr := make(chan error, 1)
 	go func() { serveErr <- srv.Serve(ln) }()

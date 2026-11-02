@@ -8,6 +8,8 @@ import (
 	"testing"
 )
 
+var discardLogger = slog.New(slog.DiscardHandler)
+
 func TestRoutes(t *testing.T) {
 	t.Parallel()
 
@@ -33,7 +35,7 @@ func TestRoutes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			rec := serve(t, New(), tt.method, tt.target)
+			rec := record(New(discardLogger), newRequest(t, tt.method, tt.target))
 
 			if rec.Code != tt.wantStatus {
 				t.Errorf("status = %d, want %d", rec.Code, tt.wantStatus)
@@ -50,8 +52,12 @@ func TestRoutes(t *testing.T) {
 				}
 				return
 			}
-			if got := decodeError(t, rec).Code; got != tt.wantCode {
-				t.Errorf("error code = %q, want %q", got, tt.wantCode)
+			got := decodeError(t, rec)
+			if got.Code != tt.wantCode {
+				t.Errorf("error code = %q, want %q", got.Code, tt.wantCode)
+			}
+			if want := rec.Header().Get(requestIDHeader); got.RequestID != want {
+				t.Errorf("error request_id = %q, want the X-Request-ID header %q", got.RequestID, want)
 			}
 		})
 	}
@@ -60,7 +66,7 @@ func TestRoutes(t *testing.T) {
 func TestNewServerSetsLimits(t *testing.T) {
 	t.Parallel()
 
-	srv := NewServer(New(), slog.New(slog.DiscardHandler))
+	srv := NewServer(New(discardLogger), discardLogger)
 
 	limits := map[string]int64{
 		"ReadHeaderTimeout": int64(srv.ReadHeaderTimeout),
@@ -76,11 +82,14 @@ func TestNewServerSetsLimits(t *testing.T) {
 	}
 }
 
-func serve(t *testing.T, h http.Handler, method, target string) *httptest.ResponseRecorder {
+func newRequest(t *testing.T, method, target string) *http.Request {
 	t.Helper()
-	req := httptest.NewRequestWithContext(t.Context(), method, target, http.NoBody)
+	return httptest.NewRequestWithContext(t.Context(), method, target, http.NoBody)
+}
+
+func record(h http.Handler, r *http.Request) *httptest.ResponseRecorder {
 	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, req)
+	h.ServeHTTP(rec, r)
 	return rec
 }
 

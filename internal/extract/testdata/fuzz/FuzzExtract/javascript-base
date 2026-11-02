@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("<base href=\"javascript:alert(1)\"><main><a href=\"x\">x</a><img src=\"y\" alt=\"y\"><link rel=\"canonical\" href=\"data:text/html,x\"></main>")

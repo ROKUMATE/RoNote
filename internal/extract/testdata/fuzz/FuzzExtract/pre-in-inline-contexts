@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("<main><table><tr><td><pre>cell\n  code</pre></td></tr></table><h2><pre>in heading</pre></h2><dl><dt><pre>term</pre></dt></dl></main>")

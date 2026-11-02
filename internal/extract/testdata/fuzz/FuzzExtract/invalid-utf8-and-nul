@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("<main><p>\xff\xfe bad \x00 nul</p><pre>\x00\xc3( code</pre><a href=\"/\xff\">\xc0\xaf</a></main>")

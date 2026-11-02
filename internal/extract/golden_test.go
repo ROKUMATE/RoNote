@@ -24,7 +24,7 @@ var update = flag.Bool("update", false, "rewrite testdata/golden/*/expected.json
 const goldenDir = "../../testdata/golden"
 
 // fixtures lists the golden fixture directories.
-func fixtures(t *testing.T) []string {
+func fixtures(t testing.TB) []string {
 	t.Helper()
 	entries, err := os.ReadDir(goldenDir)
 	if err != nil {
@@ -45,7 +45,7 @@ func fixtures(t *testing.T) []string {
 // goldenFS reads fixtures; paths stay inside goldenDir.
 var goldenFS = os.DirFS(goldenDir)
 
-func readFixture(t *testing.T, name, file string) []byte {
+func readFixture(t testing.TB, name, file string) []byte {
 	t.Helper()
 	data, err := fs.ReadFile(goldenFS, path.Join(name, file))
 	if err != nil {

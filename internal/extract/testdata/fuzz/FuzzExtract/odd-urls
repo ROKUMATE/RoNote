@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("<main><a href=\"//other.example/x\">a</a><a href=\"#\">b</a><a href=\"http://[::1\">c</a><a href=\"mailto:\">d</a><img src=\"http://\"><img src=\" \"><a href=\"HTTPS://DOCS.EXAMPLE.COM/A\">e</a><a href=\"?q=1#f\">f</a></main>")

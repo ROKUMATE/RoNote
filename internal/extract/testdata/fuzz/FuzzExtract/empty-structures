@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("<main><ul><li></li><li> </li></ul><ol></ol><table><tr></tr></table><blockquote> </blockquote><div class=\"admonition note\"></div><div class=\"callout\"><p class=\"title\">only title</p></div><figure><figcaption>c</figcaption></figure><figure><img src=\"/i.png\"><img src=\"/j.png\"></figure><h1> </h1><details></details><dl><dd>no term</dd></dl><pre></pre><hr></main>")

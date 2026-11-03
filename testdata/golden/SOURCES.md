@@ -4,7 +4,7 @@ Each fixture is a directory with `input.html`, `meta.json` (URLs and a fixed fet
 
 ## Hand-written
 
-These contain no third-party content: base-href-links, br-in-pre, callouts, chrome-removal, crlf, entities, expressive-code, go-tabs, leading-empty-line, long-line, marks, nested-highlight, nested-lists, never-text-in-code, no-main, table, trailing-whitespace, unicode.
+These contain no third-party content: adapter-fallback, base-href-links, br-in-pre, callouts, chrome-removal, crlf, detect-generator-over-host, entities, expressive-code, go-tabs, leading-empty-line, long-line, marks, nested-highlight, nested-lists, never-text-in-code, no-main, table, trailing-whitespace, unicode.
 
 Synthetic framework pages reproduce the DOM structure of a real page, with invented text, where the real page's license does not allow a copy:
 

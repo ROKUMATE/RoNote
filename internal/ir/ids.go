@@ -75,7 +75,11 @@ func blockText(b *Block) string {
 	case KindHeading, KindParagraph:
 		return normalize(inlineText(b.Content))
 	case KindCode:
-		return b.Lang + "\n" + normalize(b.Title) + "\n" + b.Text
+		title := normalize(b.Title)
+		if b.TitleLink != nil {
+			title += " <" + b.TitleLink.Href + ">"
+		}
+		return b.Lang + "\n" + title + "\n" + b.Text
 	case KindList:
 		var parts []string
 		for _, item := range b.Items {

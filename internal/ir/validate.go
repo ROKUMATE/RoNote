@@ -14,7 +14,7 @@ var fieldsByKind = map[Kind][]string{
 	KindHeading:   {"level", "anchor", "content"},
 	KindParagraph: {"content"},
 	KindList:      {"ordered", "items"},
-	KindCode:      {"lang", "title", "text"},
+	KindCode:      {"lang", "title", "title_link", "text"},
 	KindTable:     {"head", "rows"},
 	KindCallout:   {"variant", "title", "children"},
 	KindImage:     {"src", "alt", "caption"},
@@ -128,6 +128,16 @@ func (v *validator) block(path string, b *Block) {
 		if b.Text == "" {
 			v.fail(path, "code text is empty")
 		}
+		if l := b.TitleLink; l != nil {
+			switch {
+			case b.Title == "":
+				v.fail(path+".title_link", "is set without a title")
+			case l.Kind != LinkSameDomain && l.Kind != LinkExternal:
+				v.fail(path+".title_link", "kind %q is not same_domain or external", l.Kind)
+			case !isAbsoluteHTTP(l.Href):
+				v.fail(path+".title_link", "href %q is not an absolute http(s) URL", l.Href)
+			}
+		}
 	case KindTable:
 		if len(b.Head) == 0 && len(b.Rows) == 0 {
 			v.fail(path, "table has no rows")
@@ -220,21 +230,22 @@ func (v *validator) link(path string, l *Link) {
 // setFields names the kind-specific fields of b that are not zero.
 func setFields(b *Block) []string {
 	set := map[string]bool{
-		"level":    b.Level != 0,
-		"anchor":   b.Anchor != "",
-		"content":  len(b.Content) > 0,
-		"ordered":  b.Ordered,
-		"items":    len(b.Items) > 0,
-		"lang":     b.Lang != "",
-		"text":     b.Text != "",
-		"head":     len(b.Head) > 0,
-		"rows":     len(b.Rows) > 0,
-		"variant":  b.Variant != "",
-		"title":    b.Title != "",
-		"children": len(b.Children) > 0,
-		"src":      b.Src != "",
-		"alt":      b.Alt != "",
-		"caption":  len(b.Caption) > 0,
+		"level":      b.Level != 0,
+		"anchor":     b.Anchor != "",
+		"content":    len(b.Content) > 0,
+		"ordered":    b.Ordered,
+		"items":      len(b.Items) > 0,
+		"lang":       b.Lang != "",
+		"text":       b.Text != "",
+		"head":       len(b.Head) > 0,
+		"rows":       len(b.Rows) > 0,
+		"variant":    b.Variant != "",
+		"title":      b.Title != "",
+		"title_link": b.TitleLink != nil,
+		"children":   len(b.Children) > 0,
+		"src":        b.Src != "",
+		"alt":        b.Alt != "",
+		"caption":    len(b.Caption) > 0,
 	}
 	var fields []string
 	for field, isSet := range set {

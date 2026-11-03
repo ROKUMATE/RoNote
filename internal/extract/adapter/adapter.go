@@ -87,8 +87,13 @@ type Code struct {
 	// numbers, or lines the framework hides and its copy button leaves out.
 	NotText string
 	// LangAfter is a class token after which the next token of the <pre>'s
-	// class names the language, as in class="brush: js".
-	LangAfter string
+	// class names the language, as in class="brush: js". Lang names the
+	// language outright.
+	LangAfter, Lang string
+	// Markup names tags that appear as literal text inside the code, such as
+	// <font color=…>, because the page's script renders them as HTML. The
+	// reader sees their content and not the tags.
+	Markup []string
 }
 
 // Plan is an adapter applied to one parsed page: what the extractor does
@@ -124,10 +129,12 @@ type Tab struct {
 }
 
 // CodePlan is a planned code block. Title is nil and Lang is "" when the
-// generic rules decide them.
+// generic rules decide them. Markup lists tags to strip from the code text,
+// as Code.Markup says.
 type CodePlan struct {
 	Pre, Title *html.Node
 	Lang       string
+	Markup     []string
 }
 
 // Detect returns the adapter for a page, or nil. It tries every adapter's
@@ -210,7 +217,7 @@ func (a *Adapter) Apply(doc *html.Node) (*Plan, error) {
 	}
 	for i, c := range s.code {
 		for _, block := range cascadia.QueryAll(root, c.block) {
-			p.planCode(block, c, a.Code[i].LangAfter)
+			p.planCode(block, c, &a.Code[i])
 		}
 	}
 	return p, nil
@@ -253,7 +260,7 @@ func (p *Plan) pairTabs(container *html.Node, t tabsSelectors, aria ariaLookup) 
 	return tabs
 }
 
-func (p *Plan) planCode(block *html.Node, c codeSelectors, langAfter string) {
+func (p *Plan) planCode(block *html.Node, c codeSelectors, rule *Code) {
 	if _, planned := p.Code[block]; planned {
 		return
 	}
@@ -269,7 +276,10 @@ func (p *Plan) planCode(block *html.Node, c codeSelectors, langAfter string) {
 	if pre == nil {
 		return
 	}
-	plan := CodePlan{Pre: pre, Lang: langAfterToken(attr(pre, "class"), langAfter)}
+	plan := CodePlan{Pre: pre, Lang: rule.Lang, Markup: rule.Markup}
+	if plan.Lang == "" {
+		plan.Lang = langAfterToken(attr(pre, "class"), rule.LangAfter)
+	}
 	if c.title != nil {
 		plan.Title = cascadia.Query(block, c.title)
 	}

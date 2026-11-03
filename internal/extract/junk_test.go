@@ -53,12 +53,15 @@ var (
 // feedback links, pagination, version badges, breadcrumbs, language labels
 // above code, line numbers or copy labels inside code, and any of the
 // site-specific phrases. A site phrase that starts with "=" must be a whole
-// block's text, like a label.
+// block's text, like a label; one that starts with "code:" is looked for in
+// code.
 func findJunk(doc *ir.Doc, site ...string) []string {
 	j := junkFinder{phrases: junkPhrases, labels: junkLabels}
 	for _, s := range site {
 		if label, ok := strings.CutPrefix(s, "="); ok {
 			j.labels = append(j.labels, label)
+		} else if inCode, ok := strings.CutPrefix(s, "code:"); ok {
+			j.codePhrases = append(j.codePhrases, inCode)
 		} else {
 			j.phrases = append(j.phrases, s)
 		}
@@ -68,9 +71,9 @@ func findJunk(doc *ir.Doc, site ...string) []string {
 }
 
 type junkFinder struct {
-	phrases, labels []string
-	found           []string
-	seenHeading     bool
+	phrases, labels, codePhrases []string
+	found                        []string
+	seenHeading                  bool
 }
 
 func (j *junkFinder) add(what, text string) {
@@ -138,6 +141,11 @@ func (j *junkFinder) prose(text string) {
 func (j *junkFinder) code(text string) {
 	if strings.Contains(text, "Copy to clipboard") || strings.Contains(text, "Copied!") {
 		j.add("copy label in code", text)
+	}
+	for _, phrase := range j.codePhrases {
+		if strings.Contains(text, phrase) {
+			j.add("phrase in code", text)
+		}
 	}
 	lines := strings.SplitN(text, "\n", 4)
 	if len(lines) < 3 {
@@ -257,6 +265,7 @@ func TestFindJunk(t *testing.T) {
 		},
 		{name: "site label must be whole", blocks: []ir.Block{heading, p("Prevent this"), p("Prev")}, site: []string{"=Prev"}, want: 1},
 		{name: "site phrase", blocks: []ir.Block{heading, p("Supported Versions: 18")}, site: []string{"Supported Versions:"}, want: 1},
+		{name: "site phrase in code", blocks: []ir.Block{heading, code("console", "$ <font>run</font>")}, site: []string{"code:<font"}, want: 1},
 		{
 			name:   "tab labels are checked",
 			blocks: []ir.Block{heading, {Kind: ir.KindTabs, Items: []ir.Item{{Label: "Copy", Children: []ir.Block{p("x")}}}}},

@@ -282,11 +282,15 @@
       ]
     },
     {
-      "id": "fa67b735a395",
+      "id": "a1e4f4cf74eb",
       "kind": "code",
       "lang": "yaml",
       "text": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: nginx\nspec:\n  containers:\n  - name: nginx\n    image: nginx:1.14.2\n    ports:\n    - containerPort: 80\n",
-      "title": "pods/simple-pod.yaml"
+      "title": "pods/simple-pod.yaml",
+      "title_link": {
+        "href": "https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/pods/simple-pod.yaml",
+        "kind": "external"
+      }
     },
     {
       "id": "15cb8d4af3d5",

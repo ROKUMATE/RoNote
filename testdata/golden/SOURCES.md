@@ -16,6 +16,7 @@ Synthetic framework pages reproduce the DOM structure of a real page, with inven
 | mdbook-v04-reading-files | an mdBook 0.4 page: boring lines, file names in and out of a paragraph, a note, a table |
 | mdn-closures-synthetic | https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures (MDN: code examples with language headers, notecards, feedback footer); MDN text is CC BY-SA |
 | mdn-live-sample-synthetic | an MDN live sample: HTML, CSS and JS examples and the sample frame |
+| material-termy | https://fastapi.tiangolo.com/tutorial/first-steps/ (a FastAPI "termy" terminal block whose code holds <font> and <span> tags as text), next to an HTML example whose tags are source |
 | docbook-chapter | a DocBook XSL chapter: navigation header and footer, table of contents, admonitions, screen and program listings |
 | docsy-tabpane | https://www.docsy.dev/docs/content/shortcodes/ (Docsy: tabpane, alerts, Chroma line numbers, feedback); the site's footer reserves all rights |
 

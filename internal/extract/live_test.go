@@ -38,7 +38,7 @@ var livePages = []livePage{
 		url: "https://docusaurus.io/docs/markdown-features/code-blocks", adapter: "docusaurus", content: "div.theme-doc-markdown",
 		junk: []string{"=http://localhost:3000", "=Live Editor", "=Result"},
 	},
-	{url: "https://fastapi.tiangolo.com/tutorial/first-steps/", adapter: "material", content: "article.md-content__inner"},
+	{url: "https://fastapi.tiangolo.com/tutorial/first-steps/", adapter: "material", content: "article.md-content__inner", junk: []string{"code:<font"}},
 	{url: "https://docs.python.org/3/tutorial/controlflow.html", adapter: "sphinx", content: "div.body"},
 	{url: "https://requests.readthedocs.io/en/latest/user/quickstart/", adapter: "sphinx", content: "div.body"},
 	{url: "https://vite.dev/guide/", adapter: "vitepress", content: "div.vp-doc"},

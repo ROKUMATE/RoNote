@@ -1,0 +1,57 @@
+{
+  "ir_version": 1,
+  "title": "Run the Server",
+  "source": {
+    "url": "https://api-kit.example.dev/tutorial/run/",
+    "final_url": "https://api-kit.example.dev/tutorial/run/",
+    "fetched_at": "2026-11-04T00:00:00Z",
+    "body_sha256": "e16c22835a94de1e81295a7f59e71ba3ec6242077ace737ec14787a370129f5a"
+  },
+  "extractor": {
+    "name": "material",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "055f8a5af348",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "run-the-server",
+      "content": [
+        {
+          "text": "Run the Server"
+        }
+      ]
+    },
+    {
+      "id": "c519cc75c07c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Start the development server from your project folder:"
+        }
+      ]
+    },
+    {
+      "id": "b82f4013c162",
+      "kind": "code",
+      "lang": "console",
+      "text": "$ kit serve --reload\n\n   KIT   Serving on http://127.0.0.1:9000\n  Press CTRL+C to stop\n"
+    },
+    {
+      "id": "5ae70e4eb798",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The page template marks the greeting with a span; this is source code, so its tags stay:"
+        }
+      ]
+    },
+    {
+      "id": "f0b77ad2be6f",
+      "kind": "code",
+      "lang": "html",
+      "text": "<p>Hello, <span class=\"name\">Ada</span>!</p>\n"
+    }
+  ]
+}

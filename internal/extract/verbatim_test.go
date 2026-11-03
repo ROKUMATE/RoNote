@@ -65,6 +65,10 @@ type tokenRules struct {
 	tabPanels  bool     // hidden role=tabpanel elements are content
 	codeTables []string // tables that lay out one code block next to its line numbers
 	notText    []string // classes inside a <pre> that are never text
+	// markupIn names, as tag.class, the blocks whose code holds markup tags
+	// as text that the reader sees rendered; markup names those tags.
+	markupIn string
+	markup   []string
 }
 
 // adapterRules holds the rules for each adapter's pages.
@@ -73,7 +77,11 @@ var adapterRules = map[string]tokenRules{
 	"starlight":  {skipped: []string{"astro-island"}, tabPanels: true},
 	"docusaurus": {root: "div.theme-doc-markdown", tabPanels: true},
 	// Pygments line numbers sit in a cell of their own.
-	"material":  {root: "article.md-content__inner", codeTables: []string{"table.highlighttable"}, skipped: []string{"td.linenos"}},
+	// FastAPI's terminal blocks show <font> and <span> rendered.
+	"material": {
+		root: "article.md-content__inner", codeTables: []string{"table.highlighttable"}, skipped: []string{"td.linenos"},
+		markupIn: "div.termy", markup: []string{"font", "span"},
+	},
 	"sphinx":    {root: "div.body", codeTables: []string{"table.highlighttable"}, skipped: []string{"td.linenos"}},
 	"vitepress": {root: "div.vp-doc"},
 	// Boring lines are hidden, and the copy button copies what is shown.
@@ -187,6 +195,7 @@ func codeByTokens(input []byte, rules tokenRules) []string {
 		root, excluded, inlineOK bool
 		notText                  bool // inside a <pre>, drawn beside the code
 		frame                    bool
+		markup                   bool // inside a rules.markupIn block
 	}
 	// frame is the innermost open code frame: the index in codes of its
 	// <pre>, and its copy payload.
@@ -227,7 +236,11 @@ func codeByTokens(input []byte, rules tokenRules) []string {
 	// finish records the open <pre>, even when empty: a frame's payload may
 	// still replace it. Empty texts are dropped at the end.
 	finish := func() {
-		codes = append(codes, code.String())
+		text := code.String()
+		if stack[codeDepth].markup {
+			text = withoutTags(text, rules.markup)
+		}
+		codes = append(codes, text)
 		if len(frames) > 0 {
 			frames[len(frames)-1].code = len(codes) - 1
 		}
@@ -293,7 +306,8 @@ func codeByTokens(input []byte, rules tokenRules) []string {
 				inlineOK: parent.inlineOK || (tokenInlineOnly[tag] && !matchesAny(codeTables, tag, attrs)),
 				notText: code != nil && (parent.notText || strings.Contains(style, "user-select:none") ||
 					slices.ContainsFunc(strings.Fields(attrs["class"]), func(c string) bool { return c == "linenos" || slices.Contains(rules.notText, c) })),
-				frame: tag == "figure" && slices.Contains(strings.Fields(attrs["class"]), "frame"),
+				frame:  tag == "figure" && slices.Contains(strings.Fields(attrs["class"]), "frame"),
+				markup: parent.markup || (rules.markupIn != "" && matcher(rules.markupIn)(tag, attrs)),
 			}
 			stack = append(stack, e)
 			if e.frame {
@@ -336,4 +350,27 @@ func tagAndAttrs(z *html.Tokenizer) (string, map[string]string) {
 		attrs[string(key)] = string(val)
 	}
 	return string(name), attrs
+}
+
+// withoutTags removes the opening and closing tags named in tags from text
+// that holds them as literal characters, scanning character by character.
+func withoutTags(text string, tags []string) string {
+	var b strings.Builder
+	for i := 0; i < len(text); {
+		if text[i] == '<' {
+			if end := strings.IndexByte(text[i:], '>'); end > 0 {
+				name := strings.TrimPrefix(text[i+1:i+end], "/")
+				if j := strings.IndexAny(name, " \t\n"); j >= 0 {
+					name = name[:j]
+				}
+				if slices.ContainsFunc(tags, func(t string) bool { return strings.EqualFold(t, name) }) {
+					i += end + 1
+					continue
+				}
+			}
+		}
+		b.WriteByte(text[i])
+		i++
+	}
+	return b.String()
 }

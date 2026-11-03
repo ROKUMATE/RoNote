@@ -14,6 +14,7 @@ Synthetic framework pages reproduce the DOM structure of a real page, with inven
 | docusaurus-v3-install | a Docusaurus 3 docs page: tabs, admonition, titled and numbered code, live editor |
 | sphinx-linenos | a Sphinx page: inline and table line numbers, a code caption, admonitions, a console session |
 | mdbook-v04-reading-files | an mdBook 0.4 page: boring lines, file names in and out of a paragraph, a note, a table |
+| docsy-tabpane | https://www.docsy.dev/docs/content/shortcodes/ (Docsy: tabpane, alerts, Chroma line numbers, feedback); the site's footer reserves all rights |
 
 ## Excerpts of real pages
 
@@ -36,3 +37,4 @@ Trimmed copies of public documentation pages:
 | vitepress-vite-guide | https://vite.dev/guide/, "Getting Started" by the Vite contributors | Introduction, "Overview" and "Scaffolding Your First Vite Project" with "Community Templates" | MIT, per https://github.com/vitejs/vite/blob/main/LICENSE | 2026-11-03 |
 | vitepress-markdown | https://vitepress.dev/guide/markdown, "Markdown Extensions" by the VitePress contributors | Introduction; "Custom Containers" and "GitHub-flavored Alerts"; "Colored Diffs" to "Line Numbers"; "Code Groups" | MIT, per https://github.com/vuejs/vitepress/blob/main/LICENSE | 2026-11-03 |
 | mdbook-rust-data-types | https://doc.rust-lang.org/book/ch03-02-data-types.html, "Data Types" from The Rust Programming Language by Steve Klabnik, Carol Nichols and Chris Krycho, with contributions from the Rust Community | The whole section | MIT or Apache License 2.0, per https://github.com/rust-lang/book (LICENSE-MIT, LICENSE-APACHE) | 2026-11-03 |
+| docsy-k8s-pods | https://kubernetes.io/docs/concepts/workloads/pods/, "Pods" by The Kubernetes Authors | "Pods" to "Workload resources for managing pods", with the page's feedback and last-modified blocks | Creative Commons Attribution 4.0 | 2026-11-03 |

@@ -138,6 +138,7 @@ func TestApplyPlans(t *testing.T) {
 			{Block: "div.codebox", Title: ".file", NotText: ".ln"},
 			{Block: "table.lines", Pre: []string{"td.code pre"}},
 			{Block: "pre.listing", TitleBefore: "span.filename", LangAfter: "brush:"},
+			{Block: "div.codebox, pre.listing", Title: ".other"},
 		},
 	}
 	doc := parse(t, `<header class="chrome">top</header><main>

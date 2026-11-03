@@ -20,7 +20,7 @@ import (
 
 // All lists the adapters in detection order: within each detection phase,
 // the first adapter that matches wins.
-var All = []*Adapter{starlight, docusaurus, material, sphinx, vitepress, mdbook}
+var All = []*Adapter{starlight, docusaurus, material, sphinx, vitepress, mdbook, docsy}
 
 // Adapter describes one documentation framework. Selectors are CSS
 // selectors as cascadia parses them; one string may hold a comma-separated
@@ -73,6 +73,7 @@ type Tabs struct {
 
 // Code turns each element Block matches inside the root into one code
 // block. Everything in the element but the code and its title is chrome.
+// When several rules match an element, the first one decides.
 type Code struct {
 	Block string
 	// Pre lists selectors for the <pre> that holds the code, tried in order
@@ -253,6 +254,9 @@ func (p *Plan) pairTabs(container *html.Node, t tabsSelectors, aria ariaLookup) 
 }
 
 func (p *Plan) planCode(block *html.Node, c codeSelectors, langAfter string) {
+	if _, planned := p.Code[block]; planned {
+		return
+	}
 	pre := block
 	if block.DataAtom != atom.Pre {
 		pre = nil

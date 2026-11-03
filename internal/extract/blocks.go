@@ -135,7 +135,7 @@ func (w *walker) inlineElement(n *html.Node) {
 	case tag == atom.Img:
 	case tag == atom.Pre:
 		w.in.marks = append(w.in.marks, ir.MarkCode)
-		w.in.raw(preText(n))
+		w.in.raw(codeText(n))
 		w.in.marks = w.in.marks[:len(w.in.marks)-1]
 	case tag == atom.A:
 		w.withLink(n, func() { w.children(n) })
@@ -174,15 +174,19 @@ func (w *walker) block(n *html.Node) {
 	case atom.Dl:
 		w.add(e.definitionList(n))
 	case atom.Pre:
-		if text := preText(n); text != "" {
-			w.out = append(w.out, ir.Block{Kind: ir.KindCode, Lang: codeLang(n), Text: text})
-		}
+		w.add(e.code(n))
 	case atom.Table:
 		w.add(e.table(n))
 	case atom.Hr:
 		w.out = append(w.out, ir.Block{Kind: ir.KindDivider})
 	case atom.Figure:
-		w.out = append(w.out, e.figure(n)...)
+		// A code frame's title bar and copy button are chrome around the
+		// code; the code block takes its title and text from them.
+		if pre := framedPre(n); pre != nil {
+			w.add(e.code(pre))
+		} else {
+			w.out = append(w.out, e.figure(n)...)
+		}
 	case atom.Details:
 		w.out = append(w.out, e.details(n)...)
 	case atom.Blockquote:

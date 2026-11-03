@@ -14,7 +14,7 @@ var fieldsByKind = map[Kind][]string{
 	KindHeading:   {"level", "anchor", "content"},
 	KindParagraph: {"content"},
 	KindList:      {"ordered", "items"},
-	KindCode:      {"lang", "text"},
+	KindCode:      {"lang", "title", "text"},
 	KindTable:     {"head", "rows"},
 	KindCallout:   {"variant", "title", "children"},
 	KindImage:     {"src", "alt", "caption"},

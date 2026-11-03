@@ -9,7 +9,7 @@
   },
   "extractor": {
     "name": "generic",
-    "version": "1"
+    "version": "2"
   },
   "blocks": [
     {
@@ -83,7 +83,7 @@
       ]
     },
     {
-      "id": "7867a3d6196a",
+      "id": "c8ef4cdfde48",
       "kind": "callout",
       "variant": "danger",
       "title": "Danger",
@@ -98,7 +98,7 @@
           ]
         },
         {
-          "id": "e1c4aae3a6b6",
+          "id": "c1a0abd176d1",
           "kind": "code",
           "lang": "sql",
           "text": "DROP TABLE users;\n"

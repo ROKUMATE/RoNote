@@ -1,0 +1,72 @@
+{
+  "ir_version": 1,
+  "title": "Never text in code",
+  "source": {
+    "url": "https://docs.example.com/fixtures/never-text-in-code",
+    "final_url": "https://docs.example.com/fixtures/never-text-in-code",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "7bf8b7259003c686fa0f41f3fa4233668fa0ea81e82137ea0b17f9faca6f130a"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "2"
+  },
+  "blocks": [
+    {
+      "id": "4326a55bf713",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "never-text-in-code",
+      "content": [
+        {
+          "text": "Never text in code"
+        }
+      ]
+    },
+    {
+      "id": "54525aad1faa",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A shell prompt drawn as a separate, unselectable element is not part of the command."
+        }
+      ]
+    },
+    {
+      "id": "123c79354571",
+      "kind": "code",
+      "lang": "bash",
+      "text": "npm create vite@latest\nnpm run dev"
+    },
+    {
+      "id": "bf30385ef826",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Pygments line numbers are drawn next to each line."
+        }
+      ]
+    },
+    {
+      "id": "e3022655c97c",
+      "kind": "code",
+      "lang": "python",
+      "text": "def answer():\n    return 42\n"
+    },
+    {
+      "id": "a917c4f33168",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A prompt that is part of the text stays, like any other visible character."
+        }
+      ]
+    },
+    {
+      "id": "a5e18a1bf5d4",
+      "kind": "code",
+      "lang": "pycon",
+      "text": ">>> 6 * 7\n42\n"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Never text in code</title></head>
+<body>
+<main>
+<h1>Never text in code</h1>
+<p>A shell prompt drawn as a separate, unselectable element is not part of the command.</p>
+<div class="language-bash"><pre class="shiki"><code><span class="line"><span style="--shiki-light:#6F42C1;user-select:none;-webkit-user-select:none;">$ </span><span style="--shiki-light:#032F62;">npm</span><span> create vite@latest</span></span>
+<span class="line"><span style="User-Select : None">$ </span><span>npm run dev</span></span></code></pre></div>
+<p>Pygments line numbers are drawn next to each line.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">answer</span><span class="p">():</span>
+<span class="linenos">2</span>    <span class="k">return</span> <span class="mi">42</span>
+</pre></div></div>
+<p>A prompt that is part of the text stays, like any other visible character.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mi">6</span> <span class="o">*</span> <span class="mi">7</span>
+<span class="go">42</span>
+</pre></div></div>
+</main>
+</body>
+</html>

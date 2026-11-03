@@ -9,7 +9,7 @@
   },
   "extractor": {
     "name": "generic",
-    "version": "1"
+    "version": "2"
   },
   "blocks": [
     {
@@ -299,7 +299,7 @@
       "src": "https://kubernetes.io/images/copycode.svg"
     },
     {
-      "id": "b12dbc1541fa",
+      "id": "8da98c718571",
       "kind": "code",
       "lang": "yaml",
       "text": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: nginx\nspec:\n  containers:\n  - name: nginx\n    image: nginx:1.14.2\n    ports:\n    - containerPort: 80\n"
@@ -314,7 +314,7 @@
       ]
     },
     {
-      "id": "f5a4a3ae2346",
+      "id": "9a97e3c0e9c5",
       "kind": "code",
       "lang": "shell",
       "text": "kubectl apply -f https://k8s.io/examples/pods/simple-pod.yaml\n"

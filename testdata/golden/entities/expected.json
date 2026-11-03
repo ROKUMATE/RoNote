@@ -9,7 +9,7 @@
   },
   "extractor": {
     "name": "generic",
-    "version": "1"
+    "version": "2"
   },
   "blocks": [
     {
@@ -33,7 +33,7 @@
       ]
     },
     {
-      "id": "24abf8373a2e",
+      "id": "20d973443316",
       "kind": "code",
       "lang": "html",
       "text": "<a href=\"/x?a=1&b=2\">link</a>\n<p>&lt;not a tag&gt;</p>\n<< ©—\n"

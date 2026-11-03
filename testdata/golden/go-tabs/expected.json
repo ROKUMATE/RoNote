@@ -9,7 +9,7 @@
   },
   "extractor": {
     "name": "generic",
-    "version": "1"
+    "version": "2"
   },
   "blocks": [
     {
@@ -33,7 +33,7 @@
       ]
     },
     {
-      "id": "3bc5d6d7a761",
+      "id": "5dc14c218b7c",
       "kind": "code",
       "lang": "go",
       "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfor i := 0; i < 3; i++ {\n\t\tif i%2 == 0 {\n\t\t\tfmt.Println(i)\t// even\n\t\t}\n\t}\n}\n"

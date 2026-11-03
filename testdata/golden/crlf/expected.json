@@ -9,7 +9,7 @@
   },
   "extractor": {
     "name": "generic",
-    "version": "1"
+    "version": "2"
   },
   "blocks": [
     {
@@ -33,7 +33,7 @@
       ]
     },
     {
-      "id": "bb5213835a0d",
+      "id": "c045b607ad54",
       "kind": "code",
       "lang": "bat",
       "text": "@echo off\necho one\necho two\nREM after a lone CR\n"

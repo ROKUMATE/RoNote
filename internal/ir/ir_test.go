@@ -44,7 +44,7 @@ func sampleDoc() *Doc {
 				{Text: "mail", Link: &Link{Href: "mailto:a@example.org", Kind: LinkExternal}},
 			}},
 			{Kind: KindList, Ordered: true, Items: [][]Block{{para("one")}, {para("two"), {Kind: KindList, Items: [][]Block{{para("nested")}}}}}},
-			{Kind: KindCode, Lang: "go", Text: "func main() {\n\tprintln(\"hi\")\n}\n"},
+			{Kind: KindCode, Lang: "go", Title: "main.go", Text: "func main() {\n\tprintln(\"hi\")\n}\n"},
 			{Kind: KindTable, Head: [][]Cell{{{text("Name")}, {text("Value")}}}, Rows: [][]Cell{{{text("a")}, {}}}},
 			{Kind: KindCallout, Variant: VariantWarning, Title: "Careful", Children: []Block{para("Hot.")}},
 			{Kind: KindImage, Src: "https://example.com/a.png", Alt: "A diagram", Caption: []Inline{text("Figure 1")}},
@@ -73,6 +73,7 @@ func TestValidate(t *testing.T) {
 		{name: "unknown warning", mutate: func(d *Doc) { d.Warnings[0].Code = "odd" }, wantErr: `warnings[0]: unknown code "odd"`},
 		{name: "unknown kind", mutate: func(d *Doc) { d.Blocks[8].Kind = "marquee" }, wantErr: `blocks[8]: unknown kind "marquee"`},
 		{name: "field from another kind", mutate: func(d *Doc) { d.Blocks[1].Lang = "go" }, wantErr: "blocks[1]: paragraph block sets lang"},
+		{name: "title on a paragraph", mutate: func(d *Doc) { d.Blocks[1].Title = "main.go" }, wantErr: "blocks[1]: paragraph block sets title"},
 		{name: "missing id", mutate: func(d *Doc) { d.Blocks[1].ID = "" }, wantErr: "blocks[1]: has no id"},
 		{name: "duplicate id", mutate: func(d *Doc) { d.Blocks[2].ID = d.Blocks[1].ID }, wantErr: "blocks[2]: repeats id"},
 		{name: "heading level 0", mutate: func(d *Doc) { d.Blocks[0].Level = 0 }, wantErr: "blocks[0]: heading level 0 is not 1-6"},
@@ -203,6 +204,13 @@ func TestAssignIDs(t *testing.T) {
 	t.Run("nested blocks get IDs", func(t *testing.T) {
 		if a[8] == "" || a[8] == a[7] {
 			t.Errorf("callout child ID %q, callout ID %q", a[8], a[7])
+		}
+	})
+	t.Run("a code title is part of the ID", func(t *testing.T) {
+		code := []Block{{Kind: KindCode, Lang: "go", Text: "x := 1\n"}, {Kind: KindCode, Lang: "go", Title: "main.go", Text: "x := 1\n"}}
+		AssignIDs(code)
+		if code[0].ID == code[1].ID || code[1].ID == code[0].ID+"-2" {
+			t.Errorf("code with and without a title got IDs %s and %s", code[0].ID, code[1].ID)
 		}
 	})
 }

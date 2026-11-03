@@ -9,7 +9,7 @@
   },
   "extractor": {
     "name": "generic",
-    "version": "1"
+    "version": "2"
   },
   "blocks": [
     {
@@ -24,13 +24,13 @@
       ]
     },
     {
-      "id": "070632a19a29",
+      "id": "c5cb2ee81c2a",
       "kind": "code",
       "lang": "python",
       "text": "import os\n\ndef home():\n    return os.environ[\"HOME\"]\n"
     },
     {
-      "id": "80376a363794",
+      "id": "ca6d48a0b320",
       "kind": "code",
       "lang": "shell",
       "text": "$ go test ./...\n"

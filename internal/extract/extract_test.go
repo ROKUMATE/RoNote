@@ -42,6 +42,9 @@ func blockLine(b ir.Block) string {
 	case ir.KindParagraph:
 		return "p " + runs(b.Content)
 	case ir.KindCode:
+		if b.Title != "" {
+			return fmt.Sprintf("code(%s %q) %q", b.Lang, b.Title, b.Text)
+		}
 		return fmt.Sprintf("code(%s) %q", b.Lang, b.Text)
 	case ir.KindList:
 		tag := "ul"
@@ -228,6 +231,22 @@ func TestCodeBlocks(t *testing.T) {
 		{name: "highlight- class on an ancestor", html: `<div class="highlight-shell"><div class="highlight"><pre>x</pre></div></div>`, want: `code(shell) "x"`},
 		{name: "data-lang", html: `<pre data-lang="SQL">x</pre>`, want: `code(sql) "x"`},
 		{name: "no language", html: `<pre class="chroma">x</pre>`, want: `code() "x"`},
+		{name: "data-language", html: `<pre data-language="TS">x</pre>`, want: `code(ts) "x"`},
+		{
+			name: "a code frame's copy payload and title",
+			html: `<figure class="frame"><figcaption class="header"><span class="title"> a.go </span></figcaption>` +
+				`<pre data-language="go"><code><div>x := 1</div><div>y := 2</div></code></pre>` +
+				"<div class=\"copy\"><button title=\"Copy to clipboard\" data-code=\"x := 1\u007fy := 2\"></button></div></figure>",
+			want: `code(go "a.go") "x := 1\ny := 2"`,
+		},
+		{
+			name: "a code frame without a payload keeps the pre text",
+			html: `<figure class="frame"><figcaption class="header"></figcaption><pre>a` + "\n" + `b</pre></figure>`,
+			want: `code() "a\nb"`,
+		},
+		{name: "data-code outside a code frame is ignored", html: `<div><pre>a</pre><button data-code="b"></button></div>`, want: `code() "a"`},
+		{name: "an unselectable prompt is left out", html: `<pre><span style="color: red; user-select: none">$ </span>ls</pre>`, want: `code() "ls"`},
+		{name: "Pygments line numbers are left out", html: "<pre><span class=\"linenos\">1</span>a\n<span class=\"linenos\">2</span>b</pre>", want: `code() "a\nb"`},
 	}
 
 	for _, tt := range tests {

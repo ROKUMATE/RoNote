@@ -133,7 +133,8 @@ type Block struct {
 	Rows [][]Cell `json:"rows,omitempty"`
 	// callout
 	Variant Variant `json:"variant,omitempty"`
-	Title   string  `json:"title,omitempty"`
+	// callout, code (a frame or file name label such as "main.go")
+	Title string `json:"title,omitempty"`
 	// callout, quote
 	Children []Block `json:"children,omitempty"`
 	// image

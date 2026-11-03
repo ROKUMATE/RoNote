@@ -9,7 +9,7 @@
   },
   "extractor": {
     "name": "generic",
-    "version": "1"
+    "version": "2"
   },
   "blocks": [
     {
@@ -33,12 +33,12 @@
       ]
     },
     {
-      "id": "ffcbc444b081",
+      "id": "a961691e8373",
       "kind": "code",
       "text": "first line with two spaces  \nsecond line with a tab\t\n   \nlast line   "
     },
     {
-      "id": "09c9859e7dee",
+      "id": "9279cae6d11f",
       "kind": "code",
       "lang": "yaml",
       "text": "key: value    \nlist:\n  - item\t\t\n"

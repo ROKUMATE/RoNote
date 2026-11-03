@@ -1,0 +1,160 @@
+{
+  "ir_version": 1,
+  "title": "Build a Note Splitter in Python",
+  "source": {
+    "url": "https://path.example.dev/python/note-splitter/",
+    "final_url": "https://path.example.dev/python/note-splitter/",
+    "canonical_url": "https://path.example.dev/python/note-splitter/",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "dd110307d5fd0ad80e23d6af33296ad66f67ca74d453232e81d749dcc02b7f6e"
+  },
+  "extractor": {
+    "name": "starlight",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "e208757e4898",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "_top",
+      "content": [
+        {
+          "text": "Build a Note Splitter in Python"
+        }
+      ]
+    },
+    {
+      "id": "1f2ee648e796",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This walkthrough splits a long page into notes, one function per step."
+        }
+      ]
+    },
+    {
+      "id": "43f32579e684",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Last updated: March 2026.",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " The steps work with any recent Python 3 release."
+        }
+      ]
+    },
+    {
+      "id": "fca3d75f36e7",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "1-the-steps",
+      "content": [
+        {
+          "text": "1. The Steps"
+        }
+      ]
+    },
+    {
+      "id": "5ec81cb9257b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The pipeline has three steps:"
+        }
+      ]
+    },
+    {
+      "id": "6f50283b7bfd",
+      "kind": "code",
+      "lang": "plaintext",
+      "text": "1. Fetch Page     → Download the HTML\n2. Split Sections → One note per heading\n3. Render Notes   → Write Markdown files"
+    },
+    {
+      "id": "109020c388bc",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Each step takes the previous step's output."
+        }
+      ]
+    },
+    {
+      "id": "fe49f79c6201",
+      "kind": "divider"
+    },
+    {
+      "id": "bd40fa1de500",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "2-set-up",
+      "content": [
+        {
+          "text": "2. Set Up"
+        }
+      ]
+    },
+    {
+      "id": "d78b096719b8",
+      "kind": "code",
+      "lang": "bash",
+      "text": "pip install notesplit"
+    },
+    {
+      "id": "de85fd242308",
+      "kind": "callout",
+      "variant": "warning",
+      "title": "Caution",
+      "children": [
+        {
+          "id": "fd1866bdb22e",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Use a virtual environment so the install stays local."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "68a6504aff76",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "split-sections",
+      "content": [
+        {
+          "text": "Split Sections"
+        }
+      ]
+    },
+    {
+      "id": "619631af64b7",
+      "kind": "code",
+      "lang": "python",
+      "text": "def split(html: str) -> list[str]:\n    \"\"\"Return one chunk per <h2>.\"\"\"\n\n    return html.split(\"<h2>\")",
+      "title": "split.py"
+    },
+    {
+      "id": "7df05a1073d6",
+      "kind": "callout",
+      "variant": "tip",
+      "title": "Tip",
+      "children": [
+        {
+          "id": "e6b52a2f3bd2",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Keep each step a plain function so it is easy to test."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

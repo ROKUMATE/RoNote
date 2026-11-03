@@ -1,0 +1,129 @@
+{
+  "ir_version": 1,
+  "title": "Install the CLI",
+  "source": {
+    "url": "https://kit.example.org/docs/install",
+    "final_url": "https://kit.example.org/docs/install",
+    "canonical_url": "https://kit.example.org/docs/install",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "a502d2fa83fb31076cfce4844f01f892516ff5ca41fcf098061fa6cda2822e5e"
+  },
+  "extractor": {
+    "name": "docusaurus",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "82260341ab38",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "install-the-cli",
+      "content": [
+        {
+          "text": "Install the CLI"
+        }
+      ]
+    },
+    {
+      "id": "d7d718816350",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The CLI installs with any Node package manager."
+        }
+      ]
+    },
+    {
+      "id": "913d824d8db6",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "npm",
+          "children": [
+            {
+              "id": "92cb1044ca1e",
+              "kind": "code",
+              "lang": "bash",
+              "text": "npm install --global example-kit\n"
+            }
+          ]
+        },
+        {
+          "label": "Yarn",
+          "children": [
+            {
+              "id": "f3e5b117d685",
+              "kind": "code",
+              "lang": "bash",
+              "text": "yarn global add example-kit\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fa0ec76d22ce",
+      "kind": "callout",
+      "variant": "danger",
+      "title": "Never run it as root",
+      "children": [
+        {
+          "id": "9982f191a1cb",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "It writes to your home directory only."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4eb5fa3c4932",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "configure",
+      "content": [
+        {
+          "text": "Configure"
+        }
+      ]
+    },
+    {
+      "id": "c73283a3bed5",
+      "kind": "code",
+      "lang": "js",
+      "text": "export default {\n\tout: \"dist\",\n};\n",
+      "title": "kit.config.js"
+    },
+    {
+      "id": "f79c89ac34c7",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "try-it",
+      "content": [
+        {
+          "text": "Try it"
+        }
+      ]
+    },
+    {
+      "id": "e49bd4929dfc",
+      "kind": "code",
+      "lang": "tsx",
+      "text": "function Hello() {\n  return <b>Hello</b>;\n}\n"
+    },
+    {
+      "id": "91fd0eceb393",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Hello",
+          "marks": [
+            "bold"
+          ]
+        }
+      ]
+    }
+  ]
+}

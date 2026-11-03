@@ -1,0 +1,625 @@
+{
+  "ir_version": 1,
+  "title": "Code blocks",
+  "source": {
+    "url": "https://docusaurus.io/docs/markdown-features/code-blocks",
+    "final_url": "https://docusaurus.io/docs/markdown-features/code-blocks",
+    "canonical_url": "https://docusaurus.io/docs/markdown-features/code-blocks",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "6728e69b53bf25dd7ef51cca0a5697bdc421831463dd4cbf5522e7ff0da73bb8"
+  },
+  "extractor": {
+    "name": "docusaurus",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "9e97a750e8ea",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "code-blocks",
+      "content": [
+        {
+          "text": "Code blocks"
+        }
+      ]
+    },
+    {
+      "id": "d25ae2b65a97",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Code blocks within documentation are super-powered 💪."
+        }
+      ]
+    },
+    {
+      "id": "155d2208a535",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "code-title",
+      "content": [
+        {
+          "text": "Code title"
+        }
+      ]
+    },
+    {
+      "id": "54f8d3e44466",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can add a title to the code block by adding a "
+        },
+        {
+          "text": "title",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " key after the language (leave a space between them)."
+        }
+      ]
+    },
+    {
+      "id": "8bcfeb987552",
+      "kind": "code",
+      "lang": "md",
+      "text": "```jsx title=\"/src/components/HelloCodeTitle.js\"\nfunction HelloCodeTitle(props) {\n  return <h1>Hello, {props.name}</h1>;\n}\n```\n"
+    },
+    {
+      "id": "1be9993469bd",
+      "kind": "code",
+      "lang": "jsx",
+      "text": "function HelloCodeTitle(props) {\n  return <h1>Hello, {props.name}</h1>;\n}\n",
+      "title": "/src/components/HelloCodeTitle.js"
+    },
+    {
+      "id": "1f24f16490a2",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "syntax-highlighting",
+      "content": [
+        {
+          "text": "Syntax highlighting"
+        }
+      ]
+    },
+    {
+      "id": "8a8921beb0f3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Code blocks are text blocks wrapped around by strings of 3 backticks. You may check out "
+        },
+        {
+          "text": "this reference",
+          "link": {
+            "href": "https://mdxjs.com/docs/",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " for the specifications of MDX."
+        }
+      ]
+    },
+    {
+      "id": "b1c0f698bdcd",
+      "kind": "code",
+      "lang": "md",
+      "text": "```js\nconsole.log('Every repo must come with a mascot.');\n```\n"
+    },
+    {
+      "id": "a78f722271c5",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Use the matching language meta string for your code block, and Docusaurus will pick up syntax highlighting automatically, powered by "
+        },
+        {
+          "text": "Prism React Renderer",
+          "link": {
+            "href": "https://github.com/FormidableLabs/prism-react-renderer",
+            "kind": "external"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "55daab6d38c9",
+      "kind": "code",
+      "lang": "js",
+      "text": "console.log('Every repo must come with a mascot.');\n"
+    },
+    {
+      "id": "63a819b836ea",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "theming",
+      "content": [
+        {
+          "text": "Theming"
+        }
+      ]
+    },
+    {
+      "id": "78faf4448eef",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "By default, the Prism "
+        },
+        {
+          "text": "syntax highlighting theme",
+          "link": {
+            "href": "https://github.com/FormidableLabs/prism-react-renderer#theming",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " we use is "
+        },
+        {
+          "text": "Palenight",
+          "link": {
+            "href": "https://github.com/FormidableLabs/prism-react-renderer/blob/master/packages/prism-react-renderer/src/themes/palenight.ts",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ". You can change this to another theme by passing "
+        },
+        {
+          "text": "theme",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " field in "
+        },
+        {
+          "text": "prism",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " as "
+        },
+        {
+          "text": "themeConfig",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in your docusaurus.config.js."
+        }
+      ]
+    },
+    {
+      "id": "1b2d7d130a31",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "For example, if you prefer to use the "
+        },
+        {
+          "text": "dracula",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " highlighting theme:"
+        }
+      ]
+    },
+    {
+      "id": "7ec771d9da10",
+      "kind": "code",
+      "lang": "js",
+      "text": "import {themes as prismThemes} from 'prism-react-renderer';\n\nexport default {\n  themeConfig: {\n    prism: {\n      theme: prismThemes.dracula,\n    },\n  },\n};\n",
+      "title": "docusaurus.config.js"
+    },
+    {
+      "id": "96fd0285bebb",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Because a Prism theme is just a JS object, you can also write your own theme if you are not satisfied with the default. Docusaurus enhances the "
+        },
+        {
+          "text": "github",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "vsDark",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " themes to provide richer highlight, and you can check our implementations for the "
+        },
+        {
+          "text": "light",
+          "link": {
+            "href": "https://github.com/facebook/docusaurus/blob/main/website/src/utils/prismLight.ts",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "dark",
+          "link": {
+            "href": "https://github.com/facebook/docusaurus/blob/main/website/src/utils/prismDark.ts",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " code block themes."
+        }
+      ]
+    },
+    {
+      "id": "e666d9bc2f0e",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "supported-languages",
+      "content": [
+        {
+          "text": "Supported Languages"
+        }
+      ]
+    },
+    {
+      "id": "2977b32cb219",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "By default, Docusaurus comes with a subset of "
+        },
+        {
+          "text": "commonly used languages",
+          "link": {
+            "href": "https://github.com/FormidableLabs/prism-react-renderer/blob/master/packages/generate-prism-languages/index.ts#L10-L25",
+            "kind": "external"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "15c77eafb490",
+      "kind": "callout",
+      "variant": "warning",
+      "title": "warning",
+      "children": [
+        {
+          "id": "6c5de01640c1",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Some popular languages like Java, C#, or PHP are not enabled by default."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "26daa4483141",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "To add syntax highlighting for any of the other "
+        },
+        {
+          "text": "Prism-supported languages",
+          "link": {
+            "href": "https://prismjs.com/#supported-languages",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ", define it in an array of additional languages."
+        }
+      ]
+    },
+    {
+      "id": "80318bc40ce7",
+      "kind": "callout",
+      "variant": "note",
+      "title": "note",
+      "children": [
+        {
+          "id": "77785de40ce7",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Each additional language has to be a valid Prism component name. For example, Prism would map the "
+            },
+            {
+              "text": "language",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "text": " "
+            },
+            {
+              "text": "cs",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " to "
+            },
+            {
+              "text": "csharp",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", but only "
+            },
+            {
+              "text": "prism-csharp.js",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " exists as a "
+            },
+            {
+              "text": "component",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "text": ", so you need to use "
+            },
+            {
+              "text": "additionalLanguages: ['csharp']",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ". You can look into "
+            },
+            {
+              "text": "node_modules/prismjs/components",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " to find all components (languages) available."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3d2cda59161a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "For example, if you want to add highlighting for the PowerShell language:"
+        }
+      ]
+    },
+    {
+      "id": "864f5de16b5b",
+      "kind": "code",
+      "lang": "js",
+      "text": "export default {\n  // ...\n  themeConfig: {\n    prism: {\n      additionalLanguages: ['powershell'],\n    },\n    // ...\n  },\n};\n",
+      "title": "docusaurus.config.js"
+    },
+    {
+      "id": "873ab64452cc",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "After adding "
+        },
+        {
+          "text": "additionalLanguages",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", restart Docusaurus."
+        }
+      ]
+    },
+    {
+      "id": "e10c9100d800",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you want to add highlighting for languages not yet supported by Prism, you can swizzle "
+        },
+        {
+          "text": "prism-include-languages",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "id": "e3814175e2e1",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "npm",
+          "children": [
+            {
+              "id": "2ea1ae5b7126",
+              "kind": "code",
+              "lang": "bash",
+              "text": "npm run swizzle @docusaurus/theme-classic prism-include-languages\n"
+            }
+          ]
+        },
+        {
+          "label": "Yarn",
+          "children": [
+            {
+              "id": "13b5175a903a",
+              "kind": "code",
+              "lang": "bash",
+              "text": "yarn swizzle @docusaurus/theme-classic prism-include-languages\n"
+            }
+          ]
+        },
+        {
+          "label": "pnpm",
+          "children": [
+            {
+              "id": "b4d6d752756a",
+              "kind": "code",
+              "lang": "bash",
+              "text": "pnpm run swizzle @docusaurus/theme-classic prism-include-languages\n"
+            }
+          ]
+        },
+        {
+          "label": "Bun",
+          "children": [
+            {
+              "id": "88b9fccbeae1",
+              "kind": "code",
+              "lang": "bash",
+              "text": "bun run swizzle @docusaurus/theme-classic prism-include-languages\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fb04d6d1442d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "It will produce "
+        },
+        {
+          "text": "prism-include-languages.js",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in your "
+        },
+        {
+          "text": "src/theme",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " folder. You can add highlighting support for custom languages by editing "
+        },
+        {
+          "text": "prism-include-languages.js",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "id": "7bd8ee79fe79",
+      "kind": "code",
+      "lang": "js",
+      "text": "const prismIncludeLanguages = (Prism) => {\n  // ...\n\n  additionalLanguages.forEach((lang) => {\n    require(`prismjs/components/prism-${lang}`);\n  });\n\n  require('/path/to/your/prism-language-definition');\n\n  // ...\n};\n",
+      "title": "src/theme/prism-include-languages.js"
+    },
+    {
+      "id": "652f555e900f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can refer to "
+        },
+        {
+          "text": "Prism's official language definitions",
+          "link": {
+            "href": "https://github.com/PrismJS/prism/tree/master/components",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " when you are writing your own language definitions."
+        }
+      ]
+    },
+    {
+      "id": "0c93f3c16542",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "When adding a custom language definition, you do not need to add the language to the "
+        },
+        {
+          "text": "additionalLanguages",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " config array, since Docusaurus only looks up the "
+        },
+        {
+          "text": "additionalLanguages",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " strings in languages that Prism provides. Adding the language import in "
+        },
+        {
+          "text": "prism-include-languages.js",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is sufficient."
+        }
+      ]
+    }
+  ]
+}

@@ -144,6 +144,10 @@ Source text is never rewritten. Code blocks stay byte-identical, enforced by `Te
 - A code block's text is the page's copy payload when it has one, else the `<pre>` text without line numbers, copy labels, unselectable prompts and frame chrome.
 - Visible text stays. Never rewrite code with patterns; the one exception, FastAPI's terminal blocks, is in ADR 0004.
 
+## IR version
+
+`ir_version` 1 is frozen (docs/adr/0004-ir-and-links.md): documents are stored as IR. Changing the IR's shape means a new version and, in the same change, a documented upgrade path for stored documents. Extractor changes that keep the shape need neither.
+
 ## Docs-framework adapters
 
 - An adapter is configuration in `internal/extract/adapter`. Transforms such as callouts, tabs, code titles and line-number tables live once, in `internal/extract`. When a framework needs something new, add it there as a config field, not as adapter code.

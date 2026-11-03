@@ -193,7 +193,7 @@ Source text is never rewritten. Code blocks stay byte-identical, enforced by `Te
 | go | `make check-go-version`, `make tools`, `make lint-go`, `make test-go`, then Node and `make web-deps` for `make check-generated` | the same targets |
 | integration | `make check-go-version`, `make test-integration` on the runner's Docker with Ryuk on | `make test-integration` |
 | web | `make check-node-version`, `make web-deps`, `make lint-web`, `make test-web`, `make web-build` (styleguide guard and bundle budget) | the same targets |
-| e2e, after web | `make web-browsers WITH_DEPS=1`, `make web-e2e`; uploads `apps/web/playwright-report` for 7 days when it fails | `make web-install`, `make web-e2e` |
+| e2e, after web | a Postgres service with an empty `ronote_e2e`, `make check-go-version`, `make check-node-version`, `make web-browsers WITH_DEPS=1`, `make web-e2e` (migrations, API, worker, fixture site, Vite); uploads `apps/web/playwright-report` for 7 days when it fails | `make dev-up`, `make web-install`, `make web-e2e` |
 
 Pull requests merge by rebase only (a repository setting). A merge commit would carry the PR title as a second line, which `check-commits` rejects.
 

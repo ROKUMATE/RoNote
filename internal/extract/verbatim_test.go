@@ -80,6 +80,7 @@ var adapterRules = map[string]tokenRules{
 	"mdbook": {root: "main", notText: []string{"boring"}},
 	// Chroma line numbers sit in a table cell of their own or start each line.
 	"docsy": {root: "div.td-content", codeTables: []string{"table.lntable"}, notText: []string{"lnt", "ln"}},
+	"godev": {root: "article.Doc"},
 }
 
 // matcher turns tag, tag#id or tag.class into a match function.

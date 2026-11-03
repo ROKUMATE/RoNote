@@ -9,51 +9,10 @@
     "body_sha256": "9c8633e8fc5a1f613ad97bc263488d486767139c77f33d3743b51e874bc2b610"
   },
   "extractor": {
-    "name": "generic",
-    "version": "2"
+    "name": "godev",
+    "version": "1"
   },
   "blocks": [
-    {
-      "id": "84df2f7dc829",
-      "kind": "list",
-      "ordered": true,
-      "items": [
-        {
-          "children": [
-            {
-              "id": "91c3e400b6da",
-              "kind": "paragraph",
-              "content": [
-                {
-                  "text": "Documentation",
-                  "link": {
-                    "href": "https://go.dev/doc/",
-                    "kind": "same_domain"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "children": [
-            {
-              "id": "8f7fab92f1c3",
-              "kind": "paragraph",
-              "content": [
-                {
-                  "text": "Effective Go",
-                  "link": {
-                    "href": "https://go.dev/doc/effective_go",
-                    "kind": "same_domain"
-                  }
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
     {
       "id": "ada36f4c30cb",
       "kind": "heading",

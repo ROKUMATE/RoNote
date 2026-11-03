@@ -1,0 +1,704 @@
+{
+  "ir_version": 1,
+  "title": "Code blocks",
+  "source": {
+    "url": "https://squidfunk.github.io/mkdocs-material/reference/code-blocks/",
+    "final_url": "https://squidfunk.github.io/mkdocs-material/reference/code-blocks/",
+    "canonical_url": "https://squidfunk.github.io/mkdocs-material/reference/code-blocks/",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "e9cc0dd166c315cb39a97a34f46266ebf1c98bda8e057558da3f614ba004d98c"
+  },
+  "extractor": {
+    "name": "material",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "9e97a750e8ea",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "code-blocks",
+      "content": [
+        {
+          "text": "Code blocks"
+        }
+      ]
+    },
+    {
+      "id": "66d9b0cedff6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Code blocks and examples are an essential part of technical project documentation. Material for MkDocs provides different ways to set up syntax highlighting for code blocks, either during build time using "
+        },
+        {
+          "text": "Pygments",
+          "link": {
+            "href": "https://pygments.org",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " or during runtime using a JavaScript syntax highlighter."
+        }
+      ]
+    },
+    {
+      "id": "bbceaf620b41",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "configuration",
+      "content": [
+        {
+          "text": "Configuration"
+        }
+      ]
+    },
+    {
+      "id": "665195593f92",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This configuration enables syntax highlighting on code blocks and inline code blocks, and allows to include source code directly from other files. Add the following lines to "
+        },
+        {
+          "text": "mkdocs.yml",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "id": "bf9cd7ace71a",
+      "kind": "code",
+      "lang": "yaml",
+      "text": "markdown_extensions:\n  - pymdownx.highlight:\n      anchor_linenums: true\n      line_spans: __span\n      pygments_lang_class: true\n  - pymdownx.inlinehilite\n  - pymdownx.snippets\n  - pymdownx.superfences\n"
+    },
+    {
+      "id": "6c74ece0e313",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The following sections discuss how to use different syntax highlighting features with "
+        },
+        {
+          "text": "Pygments",
+          "link": {
+            "href": "https://pygments.org",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ", the recommended highlighter, so they don't apply when using a JavaScript syntax highlighter."
+        }
+      ]
+    },
+    {
+      "id": "71c0ac7b3755",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "See additional configuration options:"
+        }
+      ]
+    },
+    {
+      "id": "d46defbee531",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "786ee11ad954",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Highlight",
+                  "link": {
+                    "href": "https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#highlight",
+                    "kind": "same_domain"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "0d80b31ce645",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "InlineHilite",
+                  "link": {
+                    "href": "https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#inlinehilite",
+                    "kind": "same_domain"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "51abfe896716",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "SuperFences",
+                  "link": {
+                    "href": "https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#superfences",
+                    "kind": "same_domain"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "88a1ce8d1120",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Snippets",
+                  "link": {
+                    "href": "https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#snippets",
+                    "kind": "same_domain"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "027bea5a975c",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "code-copy-button",
+      "content": [
+        {
+          "text": "Code copy button"
+        }
+      ]
+    },
+    {
+      "id": "8c205af5661d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "9.0.0",
+          "link": {
+            "href": "https://squidfunk.github.io/mkdocs-material/changelog/#9.0.0",
+            "kind": "same_domain"
+          }
+        }
+      ]
+    },
+    {
+      "id": "7fffea9dd26a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Code blocks can automatically render a button on the right side to allow the user to copy a code block's contents to the clipboard. Add the following to "
+        },
+        {
+          "text": "mkdocs.yml",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " to enable them globally:"
+        }
+      ]
+    },
+    {
+      "id": "abbe6e1265f6",
+      "kind": "code",
+      "lang": "yaml",
+      "text": "theme:\n  features:\n    - content.code.copy\n"
+    },
+    {
+      "id": "ee12a83228fc",
+      "kind": "callout",
+      "variant": "info",
+      "title": "Enabling or disabling code copy buttons for a specific code block",
+      "children": [
+        {
+          "id": "c14491e335d6",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "If you don't want to enable code copy buttons globally, you can enable them for a specific code block by using a slightly different syntax based on the "
+            },
+            {
+              "text": "Attribute Lists",
+              "link": {
+                "href": "https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#attribute-lists",
+                "kind": "same_domain"
+              }
+            },
+            {
+              "text": " extension:"
+            }
+          ]
+        },
+        {
+          "id": "9c8cfc604050",
+          "kind": "code",
+          "lang": "yaml",
+          "text": "``` { .yaml .copy }\n# Code block content\n```\n"
+        },
+        {
+          "id": "e3d068e23576",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Note that there must be a language shortcode, which has to come first and must also be prefixed by a "
+            },
+            {
+              "text": ".",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ". Similarly, the copy button can also be disabled for a specific code block:"
+            }
+          ]
+        },
+        {
+          "id": "c5581a25829d",
+          "kind": "code",
+          "lang": "yaml",
+          "text": "``` { .yaml .no-copy }\n# Code block content\n```\n"
+        },
+        {
+          "id": "f564185d0b3f",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "To enable or disable the copy button without syntax highlighting, you can use the "
+            },
+            {
+              "text": ".text",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " language shortcode, which doesn't highlight anything."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5ca502ec4f03",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "adding-a-title",
+      "content": [
+        {
+          "text": "Adding a title"
+        }
+      ]
+    },
+    {
+      "id": "5ec9a6c4053e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In order to provide additional context, a custom title can be added to a code block by using the "
+        },
+        {
+          "text": "title=\"<custom title>\"",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " option directly after the shortcode, e.g. to display the name of a file:"
+        }
+      ]
+    },
+    {
+      "id": "0519a08f5877",
+      "kind": "code",
+      "lang": "markdown",
+      "text": "``` py title=\"bubble_sort.py\"\ndef bubble_sort(items):\n    for i in range(len(items)):\n        for j in range(len(items) - 1 - i):\n            if items[j] > items[j + 1]:\n                items[j], items[j + 1] = items[j + 1], items[j]\n```\n",
+      "title": "Code block with title"
+    },
+    {
+      "id": "d5a948a74c9e",
+      "kind": "code",
+      "lang": "py",
+      "text": "def bubble_sort(items):\n    for i in range(len(items)):\n        for j in range(len(items) - 1 - i):\n            if items[j] > items[j + 1]:\n                items[j], items[j + 1] = items[j + 1], items[j]\n",
+      "title": "bubble_sort.py"
+    },
+    {
+      "id": "2efd3bd0e7ca",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "adding-annotations",
+      "content": [
+        {
+          "text": "Adding annotations"
+        }
+      ]
+    },
+    {
+      "id": "3f9641e95ee6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Code annotations can be placed anywhere in a code block where a comment for the language of the block can be placed, e.g. for JavaScript in "
+        },
+        {
+          "text": "// ...",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "/* ... */",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", for YAML in "
+        },
+        {
+          "text": "# ...",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", etc."
+        },
+        {
+          "text": "1",
+          "marks": [
+            "sup"
+          ],
+          "link": {
+            "href": "#fn:1",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "id": "62586c3f558f",
+      "kind": "code",
+      "lang": "markdown",
+      "text": "``` yaml\ntheme:\n  features:\n    - content.code.annotate # (1)\n```\n\n1.  :man_raising_hand: I'm a code annotation! I can contain `code`, __formatted\n    text__, images, ... basically anything that can be written in Markdown.\n",
+      "title": "Code block with annotation"
+    },
+    {
+      "id": "c35dca92eb8b",
+      "kind": "code",
+      "lang": "yaml",
+      "text": "theme:\n  features:\n    - content.code.annotate # (1)\n"
+    },
+    {
+      "id": "e014a4ad51b0",
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "06dedac4a592",
+              "kind": "image",
+              "src": "https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f64b-200d-2642-fe0f.svg",
+              "alt": "🙋‍♂️"
+            },
+            {
+              "id": "b9ab2e2bf481",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "I'm a code annotation! I can contain "
+                },
+                {
+                  "text": "code",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ", "
+                },
+                {
+                  "text": "formatted text",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                {
+                  "text": ", images, ... basically anything that can be written in Markdown."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ed2588550a3d",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "stripping-comments",
+      "content": [
+        {
+          "text": "Stripping comments"
+        }
+      ]
+    },
+    {
+      "id": "42f2868f92cf",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "8.5.0",
+          "link": {
+            "href": "https://squidfunk.github.io/mkdocs-material/changelog/#8.5.0",
+            "kind": "same_domain"
+          }
+        }
+      ]
+    },
+    {
+      "id": "52bf124d8d33",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you wish to strip the comment characters surrounding a code annotation, simply add an "
+        },
+        {
+          "text": "!",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " after the closing parenthesis of the code annotation:"
+        }
+      ]
+    },
+    {
+      "id": "2e1622f0b2a5",
+      "kind": "code",
+      "lang": "markdown",
+      "text": "``` yaml\n# (1)!\n```\n\n1.  Look ma, less line noise!\n",
+      "title": "Code block with annotation, stripped"
+    },
+    {
+      "id": "8cb2f887c9c9",
+      "kind": "code",
+      "lang": "yaml",
+      "text": "# (1)!\n"
+    },
+    {
+      "id": "d366dccc048b",
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "d74e0d90598b",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Look ma, less line noise!"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "089f57acefdf",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Note that this only allows for a single code annotation to be rendered per comment. If you want to add multiple code annotations, comments cannot be stripped for technical reasons."
+        }
+      ]
+    },
+    {
+      "id": "555f0bf738f5",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "adding-line-numbers",
+      "content": [
+        {
+          "text": "Adding line numbers"
+        }
+      ]
+    },
+    {
+      "id": "da030ae94796",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Line numbers can be added to a code block by using the "
+        },
+        {
+          "text": "linenums=\"<start>\"",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " option directly after the shortcode, whereas "
+        },
+        {
+          "text": "<start>",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " represents the starting line number. A code block can start from a line number other than "
+        },
+        {
+          "text": "1",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", which allows to split large code blocks for readability:"
+        }
+      ]
+    },
+    {
+      "id": "a883ba485a37",
+      "kind": "code",
+      "lang": "markdown",
+      "text": "``` py linenums=\"1\"\ndef bubble_sort(items):\n    for i in range(len(items)):\n        for j in range(len(items) - 1 - i):\n            if items[j] > items[j + 1]:\n                items[j], items[j + 1] = items[j + 1], items[j]\n```\n",
+      "title": "Code block with line numbers"
+    },
+    {
+      "id": "7665f03d4cf8",
+      "kind": "code",
+      "lang": "py",
+      "text": "def bubble_sort(items):\n    for i in range(len(items)):\n        for j in range(len(items) - 1 - i):\n            if items[j] > items[j + 1]:\n                items[j], items[j + 1] = items[j + 1], items[j]\n"
+    },
+    {
+      "id": "8ce1cae11cc1",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "highlighting-specific-lines",
+      "content": [
+        {
+          "text": "Highlighting specific lines"
+        }
+      ]
+    },
+    {
+      "id": "95b0055cb94d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Specific lines can be highlighted by passing the line numbers to the "
+        },
+        {
+          "text": "hl_lines",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " argument placed right after the language shortcode. Note that line counts start at "
+        },
+        {
+          "text": "1",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", regardless of the starting line number specified as part of "
+        },
+        {
+          "text": "linenums",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "#adding-line-numbers",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "id": "be21a4704f4e",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "Lines",
+          "children": [
+            {
+              "id": "1808d7ca13b7",
+              "kind": "code",
+              "lang": "markdown",
+              "text": "``` py hl_lines=\"2 3\"\ndef bubble_sort(items):\n    for i in range(len(items)):\n        for j in range(len(items) - 1 - i):\n            if items[j] > items[j + 1]:\n                items[j], items[j + 1] = items[j + 1], items[j]\n```\n",
+              "title": "Code block with highlighted lines"
+            },
+            {
+              "id": "7ccf1503de25",
+              "kind": "code",
+              "lang": "py",
+              "text": "def bubble_sort(items):\n    for i in range(len(items)):\n        for j in range(len(items) - 1 - i):\n            if items[j] > items[j + 1]:\n                items[j], items[j + 1] = items[j + 1], items[j]\n"
+            }
+          ]
+        },
+        {
+          "label": "Line ranges",
+          "children": [
+            {
+              "id": "d3eb51c72767",
+              "kind": "code",
+              "lang": "markdown",
+              "text": "``` py hl_lines=\"3-5\"\ndef bubble_sort(items):\n    for i in range(len(items)):\n        for j in range(len(items) - 1 - i):\n            if items[j] > items[j + 1]:\n                items[j], items[j + 1] = items[j + 1], items[j]\n```\n",
+              "title": "Code block with highlighted line range"
+            },
+            {
+              "id": "7ccf1503de25-2",
+              "kind": "code",
+              "lang": "py",
+              "text": "def bubble_sort(items):\n    for i in range(len(items)):\n        for j in range(len(items) - 1 - i):\n            if items[j] > items[j + 1]:\n                items[j], items[j + 1] = items[j + 1], items[j]\n"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

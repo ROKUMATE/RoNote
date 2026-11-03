@@ -1,0 +1,80 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="generator" content="zensical-0.0.65"><title>First Steps - FastAPI</title><link rel="canonical" href="https://fastapi.tiangolo.com/tutorial/first-steps/"></head><body><header class="md-header" data-md-component="header"><a href="/">FastAPI</a></header><main class="md-main" data-md-component="main"><div class="md-main__inner md-grid"><div class="md-content" data-md-component="content"><article class="md-content__inner md-typeset">
+                
+  
+  
+  
+  
+
+
+<h1 id="first-steps">First Steps<a class="headerlink" href="#first-steps" title="Permanent link">&para;</a></h1>
+<p>The simplest FastAPI file could look like this:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Python 3.10+</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-0-1"><span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span>
+</span><span id="__span-0-2">
+</span><span id="__span-0-3"><span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">()</span>
+</span><span id="__span-0-4">
+</span><span id="__span-0-5">
+</span><span id="__span-0-6"><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+</span><span id="__span-0-7"><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">root</span><span class="p">():</span>
+</span><span id="__span-0-8">    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello World&quot;</span><span class="p">}</span>
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>Copy that to a file <code>main.py</code>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>FastAPI has an <a href="https://marketplace.visualstudio.com/items?itemName=FastAPILabs.fastapi-vscode">official extension for VS Code</a> (and Cursor), which provides a lot of features, including a path operation explorer, path operation search, CodeLens navigation in tests (jump to definition from tests), and FastAPI Cloud deployment and logs, all from your editor.</p>
+</div>
+<p>Run the live server:</p>
+<div class="termy">
+
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><span class="gp">$ </span>&lt;font<span class="w"> </span><span class="nv">color</span><span class="o">=</span><span class="s2">&quot;#4E9A06&quot;</span>&gt;uv<span class="w"> </span>run<span class="w"> </span>fastapi&lt;/font&gt;<span class="w"> </span>dev
+</span><span id="__span-1-2">
+</span><span id="__span-1-3"><span class="go">  &lt;span style=&quot;background-color:#009485&quot;&gt;&lt;font color=&quot;#D3D7CF&quot;&gt; FastAPI &lt;/font&gt;&lt;/span&gt;  Starting development server 🚀</span>
+</span><span id="__span-1-4">
+</span><span id="__span-1-5"><span class="go">             Searching for package file structure from directories</span>
+</span><span id="__span-1-6"><span class="go">             with &lt;font color=&quot;#3465A4&quot;&gt;__init__.py&lt;/font&gt; files</span>
+</span><span id="__span-1-7"><span class="go">             Importing from &lt;font color=&quot;#75507B&quot;&gt;/home/user/code/&lt;/font&gt;&lt;font color=&quot;#AD7FA8&quot;&gt;awesomeapp&lt;/font&gt;</span>
+</span><span id="__span-1-8">
+</span><span id="__span-1-9"><span class="go">   &lt;span style=&quot;background-color:#007166&quot;&gt;&lt;font color=&quot;#D3D7CF&quot;&gt; module &lt;/font&gt;&lt;/span&gt;  🐍 main.py</span>
+</span><span id="__span-1-10">
+</span><span id="__span-1-11"><span class="go">     &lt;span style=&quot;background-color:#007166&quot;&gt;&lt;font color=&quot;#D3D7CF&quot;&gt; code &lt;/font&gt;&lt;/span&gt;  Importing the FastAPI app object from the module with</span>
+</span><span id="__span-1-12"><span class="go">             the following code:</span>
+</span><span id="__span-1-13">
+</span><span id="__span-1-14"><span class="go">             &lt;u style=&quot;text-decoration-style:solid&quot;&gt;from &lt;/u&gt;&lt;u style=&quot;text-decoration-style:solid&quot;&gt;&lt;b&gt;main&lt;/b&gt;&lt;/u&gt;&lt;u style=&quot;text-decoration-style:solid&quot;&gt; import &lt;/u&gt;&lt;u style=&quot;text-decoration-style:solid&quot;&gt;&lt;b&gt;app&lt;/b&gt;&lt;/u&gt;</span>
+</span><span id="__span-1-15">
+</span><span id="__span-1-16"><span class="go">      &lt;span style=&quot;background-color:#007166&quot;&gt;&lt;font color=&quot;#D3D7CF&quot;&gt; app &lt;/font&gt;&lt;/span&gt;  Using import string: &lt;font color=&quot;#3465A4&quot;&gt;main:app&lt;/font&gt;</span>
+</span><span id="__span-1-17">
+</span><span id="__span-1-18"><span class="go">   &lt;span style=&quot;background-color:#007166&quot;&gt;&lt;font color=&quot;#D3D7CF&quot;&gt; server &lt;/font&gt;&lt;/span&gt;  Server started at &lt;font color=&quot;#729FCF&quot;&gt;&lt;u style=&quot;text-decoration-style:solid&quot;&gt;http://127.0.0.1:8000&lt;/u&gt;&lt;/font&gt;</span>
+</span><span id="__span-1-19"><span class="go">   &lt;span style=&quot;background-color:#007166&quot;&gt;&lt;font color=&quot;#D3D7CF&quot;&gt; server &lt;/font&gt;&lt;/span&gt;  Documentation at &lt;font color=&quot;#729FCF&quot;&gt;&lt;u style=&quot;text-decoration-style:solid&quot;&gt;http://127.0.0.1:8000/docs&lt;/u&gt;&lt;/font&gt;</span>
+</span><span id="__span-1-20">
+</span><span id="__span-1-21"><span class="go">      &lt;span style=&quot;background-color:#007166&quot;&gt;&lt;font color=&quot;#D3D7CF&quot;&gt; tip &lt;/font&gt;&lt;/span&gt;  Running in development mode, for production use:</span>
+</span><span id="__span-1-22"><span class="go">             &lt;b&gt;fastapi run&lt;/b&gt;</span>
+</span><span id="__span-1-23">
+</span><span id="__span-1-24"><span class="go">             Logs:</span>
+</span><span id="__span-1-25">
+</span><span id="__span-1-26"><span class="go">     &lt;span style=&quot;background-color:#007166&quot;&gt;&lt;font color=&quot;#D3D7CF&quot;&gt; INFO &lt;/font&gt;&lt;/span&gt;  Will watch for changes in these directories:</span>
+</span><span id="__span-1-27"><span class="go">             &lt;b&gt;[&lt;/b&gt;&lt;font color=&quot;#4E9A06&quot;&gt;&amp;apos;/home/user/code/awesomeapp&amp;apos;&lt;/font&gt;&lt;b&gt;]&lt;/b&gt;</span>
+</span><span id="__span-1-28"><span class="go">     &lt;span style=&quot;background-color:#007166&quot;&gt;&lt;font color=&quot;#D3D7CF&quot;&gt; INFO &lt;/font&gt;&lt;/span&gt;  Uvicorn running on &lt;font color=&quot;#729FCF&quot;&gt;&lt;u style=&quot;text-decoration-style:solid&quot;&gt;http://127.0.0.1:8000&lt;/u&gt;&lt;/font&gt; &lt;b&gt;(&lt;/b&gt;Press CTRL+C</span>
+</span><span id="__span-1-29"><span class="go">             to quit&lt;b&gt;)&lt;/b&gt;</span>
+</span><span id="__span-1-30"><span class="go">     &lt;span style=&quot;background-color:#007166&quot;&gt;&lt;font color=&quot;#D3D7CF&quot;&gt; INFO &lt;/font&gt;&lt;/span&gt;  Started reloader process &lt;b&gt;[&lt;/b&gt;&lt;font color=&quot;#34E2E2&quot;&gt;&lt;b&gt;383138&lt;/b&gt;&lt;/font&gt;&lt;b&gt;]&lt;/b&gt; using WatchFiles</span>
+</span><span id="__span-1-31"><span class="go">     &lt;span style=&quot;background-color:#007166&quot;&gt;&lt;font color=&quot;#D3D7CF&quot;&gt; INFO &lt;/font&gt;&lt;/span&gt;  Started server process &lt;b&gt;[&lt;/b&gt;&lt;font color=&quot;#34E2E2&quot;&gt;&lt;b&gt;383153&lt;/b&gt;&lt;/font&gt;&lt;b&gt;]&lt;/b&gt;</span>
+</span><span id="__span-1-32"><span class="go">     &lt;span style=&quot;background-color:#007166&quot;&gt;&lt;font color=&quot;#D3D7CF&quot;&gt; INFO &lt;/font&gt;&lt;/span&gt;  Waiting for application startup.</span>
+</span><span id="__span-1-33"><span class="go">     &lt;span style=&quot;background-color:#007166&quot;&gt;&lt;font color=&quot;#D3D7CF&quot;&gt; INFO &lt;/font&gt;&lt;/span&gt;  Application startup complete.</span>
+</span></code></pre></div>
+
+</div>
+
+<p>In the output, there's a line with something like:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-2-1">INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+</span></code></pre></div>
+<p>That line shows the URL where your app is being served on your local machine.</p>
+<h3 id="check-it">Check it<a class="headerlink" href="#check-it" title="Permanent link">&para;</a></h3>
+<p>Open your browser at <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a>.</p>
+<p>You will see the JSON response as:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-3-1"><span class="p">{</span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Hello World&quot;</span><span class="p">}</span>
+</span></code></pre></div>
+</article></div></div></main><footer class="md-footer"><p>Site footer</p></footer></body></html>

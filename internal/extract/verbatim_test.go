@@ -60,9 +60,10 @@ func codeTexts(blocks []ir.Block) []string {
 // tokenRules are one framework's code rules, written down here apart from
 // its adapter's configuration.
 type tokenRules struct {
-	root      string   // the content root as tag, tag#id or tag.class; empty for the generic rule
-	skipped   []string // elements, in the same form, whose content is never kept
-	tabPanels bool     // hidden role=tabpanel elements are content
+	root       string   // the content root as tag, tag#id or tag.class; empty for the generic rule
+	skipped    []string // elements, in the same form, whose content is never kept
+	tabPanels  bool     // hidden role=tabpanel elements are content
+	codeTables []string // tables that lay out one code block next to its line numbers
 }
 
 // adapterRules holds the rules for each adapter's pages.
@@ -70,6 +71,8 @@ var adapterRules = map[string]tokenRules{
 	// Islands are interactive widgets.
 	"starlight":  {skipped: []string{"astro-island"}, tabPanels: true},
 	"docusaurus": {root: "div.theme-doc-markdown", tabPanels: true},
+	// Pygments line numbers sit in a cell of their own.
+	"material": {root: "article.md-content__inner", codeTables: []string{"table.highlighttable"}, skipped: []string{"td.linenos"}},
 }
 
 // matcher turns tag, tag#id or tag.class into a match function.
@@ -185,8 +188,12 @@ func codeByTokens(input []byte, rules tokenRules) []string {
 	for _, s := range rules.skipped {
 		skipped = append(skipped, matcher(s))
 	}
-	isSkipped := func(tag string, attrs map[string]string) bool {
-		return slices.ContainsFunc(skipped, func(m func(string, map[string]string) bool) bool { return m(tag, attrs) })
+	var codeTables []func(string, map[string]string) bool
+	for _, s := range rules.codeTables {
+		codeTables = append(codeTables, matcher(s))
+	}
+	matchesAny := func(ms []func(string, map[string]string) bool, tag string, attrs map[string]string) bool {
+		return slices.ContainsFunc(ms, func(m func(string, map[string]string) bool) bool { return m(tag, attrs) })
 	}
 	var stack []element
 	var frames []frame
@@ -269,10 +276,10 @@ func codeByTokens(input []byte, rules tokenRules) []string {
 			e := element{
 				tag:  tag,
 				root: isRoot,
-				excluded: parent.excluded || tokenSkipped[tag] || hidden || isSkipped(tag, attrs) ||
+				excluded: parent.excluded || tokenSkipped[tag] || hidden || matchesAny(skipped, tag, attrs) ||
 					strings.EqualFold(attrs["aria-hidden"], "true") ||
 					(root.fallback && (tag == "header" || tag == "footer")),
-				inlineOK: parent.inlineOK || tokenInlineOnly[tag],
+				inlineOK: parent.inlineOK || (tokenInlineOnly[tag] && !matchesAny(codeTables, tag, attrs)),
 				notText: code != nil && (parent.notText || strings.Contains(style, "user-select:none") ||
 					slices.Contains(strings.Fields(attrs["class"]), "linenos")),
 				frame: tag == "figure" && slices.Contains(strings.Fields(attrs["class"]), "frame"),

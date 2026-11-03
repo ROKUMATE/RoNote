@@ -140,18 +140,27 @@ func codeLang(pre *html.Node) string {
 	}
 
 	for _, n := range candidates {
-		for _, class := range strings.Fields(attr(n, "class")) {
-			for _, prefix := range langPrefixes {
-				if lang, ok := strings.CutPrefix(strings.ToLower(class), prefix); ok && lang != "" {
-					return lang
-				}
-			}
+		if lang := classLang(n); lang != "" {
+			return lang
 		}
 	}
 	for _, n := range tagged {
 		for _, key := range []string{"data-lang", "data-language"} {
 			if lang := strings.TrimSpace(attr(n, key)); lang != "" {
 				return strings.ToLower(lang)
+			}
+		}
+	}
+	return ""
+}
+
+// classLang is the language a language-x, lang-x or highlight-x class on n
+// names, or "".
+func classLang(n *html.Node) string {
+	for _, class := range strings.Fields(attr(n, "class")) {
+		for _, prefix := range langPrefixes {
+			if lang, ok := strings.CutPrefix(strings.ToLower(class), prefix); ok && lang != "" {
+				return lang
 			}
 		}
 	}

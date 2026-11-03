@@ -1,0 +1,179 @@
+{
+  "ir_version": 1,
+  "title": "First Steps",
+  "source": {
+    "url": "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "final_url": "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "canonical_url": "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "a9b4ed3116d4ac91d6718d612074ae04822b0c2e664b499c27b72c674dff9ad4"
+  },
+  "extractor": {
+    "name": "material",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "2aa78a0b349f",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "first-steps",
+      "content": [
+        {
+          "text": "First Steps"
+        }
+      ]
+    },
+    {
+      "id": "0e4c6ccea9a8",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The simplest FastAPI file could look like this:"
+        }
+      ]
+    },
+    {
+      "id": "4ec51e5d164d",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "Python 3.10+",
+          "children": [
+            {
+              "id": "f50d99758491",
+              "kind": "code",
+              "text": "from fastapi import FastAPI\n\napp = FastAPI()\n\n\n@app.get(\"/\")\nasync def root():\n    return {\"message\": \"Hello World\"}\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f9c5b0f20892",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Copy that to a file "
+        },
+        {
+          "text": "main.py",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "2cf68536e6f9",
+      "kind": "callout",
+      "variant": "tip",
+      "title": "Tip",
+      "children": [
+        {
+          "id": "8cfe56695e0a",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "FastAPI has an "
+            },
+            {
+              "text": "official extension for VS Code",
+              "link": {
+                "href": "https://marketplace.visualstudio.com/items?itemName=FastAPILabs.fastapi-vscode",
+                "kind": "external"
+              }
+            },
+            {
+              "text": " (and Cursor), which provides a lot of features, including a path operation explorer, path operation search, CodeLens navigation in tests (jump to definition from tests), and FastAPI Cloud deployment and logs, all from your editor."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "198c6393060e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Run the live server:"
+        }
+      ]
+    },
+    {
+      "id": "871a610e06e4",
+      "kind": "code",
+      "text": "$ <font color=\"#4E9A06\">uv run fastapi</font> dev\n\n  <span style=\"background-color:#009485\"><font color=\"#D3D7CF\"> FastAPI </font></span>  Starting development server 🚀\n\n             Searching for package file structure from directories\n             with <font color=\"#3465A4\">__init__.py</font> files\n             Importing from <font color=\"#75507B\">/home/user/code/</font><font color=\"#AD7FA8\">awesomeapp</font>\n\n   <span style=\"background-color:#007166\"><font color=\"#D3D7CF\"> module </font></span>  🐍 main.py\n\n     <span style=\"background-color:#007166\"><font color=\"#D3D7CF\"> code </font></span>  Importing the FastAPI app object from the module with\n             the following code:\n\n             <u style=\"text-decoration-style:solid\">from </u><u style=\"text-decoration-style:solid\"><b>main</b></u><u style=\"text-decoration-style:solid\"> import </u><u style=\"text-decoration-style:solid\"><b>app</b></u>\n\n      <span style=\"background-color:#007166\"><font color=\"#D3D7CF\"> app </font></span>  Using import string: <font color=\"#3465A4\">main:app</font>\n\n   <span style=\"background-color:#007166\"><font color=\"#D3D7CF\"> server </font></span>  Server started at <font color=\"#729FCF\"><u style=\"text-decoration-style:solid\">http://127.0.0.1:8000</u></font>\n   <span style=\"background-color:#007166\"><font color=\"#D3D7CF\"> server </font></span>  Documentation at <font color=\"#729FCF\"><u style=\"text-decoration-style:solid\">http://127.0.0.1:8000/docs</u></font>\n\n      <span style=\"background-color:#007166\"><font color=\"#D3D7CF\"> tip </font></span>  Running in development mode, for production use:\n             <b>fastapi run</b>\n\n             Logs:\n\n     <span style=\"background-color:#007166\"><font color=\"#D3D7CF\"> INFO </font></span>  Will watch for changes in these directories:\n             <b>[</b><font color=\"#4E9A06\">&apos;/home/user/code/awesomeapp&apos;</font><b>]</b>\n     <span style=\"background-color:#007166\"><font color=\"#D3D7CF\"> INFO </font></span>  Uvicorn running on <font color=\"#729FCF\"><u style=\"text-decoration-style:solid\">http://127.0.0.1:8000</u></font> <b>(</b>Press CTRL+C\n             to quit<b>)</b>\n     <span style=\"background-color:#007166\"><font color=\"#D3D7CF\"> INFO </font></span>  Started reloader process <b>[</b><font color=\"#34E2E2\"><b>383138</b></font><b>]</b> using WatchFiles\n     <span style=\"background-color:#007166\"><font color=\"#D3D7CF\"> INFO </font></span>  Started server process <b>[</b><font color=\"#34E2E2\"><b>383153</b></font><b>]</b>\n     <span style=\"background-color:#007166\"><font color=\"#D3D7CF\"> INFO </font></span>  Waiting for application startup.\n     <span style=\"background-color:#007166\"><font color=\"#D3D7CF\"> INFO </font></span>  Application startup complete.\n"
+    },
+    {
+      "id": "7d61d11adf39",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In the output, there's a line with something like:"
+        }
+      ]
+    },
+    {
+      "id": "a10d0d814a98",
+      "kind": "code",
+      "text": "INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)\n"
+    },
+    {
+      "id": "696019044ccf",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "That line shows the URL where your app is being served on your local machine."
+        }
+      ]
+    },
+    {
+      "id": "06048d4c95da",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "check-it",
+      "content": [
+        {
+          "text": "Check it"
+        }
+      ]
+    },
+    {
+      "id": "f657dbe3db7f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Open your browser at "
+        },
+        {
+          "text": "http://127.0.0.1:8000",
+          "link": {
+            "href": "http://127.0.0.1:8000",
+            "kind": "external"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "227337208be9",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You will see the JSON response as:"
+        }
+      ]
+    },
+    {
+      "id": "16ce9bbfe5bd",
+      "kind": "code",
+      "text": "{\"message\": \"Hello World\"}\n"
+    }
+  ]
+}

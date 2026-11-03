@@ -81,7 +81,8 @@ func TestDetect(t *testing.T) {
 		name, head, body, host string
 		want                   *Adapter
 	}{
-		{name: "generator prefix, any case", head: `<meta name="generator" content="alpha v2.1">`, host: "x.example", want: alpha},
+		{name: "generator, any case", head: `<meta name="generator" content="alpha v2.1">`, host: "x.example", want: alpha},
+		{name: "generator inside a list", head: `<meta name="generator" content="kit-1.0, beta docs-4">`, host: "x.example", want: beta},
 		{name: "generator name in another case", head: `<meta name="Generator" content="Beta Docs 4">`, host: "x.example", want: beta},
 		{name: "one of several generators", head: `<meta name="generator" content="Astro v5"><meta name="generator" content="Beta Docs 1">`, host: "x.example", want: beta},
 		{name: "signature", body: `<div class="beta-content"></div>`, host: "x.example", want: beta},

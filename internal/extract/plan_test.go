@@ -78,7 +78,7 @@ func TestPlannedPage(t *testing.T) {
 			<div role="tabpanel" aria-labelledby="t2" hidden><pre>pnpm i</pre></div></div>
 		<div class="tabset"><span role="tab"> </span><div role="tabpanel"><p>Unlabelled.</p></div></div>
 		<div class="codebox"><div class="file">main.go</div><button>Copy</button><pre class="language-go"><span class="ln">1</span>package main</pre></div>
-		<table class="lines"><tr><td><pre>1</pre></td><td class="code"><pre>x := 1</pre></td></tr></table>
+		<table class="lines language-sql"><tr><td><pre>1</pre></td><td class="code"><div><pre>x := 1</pre></div></td></tr></table>
 		<span class="filename">Filename: src/main.rs</span><pre class="listing">fn main() {}</pre>
 	</div></main>`)
 
@@ -87,7 +87,7 @@ func TestPlannedPage(t *testing.T) {
 	}
 	want := `heading(Title) paragraph(Text.) callout(tip "Tip": paragraph(Inside.)) ` +
 		`tabs(npm: code( "" "npm i") | pnpm: code( "" "pnpm i")) paragraph(Unlabelled.) ` +
-		`code(go "main.go" "package main") code( "" "x := 1") code( "Filename: src/main.rs" "fn main() {}")`
+		`code(go "main.go" "package main") code(sql "" "x := 1") code( "Filename: src/main.rs" "fn main() {}")`
 	if got := outline(doc.Blocks); got != want {
 		t.Errorf("blocks =\n%s\nwant\n%s", got, want)
 	}

@@ -94,7 +94,7 @@ func (e *extractor) planned(n *html.Node) (blocks []ir.Block, ok bool) {
 		return nil, false
 	}
 	if c, ok := e.plan.Code[n]; ok {
-		return blockList(e.plannedCode(c)), true
+		return blockList(e.plannedCode(n, c)), true
 	}
 	if tabs, ok := e.plan.Tabs[n]; ok {
 		return e.tabs(tabs), true
@@ -112,9 +112,11 @@ func blockList(b *ir.Block) []ir.Block {
 	return []ir.Block{*b}
 }
 
-// plannedCode builds a code block from the plan's <pre>; the generic rules
-// supply the title and language the plan leaves open.
-func (e *extractor) plannedCode(c adapter.CodePlan) *ir.Block {
+// plannedCode builds a code block from the plan's <pre> inside block. The
+// generic rules supply the title and language the plan leaves open, and a
+// language class on block itself counts too, since a layout table can put
+// the <pre> far below it.
+func (e *extractor) plannedCode(block *html.Node, c adapter.CodePlan) *ir.Block {
 	b := e.code(c.Pre)
 	if b == nil {
 		return nil
@@ -122,8 +124,11 @@ func (e *extractor) plannedCode(c adapter.CodePlan) *ir.Block {
 	if c.Title != nil {
 		b.Title = collapse(textContent(c.Title))
 	}
-	if c.Lang != "" {
+	switch {
+	case c.Lang != "":
 		b.Lang = c.Lang
+	case b.Lang == "":
+		b.Lang = classLang(block)
 	}
 	return b
 }

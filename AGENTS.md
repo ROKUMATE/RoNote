@@ -47,7 +47,7 @@ Create a directory when its first file needs it, not before.
 | `make help` | list targets (default target) |
 | `make setup` | point git at `.githooks`, make the hook executable, set `pull.rebase true`; run once per clone |
 | `make hooks-test` | test the commit message hook (normal and strict mode) and `scripts/check-commits.sh` |
-| `make check-commits RANGE=main..HEAD` | check every commit message in `RANGE` in strict mode; in CI the event sets the range (`scripts/commit-range.sh`) |
+| `make check-commits RANGE=main..HEAD` | check every commit message in `RANGE` in strict mode; in CI the event sets the range (`scripts/commit-range.sh`). `scripts/check-commits.sh` exits 0 when all pass, 1 when any is bad (report on stderr), 2 on a usage or internal error |
 | `make tools` | install the pinned golangci-lint into `./bin` |
 | `make check` | `lint`, `test` and `hooks-test`: what CI's fast jobs run. Run it before pushing |
 | `make lint` | `lint-go` and `lint-web` |

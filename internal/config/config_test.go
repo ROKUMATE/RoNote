@@ -5,7 +5,10 @@ import (
 	"maps"
 	"strings"
 	"testing"
+	"time"
 )
+
+const day = 24 * time.Hour
 
 // leakMarker stands in for a database password; no error may contain it.
 const leakMarker = "s3cret"
@@ -36,7 +39,7 @@ func TestLoad(t *testing.T) {
 		{
 			name: "defaults",
 			env:  validEnv(nil),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day},
 		},
 		{
 			name: "all set",
@@ -46,12 +49,12 @@ func TestLoad(t *testing.T) {
 				"RONOTE_LOG_LEVEL":    "debug",
 				"RONOTE_DATABASE_URL": "postgresql://db/ronote",
 			}),
-			want: Config{Env: EnvProd, HTTPAddr: "0.0.0.0:9000", LogLevel: slog.LevelDebug, DatabaseURL: "postgresql://db/ronote"},
+			want: Config{Env: EnvProd, HTTPAddr: "0.0.0.0:9000", LogLevel: slog.LevelDebug, DatabaseURL: "postgresql://db/ronote", SourceTTL: day},
 		},
 		{
 			name: "empty host",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_HTTP_ADDR": ":8080", "RONOTE_LOG_LEVEL": "warn"}),
-			want: Config{Env: EnvStaging, HTTPAddr: ":8080", LogLevel: slog.LevelWarn, DatabaseURL: testDatabaseURL},
+			want: Config{Env: EnvStaging, HTTPAddr: ":8080", LogLevel: slog.LevelWarn, DatabaseURL: testDatabaseURL, SourceTTL: day},
 		},
 		{
 			name:    "missing env",
@@ -116,17 +119,17 @@ func TestLoad(t *testing.T) {
 		{
 			name: "private fetches allowed in dev",
 			env:  validEnv(map[string]string{"RONOTE_FETCH_ALLOW_PRIVATE": "true"}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day},
 		},
 		{
 			name: "private fetches allowed in test",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "test", "RONOTE_FETCH_ALLOW_PRIVATE": "1"}),
-			want: Config{Env: EnvTest, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true},
+			want: Config{Env: EnvTest, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day},
 		},
 		{
 			name: "private fetches off in prod",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_FETCH_ALLOW_PRIVATE": "false"}),
-			want: Config{Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL},
+			want: Config{Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day},
 		},
 		{
 			name:    "private fetches refused in prod",
@@ -142,6 +145,26 @@ func TestLoad(t *testing.T) {
 			name:    "private fetches not a boolean",
 			env:     validEnv(map[string]string{"RONOTE_FETCH_ALLOW_PRIVATE": "yes"}),
 			wantErr: []string{`RONOTE_FETCH_ALLOW_PRIVATE: "yes" is not true or false`},
+		},
+		{
+			name: "source TTL",
+			env:  validEnv(map[string]string{"RONOTE_SOURCE_TTL": "90m"}),
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: 90 * time.Minute},
+		},
+		{
+			name: "source TTL of zero always revalidates",
+			env:  validEnv(map[string]string{"RONOTE_SOURCE_TTL": "0s"}),
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL},
+		},
+		{
+			name:    "source TTL not a duration",
+			env:     validEnv(map[string]string{"RONOTE_SOURCE_TTL": "1 day"}),
+			wantErr: []string{`RONOTE_SOURCE_TTL: "1 day" is not a duration such as 24h or 90m`},
+		},
+		{
+			name:    "negative source TTL",
+			env:     validEnv(map[string]string{"RONOTE_SOURCE_TTL": "-1h"}),
+			wantErr: []string{`RONOTE_SOURCE_TTL: "-1h" is negative`},
 		},
 		{
 			name: "every bad variable reported",
@@ -187,5 +210,19 @@ func TestLoad(t *testing.T) {
 				t.Errorf("Load() error = %q leaks the database password", err)
 			}
 		})
+	}
+}
+
+func TestLogger(t *testing.T) {
+	t.Parallel()
+	var text, js strings.Builder
+	Config{Env: EnvDev, LogLevel: slog.LevelInfo}.Logger(&text).Info("hello", "n", 1)
+	Config{Env: EnvProd, LogLevel: slog.LevelWarn}.Logger(&js).Info("hidden")
+	Config{Env: EnvProd, LogLevel: slog.LevelWarn}.Logger(&js).Warn("shown")
+	if !strings.Contains(text.String(), "msg=hello n=1") {
+		t.Errorf("dev log = %q, want text", text.String())
+	}
+	if strings.Contains(js.String(), "hidden") || !strings.Contains(js.String(), `"msg":"shown"`) {
+		t.Errorf("prod log = %q, want JSON at warn and above", js.String())
 	}
 }

@@ -177,12 +177,13 @@ func TestFetch(t *testing.T) {
 	}
 
 	tests := []struct {
-		name       string
-		handler    http.HandlerFunc
-		request    func(base string) Request
-		wantErr    error
-		wantStatus int
-		check      func(t *testing.T, res *Result)
+		name           string
+		handler        http.HandlerFunc
+		request        func(base string) Request
+		wantErr        error
+		wantStatus     int
+		wantRetryAfter time.Duration
+		check          func(t *testing.T, res *Result)
 	}{
 		{
 			name:    "HTML page",
@@ -308,6 +309,15 @@ func TestFetch(t *testing.T) {
 			handler:    http.NotFound,
 			wantStatus: http.StatusNotFound,
 		},
+		{
+			name: "too many requests with Retry-After",
+			handler: func(w http.ResponseWriter, _ *http.Request) {
+				w.Header().Set("Retry-After", "120")
+				w.WriteHeader(http.StatusTooManyRequests)
+			},
+			wantStatus:     http.StatusTooManyRequests,
+			wantRetryAfter: 2 * time.Minute,
+		},
 	}
 
 	for _, tt := range tests {
@@ -323,8 +333,8 @@ func TestFetch(t *testing.T) {
 
 			if tt.wantStatus != 0 {
 				var status *StatusError
-				if !errors.As(err, &status) || status.Code != tt.wantStatus {
-					t.Fatalf("Fetch() error = %v, want StatusError %d", err, tt.wantStatus)
+				if !errors.As(err, &status) || status.Code != tt.wantStatus || status.RetryAfter != tt.wantRetryAfter {
+					t.Fatalf("Fetch() error = %+v, want StatusError %d with RetryAfter %v", err, tt.wantStatus, tt.wantRetryAfter)
 				}
 				return
 			}
@@ -367,5 +377,29 @@ func TestFetchTimesOut(t *testing.T) {
 
 	if !errors.Is(err, ErrTimeout) {
 		t.Fatalf("Fetch() error = %v, want ErrTimeout", err)
+	}
+}
+
+func TestRetryAfter(t *testing.T) {
+	t.Parallel()
+	now := time.Date(2026, 11, 4, 9, 0, 0, 0, time.UTC)
+	tests := []struct {
+		header string
+		want   time.Duration
+	}{
+		{"", 0},
+		{"30", 30 * time.Second},
+		{" 5 ", 5 * time.Second},
+		{"0", 0},
+		{"-3", 0},
+		{"soon", 0},
+		{"99999999999999999999", 0},
+		{"Wed, 04 Nov 2026 09:01:30 GMT", 90 * time.Second},
+		{"Wed, 04 Nov 2026 08:59:00 GMT", 0},
+	}
+	for _, tt := range tests {
+		if got := retryAfter(tt.header, now); got != tt.want {
+			t.Errorf("retryAfter(%q) = %v, want %v", tt.header, got, tt.want)
+		}
 	}
 }

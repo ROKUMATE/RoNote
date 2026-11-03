@@ -5,12 +5,14 @@ package config
 import (
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"net"
 	"net/url"
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Env is the deployment environment the service runs in.
@@ -33,11 +35,15 @@ type Config struct {
 	// FetchAllowPrivateNetworks lets the page fetcher reach loopback and
 	// private addresses on any port. Only dev and test may set it.
 	FetchAllowPrivateNetworks bool
+	// SourceTTL is how long a fetched page stays fresh: imports within it
+	// reuse the stored copy without asking the site.
+	SourceTTL time.Duration
 }
 
 const (
-	defaultHTTPAddr = "127.0.0.1:8080"
-	defaultLogLevel = "info"
+	defaultHTTPAddr  = "127.0.0.1:8080"
+	defaultLogLevel  = "info"
+	defaultSourceTTL = "24h"
 )
 
 var (
@@ -65,6 +71,8 @@ func Load(getenv func(string) string) (Config, error) {
 	check("RONOTE_DATABASE_URL", validateDatabaseURL(dbURL))
 	allowPrivate, err := parseAllowPrivate(getenv("RONOTE_FETCH_ALLOW_PRIVATE"), env)
 	check("RONOTE_FETCH_ALLOW_PRIVATE", err)
+	ttl, err := parseTTL(withDefault(getenv("RONOTE_SOURCE_TTL"), defaultSourceTTL))
+	check("RONOTE_SOURCE_TTL", err)
 
 	if len(errs) > 0 {
 		return Config{}, fmt.Errorf("invalid config:\n%w", errors.Join(errs...))
@@ -75,7 +83,30 @@ func Load(getenv func(string) string) (Config, error) {
 		LogLevel:                  level,
 		DatabaseURL:               dbURL,
 		FetchAllowPrivateNetworks: allowPrivate,
+		SourceTTL:                 ttl,
 	}, nil
+}
+
+// Logger returns the service logger writing to w: text in dev, JSON
+// elsewhere, at the configured level.
+func (c Config) Logger(w io.Writer) *slog.Logger {
+	opts := &slog.HandlerOptions{Level: c.LogLevel}
+	if c.Env == EnvDev {
+		return slog.New(slog.NewTextHandler(w, opts))
+	}
+	return slog.New(slog.NewJSONHandler(w, opts))
+}
+
+// parseTTL reads a non-negative Go duration such as "24h" or "90m".
+func parseTTL(s string) (time.Duration, error) {
+	d, err := time.ParseDuration(s)
+	if err != nil {
+		return 0, fmt.Errorf("%q is not a duration such as 24h or 90m", s)
+	}
+	if d < 0 {
+		return 0, fmt.Errorf("%q is negative", s)
+	}
+	return d, nil
 }
 
 // parseAllowPrivate reads a boolean that may only be true in dev and test:

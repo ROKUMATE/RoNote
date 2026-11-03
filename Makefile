@@ -54,6 +54,9 @@ test-web: ## Run web unit tests (Vitest)
 run-api: ## Run the API locally (RONOTE_ENV defaults to dev)
 	RONOTE_ENV=$${RONOTE_ENV:-dev} go run ./cmd/api
 
+run-worker: ## Run the import worker locally (RONOTE_ENV defaults to dev)
+	RONOTE_ENV=$${RONOTE_ENV:-dev} go run ./cmd/worker
+
 extract: ## Print a page's IR: make extract url=https://... [format=text]
 	@test -n "$(url)" || { echo "usage: make extract url=https://... [format=text]" >&2; exit 1; }
 	go run ./cmd/extract --format=$(or $(format),json) "$(url)"
@@ -167,7 +170,7 @@ web-e2e: ## Run web end-to-end tests (Playwright, Chromium)
 	@$(node_required)
 	$(WEB) e2e
 
-.PHONY: help setup hooks-test check-commits tools check test test-go test-web run-api extract lint lint-go lint-web fmt
+.PHONY: help setup hooks-test check-commits tools check test test-go test-web run-api run-worker extract lint lint-go lint-web fmt
 .PHONY: dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: check-generated check-go-version ci-cache-keys
 .PHONY: test-integration test-live test-clean web-install web-deps web-browsers check-node-version

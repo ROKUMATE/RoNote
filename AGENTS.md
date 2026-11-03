@@ -32,6 +32,7 @@ Site crawling, AI summaries, chat, handwritten OCR, pseudocode conversion. Do no
 | `deploy/` | deployment config |
 | `scripts/` | repo scripts |
 | `internal/ir/` | the document model every importer produces (docs/adr/0004-ir-and-links.md) |
+| `internal/importer/` | the import pipeline: the River job that fetches, extracts and stores a document, and the service the API queues imports with |
 | `internal/canon/` | canonical URLs: what sources and imports are keyed by, and the same-host rule for a page's canonical link |
 | `internal/fetch/` | the only way to fetch a user-supplied URL: SSRF guard, limits, robots.txt, rate limit |
 | `internal/extract/` | HTML to IR extractor: generic rules, refined by a framework adapter when one matches |
@@ -69,6 +70,7 @@ Create a directory when its first file needs it, not before.
 | `make web-dev` | Vite dev server on `127.0.0.1:5173`; the styleguide is at `/_styleguide` |
 | `make web-build` | production build into `apps/web/dist`; fails if styleguide code ends up in it or the gzip size passes the budget in `scripts/web-budget.sh` (JS 150 kB, CSS 20 kB) |
 | `make web-e2e` | Playwright end-to-end and axe tests in Chromium against the dev server; kept out of `make test` |
+| `make run-worker` | run the import worker (River queue `imports`); `RONOTE_ENV` defaults to `dev` |
 | `make run-api` | run the API on `127.0.0.1:8080`; `RONOTE_ENV` defaults to `dev` |
 | `make extract url=... [format=text]` | fetch one page with the production fetcher rules and print its IR as JSON, or as readable text |
 | `make dev` (P0x) | run API, worker and web locally |

@@ -12,11 +12,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"mime"
 	"net"
 	"net/http"
 	"net/netip"
 	"net/url"
+	"strconv"
+	"strings"
 	"time"
 
 	"golang.org/x/net/html/charset"
@@ -43,6 +46,9 @@ var (
 // request asked for.
 type StatusError struct {
 	Code int
+	// RetryAfter is how long the server asked clients to wait before trying
+	// again (Retry-After, in seconds or as a date), or 0.
+	RetryAfter time.Duration
 }
 
 func (e *StatusError) Error() string {
@@ -195,7 +201,7 @@ func (f *Fetcher) get(ctx context.Context, u *url.URL, r Request) (*Result, erro
 		return res, nil
 	}
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return nil, &StatusError{Code: resp.StatusCode}
+		return nil, &StatusError{Code: resp.StatusCode, RetryAfter: retryAfter(resp.Header.Get("Retry-After"), res.FetchedAt)}
 	}
 	if resp.ContentLength > f.maxBody {
 		return nil, fmt.Errorf("%w: %d bytes declared, limit %d", ErrTooLarge, resp.ContentLength, f.maxBody)
@@ -264,4 +270,23 @@ func (f *Fetcher) checkRobotsRedirect(req *http.Request, via []*http.Request) er
 func isTimeout(err error) bool {
 	var netErr net.Error
 	return errors.Is(err, context.DeadlineExceeded) || (errors.As(err, &netErr) && netErr.Timeout())
+}
+
+// retryAfter reads a Retry-After header, given in seconds or as an HTTP
+// date, as a wait from now. A missing, malformed or past value gives 0.
+func retryAfter(header string, now time.Time) time.Duration {
+	header = strings.TrimSpace(header)
+	if header == "" {
+		return 0
+	}
+	if secs, err := strconv.ParseInt(header, 10, 64); err == nil {
+		if secs <= 0 || secs > math.MaxInt64/int64(time.Second) {
+			return 0
+		}
+		return time.Duration(secs) * time.Second
+	}
+	if at, err := http.ParseTime(header); err == nil && at.After(now) {
+		return at.Sub(now)
+	}
+	return 0
 }

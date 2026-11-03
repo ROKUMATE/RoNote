@@ -48,7 +48,7 @@ func codeTexts(blocks []ir.Block) []string {
 			out = append(out, b.Text)
 		}
 		for _, item := range b.Items {
-			out = append(out, codeTexts(item)...)
+			out = append(out, codeTexts(item.Children)...)
 		}
 		out = append(out, codeTexts(b.Children)...)
 	}

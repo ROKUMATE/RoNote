@@ -52,9 +52,20 @@ func TestBlockText(t *testing.T) {
 			want:  "```go title=\"main.go\"\npackage main\n```",
 		},
 		{
-			name:  "nested lists",
-			block: ir.Block{Kind: ir.KindList, Ordered: true, Items: [][]ir.Block{{para("One")}, {para("Two"), {Kind: ir.KindList, Items: [][]ir.Block{{para("Inner")}}}}}},
-			want:  "1. One\n2. Two\n   - Inner",
+			name: "nested lists",
+			block: ir.Block{Kind: ir.KindList, Ordered: true, Items: []ir.Item{
+				{Children: []ir.Block{para("One")}},
+				{Children: []ir.Block{para("Two"), {Kind: ir.KindList, Items: []ir.Item{{Children: []ir.Block{para("Inner")}}}}}},
+			}},
+			want: "1. One\n2. Two\n   - Inner",
+		},
+		{
+			name: "tabs",
+			block: ir.Block{Kind: ir.KindTabs, Items: []ir.Item{
+				{Label: "npm", Children: []ir.Block{{Kind: ir.KindCode, Text: "npm i\n"}}},
+				{Label: "Yarn", Children: []ir.Block{para("Run:"), {Kind: ir.KindCode, Text: "yarn\n"}}},
+			}},
+			want: "=== npm\n    ```\n    npm i\n    ```\n=== Yarn\n    Run:\n    ```\n    yarn\n    ```",
 		},
 		{
 			name:  "table",

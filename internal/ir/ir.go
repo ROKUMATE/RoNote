@@ -22,6 +22,9 @@ const (
 	KindImage     Kind = "image"
 	KindQuote     Kind = "quote"
 	KindDivider   Kind = "divider"
+	// KindTabs holds alternatives shown one at a time, such as the same code
+	// in several languages or install steps per OS. Each item is one tab.
+	KindTabs Kind = "tabs"
 )
 
 // Mark is inline formatting on a text run.
@@ -112,7 +115,8 @@ type Warning struct {
 }
 
 // Block is one block of content. Kind decides which fields may be set; see
-// Validate. Children of lists, callouts and quotes are blocks themselves.
+// Validate. Children of lists, tabs, callouts and quotes are blocks
+// themselves.
 type Block struct {
 	ID   string `json:"id"`
 	Kind Kind   `json:"kind"`
@@ -123,8 +127,9 @@ type Block struct {
 	// heading, paragraph
 	Content []Inline `json:"content,omitempty"`
 	// list
-	Ordered bool      `json:"ordered,omitempty"`
-	Items   [][]Block `json:"items,omitempty"`
+	Ordered bool `json:"ordered,omitempty"`
+	// list, tabs
+	Items []Item `json:"items,omitempty"`
 	// code
 	Lang string `json:"lang,omitempty"`
 	Text string `json:"text,omitempty"`
@@ -141,6 +146,13 @@ type Block struct {
 	Src     string   `json:"src,omitempty"`
 	Alt     string   `json:"alt,omitempty"`
 	Caption []Inline `json:"caption,omitempty"`
+}
+
+// Item is one item of a list, or one tab of a tabs block. Only tabs have a
+// label.
+type Item struct {
+	Label    string  `json:"label,omitempty"`
+	Children []Block `json:"children"`
 }
 
 // Cell is a table cell. Cells hold inline content only.

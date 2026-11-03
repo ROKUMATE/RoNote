@@ -174,78 +174,82 @@
       "id": "fcd0e4e01317",
       "kind": "list",
       "items": [
-        [
-          {
-            "id": "007e9553d7d3",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "Pods that run a single container",
-                "marks": [
-                  "bold"
-                ]
-              },
-              {
-                "text": ". The \"one-container-per-Pod\" model is the most common Kubernetes use case; in this case, you can think of a Pod as a wrapper around a single container; Kubernetes manages Pods rather than managing the containers directly."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "id": "95f14d0bd52b",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "Pods that run multiple containers that need to work together",
-                "marks": [
-                  "bold"
-                ]
-              },
-              {
-                "text": ". A Pod can encapsulate an application composed of "
-              },
-              {
-                "text": "multiple co-located containers",
-                "link": {
-                  "href": "#how-pods-manage-multiple-containers",
-                  "kind": "anchor"
+        {
+          "children": [
+            {
+              "id": "007e9553d7d3",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Pods that run a single container",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                {
+                  "text": ". The \"one-container-per-Pod\" model is the most common Kubernetes use case; in this case, you can think of a Pod as a wrapper around a single container; Kubernetes manages Pods rather than managing the containers directly."
                 }
-              },
-              {
-                "text": " that are tightly coupled and need to share resources. These co-located containers form a single cohesive unit."
-              }
-            ]
-          },
-          {
-            "id": "089be3d015cd",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "Grouping multiple co-located and co-managed containers in a single Pod is a relatively advanced use case. You should use this pattern only in specific instances in which your containers are tightly coupled."
-              }
-            ]
-          },
-          {
-            "id": "d23619064515",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "You don't need to run multiple containers to provide replication (for resilience or capacity); if you need multiple replicas, see "
-              },
-              {
-                "text": "Workload management",
-                "link": {
-                  "href": "https://kubernetes.io/docs/concepts/workloads/controllers/",
-                  "kind": "same_domain"
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "95f14d0bd52b",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Pods that run multiple containers that need to work together",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                {
+                  "text": ". A Pod can encapsulate an application composed of "
+                },
+                {
+                  "text": "multiple co-located containers",
+                  "link": {
+                    "href": "#how-pods-manage-multiple-containers",
+                    "kind": "anchor"
+                  }
+                },
+                {
+                  "text": " that are tightly coupled and need to share resources. These co-located containers form a single cohesive unit."
                 }
-              },
-              {
-                "text": "."
-              }
-            ]
-          }
-        ]
+              ]
+            },
+            {
+              "id": "089be3d015cd",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Grouping multiple co-located and co-managed containers in a single Pod is a relatively advanced use case. You should use this pattern only in specific instances in which your containers are tightly coupled."
+                }
+              ]
+            },
+            {
+              "id": "d23619064515",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "You don't need to run multiple containers to provide replication (for resilience or capacity); if you need multiple replicas, see "
+                },
+                {
+                  "text": "Workload management",
+                  "link": {
+                    "href": "https://kubernetes.io/docs/concepts/workloads/controllers/",
+                    "kind": "same_domain"
+                  }
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        }
       ]
     },
     {

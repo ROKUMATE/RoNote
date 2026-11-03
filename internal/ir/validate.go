@@ -20,6 +20,7 @@ var fieldsByKind = map[Kind][]string{
 	KindImage:     {"src", "alt", "caption"},
 	KindQuote:     {"children"},
 	KindDivider:   {},
+	KindTabs:      {"items"},
 }
 
 var (
@@ -115,10 +116,13 @@ func (v *validator) block(path string, b *Block) {
 		}
 		for i, item := range b.Items {
 			itemPath := fmt.Sprintf("%s.items[%d]", path, i)
-			if len(item) == 0 {
+			if item.Label != "" {
+				v.fail(itemPath, "list item has a label")
+			}
+			if len(item.Children) == 0 {
 				v.fail(itemPath, "list item is empty")
 			}
-			v.blocks(itemPath, item)
+			v.blocks(itemPath+".children", item.Children)
 		}
 	case KindCode:
 		if b.Text == "" {
@@ -146,6 +150,20 @@ func (v *validator) block(path string, b *Block) {
 			v.fail(path, "quote has no children")
 		}
 		v.blocks(path+".children", b.Children)
+	case KindTabs:
+		if len(b.Items) == 0 {
+			v.fail(path, "tabs block has no tabs")
+		}
+		for i, item := range b.Items {
+			itemPath := fmt.Sprintf("%s.items[%d]", path, i)
+			if item.Label == "" {
+				v.fail(itemPath, "tab has no label")
+			}
+			if len(item.Children) == 0 {
+				v.fail(itemPath, "tab is empty")
+			}
+			v.blocks(itemPath+".children", item.Children)
+		}
 	case KindDivider:
 	}
 }

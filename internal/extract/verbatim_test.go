@@ -78,6 +78,8 @@ var adapterRules = map[string]tokenRules{
 	"vitepress": {root: "div.vp-doc"},
 	// Boring lines are hidden, and the copy button copies what is shown.
 	"mdbook": {root: "main", notText: []string{"boring"}},
+	// Chroma line numbers sit in a table cell of their own or start each line.
+	"docsy": {root: "div.td-content", codeTables: []string{"table.lntable"}, notText: []string{"lnt", "ln"}},
 }
 
 // matcher turns tag, tag#id or tag.class into a match function.

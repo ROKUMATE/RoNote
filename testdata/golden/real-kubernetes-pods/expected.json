@@ -8,8 +8,8 @@
     "body_sha256": "2ae19910b3dc2aeaacd97bbb40c597ef5ca5163d11daafe6b3dfaff99426c10c"
   },
   "extractor": {
-    "name": "generic",
-    "version": "2"
+    "name": "docsy",
+    "version": "1"
   },
   "blocks": [
     {
@@ -282,31 +282,11 @@
       ]
     },
     {
-      "id": "846fc30c5ec8",
-      "kind": "paragraph",
-      "content": [
-        {
-          "text": "pods/simple-pod.yaml",
-          "marks": [
-            "code"
-          ],
-          "link": {
-            "href": "https://raw.githubusercontent.com/kubernetes/website/main/content/en/examples/pods/simple-pod.yaml",
-            "kind": "external"
-          }
-        }
-      ]
-    },
-    {
-      "id": "17b9fb26b97e",
-      "kind": "image",
-      "src": "https://kubernetes.io/images/copycode.svg"
-    },
-    {
-      "id": "8da98c718571",
+      "id": "fa67b735a395",
       "kind": "code",
       "lang": "yaml",
-      "text": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: nginx\nspec:\n  containers:\n  - name: nginx\n    image: nginx:1.14.2\n    ports:\n    - containerPort: 80\n"
+      "text": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: nginx\nspec:\n  containers:\n  - name: nginx\n    image: nginx:1.14.2\n    ports:\n    - containerPort: 80\n",
+      "title": "pods/simple-pod.yaml"
     },
     {
       "id": "15cb8d4af3d5",

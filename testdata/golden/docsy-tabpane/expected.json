@@ -1,0 +1,149 @@
+{
+  "ir_version": 1,
+  "title": "Configure the Runner",
+  "source": {
+    "url": "https://runner.example.dev/docs/configure/",
+    "final_url": "https://runner.example.dev/docs/configure/",
+    "canonical_url": "https://runner.example.dev/docs/configure/",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "0be75a4d4d51c07fe5010170465317291f1774c2dfb9557ce0a8f49b3849a173"
+  },
+  "extractor": {
+    "name": "docsy",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "0155d17d40d1",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "configure-the-runner",
+      "content": [
+        {
+          "text": "Configure the Runner"
+        }
+      ]
+    },
+    {
+      "id": "3dac0fbf8497",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "One file sets every option."
+        }
+      ]
+    },
+    {
+      "id": "70c38f60a175",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The runner reads its settings from one file, in any of three formats."
+        }
+      ]
+    },
+    {
+      "id": "1ca2f5e745da",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "toml",
+          "children": [
+            {
+              "id": "ca51c5814350",
+              "kind": "code",
+              "lang": "toml",
+              "text": "workers = 4\n"
+            }
+          ]
+        },
+        {
+          "label": "yaml",
+          "children": [
+            {
+              "id": "179008f4c267",
+              "kind": "code",
+              "lang": "yaml",
+              "text": "workers: 4\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "50aba5b18937",
+      "kind": "callout",
+      "variant": "warning",
+      "title": "Warning",
+      "children": [
+        {
+          "id": "60fbb95a6eb8",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Restart the runner after every change."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1339ce86f31e",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "line-numbers",
+      "content": [
+        {
+          "text": "Line numbers"
+        }
+      ]
+    },
+    {
+      "id": "98189f836e29",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Long examples show line numbers in a column of their own:"
+        }
+      ]
+    },
+    {
+      "id": "a52fda442461",
+      "kind": "code",
+      "lang": "sh",
+      "text": "runner check\nrunner start --detach\n"
+    },
+    {
+      "id": "b097562aebcd",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Short ones number each line inline:"
+        }
+      ]
+    },
+    {
+      "id": "5134fd7e8ce0",
+      "kind": "code",
+      "lang": "go",
+      "text": "package main\n"
+    },
+    {
+      "id": "d703d405771e",
+      "kind": "callout",
+      "variant": "note",
+      "title": "Note",
+      "children": [
+        {
+          "id": "0092d8df699b",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Line numbers are never part of the copied text."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -135,12 +135,16 @@ func (e *extractor) plannedCode(block *html.Node, c adapter.CodePlan) *ir.Block 
 
 // tabs builds a tabs block from planned tabs, dropping empty panels. If a
 // panel with content has no label, the panels' blocks follow one another
-// instead: a label is never made up.
+// instead: a label is never made up. A panel the plan converts itself, such
+// as one that is a code block's wrapper, is converted whole.
 func (e *extractor) tabs(tabs []adapter.Tab) []ir.Block {
 	var items []ir.Item
 	labelled := true
 	for _, t := range tabs {
-		children := e.blocks(t.Panel)
+		children, planned := e.planned(t.Panel)
+		if !planned {
+			children = e.blocks(t.Panel)
+		}
 		if len(children) == 0 {
 			continue
 		}

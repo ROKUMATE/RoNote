@@ -72,8 +72,9 @@ var adapterRules = map[string]tokenRules{
 	"starlight":  {skipped: []string{"astro-island"}, tabPanels: true},
 	"docusaurus": {root: "div.theme-doc-markdown", tabPanels: true},
 	// Pygments line numbers sit in a cell of their own.
-	"material": {root: "article.md-content__inner", codeTables: []string{"table.highlighttable"}, skipped: []string{"td.linenos"}},
-	"sphinx":   {root: "div.body", codeTables: []string{"table.highlighttable"}, skipped: []string{"td.linenos"}},
+	"material":  {root: "article.md-content__inner", codeTables: []string{"table.highlighttable"}, skipped: []string{"td.linenos"}},
+	"sphinx":    {root: "div.body", codeTables: []string{"table.highlighttable"}, skipped: []string{"td.linenos"}},
+	"vitepress": {root: "div.vp-doc"},
 }
 
 // matcher turns tag, tag#id or tag.class into a match function.

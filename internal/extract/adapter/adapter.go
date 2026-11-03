@@ -20,7 +20,7 @@ import (
 
 // All lists the adapters in detection order: within each detection phase,
 // the first adapter that matches wins.
-var All = []*Adapter{starlight, docusaurus, material, sphinx}
+var All = []*Adapter{starlight, docusaurus, material, sphinx, vitepress}
 
 // Adapter describes one documentation framework. Selectors are CSS
 // selectors as cascadia parses them; one string may hold a comma-separated

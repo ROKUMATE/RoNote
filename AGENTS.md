@@ -100,9 +100,17 @@ Targets marked (P0x) do not exist yet. The phase that adds a target removes its 
 
 Web targets, `make lint` and `make test` check that `node --version` matches `.nvmrc` first; with nvm, `nvm install && nvm use` picks it up.
 
-Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`: deadcode, goose, sqlc, river, oapi-codegen.
+Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`: deadcode, goose, sqlc, river, oapi-codegen. golangci-lint is the exception: `make tools` installs the version pinned in the Makefile into `./bin`.
 
-The API is spec-first: change `api/openapi.yaml`, then `make generate`. Never hand-write a type the spec defines. The spec's IR schema maps onto `internal/ir` (`x-go-type`), and `TestIRSchemaMatchesGoldens` keeps the two in step. golangci-lint is the exception: `make tools` installs the version pinned in the Makefile into `./bin`.
+The API is spec-first: change `api/openapi.yaml`, then `make generate`. Never hand-write a type the spec defines. The spec's IR schema maps onto `internal/ir` (`x-go-type`), and `TestIRSchemaMatchesGoldens` keeps the two in step.
+
+### Running locally
+
+Dev runs two processes, each in its own terminal, after `make dev-up` and `make migrate-up`:
+- `make run-api` serves the API. Set `RONOTE_DEV_USER_EMAIL` (in `.env.dev`, or `make run-api RONOTE_DEV_USER_EMAIL=...`), or every `/api/v1` route answers 401.
+- `make run-worker` runs imports. Without it, imports stay `queued`.
+
+docs/adr/0005-import-pipeline.md describes the pipeline both serve.
 
 ## Commits
 

@@ -68,7 +68,8 @@ type tokenRules struct {
 // adapterRules holds the rules for each adapter's pages.
 var adapterRules = map[string]tokenRules{
 	// Islands are interactive widgets.
-	"starlight": {skipped: []string{"astro-island"}, tabPanels: true},
+	"starlight":  {skipped: []string{"astro-island"}, tabPanels: true},
+	"docusaurus": {root: "div.theme-doc-markdown", tabPanels: true},
 }
 
 // matcher turns tag, tag#id or tag.class into a match function.

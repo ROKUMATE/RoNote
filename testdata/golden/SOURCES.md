@@ -11,6 +11,7 @@ Synthetic framework pages reproduce the DOM structure of a real page, with inven
 | Fixture | Structure of |
 |---|---|
 | starlight-rag | https://myengineeringpath.dev/programming/python/rag-pipeline-tutorial/ (Starlight) |
+| docusaurus-v3-install | a Docusaurus 3 docs page: tabs, admonition, titled and numbered code, live editor |
 
 ## Excerpts of real pages
 
@@ -26,3 +27,4 @@ Trimmed copies of public documentation pages:
 | real-python-controlflow | https://docs.python.org/3/tutorial/controlflow.html, © Python Software Foundation | Sections 4.1 and 4.2 | Text: Python Software Foundation License Version 2. Code: Zero Clause BSD License | 2026-11-02 |
 | real-kubernetes-pods | https://kubernetes.io/docs/concepts/workloads/pods/, "Pods" by The Kubernetes Authors | "What is a Pod?" and "Using Pods" | Creative Commons Attribution 4.0 | 2026-11-02 |
 | starlight-tabs | https://starlight.astro.build/components/tabs/, "Tabs" by the Starlight contributors | Introduction to the first Usage example | MIT, per https://github.com/withastro/starlight/blob/main/LICENSE | 2026-11-03 |
+| docusaurus-code-blocks | https://docusaurus.io/docs/markdown-features/code-blocks, "Code blocks" by Meta Platforms, Inc. and the Docusaurus contributors | "Code title" to "Supported Languages" | Creative Commons Attribution 4.0, per https://github.com/facebook/docusaurus/blob/main/LICENSE-docs | 2026-11-03 |

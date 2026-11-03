@@ -1,31 +1,11 @@
-import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { documentsKey } from "../api/queries";
-import type { ImportEvent } from "../api/schema";
 import { apiError, json, stubApi } from "../test/api";
+import { send, subscriptions } from "../test/events";
 import { renderApp } from "../test/render";
 
-// subscribeImport is the seam at the event stream: the tests play the server.
-const stream = vi.hoisted(() => ({
-  subscriptions: [] as {
-    id: string;
-    onEvent: (event: ImportEvent) => void;
-    unsubscribe: () => void;
-  }[],
-}));
-vi.mock("../api/events", () => ({
-  subscribeImport: vi.fn((id: string, onEvent: (event: ImportEvent) => void) => {
-    const subscription = { id, onEvent, unsubscribe: vi.fn() };
-    stream.subscriptions.push(subscription);
-    return subscription.unsubscribe;
-  }),
-}));
-
-function send(event: ImportEvent) {
-  const subscription = stream.subscriptions.at(-1);
-  if (!subscription) throw new Error("nothing subscribed");
-  act(() => subscription.onEvent(event));
-}
+vi.mock("../api/events", () => import("../test/events"));
 
 const queued = {
   id: "imp-1",
@@ -62,7 +42,7 @@ const documentWithContent = {
 };
 
 beforeEach(() => {
-  stream.subscriptions.length = 0;
+  subscriptions.length = 0;
 });
 
 async function openDialog() {
@@ -97,7 +77,7 @@ describe("a new import", () => {
     submit(dialog, "  https://docs.example.com/guide ");
 
     await within(dialog).findByRole("list", { name: "Progress" });
-    expect(stream.subscriptions.map((s) => s.id)).toEqual(["imp-1"]);
+    expect(subscriptions.map((s) => s.id)).toEqual(["imp-1"]);
     expect(progress(dialog)).toEqual([
       "queued:current",
       "fetching:waiting",
@@ -143,12 +123,12 @@ describe("a new import", () => {
 
     fireEvent.click(within(dialog).getByRole("button", { name: "Close" }));
     expect(dialog).toHaveProperty("open", false);
-    expect(stream.subscriptions[0]?.unsubscribe).not.toHaveBeenCalled();
+    expect(subscriptions[0]?.unsubscribe).not.toHaveBeenCalled();
 
     send({ status: "done", document_id: "doc-1" });
 
     expect(invalidate).toHaveBeenCalledWith({ queryKey: documentsKey });
-    expect(stream.subscriptions[0]?.unsubscribe).toHaveBeenCalled();
+    expect(subscriptions[0]?.unsubscribe).toHaveBeenCalled();
     expect(router.state.location.pathname).toBe("/");
   });
 
@@ -188,7 +168,7 @@ test("a page already in the library opens its document with a notice", async () 
   await waitFor(() => expect(router.state.location.pathname).toBe("/doc/doc-1"));
   expect(dialog).toHaveProperty("open", false);
   expect((await screen.findByRole("status")).textContent).toContain("Already in your library");
-  expect(stream.subscriptions).toEqual([]);
+  expect(subscriptions).toEqual([]);
 });
 
 describe("the URL field", () => {

@@ -52,13 +52,14 @@ Create a directory when its first file needs it, not before.
 | `make tools` | install the pinned golangci-lint into `./bin` |
 | `make check` | `lint`, `test` and `hooks-test`: what CI's fast jobs run. Run it before pushing |
 | `make lint` | `lint-go` and `lint-web` |
-| `make lint-go` | golangci-lint (`.golangci.yml`, includes `integration` files), then `go tool deadcode -test -tags integration ./...`, which must print nothing, then `go mod tidy -diff`, then `go tool actionlint` on `.github/workflows` |
+| `make lint-go` | golangci-lint (`.golangci.yml`, includes `integration` and `live` files), then `go tool deadcode -test -tags integration,live ./...`, which must print nothing, then `go mod tidy -diff`, then `go tool actionlint` on `.github/workflows` |
 | `make lint-web` | `biome check --error-on-warnings`, `tsc -b`, `knip`, all with zero findings |
 | `make fmt` | format Go code with gofumpt and goimports |
 | `make test` | `test-go` and `test-web` |
 | `make test-go` | Go unit tests with `-race` |
 | `make test-web` | web unit tests (Vitest, jsdom) |
 | `make test-integration` | unit and integration tests (`integration` build tag, testcontainers); fails if a test container is left behind |
+| `make test-live` | extract the real pages listed in `internal/extract/live_test.go` over the network and print a table: adapter, blocks, code found vs an independent count, verbatim check, warnings, junk. Needs the network, so it never runs in CI |
 | `make test-clean` | remove leftover testcontainers containers |
 | `make web-install` | `web-deps` and `web-browsers` |
 | `make web-deps` | `pnpm install --frozen-lockfile` |

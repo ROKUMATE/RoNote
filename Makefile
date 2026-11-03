@@ -63,7 +63,7 @@ lint: lint-go lint-web ## Lint Go and web code
 lint-go: ## Lint Go code and CI workflows (golangci-lint, deadcode, go mod tidy, actionlint)
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) run
-	@dead=$$(go tool deadcode -test -tags integration ./...) && [ -z "$$dead" ] || \
+	@dead=$$(go tool deadcode -test -tags integration,live ./...) && [ -z "$$dead" ] || \
 		{ printf '%s\n' "$$dead" >&2; echo "make lint-go: deadcode failed or found unreachable functions" >&2; exit 1; }
 	go mod tidy -diff
 	go tool actionlint
@@ -126,6 +126,9 @@ ci-cache-keys: ## (CI) Write tool versions used in cache keys to GITHUB_OUTPUT
 test-integration: ## Run unit and integration tests against throwaway Postgres containers
 	sh scripts/container.sh test go test -race -count=1 -tags integration ./...
 
+test-live: ## Extract real documentation pages over the network and print a report (never in CI)
+	go test -tags live -run TestLive -count=1 -v ./internal/extract
+
 test-clean: ## Remove leftover testcontainers containers
 	sh scripts/container.sh clean
 
@@ -160,5 +163,5 @@ web-e2e: ## Run web end-to-end tests (Playwright, Chromium)
 .PHONY: help setup hooks-test check-commits tools check test test-go test-web run-api extract lint lint-go lint-web fmt
 .PHONY: dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new sqlc
 .PHONY: check-generated check-go-version ci-cache-keys
-.PHONY: test-integration test-clean web-install web-deps web-browsers check-node-version
+.PHONY: test-integration test-live test-clean web-install web-deps web-browsers check-node-version
 .PHONY: web-dev web-build web-e2e

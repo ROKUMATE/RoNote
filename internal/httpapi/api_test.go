@@ -98,7 +98,9 @@ func apiRequest(t *testing.T, h http.Handler, method, target, body string) *http
 		r = httptest.NewRequestWithContext(t.Context(), method, target, strings.NewReader(body))
 		r.Header.Set("Content-Type", "application/json")
 	}
-	return record(h, r)
+	rec := record(h, r)
+	checkContract(t, r, rec)
+	return rec
 }
 
 func decodeJSON[T any](t *testing.T, rec *httptest.ResponseRecorder) T {

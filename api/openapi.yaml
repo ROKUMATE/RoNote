@@ -18,8 +18,8 @@ paths:
       summary: Import a page
       description: |
         Queues an import of the URL. If the user already has a document for
-        it, nothing is queued and the answer is 200 with that document's
-        import and document ID.
+        it, nothing is queued and the answer is 200 with the import that made
+        the document and the document's summary.
       requestBody:
         required: true
         content:
@@ -49,6 +49,8 @@ paths:
                 $ref: "#/components/schemas/Error"
         "401":
           $ref: "#/components/responses/Unauthenticated"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /imports/{id}:
     get:
       operationId: getImport
@@ -66,6 +68,8 @@ paths:
           $ref: "#/components/responses/InvalidParameter"
         "401":
           $ref: "#/components/responses/Unauthenticated"
+        "500":
+          $ref: "#/components/responses/InternalError"
         "404":
           $ref: "#/components/responses/NotFound"
   /imports/{id}/events:
@@ -97,6 +101,8 @@ paths:
           $ref: "#/components/responses/InvalidParameter"
         "401":
           $ref: "#/components/responses/Unauthenticated"
+        "500":
+          $ref: "#/components/responses/InternalError"
         "404":
           $ref: "#/components/responses/NotFound"
   /documents:
@@ -131,6 +137,8 @@ paths:
                 $ref: "#/components/schemas/Error"
         "401":
           $ref: "#/components/responses/Unauthenticated"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /documents/{id}:
     get:
       operationId: getDocument
@@ -148,6 +156,8 @@ paths:
           $ref: "#/components/responses/InvalidParameter"
         "401":
           $ref: "#/components/responses/Unauthenticated"
+        "500":
+          $ref: "#/components/responses/InternalError"
         "404":
           $ref: "#/components/responses/NotFound"
 components:
@@ -174,6 +184,12 @@ components:
             $ref: "#/components/schemas/Error"
     InvalidParameter:
       description: "A path or query parameter is malformed. Code: invalid_parameter."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    InternalError:
+      description: "The server failed; the request may be retried. Code: internal_error."
       content:
         application/json:
           schema:

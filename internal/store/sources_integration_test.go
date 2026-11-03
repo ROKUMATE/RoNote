@@ -111,11 +111,11 @@ func TestSnapshots(t *testing.T) {
 	}
 }
 
-func extracted(name, version, title string) *ir.Doc {
+func extracted(version, title string) *ir.Doc {
 	doc := &ir.Doc{
 		IRVersion: ir.Version, Title: title,
 		Source:    ir.Source{URL: "https://docs.example.com/a", FinalURL: "https://docs.example.com/a", FetchedAt: t0, BodySHA256: hash(1)},
-		Extractor: ir.Extractor{Name: name, Version: version},
+		Extractor: ir.Extractor{Name: "generic", Version: version},
 		Blocks:    []ir.Block{{Kind: ir.KindParagraph, Content: []ir.Inline{{Text: title}}}},
 	}
 	ir.AssignIDs(doc.Blocks)
@@ -132,21 +132,21 @@ func TestExtractions(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	first, err := s.SaveExtraction(ctx, snap, extracted("generic", "2", "First"))
+	first, err := s.SaveExtraction(ctx, snap, extracted("2", "First"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if first.Doc.Title != "First" || ir.Validate(first.Doc) != nil {
 		t.Errorf("stored extraction = %+v", first.Doc)
 	}
-	reused, err := s.SaveExtraction(ctx, snap, extracted("generic", "2", "Second"))
+	reused, err := s.SaveExtraction(ctx, snap, extracted("2", "Second"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if reused.ID != first.ID || reused.Doc.Title != "First" {
 		t.Errorf("same extractor version again = %v %q, want the stored %v %q", reused.ID, reused.Doc.Title, first.ID, "First")
 	}
-	newer, err := s.SaveExtraction(ctx, snap, extracted("generic", "3", "Third"))
+	newer, err := s.SaveExtraction(ctx, snap, extracted("3", "Third"))
 	if err != nil || newer.ID == first.ID || newer.Doc.Title != "Third" {
 		t.Errorf("a new extractor version = %v %v %q, want a new extraction", newer.ID, err, newer.Doc.Title)
 	}

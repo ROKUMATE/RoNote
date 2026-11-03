@@ -8,7 +8,20 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type Import struct {
+	ID           uuid.UUID
+	OwnerID      uuid.UUID
+	RequestedURL string
+	CanonicalURL string
+	Status       string
+	ErrorCode    pgtype.Text
+	DocumentID   uuid.NullUUID
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}
 
 type SourceSnapshot struct {
 	ID          uuid.UUID

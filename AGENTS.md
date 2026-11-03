@@ -38,6 +38,8 @@ Site crawling, AI summaries, chat, handwritten OCR, pseudocode conversion. Do no
 | `internal/extract/` | HTML to IR extractor: generic rules, refined by a framework adapter when one matches |
 | `internal/extract/adapter/` | docs-framework adapters as configuration: detection, content root, chrome, callouts, tabs and code rules |
 | `testdata/golden/` | extractor fixtures: `input.html`, `meta.json`, `expected.json`; third-party excerpts are listed in `SOURCES.md` |
+| `api/` | `openapi.yaml`, the API contract that Go and TypeScript types are generated from, and the oapi-codegen config |
+| `internal/httpapi/gen/` | Go server code generated from `api/openapi.yaml`; never edit it |
 | `docs/adr/` | architecture decision records |
 | `.githooks/` | git hooks, installed by `make setup` |
 
@@ -54,7 +56,7 @@ Create a directory when its first file needs it, not before.
 | `make tools` | install the pinned golangci-lint into `./bin` |
 | `make check` | `lint`, `test` and `hooks-test`: what CI's fast jobs run. Run it before pushing |
 | `make lint` | `lint-go` and `lint-web` |
-| `make lint-go` | golangci-lint (`.golangci.yml`, includes `integration` and `live` files), then `go tool deadcode -test -tags integration,live ./...`, which must print nothing, then `go mod tidy -diff`, then `go tool actionlint` on `.github/workflows` |
+| `make lint-go` | golangci-lint (`.golangci.yml`, includes `integration` and `live` files), then `go tool deadcode -test -tags integration,live ./...`, which must print nothing outside `internal/httpapi/gen/` (generated helpers may go unused), then `go mod tidy -diff`, then `go tool actionlint` on `.github/workflows` |
 | `make lint-web` | `biome check --error-on-warnings`, `tsc -b`, `knip`, all with zero findings |
 | `make fmt` | format Go code with gofumpt and goimports |
 | `make test` | `test-go` and `test-web` |
@@ -83,7 +85,8 @@ Create a directory when its first file needs it, not before.
 | `make migrate-new name=...` | create the next sequential SQL migration in `migrations/` |
 | `make river-migration first=N last=M` | add a migration holding River's own migrations N to M, from the River version go.mod pins. Goose owns all schema, River's tables included; after a River upgrade, `make test-integration` names the versions to add |
 | `make sqlc` | regenerate `internal/store/sqlcdb` from `migrations/` and `internal/store/queries/`; commit the result |
-| `make check-generated` | regenerate sqlc output and fail if it differs from what is committed |
+| `make generate` | regenerate everything generated: sqlc output, and `internal/httpapi/gen` from `api/openapi.yaml` (oapi-codegen); commit the result |
+| `make check-generated` | `make generate`, then fail if the output differs from what is committed |
 | `make check-go-version` | print the Go toolchain and fail unless it is go.mod's `toolchain` |
 
 Targets marked (P0x) do not exist yet. The phase that adds a target removes its tag.
@@ -96,7 +99,9 @@ Targets marked (P0x) do not exist yet. The phase that adds a target removes its 
 
 Web targets, `make lint` and `make test` check that `node --version` matches `.nvmrc` first; with nvm, `nvm install && nvm use` picks it up.
 
-Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`: deadcode, goose, sqlc, river. golangci-lint is the exception: `make tools` installs the version pinned in the Makefile into `./bin`.
+Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`: deadcode, goose, sqlc, river, oapi-codegen.
+
+The API is spec-first: change `api/openapi.yaml`, then `make generate`. Never hand-write a type the spec defines. The spec's IR schema maps onto `internal/ir` (`x-go-type`), and `TestIRSchemaMatchesGoldens` keeps the two in step. golangci-lint is the exception: `make tools` installs the version pinned in the Makefile into `./bin`.
 
 ## Commits
 

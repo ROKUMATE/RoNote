@@ -66,8 +66,9 @@ lint: lint-go lint-web ## Lint Go and web code
 lint-go: ## Lint Go code and CI workflows (golangci-lint, deadcode, go mod tidy, actionlint)
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) run
-	@dead=$$(go tool deadcode -test -tags integration,live ./...) && [ -z "$$dead" ] || \
-		{ printf '%s\n' "$$dead" >&2; echo "make lint-go: deadcode failed or found unreachable functions" >&2; exit 1; }
+	@dead=$$(go tool deadcode -test -tags integration,live ./...) || { echo "make lint-go: deadcode failed" >&2; exit 1; }; \
+		dead=$$(printf '%s\n' "$$dead" | grep -v '^internal/httpapi/gen/' || true); \
+		[ -z "$$dead" ] || { printf '%s\n' "$$dead" >&2; echo "make lint-go: deadcode found unreachable functions" >&2; exit 1; }
 	go mod tidy -diff
 	go tool actionlint
 
@@ -118,10 +119,12 @@ river-migration: ## Add a migration with River's schema: make river-migration fi
 sqlc: ## Regenerate internal/store/sqlcdb from migrations and queries
 	go tool sqlc generate
 
-check-generated: ## Fail if sqlc output needs regenerating
-	go tool sqlc generate
-	@test -z "$$(git status --porcelain -- internal/store/sqlcdb)" || \
-		{ git status --short -- internal/store/sqlcdb; echo "make check-generated: sqlc output is stale; run make sqlc and commit it" >&2; exit 1; }
+generate: sqlc ## Regenerate all generated code: sqlc, and the API server from api/openapi.yaml
+	go tool oapi-codegen -config api/oapi-codegen.yaml api/openapi.yaml
+
+check-generated: generate ## Fail if generated code is stale
+	@test -z "$$(git status --porcelain -- internal/store/sqlcdb internal/httpapi/gen)" || \
+		{ git status --short -- internal/store/sqlcdb internal/httpapi/gen; echo "make check-generated: generated code is stale; run make generate and commit it" >&2; exit 1; }
 
 check-go-version: ## Print the Go toolchain; fail unless it is the one go.mod pins
 	@want=$$($(go_toolchain)); have=$$(go env GOVERSION); \
@@ -172,6 +175,6 @@ web-e2e: ## Run web end-to-end tests (Playwright, Chromium)
 
 .PHONY: help setup hooks-test check-commits tools check test test-go test-web run-api run-worker extract lint lint-go lint-web fmt
 .PHONY: dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
-.PHONY: check-generated check-go-version ci-cache-keys
+.PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration test-live test-clean web-install web-deps web-browsers check-node-version
 .PHONY: web-dev web-build web-e2e

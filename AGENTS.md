@@ -145,6 +145,9 @@ docs/adr/0005-import-pipeline.md describes the pipeline both serve.
 - Phosphor icons at 16px, imported one per file: `import { BooksIcon } from "@phosphor-icons/react/Books"`.
 - Every `localStorage` access goes in try/catch and falls back to the default.
 - Dev-only code sits behind `import.meta.env.DEV` so production builds drop it; `make web-build` checks the styleguide is gone.
+- API types come only from the generated `src/api/schema.d.ts`; calls go through the openapi-fetch client in `src/api/client.ts`, and server state through TanStack Query (`src/api/queries.ts`). Every documents query sits under one key, so one invalidation refreshes them all.
+- Import progress is read only through `subscribeImport` (`src/api/events.ts`), the one wrapper around `EventSource` and the test seam at that boundary. The imports a session follows live in `ImportTracker`, outside React, so closing the dialog never cancels one.
+- Every API error code has one plain sentence in `src/api/messages.ts`; a test fails when the spec gains a code without one.
 - TypeScript is strict with `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes` and `verbatimModuleSyntax`. A Biome suppression needs a reason, like a `//nolint`.
 
 ## Tests

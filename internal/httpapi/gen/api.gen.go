@@ -167,6 +167,9 @@ type ImportStatus string
 // ID defines model for ID.
 type ID = openapi_types.UUID
 
+// InternalError defines model for InternalError.
+type InternalError = Error
+
 // InvalidParameter defines model for InvalidParameter.
 type InvalidParameter = Error
 
@@ -451,6 +454,8 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	return m
 }
 
+type InternalErrorJSONResponse Error
+
 type InvalidParameterJSONResponse Error
 
 type NotFoundJSONResponse Error
@@ -503,6 +508,20 @@ func (response ListDocuments401JSONResponse) VisitListDocumentsResponse(w http.R
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListDocuments500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response ListDocuments500JSONResponse) VisitListDocumentsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -571,6 +590,20 @@ func (response GetDocument404JSONResponse) VisitGetDocumentResponse(w http.Respo
 	return err
 }
 
+type GetDocument500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response GetDocument500JSONResponse) VisitGetDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type CreateImportRequestObject struct {
 	Body *CreateImportJSONRequestBody
 }
@@ -635,6 +668,20 @@ func (response CreateImport401JSONResponse) VisitCreateImportResponse(w http.Res
 	return err
 }
 
+type CreateImport500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response CreateImport500JSONResponse) VisitCreateImportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetImportRequestObject struct {
 	ID ID `json:"id"`
 }
@@ -695,6 +742,20 @@ func (response GetImport404JSONResponse) VisitGetImportResponse(w http.ResponseW
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetImport500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response GetImport500JSONResponse) VisitGetImportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
 	_, err := buf.WriteTo(w)
 	return err
 }

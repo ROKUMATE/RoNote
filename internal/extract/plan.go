@@ -3,6 +3,8 @@ package extract
 import (
 	"errors"
 	"fmt"
+	"regexp"
+	"strings"
 
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
@@ -115,14 +117,21 @@ func blockList(b *ir.Block) []ir.Block {
 // plannedCode builds a code block from the plan's <pre> inside block. The
 // generic rules supply the title and language the plan leaves open, and a
 // language class on block itself counts too, since a layout table can put
-// the <pre> far below it.
+// the <pre> far below it. A title that is or holds a link to another page
+// keeps that link.
 func (e *extractor) plannedCode(block *html.Node, c adapter.CodePlan) *ir.Block {
 	b := e.code(c.Pre)
 	if b == nil {
 		return nil
 	}
+	if len(c.Markup) > 0 {
+		if b.Text = stripMarkup(b.Text, c.Markup); b.Text == "" {
+			return nil
+		}
+	}
 	if c.Title != nil {
 		b.Title = collapse(textContent(c.Title))
+		b.TitleLink = e.titleLink(c.Title)
 	}
 	switch {
 	case c.Lang != "":
@@ -166,4 +175,31 @@ func (e *extractor) tabs(tabs []adapter.Tab) []ir.Block {
 		return out
 	}
 	return []ir.Block{{Kind: ir.KindTabs, Items: items}}
+}
+
+// titleLink is the link of a code title: title itself or the first link in
+// it, when it points to another page.
+func (e *extractor) titleLink(title *html.Node) *ir.Link {
+	a := title
+	if a.DataAtom != atom.A {
+		a = findFirst(title, func(n *html.Node) bool { return n.DataAtom == atom.A && hasAttr(n, "href") })
+	}
+	if a == nil || !hasAttr(a, "href") {
+		return nil
+	}
+	if l := e.links.link(attr(a, "href")); l != nil && (l.Kind == ir.LinkSameDomain || l.Kind == ir.LinkExternal) {
+		return l
+	}
+	return nil
+}
+
+// stripMarkup removes the opening and closing tags named in tags from code
+// text that holds them as literal characters, keeping what is between them.
+func stripMarkup(text string, tags []string) string {
+	names := make([]string, len(tags))
+	for i, t := range tags {
+		names[i] = regexp.QuoteMeta(t)
+	}
+	re := regexp.MustCompile(`(?i)</?(?:` + strings.Join(names, "|") + `)(?:\s[^<>]*)?>`)
+	return re.ReplaceAllString(text, "")
 }

@@ -52,6 +52,14 @@ func TestBlockText(t *testing.T) {
 			want:  "```go title=\"main.go\"\npackage main\n```",
 		},
 		{
+			name: "code with a title link",
+			block: ir.Block{
+				Kind: ir.KindCode, Lang: "yaml", Title: "pod.yaml", Text: "kind: Pod\n",
+				TitleLink: &ir.Link{Href: "https://example.com/pod.yaml", Kind: ir.LinkExternal},
+			},
+			want: "```yaml title=\"pod.yaml\" link=https://example.com/pod.yaml\nkind: Pod\n```",
+		},
+		{
 			name: "nested lists",
 			block: ir.Block{Kind: ir.KindList, Ordered: true, Items: []ir.Item{
 				{Children: []ir.Block{para("One")}},

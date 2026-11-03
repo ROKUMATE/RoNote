@@ -39,6 +39,9 @@ func blockText(b ir.Block) string {
 		if b.Title != "" {
 			fence += " title=" + strconv.Quote(b.Title)
 		}
+		if b.TitleLink != nil {
+			fence += " link=" + b.TitleLink.Href
+		}
 		return fence + "\n" + strings.TrimSuffix(b.Text, "\n") + "\n```"
 	case ir.KindList:
 		var items []string

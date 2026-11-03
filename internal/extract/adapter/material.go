@@ -16,7 +16,12 @@ var material = &Adapter{
 		Label:     ".tabbed-labels > label",
 		Panel:     ".tabbed-content > .tabbed-block",
 	}},
-	// With line numbers, Pygments puts them in a table cell of their own,
-	// next to the cell with the code.
-	Code: []Code{{Block: "div.highlight", Pre: []string{"td.code pre", "pre"}, Title: ".filename"}},
+	Code: []Code{
+		// FastAPI's terminal blocks ("termy") hold <font> and <span> tags as
+		// text, which its termynal script renders as colours.
+		{Block: "div.termy", Lang: "console", Markup: []string{"font", "span"}},
+		// With line numbers, Pygments puts them in a table cell of their own,
+		// next to the cell with the code.
+		{Block: "div.highlight", Pre: []string{"td.code pre", "pre"}, Title: ".filename"},
+	},
 }

@@ -144,6 +144,8 @@ type Block struct {
 	Variant Variant `json:"variant,omitempty"`
 	// callout, code (a frame or file name label such as "main.go")
 	Title string `json:"title,omitempty"`
+	// code: where the title points, such as the file it names
+	TitleLink *Link `json:"title_link,omitempty"`
 	// callout, quote
 	Children []Block `json:"children,omitempty"`
 	// image

@@ -14,6 +14,8 @@ COMPOSE := sh scripts/container.sh compose
 GOOSE := go tool goose -dir migrations postgres "$$RONOTE_DATABASE_URL"
 db_url_required = test -n "$$RONOTE_DATABASE_URL" || { echo "RONOTE_DATABASE_URL is not set; copy .env.example to .env.dev" >&2; exit 1; }
 WEB := pnpm --dir apps/web
+# The end-to-end tests' own database, recreated by every make web-e2e.
+E2E_DATABASE_URL ?= postgres://ronote:ronote@127.0.0.1:5432/ronote_e2e?sslmode=disable
 GENERATED := internal/store/sqlcdb internal/httpapi/gen apps/web/src/api/schema.d.ts
 node_required = want=$$(cat .nvmrc); have=$$(node --version 2>/dev/null); [ "$$have" = "v$$want" ] || \
 	{ echo "Node $$want is required (.nvmrc), found $${have:-none}. With nvm: nvm install && nvm use" >&2; exit 1; }
@@ -172,9 +174,11 @@ web-build: ## Build the web app; fails if dev-only code ships or it is over budg
 		{ echo "make web-build: dev-only styleguide code found in the files above" >&2; exit 1; }
 	sh scripts/web-budget.sh
 
-web-e2e: ## Run web end-to-end tests (Playwright, Chromium)
+web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromium); locally needs make dev-up
 	@$(node_required)
-	$(WEB) e2e
+	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" sh scripts/e2e-db.sh
+	go build -o bin/e2e/ ./cmd/api ./cmd/worker
+	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" $(WEB) e2e
 
 .PHONY: help setup hooks-test check-commits tools check test test-go test-web run-api run-worker extract lint lint-go lint-web fmt
 .PHONY: dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc

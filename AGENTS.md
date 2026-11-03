@@ -74,7 +74,7 @@ Create a directory when its first file needs it, not before.
 | `make check-node-version` | print the Node version and fail unless it is `.nvmrc`'s |
 | `make web-dev` | Vite dev server on `127.0.0.1:5173`; the styleguide is at `/_styleguide`. It proxies `/api` to the API at `RONOTE_API_ORIGIN` (default `http://127.0.0.1:8080`), so run `make run-api` and `make run-worker` too |
 | `make web-build` | production build into `apps/web/dist`; fails if styleguide code ends up in it or the gzip size passes the budget in `scripts/web-budget.sh` (JS 150 kB, CSS 20 kB) |
-| `make web-e2e` | Playwright end-to-end and axe tests in Chromium against the dev server; kept out of `make test` |
+| `make web-e2e` | Playwright end-to-end and axe tests in Chromium against the full stack: it recreates and migrates the `ronote_e2e` database (`E2E_DATABASE_URL`; locally in the dev stack's Postgres, so run `make dev-up` first), builds the API and worker, and Playwright starts them (API on 18080, worker), the fixture site (`apps/web/e2e/fixture-site.ts` on `localhost:18090`, serving `testdata/golden` pages) and Vite on 5180. Kept out of `make test` |
 | `make run-worker` | run the import worker (River queue `imports`); `RONOTE_ENV` defaults to `dev` |
 | `make run-api` | run the API on `127.0.0.1:8080`; `RONOTE_ENV` defaults to `dev` |
 | `make extract url=... [format=text]` | fetch one page with the production fetcher rules and print its IR as JSON, or as readable text |

@@ -1,9 +1,8 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
-import { expectNoHorizontalScroll } from "./helpers";
+import { chooseTheme, expectNoAxeViolations, expectNoHorizontalScroll } from "./helpers";
 
 async function openStyleguide(page: Page, theme: "light" | "dark") {
-  await page.addInitScript((value) => localStorage.setItem("ronote.theme", value), theme);
+  await chooseTheme(page, theme);
   await page.goto("/_styleguide");
   await expect(page.getByRole("heading", { level: 1, name: "Styleguide" })).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
@@ -13,11 +12,7 @@ for (const theme of ["light", "dark"] as const) {
   test(`the styleguide has no axe violations in ${theme}`, async ({ page }) => {
     await openStyleguide(page, theme);
 
-    const { violations } = await new AxeBuilder({ page }).analyze();
-
-    expect(
-      violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`),
-    ).toEqual([]);
+    await expectNoAxeViolations(page);
   });
 }
 

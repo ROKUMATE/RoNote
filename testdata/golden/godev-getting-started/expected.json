@@ -1,0 +1,999 @@
+{
+  "ir_version": 1,
+  "title": "Tutorial: Get started with Go",
+  "source": {
+    "url": "https://go.dev/doc/tutorial/getting-started",
+    "final_url": "https://go.dev/doc/tutorial/getting-started",
+    "canonical_url": "https://go.dev/doc/tutorial/getting-started",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "a0e345486184ef6c87c46a326ce96e8152e47b7e5b704da95b373f1722d3443c"
+  },
+  "extractor": {
+    "name": "godev",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "123ae5dfcd70",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "tutorial-get-started-with-go",
+      "content": [
+        {
+          "text": "Tutorial: Get started with Go"
+        }
+      ]
+    },
+    {
+      "id": "af635e43360d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In this tutorial, you'll get a brief introduction to Go programming. Along the way, you will:"
+        }
+      ]
+    },
+    {
+      "id": "c4cd2380352f",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "d6bcc5a8ea8e",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Install Go (if you haven't already)."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "459587d12fdc",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Write some simple \"Hello, world\" code."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "dc32329a2f75",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Use the "
+                },
+                {
+                  "text": "go",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " command to run your code."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "cb7afa0d0f0b",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Use the Go package discovery tool to find packages you can use in your own code."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "12435c6ffc0a",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Call functions of an external module."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "de3498cfb490",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "prerequisites",
+      "content": [
+        {
+          "text": "Prerequisites"
+        }
+      ]
+    },
+    {
+      "id": "a4f92a579bf4",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "1acfbfb31aa2",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Some programming experience.",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                {
+                  "text": " The code here is pretty simple, but it helps to know something about functions."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "7aeee9ef2f8b",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "A tool to edit your code.",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                {
+                  "text": " Any text editor you have will work fine. Most text editors have good support for Go. The most popular are VSCode (free), GoLand (paid), and Vim (free)."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "900a9732f122",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "A command terminal.",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                {
+                  "text": " Go works well using any terminal on Linux and Mac, and on PowerShell or cmd in Windows."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "55aef9434ae3",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "install",
+      "content": [
+        {
+          "text": "Install Go"
+        }
+      ]
+    },
+    {
+      "id": "e82d52efa440",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Just use the "
+        },
+        {
+          "text": "Download and install",
+          "link": {
+            "href": "https://go.dev/doc/install",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " steps."
+        }
+      ]
+    },
+    {
+      "id": "8be6e34555c4",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "code",
+      "content": [
+        {
+          "text": "Write some code"
+        }
+      ]
+    },
+    {
+      "id": "e859967ee6f9",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Get started with Hello, World."
+        }
+      ]
+    },
+    {
+      "id": "6d5f4959d1e3",
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "0d7fff22e298",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Open a command prompt and cd to your home directory."
+                }
+              ]
+            },
+            {
+              "id": "1ba1b8015fbd",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "On Linux or Mac:"
+                }
+              ]
+            },
+            {
+              "id": "f7115026ed95",
+              "kind": "code",
+              "text": "cd\n"
+            },
+            {
+              "id": "5e9b9a17b587",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "On Windows:"
+                }
+              ]
+            },
+            {
+              "id": "098747852bc5",
+              "kind": "code",
+              "text": "cd %HOMEPATH%\n"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "cbfcba89c3d5",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Create a hello directory for your first Go source code."
+                }
+              ]
+            },
+            {
+              "id": "5a2e0d957ce6",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "For example, use the following commands:"
+                }
+              ]
+            },
+            {
+              "id": "2c82488da79b",
+              "kind": "code",
+              "text": "mkdir hello\ncd hello\n"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "22d77d6eff9e",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Enable dependency tracking for your code."
+                }
+              ]
+            },
+            {
+              "id": "96c880741b6d",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "When your code imports packages contained in other modules, you manage those dependencies through your code's own module. That module is defined by a go.mod file that tracks the modules that provide those packages. That go.mod file stays with your code, including in your source code repository."
+                }
+              ]
+            },
+            {
+              "id": "0c55e31fd4a0",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "To enable dependency tracking for your code by creating a go.mod file, run the "
+                },
+                {
+                  "text": "go mod init",
+                  "marks": [
+                    "code"
+                  ],
+                  "link": {
+                    "href": "https://go.dev/ref/mod#go-mod-init",
+                    "kind": "same_domain"
+                  }
+                },
+                {
+                  "text": " command, giving it the name of the module your code will be in. The name is the module's module path."
+                }
+              ]
+            },
+            {
+              "id": "b4e15262434b",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "In actual development, the module path will typically be the repository location where your source code will be kept. For example, the module path might be "
+                },
+                {
+                  "text": "github.com/mymodule",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ". If you plan to publish your module for others to use, the module path "
+                },
+                {
+                  "text": "must",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                {
+                  "text": " be a location from which Go tools can download your module. For more about naming a module with a module path, see "
+                },
+                {
+                  "text": "Managing dependencies",
+                  "link": {
+                    "href": "https://go.dev/doc/modules/managing-dependencies#naming_module",
+                    "kind": "same_domain"
+                  }
+                },
+                {
+                  "text": "."
+                }
+              ]
+            },
+            {
+              "id": "7a5ce38a87fc",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "For the purposes of this tutorial, just use "
+                },
+                {
+                  "text": "example/hello",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": "."
+                }
+              ]
+            },
+            {
+              "id": "96ccfc9642af",
+              "kind": "code",
+              "text": "$ go mod init example/hello\ngo: creating new go.mod: module example/hello\n"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "a509c243e371",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "In your text editor, create a file hello.go in which to write your code."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "0871965424f8",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Paste the following code into your hello.go file and save the file."
+                }
+              ]
+            },
+            {
+              "id": "cf83c7bedb61",
+              "kind": "code",
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"Hello, World!\")\n}\n"
+            },
+            {
+              "id": "d88e23ae23c1",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "This is your Go code. In this code, you:"
+                }
+              ]
+            },
+            {
+              "id": "423afd6bb19d",
+              "kind": "list",
+              "items": [
+                {
+                  "children": [
+                    {
+                      "id": "3eb184161611",
+                      "kind": "paragraph",
+                      "content": [
+                        {
+                          "text": "Declare a "
+                        },
+                        {
+                          "text": "main",
+                          "marks": [
+                            "code"
+                          ]
+                        },
+                        {
+                          "text": " package (a package is a way to group functions, and it's made up of all the files in the same directory)."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "id": "b860fb20aa43",
+                      "kind": "paragraph",
+                      "content": [
+                        {
+                          "text": "Import the popular "
+                        },
+                        {
+                          "text": "fmt",
+                          "marks": [
+                            "code"
+                          ],
+                          "link": {
+                            "href": "https://pkg.go.dev/fmt/",
+                            "kind": "external"
+                          }
+                        },
+                        {
+                          "text": " package",
+                          "link": {
+                            "href": "https://pkg.go.dev/fmt/",
+                            "kind": "external"
+                          }
+                        },
+                        {
+                          "text": ", which contains functions for formatting text, including printing to the console. This package is one of the "
+                        },
+                        {
+                          "text": "standard library",
+                          "link": {
+                            "href": "https://pkg.go.dev/std",
+                            "kind": "external"
+                          }
+                        },
+                        {
+                          "text": " packages you got when you installed Go."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "id": "cace64d70c7e",
+                      "kind": "paragraph",
+                      "content": [
+                        {
+                          "text": "Implement a "
+                        },
+                        {
+                          "text": "main",
+                          "marks": [
+                            "code"
+                          ]
+                        },
+                        {
+                          "text": " function to print a message to the console. A "
+                        },
+                        {
+                          "text": "main",
+                          "marks": [
+                            "code"
+                          ]
+                        },
+                        {
+                          "text": " function executes by default when you run the "
+                        },
+                        {
+                          "text": "main",
+                          "marks": [
+                            "code"
+                          ]
+                        },
+                        {
+                          "text": " package."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "93039ad241b8",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Run your code to see the greeting."
+                }
+              ]
+            },
+            {
+              "id": "22a884946b9a",
+              "kind": "code",
+              "text": "$ go run .\nHello, World!\n"
+            },
+            {
+              "id": "871d63cc3792",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "The "
+                },
+                {
+                  "text": "go run",
+                  "marks": [
+                    "code"
+                  ],
+                  "link": {
+                    "href": "https://go.dev/cmd/go/#hdr-Compile_and_run_Go_program",
+                    "kind": "same_domain"
+                  }
+                },
+                {
+                  "text": " command is one of many "
+                },
+                {
+                  "text": "go",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " commands you'll use to get things done with Go. Use the following command to get a list of the others:"
+                }
+              ]
+            },
+            {
+              "id": "4cf2dc7122ae",
+              "kind": "code",
+              "text": "$ go help\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "84c46b4aae4e",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "call",
+      "content": [
+        {
+          "text": "Call code in an external package"
+        }
+      ]
+    },
+    {
+      "id": "78d59830409b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "When you need your code to do something that might have been implemented by someone else, you can look for a package that has functions you can use in your code."
+        }
+      ]
+    },
+    {
+      "id": "b1d7e5f26ace",
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "84b3a729f32b",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Make your printed message a little more interesting with a function from an external module."
+                }
+              ]
+            },
+            {
+              "id": "1d1b59a54dfe",
+              "kind": "list",
+              "ordered": true,
+              "items": [
+                {
+                  "children": [
+                    {
+                      "id": "48984c8e9a62",
+                      "kind": "paragraph",
+                      "content": [
+                        {
+                          "text": "Visit pkg.go.dev and "
+                        },
+                        {
+                          "text": "search for a \"quote\" package",
+                          "link": {
+                            "href": "https://pkg.go.dev/search?q=quote",
+                            "kind": "external"
+                          }
+                        },
+                        {
+                          "text": "."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "id": "587526c23597",
+                      "kind": "paragraph",
+                      "content": [
+                        {
+                          "text": "In the search results, locate and click on the v1 of the "
+                        },
+                        {
+                          "text": "rsc.io/quote",
+                          "marks": [
+                            "code"
+                          ]
+                        },
+                        {
+                          "text": " package (it should be listed with the \"Other major versions\" of "
+                        },
+                        {
+                          "text": "rsc.io/quote/v4",
+                          "marks": [
+                            "code"
+                          ]
+                        },
+                        {
+                          "text": ")."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "id": "d9a099153c7b",
+                      "kind": "paragraph",
+                      "content": [
+                        {
+                          "text": "In the "
+                        },
+                        {
+                          "text": "Documentation",
+                          "marks": [
+                            "bold"
+                          ]
+                        },
+                        {
+                          "text": " section, under "
+                        },
+                        {
+                          "text": "Index",
+                          "marks": [
+                            "bold"
+                          ]
+                        },
+                        {
+                          "text": ", note the list of functions you can call from your code. You'll use the "
+                        },
+                        {
+                          "text": "Go",
+                          "marks": [
+                            "code"
+                          ]
+                        },
+                        {
+                          "text": " function."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "children": [
+                    {
+                      "id": "7735e857db36",
+                      "kind": "paragraph",
+                      "content": [
+                        {
+                          "text": "At the top of this page, note that package "
+                        },
+                        {
+                          "text": "quote",
+                          "marks": [
+                            "code"
+                          ]
+                        },
+                        {
+                          "text": " is included in the "
+                        },
+                        {
+                          "text": "rsc.io/quote",
+                          "marks": [
+                            "code"
+                          ]
+                        },
+                        {
+                          "text": " module."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "c8ee4d9e0416",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "You can use the pkg.go.dev site to find published modules whose packages have functions you can use in your own code. Packages are published in modules -- like "
+                },
+                {
+                  "text": "rsc.io/quote",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " -- where others can use them. Modules are improved with new versions over time, and you can upgrade your code to use the improved versions."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "f895b6e18e63",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "In your Go code, import the "
+                },
+                {
+                  "text": "rsc.io/quote",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " package and add a call to its "
+                },
+                {
+                  "text": "Go",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " function."
+                }
+              ]
+            },
+            {
+              "id": "27a88c9a8c88",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "After adding the highlighted lines, your code should include the following:"
+                }
+              ]
+            },
+            {
+              "id": "7f4eaa86af50",
+              "kind": "code",
+              "text": "package main\n\nimport \"fmt\"\n\nimport \"rsc.io/quote\"\n\nfunc main() {\n    fmt.Println(quote.Go())\n}\n"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "4e775dd69024",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Add new module requirements and sums."
+                }
+              ]
+            },
+            {
+              "id": "84880537d2c9",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Go will add the "
+                },
+                {
+                  "text": "quote",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " module as a requirement, as well as a go.sum file for use in authenticating the module. For more, see "
+                },
+                {
+                  "text": "Authenticating modules",
+                  "link": {
+                    "href": "https://go.dev/ref/mod#authenticating",
+                    "kind": "same_domain"
+                  }
+                },
+                {
+                  "text": " in the Go Modules Reference."
+                }
+              ]
+            },
+            {
+              "id": "63e499823e0a",
+              "kind": "code",
+              "text": "$ go mod tidy\ngo: finding module for package rsc.io/quote\ngo: found rsc.io/quote in rsc.io/quote v1.5.2\n"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "9cd0b5514621",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Run your code to see the message generated by the function you're calling."
+                }
+              ]
+            },
+            {
+              "id": "48fbe8f62c97",
+              "kind": "code",
+              "text": "$ go run .\nDon't communicate by sharing memory, share memory by communicating.\n"
+            },
+            {
+              "id": "38df1ffbb000",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Notice that your code calls the "
+                },
+                {
+                  "text": "Go",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " function, printing a clever message about communication."
+                }
+              ]
+            },
+            {
+              "id": "8ad891041d31",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "When you ran "
+                },
+                {
+                  "text": "go mod tidy",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ", it located and downloaded the "
+                },
+                {
+                  "text": "rsc.io/quote",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " module that contains the package you imported. By default, it downloaded the latest version -- v1.5.2."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c485b2cead5e",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "write-more",
+      "content": [
+        {
+          "text": "Write more code"
+        }
+      ]
+    },
+    {
+      "id": "4cdb90215c12",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "With this quick introduction, you got Go installed and learned some of the basics. To write some more code with another tutorial, take a look at "
+        },
+        {
+          "text": "Create a Go module",
+          "link": {
+            "href": "https://go.dev/doc/tutorial/create-module.html",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    }
+  ]
+}

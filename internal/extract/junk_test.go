@@ -10,19 +10,12 @@ import (
 	"github.com/rokumate/ronote/internal/ir"
 )
 
-// knownJunk is chrome that fixtures still come out with, until the adapter
-// for their framework removes it.
-var knownJunk = map[string][]string{
-	"real-go-effective-go": {`breadcrumb "Documentation | Effective Go"`},
-}
-
-// TestGoldenHasNoJunk requires every fixture to come out free of page chrome,
-// apart from its knownJunk, which must still be there.
+// TestGoldenHasNoJunk requires every fixture to come out free of page chrome.
 func TestGoldenHasNoJunk(t *testing.T) {
 	for _, name := range fixtures(t) {
 		t.Run(name, func(t *testing.T) {
-			if junk := findJunk(extractFixture(t, name)); !slices.Equal(junk, knownJunk[name]) {
-				t.Errorf("junk found:\n%s\nwant:\n%s", strings.Join(junk, "\n"), strings.Join(knownJunk[name], "\n"))
+			if junk := findJunk(extractFixture(t, name)); len(junk) > 0 {
+				t.Errorf("junk found:\n%s", strings.Join(junk, "\n"))
 			}
 		})
 	}

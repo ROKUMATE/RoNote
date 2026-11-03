@@ -146,6 +146,7 @@ Source text is never rewritten. Code blocks stay byte-identical, enforced by `Te
 - Steps only call make targets. Anything CI needs becomes a make target first, so every job can be reproduced locally.
 - Actions are pinned to full commit SHAs with the version in a trailing comment. When you bump one, update the SHA and the comment together; `git ls-remote https://github.com/OWNER/REPO 'refs/tags/TAG^{}'` gives the SHA.
 - The workflow has `contents: read` permissions, cancels superseded runs for the same ref, and sets a timeout on every job. `make lint-go` runs actionlint on it.
+- Every job runs on `ubuntu-26.04`, never `ubuntu-latest`, so the runner image only changes in a reviewed commit. `.github/actionlint.yaml` declares the label until actionlint knows it (rhysd/actionlint#682).
 
 | Job | Runs | Reproduce locally |
 |---|---|---|

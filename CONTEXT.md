@@ -4,10 +4,11 @@ Current state of the project. Rewrite this file at the end of each phase; never 
 
 ## Current milestone
 
-P06, fetcher, IR, generic extractor and verbatim golden tests: done.
+P06, fetcher, IR, generic extractor and verbatim golden tests: done, cleaned up in P06.1.
 - One documentation page can be fetched safely and turned into IR blocks with byte-exact code.
 - It's not wired to the API or DB yet; P08 adds import jobs and persistence.
 - `make extract url=...` shows the pipeline end to end.
+- P06.1 folded the branch's fix-ups, proved every commit green with `make check`, added `go mod tidy -diff` to `make lint-go`, made `check-commits.sh` exit 0/1/2 with its report on stderr, and pinned CI's runner.
 
 ## Decisions so far
 
@@ -46,7 +47,9 @@ Extractor (`internal/extract`, generic v1):
 - Golden tests: 19 fixtures in `testdata/golden` (16 hand-written, 3 licensed excerpts in `SOURCES.md`).
 - `FuzzExtract`: 10 committed seeds plus the fixtures. 60s runs find nothing.
 
-Unchanged: the API (`/healthz`, `/readyz` with Postgres), the store and migrations, testcontainers integration tests, the web app (P04 tokens, shell, styleguide), and CI (P05).
+CI: the P05 jobs, on the pinned `ubuntu-26.04` image instead of `ubuntu-latest`. actionlint doesn't know that label yet, so `.github/actionlint.yaml` declares it (rhysd/actionlint#682).
+
+Unchanged: the API (`/healthz`, `/readyz` with Postgres), the store and migrations, testcontainers integration tests, and the web app (P04 tokens, shell, styleguide).
 
 ## Open questions
 

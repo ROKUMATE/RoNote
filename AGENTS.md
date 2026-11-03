@@ -51,7 +51,7 @@ Create a directory when its first file needs it, not before.
 | `make tools` | install the pinned golangci-lint into `./bin` |
 | `make check` | `lint`, `test` and `hooks-test`: what CI's fast jobs run. Run it before pushing |
 | `make lint` | `lint-go` and `lint-web` |
-| `make lint-go` | golangci-lint (`.golangci.yml`, includes `integration` files), then `go tool deadcode -test -tags integration ./...`, which must print nothing, then `go tool actionlint` on `.github/workflows` |
+| `make lint-go` | golangci-lint (`.golangci.yml`, includes `integration` files), then `go tool deadcode -test -tags integration ./...`, which must print nothing, then `go mod tidy -diff`, then `go tool actionlint` on `.github/workflows` |
 | `make lint-web` | `biome check --error-on-warnings`, `tsc -b`, `knip`, all with zero findings |
 | `make fmt` | format Go code with gofumpt and goimports |
 | `make test` | `test-go` and `test-web` |
@@ -77,7 +77,7 @@ Create a directory when its first file needs it, not before.
 | `make migrate-up` / `migrate-down` / `migrate-status` | apply, roll back the latest, or list goose migrations against `RONOTE_DATABASE_URL` |
 | `make migrate-new name=...` | create the next sequential SQL migration in `migrations/` |
 | `make sqlc` | regenerate `internal/store/sqlcdb` from `migrations/` and `internal/store/queries/`; commit the result |
-| `make check-generated` | regenerate sqlc output and fail if it differs from what is committed, then `go mod tidy -diff` |
+| `make check-generated` | regenerate sqlc output and fail if it differs from what is committed |
 | `make check-go-version` | print the Go toolchain and fail unless it is go.mod's `toolchain` |
 
 Targets marked (P0x) do not exist yet. The phase that adds a target removes its tag.

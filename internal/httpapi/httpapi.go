@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
+	"github.com/rokumate/ronote/internal/httpapi/gen"
 )
 
 // readyTimeout bounds the database ping behind /readyz.
@@ -64,10 +66,10 @@ func (rt router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fallback.ServeHTTP(rec, r)
 	if rec.status == http.StatusMethodNotAllowed {
 		w.Header().Set("Allow", rec.header.Get("Allow"))
-		writeError(w, r, http.StatusMethodNotAllowed, "method_not_allowed", "method not allowed")
+		writeError(w, r, http.StatusMethodNotAllowed, gen.ErrorCodeMethodNotAllowed, "method not allowed")
 		return
 	}
-	writeError(w, r, http.StatusNotFound, "not_found", "not found")
+	writeError(w, r, http.StatusNotFound, gen.ErrorCodeNotFound, "not found")
 }
 
 // headerRecorder keeps the status and headers of a response and drops its body.
@@ -91,6 +93,10 @@ func healthz(w http.ResponseWriter, _ *http.Request) {
 	writeOK(w)
 }
 
+// codeNotReady is the error code of /readyz, which shares the error envelope
+// but is not part of the API spec.
+const codeNotReady gen.ErrorCode = "not_ready"
+
 // readyz reports whether the API can serve traffic: the database has to
 // answer a ping within readyTimeout.
 func readyz(logger *slog.Logger, db Pinger) http.HandlerFunc {
@@ -102,7 +108,7 @@ func readyz(logger *slog.Logger, db Pinger) http.HandlerFunc {
 				slog.String("error", err.Error()),
 				slog.String("request_id", requestID(ctx)),
 			)
-			writeError(w, r, http.StatusServiceUnavailable, "not_ready", "database unavailable")
+			writeError(w, r, http.StatusServiceUnavailable, codeNotReady, "database unavailable")
 			return
 		}
 		writeOK(w)

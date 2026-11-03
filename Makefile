@@ -14,6 +14,7 @@ COMPOSE := sh scripts/container.sh compose
 GOOSE := go tool goose -dir migrations postgres "$$RONOTE_DATABASE_URL"
 db_url_required = test -n "$$RONOTE_DATABASE_URL" || { echo "RONOTE_DATABASE_URL is not set; copy .env.example to .env.dev" >&2; exit 1; }
 WEB := pnpm --dir apps/web
+GENERATED := internal/store/sqlcdb internal/httpapi/gen apps/web/src/api/schema.d.ts
 node_required = want=$$(cat .nvmrc); have=$$(node --version 2>/dev/null); [ "$$have" = "v$$want" ] || \
 	{ echo "Node $$want is required (.nvmrc), found $${have:-none}. With nvm: nvm install && nvm use" >&2; exit 1; }
 
@@ -119,12 +120,14 @@ river-migration: ## Add a migration with River's schema: make river-migration fi
 sqlc: ## Regenerate internal/store/sqlcdb from migrations and queries
 	go tool sqlc generate
 
-generate: sqlc ## Regenerate all generated code: sqlc, and the API server from api/openapi.yaml
+generate: sqlc ## Regenerate all generated code: sqlc, then the API server and the web app's API types from api/openapi.yaml
 	go tool oapi-codegen -config api/oapi-codegen.yaml api/openapi.yaml
+	@$(node_required)
+	pnpm --filter @ronote/openapi-ts generate
 
 check-generated: generate ## Fail if generated code is stale
-	@test -z "$$(git status --porcelain -- internal/store/sqlcdb internal/httpapi/gen)" || \
-		{ git status --short -- internal/store/sqlcdb internal/httpapi/gen; echo "make check-generated: generated code is stale; run make generate and commit it" >&2; exit 1; }
+	@test -z "$$(git status --porcelain -- $(GENERATED))" || \
+		{ git status --short -- $(GENERATED); echo "make check-generated: generated code is stale; run make generate and commit it" >&2; exit 1; }
 
 check-go-version: ## Print the Go toolchain; fail unless it is the one go.mod pins
 	@want=$$($(go_toolchain)); have=$$(go env GOVERSION); \

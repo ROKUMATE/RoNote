@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+
+	"github.com/rokumate/ronote/internal/httpapi/gen"
 )
 
 type userKey struct{}
@@ -14,7 +16,7 @@ type userKey struct{}
 func requireUser(user uuid.UUID, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if user == uuid.Nil {
-			writeError(w, r, http.StatusUnauthorized, "unauthenticated", "sign-in required")
+			writeError(w, r, http.StatusUnauthorized, gen.ErrorCodeUnauthenticated, "sign-in required")
 			return
 		}
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), userKey{}, user)))

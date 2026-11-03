@@ -10,6 +10,8 @@ import (
 	"regexp"
 	"runtime/debug"
 	"time"
+
+	"github.com/rokumate/ronote/internal/httpapi/gen"
 )
 
 const requestIDHeader = "X-Request-ID"
@@ -96,7 +98,7 @@ func recoverPanic(logger *slog.Logger, w *statusWriter, r *http.Request) {
 		slog.String("request_id", requestID(r.Context())),
 	)
 	if w.status == 0 {
-		writeError(w, r, http.StatusInternalServerError, "internal_error", "internal server error")
+		writeError(w, r, http.StatusInternalServerError, gen.ErrorCodeInternalError, "internal server error")
 	}
 }
 

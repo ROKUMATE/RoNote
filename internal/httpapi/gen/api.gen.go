@@ -19,6 +19,108 @@ import (
 	"github.com/rokumate/ronote/internal/ir"
 )
 
+// Defines values for ErrorCode.
+const (
+	ErrorCodeIPLiteralHost     ErrorCode = "ip_literal_host"
+	ErrorCodeInternalError     ErrorCode = "internal_error"
+	ErrorCodeInvalidCursor     ErrorCode = "invalid_cursor"
+	ErrorCodeInvalidParameter  ErrorCode = "invalid_parameter"
+	ErrorCodeInvalidRequest    ErrorCode = "invalid_request"
+	ErrorCodeInvalidURL        ErrorCode = "invalid_url"
+	ErrorCodeMethodNotAllowed  ErrorCode = "method_not_allowed"
+	ErrorCodeNotFound          ErrorCode = "not_found"
+	ErrorCodeURLTooLong        ErrorCode = "url_too_long"
+	ErrorCodeUnauthenticated   ErrorCode = "unauthenticated"
+	ErrorCodeUnsupportedScheme ErrorCode = "unsupported_scheme"
+)
+
+// Valid indicates whether the value is a known member of the ErrorCode enum.
+func (e ErrorCode) Valid() bool {
+	switch e {
+	case ErrorCodeIPLiteralHost:
+		return true
+	case ErrorCodeInternalError:
+		return true
+	case ErrorCodeInvalidCursor:
+		return true
+	case ErrorCodeInvalidParameter:
+		return true
+	case ErrorCodeInvalidRequest:
+		return true
+	case ErrorCodeInvalidURL:
+		return true
+	case ErrorCodeMethodNotAllowed:
+		return true
+	case ErrorCodeNotFound:
+		return true
+	case ErrorCodeURLTooLong:
+		return true
+	case ErrorCodeUnauthenticated:
+		return true
+	case ErrorCodeUnsupportedScheme:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ImportErrorCode.
+const (
+	ImportErrorCodeBlockedAddress     ImportErrorCode = "blocked_address"
+	ImportErrorCodeDisallowedByRobots ImportErrorCode = "disallowed_by_robots"
+	ImportErrorCodeExtractFailed      ImportErrorCode = "extract_failed"
+	ImportErrorCodeHTTPError          ImportErrorCode = "http_error"
+	ImportErrorCodeInternalError      ImportErrorCode = "internal_error"
+	ImportErrorCodeInvalidURL         ImportErrorCode = "invalid_url"
+	ImportErrorCodeNetworkError       ImportErrorCode = "network_error"
+	ImportErrorCodeNotFound           ImportErrorCode = "not_found"
+	ImportErrorCodeRateLimited        ImportErrorCode = "rate_limited"
+	ImportErrorCodeRobotsUnavailable  ImportErrorCode = "robots_unavailable"
+	ImportErrorCodeTimeout            ImportErrorCode = "timeout"
+	ImportErrorCodeTooLarge           ImportErrorCode = "too_large"
+	ImportErrorCodeTooManyRedirects   ImportErrorCode = "too_many_redirects"
+	ImportErrorCodeUnsupportedType    ImportErrorCode = "unsupported_type"
+	ImportErrorCodeUpstreamError      ImportErrorCode = "upstream_error"
+)
+
+// Valid indicates whether the value is a known member of the ImportErrorCode enum.
+func (e ImportErrorCode) Valid() bool {
+	switch e {
+	case ImportErrorCodeBlockedAddress:
+		return true
+	case ImportErrorCodeDisallowedByRobots:
+		return true
+	case ImportErrorCodeExtractFailed:
+		return true
+	case ImportErrorCodeHTTPError:
+		return true
+	case ImportErrorCodeInternalError:
+		return true
+	case ImportErrorCodeInvalidURL:
+		return true
+	case ImportErrorCodeNetworkError:
+		return true
+	case ImportErrorCodeNotFound:
+		return true
+	case ImportErrorCodeRateLimited:
+		return true
+	case ImportErrorCodeRobotsUnavailable:
+		return true
+	case ImportErrorCodeTimeout:
+		return true
+	case ImportErrorCodeTooLarge:
+		return true
+	case ImportErrorCodeTooManyRedirects:
+		return true
+	case ImportErrorCodeUnsupportedType:
+		return true
+	case ImportErrorCodeUpstreamError:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ImportStatus.
 const (
 	Done       ImportStatus = "done"
@@ -95,10 +197,14 @@ type Error struct {
 
 // ErrorBody defines model for ErrorBody.
 type ErrorBody struct {
-	Code      string `json:"code"`
-	Message   string `json:"message"`
-	RequestID string `json:"request_id"`
+	// Code Why a request failed. Each response lists the codes it can carry.
+	Code      ErrorCode `json:"code"`
+	Message   string    `json:"message"`
+	RequestID string    `json:"request_id"`
 }
+
+// ErrorCode Why a request failed. Each response lists the codes it can carry.
+type ErrorCode string
 
 // ExistingImportResponse defines model for ExistingImportResponse.
 type ExistingImportResponse struct {
@@ -141,19 +247,24 @@ type Import struct {
 	// DocumentID Set when status is done.
 	DocumentID *openapi_types.UUID `json:"document_id,omitempty"`
 
-	// ErrorCode Set when status is failed: invalid_url, blocked_address, disallowed_by_robots, too_large, unsupported_type, too_many_redirects, not_found, http_error, extract_failed, timeout, rate_limited, upstream_error, robots_unavailable, network_error or internal_error.
-	ErrorCode    *string            `json:"error_code,omitempty"`
+	// ErrorCode Why an import failed; set when its status is failed.
+	ErrorCode    *ImportErrorCode   `json:"error_code,omitempty"`
 	ID           openapi_types.UUID `json:"id"`
 	RequestedURL string             `json:"requested_url"`
 	Status       ImportStatus       `json:"status"`
 	UpdatedAt    time.Time          `json:"updated_at"`
 }
 
+// ImportErrorCode Why an import failed; set when its status is failed.
+type ImportErrorCode string
+
 // ImportEvent defines model for ImportEvent.
 type ImportEvent struct {
 	DocumentID *openapi_types.UUID `json:"document_id,omitempty"`
-	ErrorCode  *string             `json:"error_code,omitempty"`
-	Status     ImportStatus        `json:"status"`
+
+	// ErrorCode Why an import failed; set when its status is failed.
+	ErrorCode *ImportErrorCode `json:"error_code,omitempty"`
+	Status    ImportStatus     `json:"status"`
 }
 
 // ImportResponse defines model for ImportResponse.

@@ -12,6 +12,10 @@ import (
 // errExtract marks a page the extractor could not turn into valid IR.
 var errExtract = errors.New("extraction failed")
 
+// codeInternal fails an import whose last attempt hit an error of our own,
+// such as the database being down.
+const codeInternal = "internal_error"
+
 // failure says what an error means for an import: the stable code it fails
 // with, whether retrying could help, and how long the server asked to wait.
 type failure struct {

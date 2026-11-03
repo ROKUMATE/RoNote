@@ -1,5 +1,6 @@
 packages:
   - apps/*
+  - tools/*
 
 # Save exact versions and refuse to install on the wrong Node.
 savePrefix: ""

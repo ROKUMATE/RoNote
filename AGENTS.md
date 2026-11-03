@@ -41,6 +41,8 @@ Site crawling, AI summaries, chat, handwritten OCR, pseudocode conversion. Do no
 | `testdata/golden/` | extractor fixtures: `input.html`, `meta.json`, `expected.json`; third-party excerpts are listed in `SOURCES.md` |
 | `api/` | `openapi.yaml`, the API contract that Go and TypeScript types are generated from, and the oapi-codegen config |
 | `internal/httpapi/gen/` | Go server code generated from `api/openapi.yaml`; never edit it |
+| `apps/web/src/api/` | the web app's API layer; `schema.d.ts` is generated from `api/openapi.yaml`, never edit it |
+| `tools/openapi-ts/` | the pnpm package that runs openapi-typescript, kept apart because it needs TypeScript 5 and the app uses TypeScript 7 |
 | `docs/adr/` | architecture decision records |
 | `.githooks/` | git hooks, installed by `make setup` |
 
@@ -86,7 +88,7 @@ Create a directory when its first file needs it, not before.
 | `make migrate-new name=...` | create the next sequential SQL migration in `migrations/` |
 | `make river-migration first=N last=M` | add a migration holding River's own migrations N to M, from the River version go.mod pins. Goose owns all schema, River's tables included; after a River upgrade, `make test-integration` names the versions to add |
 | `make sqlc` | regenerate `internal/store/sqlcdb` from `migrations/` and `internal/store/queries/`; commit the result |
-| `make generate` | regenerate everything generated: sqlc output, and `internal/httpapi/gen` from `api/openapi.yaml` (oapi-codegen); commit the result |
+| `make generate` | regenerate everything generated: sqlc output, then `internal/httpapi/gen` (oapi-codegen) and `apps/web/src/api/schema.d.ts` (openapi-typescript) from `api/openapi.yaml`; commit the result. Needs Node as well as Go |
 | `make check-generated` | `make generate`, then fail if the output differs from what is committed |
 | `make check-go-version` | print the Go toolchain and fail unless it is go.mod's `toolchain` |
 
@@ -102,7 +104,7 @@ Web targets, `make lint` and `make test` check that `node --version` matches `.n
 
 Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`: deadcode, goose, sqlc, river, oapi-codegen. golangci-lint is the exception: `make tools` installs the version pinned in the Makefile into `./bin`.
 
-The API is spec-first: change `api/openapi.yaml`, then `make generate`. Never hand-write a type the spec defines. The spec's IR schema maps onto `internal/ir` (`x-go-type`), and `TestIRSchemaMatchesGoldens` keeps the two in step.
+The API is spec-first: change `api/openapi.yaml`, then `make generate`. Never hand-write a type the spec defines: Go uses `internal/httpapi/gen`, TypeScript imports from `apps/web/src/api/schema.d.ts`, and a Vitest test fails on a TypeScript copy of a spec type. Error codes are enums in the spec (`ErrorCode`, `ImportErrorCode`), so Go uses the generated constants. The spec's IR schema maps onto `internal/ir` (`x-go-type`), and `TestIRSchemaMatchesGoldens` keeps the two in step.
 
 ### Running locally
 
@@ -188,7 +190,7 @@ Source text is never rewritten. Code blocks stay byte-identical, enforced by `Te
 | Job | Runs | Reproduce locally |
 |---|---|---|
 | commits | `make check-commits` (the strict hook over a PR's base..head, or a push's before..sha; `sha~1..sha` after a force push or a new branch), then `make hooks-test` with dash and GNU tools | `make check-commits RANGE=main..HEAD`, `make hooks-test` |
-| go | `make check-go-version`, `make tools`, `make lint-go`, `make test-go`, `make check-generated` | the same targets |
+| go | `make check-go-version`, `make tools`, `make lint-go`, `make test-go`, then Node and `make web-deps` for `make check-generated` | the same targets |
 | integration | `make check-go-version`, `make test-integration` on the runner's Docker with Ryuk on | `make test-integration` |
 | web | `make check-node-version`, `make web-deps`, `make lint-web`, `make test-web`, `make web-build` (styleguide guard and bundle budget) | the same targets |
 | e2e, after web | `make web-browsers WITH_DEPS=1`, `make web-e2e`; uploads `apps/web/playwright-report` for 7 days when it fails | `make web-install`, `make web-e2e` |

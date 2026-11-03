@@ -39,7 +39,7 @@ func importEvents(backend Backend, feed Events, done <-chan struct{}, every time
 		ctx := r.Context()
 		id, err := uuid.Parse(r.PathValue("id"))
 		if err != nil {
-			writeError(w, r, http.StatusBadRequest, "invalid_parameter", "id is not a UUID")
+			writeError(w, r, http.StatusBadRequest, gen.ErrorCodeInvalidParameter, "id is not a UUID")
 			return
 		}
 		owner := userFrom(ctx)
@@ -49,10 +49,10 @@ func importEvents(backend Backend, feed Events, done <-chan struct{}, every time
 		imp, err := backend.GetImport(ctx, owner, id)
 		switch {
 		case errors.Is(err, store.ErrNotFound):
-			writeError(w, r, http.StatusNotFound, "not_found", "no such import")
+			writeError(w, r, http.StatusNotFound, gen.ErrorCodeNotFound, "no such import")
 			return
 		case err != nil:
-			writeError(w, r, http.StatusInternalServerError, "internal_error", "internal server error")
+			writeError(w, r, http.StatusInternalServerError, gen.ErrorCodeInternalError, "internal server error")
 			return
 		}
 
@@ -115,7 +115,8 @@ func apply(ctx context.Context, backend Backend, owner uuid.UUID, imp store.Impo
 func send(w http.ResponseWriter, rc *http.ResponseController, imp store.Import) error {
 	ev := gen.ImportEvent{Status: gen.ImportStatus(imp.Status)}
 	if imp.ErrorCode != "" {
-		ev.ErrorCode = &imp.ErrorCode
+		code := gen.ImportErrorCode(imp.ErrorCode)
+		ev.ErrorCode = &code
 	}
 	if imp.DocumentID != uuid.Nil {
 		ev.DocumentID = &imp.DocumentID

@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/rokumate/ronote/internal/events"
+	"github.com/rokumate/ronote/internal/httpapi/gen"
 	"github.com/rokumate/ronote/internal/store"
 )
 
@@ -211,7 +212,7 @@ func TestStreamRefusals(t *testing.T) {
 	feed := newFeed()
 	b := &fakeBackend{imports: map[uuid.UUID]store.Import{imp.ID: imp}}
 	h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, Events: feed, DevUser: devUser})
-	for target, want := range map[string]string{
+	for target, want := range map[string]gen.ErrorCode{
 		"/api/v1/imports/" + uuid.NewString() + "/events": "not_found",
 		"/api/v1/imports/not-a-uuid/events":               "invalid_parameter",
 	} {

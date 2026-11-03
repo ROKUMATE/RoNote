@@ -37,19 +37,19 @@ func apiRoutes(o Options) *http.ServeMux {
 	mux.Handle("GET /api/v1/imports/{id}/events", importEvents(o.Backend, o.Events, o.Done, heartbeat))
 	strict := gen.NewStrictHandlerWithOptions(apiServer{backend: o.Backend}, nil, gen.StrictHTTPServerOptions{
 		RequestErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, _ error) {
-			writeError(w, r, http.StatusBadRequest, "invalid_request", "the request body is not valid JSON for this operation")
+			writeError(w, r, http.StatusBadRequest, gen.ErrorCodeInvalidRequest, "the request body is not valid JSON for this operation")
 		},
 		ResponseErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {
 			logger.LogAttrs(r.Context(), slog.LevelError, "api error",
 				slog.String("error", err.Error()), slog.String("request_id", requestID(r.Context())))
-			writeError(w, r, http.StatusInternalServerError, "internal_error", "internal server error")
+			writeError(w, r, http.StatusInternalServerError, gen.ErrorCodeInternalError, "internal server error")
 		},
 	})
 	gen.HandlerWithOptions(strict, gen.StdHTTPServerOptions{
 		BaseURL:    "/api/v1",
 		BaseRouter: mux,
 		ErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {
-			writeError(w, r, http.StatusBadRequest, "invalid_parameter", err.Error())
+			writeError(w, r, http.StatusBadRequest, gen.ErrorCodeInvalidParameter, err.Error())
 		},
 	})
 	return mux
@@ -60,24 +60,24 @@ type apiServer struct {
 	backend Backend
 }
 
-func apiError(ctx context.Context, code, message string) gen.Error {
+func apiError(ctx context.Context, code gen.ErrorCode, message string) gen.Error {
 	return gen.Error{Error: gen.ErrorBody{Code: code, Message: message, RequestID: requestID(ctx)}}
 }
 
 // importErrorCodes maps the URLs Request refuses to their error codes.
 var importErrorCodes = []struct {
 	err  error
-	code string
+	code gen.ErrorCode
 }{
-	{importer.ErrInvalidURL, "invalid_url"},
-	{importer.ErrUnsupportedScheme, "unsupported_scheme"},
-	{importer.ErrURLTooLong, "url_too_long"},
-	{importer.ErrIPLiteralHost, "ip_literal_host"},
+	{importer.ErrInvalidURL, gen.ErrorCodeInvalidURL},
+	{importer.ErrUnsupportedScheme, gen.ErrorCodeUnsupportedScheme},
+	{importer.ErrURLTooLong, gen.ErrorCodeURLTooLong},
+	{importer.ErrIPLiteralHost, gen.ErrorCodeIPLiteralHost},
 }
 
 func (s apiServer) CreateImport(ctx context.Context, req gen.CreateImportRequestObject) (gen.CreateImportResponseObject, error) {
 	if req.Body == nil {
-		return gen.CreateImport400JSONResponse(apiError(ctx, "invalid_request", "a JSON body with a url is required")), nil
+		return gen.CreateImport400JSONResponse(apiError(ctx, gen.ErrorCodeInvalidRequest, "a JSON body with a url is required")), nil
 	}
 	owner := userFrom(ctx)
 	res, err := s.backend.Request(ctx, owner, req.Body.URL)
@@ -102,7 +102,7 @@ func (s apiServer) CreateImport(ctx context.Context, req gen.CreateImportRequest
 func (s apiServer) GetImport(ctx context.Context, req gen.GetImportRequestObject) (gen.GetImportResponseObject, error) {
 	imp, err := s.backend.GetImport(ctx, userFrom(ctx), req.ID)
 	if errors.Is(err, store.ErrNotFound) {
-		return gen.GetImport404JSONResponse{NotFoundJSONResponse: gen.NotFoundJSONResponse(apiError(ctx, "not_found", "no such import"))}, nil
+		return gen.GetImport404JSONResponse{NotFoundJSONResponse: gen.NotFoundJSONResponse(apiError(ctx, gen.ErrorCodeNotFound, "no such import"))}, nil
 	}
 	if err != nil {
 		return nil, err
@@ -113,7 +113,7 @@ func (s apiServer) GetImport(ctx context.Context, req gen.GetImportRequestObject
 func (s apiServer) GetDocument(ctx context.Context, req gen.GetDocumentRequestObject) (gen.GetDocumentResponseObject, error) {
 	doc, err := s.backend.GetDocument(ctx, userFrom(ctx), req.ID)
 	if errors.Is(err, store.ErrNotFound) {
-		return gen.GetDocument404JSONResponse{NotFoundJSONResponse: gen.NotFoundJSONResponse(apiError(ctx, "not_found", "no such document"))}, nil
+		return gen.GetDocument404JSONResponse{NotFoundJSONResponse: gen.NotFoundJSONResponse(apiError(ctx, gen.ErrorCodeNotFound, "no such document"))}, nil
 	}
 	if err != nil {
 		return nil, err
@@ -131,13 +131,13 @@ func (s apiServer) ListDocuments(ctx context.Context, req gen.ListDocumentsReque
 		limit = *req.Params.Limit
 	}
 	if limit < 1 || limit > maxPageSize {
-		return gen.ListDocuments400JSONResponse(apiError(ctx, "invalid_parameter", "limit must be between 1 and 100")), nil
+		return gen.ListDocuments400JSONResponse(apiError(ctx, gen.ErrorCodeInvalidParameter, "limit must be between 1 and 100")), nil
 	}
 	var after *store.DocumentCursor
 	if req.Params.Cursor != nil {
 		c, err := decodeCursor(*req.Params.Cursor)
 		if err != nil {
-			return gen.ListDocuments400JSONResponse(apiError(ctx, "invalid_cursor", "the cursor is not one this API made")), nil
+			return gen.ListDocuments400JSONResponse(apiError(ctx, gen.ErrorCodeInvalidCursor, "the cursor is not one this API made")), nil
 		}
 		after = &c
 	}
@@ -167,7 +167,8 @@ func importJSON(imp store.Import) gen.Import {
 		Status: gen.ImportStatus(imp.Status), CreatedAt: imp.CreatedAt.UTC(), UpdatedAt: imp.UpdatedAt.UTC(),
 	}
 	if imp.ErrorCode != "" {
-		out.ErrorCode = &imp.ErrorCode
+		code := gen.ImportErrorCode(imp.ErrorCode)
+		out.ErrorCode = &code
 	}
 	if imp.DocumentID != uuid.Nil {
 		out.DocumentID = &imp.DocumentID

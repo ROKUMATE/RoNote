@@ -1,0 +1,13 @@
+{
+  "name": "@ronote/openapi-ts",
+  "private": true,
+  "type": "module",
+  "description": "Generates apps/web/src/api/schema.d.ts from api/openapi.yaml. A package of its own because openapi-typescript needs TypeScript 5's compiler API, and the web app compiles with TypeScript 7.",
+  "scripts": {
+    "generate": "openapi-typescript ../../api/openapi.yaml --output ../../apps/web/src/api/schema.d.ts --root-types --root-types-no-schema-prefix"
+  },
+  "devDependencies": {
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3"
+  }
+}

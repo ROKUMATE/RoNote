@@ -36,7 +36,7 @@ func TestRequestID(t *testing.T) {
 			if tt.incoming != "" {
 				req.Header.Set(requestIDHeader, tt.incoming)
 			}
-			rec := record(New(discardLogger, dbUp), req)
+			rec := record(New(Options{Logger: discardLogger, DB: dbUp}), req)
 
 			got := rec.Header().Get(requestIDHeader)
 			switch {
@@ -131,7 +131,7 @@ func TestAccessLog(t *testing.T) {
 	var logs bytes.Buffer
 	req := newRequest(t, http.MethodGet, "/healthz")
 	req.Header.Set(requestIDHeader, "req-1")
-	record(New(slog.New(slog.NewJSONHandler(&logs, nil)), dbUp), req)
+	record(New(Options{Logger: slog.New(slog.NewJSONHandler(&logs, nil)), DB: dbUp}), req)
 
 	lines := logLines(t, &logs)
 	if len(lines) != 1 {

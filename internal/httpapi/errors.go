@@ -3,22 +3,14 @@ package httpapi
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/rokumate/ronote/internal/httpapi/gen"
 )
 
-type errorEnvelope struct {
-	Error errorBody `json:"error"`
-}
-
-type errorBody struct {
-	Code      string `json:"code"`
-	Message   string `json:"message"`
-	RequestID string `json:"request_id"`
-}
-
-// writeError writes the JSON error envelope. Every error response goes
-// through it.
+// writeError writes the error envelope of api/openapi.yaml. Every error
+// response goes through it or apiError.
 func writeError(w http.ResponseWriter, r *http.Request, status int, code, message string) {
-	writeJSON(w, status, errorEnvelope{Error: errorBody{
+	writeJSON(w, status, gen.Error{Error: gen.ErrorBody{
 		Code:      code,
 		Message:   message,
 		RequestID: requestID(r.Context()),

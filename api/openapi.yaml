@@ -32,7 +32,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ImportResponse"
+                $ref: "#/components/schemas/ExistingImportResponse"
         "202":
           description: The import is queued.
           content:
@@ -184,15 +184,17 @@ components:
       required: [error]
       properties:
         error:
-          type: object
-          required: [code, message, request_id]
-          properties:
-            code:
-              type: string
-            message:
-              type: string
-            request_id:
-              type: string
+          $ref: "#/components/schemas/ErrorBody"
+    ErrorBody:
+      type: object
+      required: [code, message, request_id]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
     CreateImportRequest:
       type: object
       required: [url]
@@ -240,6 +242,14 @@ components:
       properties:
         import:
           $ref: "#/components/schemas/Import"
+    ExistingImportResponse:
+      type: object
+      required: [import, document]
+      properties:
+        import:
+          $ref: "#/components/schemas/Import"
+        document:
+          $ref: "#/components/schemas/DocumentSummary"
     ImportEvent:
       type: object
       required: [status]

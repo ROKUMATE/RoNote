@@ -90,11 +90,20 @@ type DocumentSummary struct {
 
 // Error defines model for Error.
 type Error struct {
-	Error struct {
-		Code      string `json:"code"`
-		Message   string `json:"message"`
-		RequestID string `json:"request_id"`
-	} `json:"error"`
+	Error ErrorBody `json:"error"`
+}
+
+// ErrorBody defines model for ErrorBody.
+type ErrorBody struct {
+	Code      string `json:"code"`
+	Message   string `json:"message"`
+	RequestID string `json:"request_id"`
+}
+
+// ExistingImportResponse defines model for ExistingImportResponse.
+type ExistingImportResponse struct {
+	Document DocumentSummary `json:"document"`
+	Import   Import          `json:"import"`
 }
 
 // IRBlock One block. kind decides which other fields may be set: heading has level, anchor and content; paragraph content; list ordered and items; tabs items with labels; code lang, title, title_link and text; table head and rows; callout variant, title and children; quote children; image src, alt and caption; divider nothing.
@@ -563,7 +572,7 @@ type CreateImportResponseObject interface {
 	VisitCreateImportResponse(w http.ResponseWriter) error
 }
 
-type CreateImport200JSONResponse ImportResponse
+type CreateImport200JSONResponse ExistingImportResponse
 
 func (response CreateImport200JSONResponse) VisitCreateImportResponse(w http.ResponseWriter) error {
 

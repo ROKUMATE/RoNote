@@ -19,7 +19,7 @@ func TestReadyzFollowsDatabase(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(pool.Close)
-	h := New(discardLogger, pool)
+	h := New(Options{Logger: discardLogger, DB: pool})
 
 	steps := []struct {
 		name       string

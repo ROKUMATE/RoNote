@@ -1,5 +1,8 @@
 import { BooksIcon } from "@phosphor-icons/react/Books";
+import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet } from "@tanstack/react-router";
+import { useId } from "react";
+import { recentDocuments } from "../api/queries";
 import { Settings } from "./Settings";
 
 const navLink =
@@ -32,6 +35,7 @@ export function AppShell() {
               </Link>
             </li>
           </ul>
+          <RecentDocuments />
         </nav>
         <Settings />
       </header>
@@ -47,5 +51,30 @@ export function AppShell() {
         </aside>
       </div>
     </div>
+  );
+}
+
+/** The newest documents, under Library. The top bar has no room for them. */
+function RecentDocuments() {
+  const headingId = useId();
+  const recent = useQuery(recentDocuments);
+  if (!recent.data?.length) {
+    return null;
+  }
+  return (
+    <section aria-labelledby={headingId} className="mt-6 hidden sidebar:block">
+      <h2 id={headingId} className="px-2 text-ink-2 text-ui">
+        Recent
+      </h2>
+      <ul className="mt-1 space-y-0.5">
+        {recent.data.map((doc) => (
+          <li key={doc.id}>
+            <Link to="/doc/$id" params={{ id: doc.id }} className={navLink}>
+              <span className="truncate">{doc.title || doc.source_url}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

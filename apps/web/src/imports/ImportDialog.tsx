@@ -7,14 +7,11 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { type FormEvent, type RefObject, useEffect, useId, useRef, useState } from "react";
 import { ApiError } from "../api/client";
-import {
-  importErrorMessages,
-  lostMessage,
-  requestErrorMessages,
-  unreachableMessage,
-} from "../api/messages";
+import { requestErrorMessages, unreachableMessage } from "../api/messages";
 import { createImport } from "../api/queries";
 import type { ErrorCode } from "../api/schema";
+import { buttonClass } from "../ui/button";
+import { endingMessage, stepLabels } from "./describe";
 import { stepState, steps, type TrackedImport } from "./state";
 import { useImportTracker, useTrackedImports } from "./tracker";
 
@@ -44,22 +41,12 @@ function requestErrorMessage(error: unknown): string {
     : unreachableMessage;
 }
 
-const stepLabels: Record<(typeof steps)[number], string> = {
-  queued: "Queued",
-  fetching: "Fetching the page",
-  extracting: "Extracting the content",
-  done: "Done",
-};
-
-const button =
-  "inline-flex items-center gap-2 rounded-sm border border-rule px-3 py-1.5 text-ui-lg hover:bg-paper-2";
-
 /** The "Import page" button and the dialog it opens. */
 export function ImportButton() {
   const dialog = useRef<HTMLDialogElement>(null);
   return (
     <>
-      <button type="button" onClick={() => dialog.current?.showModal()} className={button}>
+      <button type="button" onClick={() => dialog.current?.showModal()} className={buttonClass}>
         <FilePlusIcon size={16} aria-hidden />
         Import page
       </button>
@@ -95,7 +82,7 @@ function ImportDialog({ dialog }: { dialog: RefObject<HTMLDialogElement | null> 
   // Back to an empty form. An ending the dialog has shown is not kept for
   // the library to show again.
   const reset = () => {
-    if (following && (following.status === "failed" || following.lost)) {
+    if (following && endingMessage(following)) {
       tracker.dismiss(following.id);
     }
     setFollowingId(undefined);
@@ -166,10 +153,10 @@ function ImportDialog({ dialog }: { dialog: RefObject<HTMLDialogElement | null> 
             </p>
           )}
           <div className="mt-4 flex gap-2">
-            <button type="submit" disabled={create.isPending} className={button}>
+            <button type="submit" disabled={create.isPending} className={buttonClass}>
               Import
             </button>
-            <button type="button" onClick={() => dialog.current?.close()} className={button}>
+            <button type="button" onClick={() => dialog.current?.close()} className={buttonClass}>
               Cancel
             </button>
           </div>
@@ -195,19 +182,14 @@ const stepIcons = {
 
 /** An import's steps as they happen, or why it ended early. */
 function Progress({ state, onRetry }: { state: TrackedImport; onRetry: () => void }) {
-  const ending =
-    state.status === "failed"
-      ? importErrorMessages[state.errorCode ?? "internal_error"]
-      : state.lost
-        ? lostMessage
-        : undefined;
+  const ending = endingMessage(state);
   if (ending) {
     return (
       <div className="mt-4">
         <p role="alert" className="text-ui-lg">
           {ending}
         </p>
-        <button type="button" onClick={onRetry} className={`mt-4 ${button}`}>
+        <button type="button" onClick={onRetry} className={`mt-4 ${buttonClass}`}>
           Try another link
         </button>
       </div>

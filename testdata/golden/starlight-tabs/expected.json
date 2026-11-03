@@ -1,0 +1,246 @@
+{
+  "ir_version": 1,
+  "title": "Tabs",
+  "source": {
+    "url": "https://starlight.astro.build/components/tabs/",
+    "final_url": "https://starlight.astro.build/components/tabs/",
+    "canonical_url": "https://starlight.astro.build/components/tabs/",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "101a75159e6bf9e14c24e29953bc033c1dda376e41d0668a6fd4a5501b6ddb8b"
+  },
+  "extractor": {
+    "name": "starlight",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "d5bd06779f24",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "_top",
+      "content": [
+        {
+          "text": "Tabs"
+        }
+      ]
+    },
+    {
+      "id": "8f25626f1b97",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "To create a tabbed interface use the "
+        },
+        {
+          "text": "<Tabs>",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "<TabItem>",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " components. Tabs are useful for grouping equivalent information where a user only needs to see one of several options."
+        }
+      ]
+    },
+    {
+      "id": "ed545f12ea56",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Preview"
+        }
+      ]
+    },
+    {
+      "id": "54c233f5171b",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "Stars",
+          "children": [
+            {
+              "id": "4971e9d1cdd7",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Sirius, Vega, Betelgeuse"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Moons",
+          "children": [
+            {
+              "id": "8d822df6daad",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Io, Europa, Ganymede"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f69c1fcb44dc",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "import",
+      "content": [
+        {
+          "text": "Import"
+        }
+      ]
+    },
+    {
+      "id": "0adffd94d101",
+      "kind": "code",
+      "lang": "tsx",
+      "text": "import { Tabs, TabItem } from '@astrojs/starlight/components';"
+    },
+    {
+      "id": "7d18452dd063",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "usage",
+      "content": [
+        {
+          "text": "Usage"
+        }
+      ]
+    },
+    {
+      "id": "88001f4e6c5f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Display a tabbed interface using the "
+        },
+        {
+          "text": "<Tabs>",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "<TabItem>",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " components. Each "
+        },
+        {
+          "text": "<TabItem>",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " must have a "
+        },
+        {
+          "text": "label",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "#label",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": " to display to users."
+        }
+      ]
+    },
+    {
+      "id": "16ed7743397c",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "MDX",
+          "children": [
+            {
+              "id": "979e0f711328",
+              "kind": "code",
+              "lang": "mdx",
+              "text": "import { Tabs, TabItem } from '@astrojs/starlight/components';\n\n<Tabs>\n  <TabItem label=\"Stars\">Sirius, Vega, Betelgeuse</TabItem>\n  <TabItem label=\"Moons\">Io, Europa, Ganymede</TabItem>\n</Tabs>"
+            }
+          ]
+        },
+        {
+          "label": "Markdoc",
+          "children": [
+            {
+              "id": "e598893e0630",
+              "kind": "code",
+              "lang": "markdoc",
+              "text": "{% tabs %}\n{% tabitem label=\"Stars\" %}\nSirius, Vega, Betelgeuse\n{% /tabitem %}\n\n{% tabitem label=\"Moons\" %}\nIo, Europa, Ganymede\n{% /tabitem %}\n{% /tabs %}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cd5a269122f4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Preview"
+        }
+      ]
+    },
+    {
+      "id": "725c73cbaf63",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "Stars",
+          "children": [
+            {
+              "id": "a9553da41c02",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Sirius, Vega, Betelgeuse"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Moons",
+          "children": [
+            {
+              "id": "4bf40684ebf2",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Io, Europa, Ganymede"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

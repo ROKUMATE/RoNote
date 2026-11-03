@@ -16,14 +16,16 @@ import (
 // reading (codeByTokens) walks the raw token stream, while the extractor walks
 // a parsed tree, and it implements the documented rules on its own without
 // sharing code with the extractor, so agreement is evidence rather than a
-// tautology.
+// tautology. Framework rules come from adapterRules, keyed by the adapter the
+// extractor chose; detection itself is checked by the golden files.
 func TestCodeIsVerbatim(t *testing.T) {
 	total := 0
 	for _, name := range fixtures(t) {
-		want := codeByTokens(readFixture(t, name, "input.html"))
+		doc := extractFixture(t, name)
+		want := codeByTokens(readFixture(t, name, "input.html"), adapterRules[doc.Extractor.Name])
 		total += len(want)
 		t.Run(name, func(t *testing.T) {
-			got := codeTexts(extractFixture(t, name).Blocks)
+			got := codeTexts(doc.Blocks)
 			if len(got) != len(want) {
 				t.Fatalf("extractor found %d code blocks, the token reading %d:\n got %q\nwant %q", len(got), len(want), got, want)
 			}
@@ -55,6 +57,29 @@ func codeTexts(blocks []ir.Block) []string {
 	return out
 }
 
+// tokenRules are one framework's code rules, written down here apart from
+// its adapter's configuration.
+type tokenRules struct {
+	root      string   // the content root as tag, tag#id or tag.class; empty for the generic rule
+	skipped   []string // elements, in the same form, whose content is never kept
+	tabPanels bool     // hidden role=tabpanel elements are content
+}
+
+// adapterRules holds the rules for each adapter's pages.
+var adapterRules = map[string]tokenRules{
+	// Islands are interactive widgets.
+	"starlight": {skipped: []string{"astro-island"}, tabPanels: true},
+}
+
+// matcher turns tag, tag#id or tag.class into a match function.
+func matcher(s string) func(tag string, attrs map[string]string) bool {
+	tag, class, _ := strings.Cut(s, ".")
+	tag, id, _ := strings.Cut(tag, "#")
+	return func(t string, attrs map[string]string) bool {
+		return t == tag && (id == "" || attrs["id"] == id) && (class == "" || slices.Contains(strings.Fields(attrs["class"]), class))
+	}
+}
+
 // Elements whose content is never kept.
 var tokenSkipped = map[string]bool{
 	"nav": true, "aside": true, "script": true, "style": true, "noscript": true,
@@ -77,9 +102,26 @@ type tokenRoot struct {
 	fallback bool // the root is <body>, so header and footer are left out too
 }
 
-// contentRoot applies the root rule to the token stream: the first <main>,
-// else the first <article>, else the first role=main element, else <body>.
-func contentRoot(input []byte) tokenRoot {
+// contentRoot applies the root rule to the token stream: the first element
+// the framework's root matches, or the generic rule: the first <main>, else
+// the first <article>, else the first role=main element, else <body>.
+func contentRoot(input []byte, rules tokenRules) tokenRoot {
+	if rules.root != "" {
+		match := matcher(rules.root)
+		z := html.NewTokenizer(bytes.NewReader(input))
+		for ordinal := 0; ; {
+			tt := z.Next()
+			if tt == html.ErrorToken {
+				return tokenRoot{ordinal: -1}
+			}
+			if tt == html.StartTagToken || tt == html.SelfClosingTagToken {
+				if tag, attrs := tagAndAttrs(z); match(tag, attrs) {
+					return tokenRoot{ordinal: ordinal}
+				}
+				ordinal++
+			}
+		}
+	}
 	firsts := map[string]int{}
 	z := html.NewTokenizer(bytes.NewReader(input))
 	for ordinal := 0; ; {
@@ -122,8 +164,9 @@ func contentRoot(input []byte) tokenRoot {
 //     <br> as "\n" and one "\n" dropped when it is the very next thing after
 //     the <pre> start tag, leaving out what is inside an element styled
 //     user-select: none or with class linenos;
-//   - a <pre> with no text gives no code block.
-func codeByTokens(input []byte) []string {
+//   - a <pre> with no text gives no code block;
+//   - rules add the framework's own root, skipped elements and tab panels.
+func codeByTokens(input []byte, rules tokenRules) []string {
 	type element struct {
 		tag                      string
 		root, excluded, inlineOK bool
@@ -136,7 +179,14 @@ func codeByTokens(input []byte) []string {
 		depth, code int
 		payload     *string
 	}
-	root := contentRoot(input)
+	root := contentRoot(input, rules)
+	var skipped []func(string, map[string]string) bool
+	for _, s := range rules.skipped {
+		skipped = append(skipped, matcher(s))
+	}
+	isSkipped := func(tag string, attrs map[string]string) bool {
+		return slices.ContainsFunc(skipped, func(m func(string, map[string]string) bool) bool { return m(tag, attrs) })
+	}
 	var stack []element
 	var frames []frame
 	var codes []string
@@ -211,11 +261,14 @@ func codeByTokens(input []byte) []string {
 				continue
 			}
 			_, hidden := attrs["hidden"]
+			if rules.tabPanels && attrs["role"] == "tabpanel" {
+				hidden = false
+			}
 			style := strings.ToLower(strings.Join(strings.Fields(attrs["style"]), ""))
 			e := element{
 				tag:  tag,
 				root: isRoot,
-				excluded: parent.excluded || tokenSkipped[tag] || hidden ||
+				excluded: parent.excluded || tokenSkipped[tag] || hidden || isSkipped(tag, attrs) ||
 					strings.EqualFold(attrs["aria-hidden"], "true") ||
 					(root.fallback && (tag == "header" || tag == "footer")),
 				inlineOK: parent.inlineOK || tokenInlineOnly[tag],

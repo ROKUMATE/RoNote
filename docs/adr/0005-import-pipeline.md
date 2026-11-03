@@ -1,0 +1,51 @@
+# 0005: Import pipeline, caching and idempotency
+
+Accepted, 2026-11-04
+
+## Context
+
+From P08 on, a user's import is stored: the API takes a URL, a worker fetches and extracts the page, and the user gets their own document. Many users import the same pages, sites must not be fetched more than needed, jobs can run twice, and one user must never see another's data.
+
+## Decision
+
+- **Two processes.** The API validates the URL, then canonicalizes it (`internal/canon`):
+  - lowercase scheme and host, default port dropped, fragment dropped;
+  - `utm_*`, `gclid` and `fbclid` dropped; IP-literal hosts refused.
+
+  If the user already has a document for that URL, the API answers 200 with it. Otherwise it creates the import (`queued`) and its River job in one transaction (202). The worker (`cmd/worker`, River queue `imports`, 4 at a time, 60s per attempt) runs the job.
+- **Shared cache, private documents.**
+  - The cache is shared by all users: a source per canonical URL, a snapshot per distinct body (gzip in Postgres for now), and an extraction per snapshot and extractor version.
+  - A document is the user's own IR copy, one per owner and source (`documents_owner_source_key`).
+  - Extractions record the canonical URL, never one user's exact request.
+- **Freshness.**
+  - A source fetched or confirmed within `RONOTE_SOURCE_TTL` (24h) is not fetched again.
+  - After that, a conditional GET; a 304 confirms the stored snapshot and restarts the clock.
+  - The extractor always runs, since it is milliseconds and deterministic. Its result is stored only when that snapshot has no extraction by that extractor version; otherwise the stored one is reused, so detection always follows the current code.
+- **Canonical URLs.** A page's `<link rel=canonical>` is trusted only on the page's own host. Otherwise any page could claim another site's URL and replace that site's cached copy for everyone.
+- **Idempotency.**
+  - The worker writes source, snapshot, extraction, document, the `done` status and River's job completion (`JobCompleteTx`) in one final transaction. Every insert there reuses existing rows on its unique key.
+  - A retried or duplicate job finds the import done, or the document already there; it never makes a second one.
+- **Errors.**
+  - **Permanent** (`JobCancel` on the first attempt): invalid URL, blocked address, robots.txt disallow, too large, unsupported type, too many redirects, 404/410, other 4xx, extraction failure.
+  - **Transient** (River backoff, 3 attempts in all): timeout, 5xx, 429, network errors, robots.txt answering 5xx (RFC 9309: nothing is fetched until it can be read).
+  - A `Retry-After` on a 429 or 503 sets the next attempt's time, capped at 10 minutes.
+  - The last failed attempt marks the import failed with a stable `error_code`.
+- **Progress.** A trigger on `imports` sends `pg_notify('import_status', …)` for every new import and status change, inside the transaction that makes it. Each API process holds one LISTEN connection and fans events out in memory to `GET /api/v1/imports/{id}/events` (SSE). A stream:
+  - subscribes before reading the import;
+  - sends the current status, then only forward moves, and closes at done or failed;
+  - sends a heartbeat every 15s;
+  - rereads the import after the listener reconnects.
+- **Owner scoping.**
+  - Every query on documents or imports takes `owner_id` (a test fails on any that does not).
+  - An import can only reference a document of the same owner (composite foreign key).
+  - Another user's rows answer 404.
+- **Rate limit.** The fetcher's 1 request per second per host holds per worker process. Several worker processes multiply it.
+- **Schema.** Goose owns all schema, River's tables included (`make river-migration`). A test fails when the pinned River knows a migration we have not added.
+
+## Consequences
+
+- Imports of popular pages cost one fetch per TTL period, whoever asks.
+- A user's document keeps the IR it was made from; re-importing returns it unchanged. Syncing to newer snapshots comes with editing (P10+).
+- Raw HTML lives in Postgres (5 MiB cap per page) until file storage arrives with PDFs (P13).
+- Running more than one worker process needs a shared rate limit first.
+- Real sign-in (P16) replaces the dev identity; until then staging and prod answer 401 on `/api/v1`.

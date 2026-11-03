@@ -79,6 +79,10 @@ const (
 	// example because it nests elements deeper than the parser allows. The
 	// document has no blocks.
 	WarningParseFailed WarningCode = "parse_failed"
+	// WarningAdapterFallback means the page looked like a framework the
+	// extractor has an adapter for, but did not have the structure the
+	// adapter expects, so the generic rules were used.
+	WarningAdapterFallback WarningCode = "adapter_fallback"
 )
 
 // Doc is one imported page.

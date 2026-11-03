@@ -11,7 +11,7 @@ import (
 
 // code converts a <pre> to a code block, or nil when it has no text.
 func (e *extractor) code(pre *html.Node) *ir.Block {
-	text := codeText(pre)
+	text := e.codeText(pre)
 	if text == "" {
 		return nil
 	}
@@ -21,17 +21,18 @@ func (e *extractor) code(pre *html.Node) *ir.Block {
 // codeText is a code block's text under the verbatim rule: what the page's
 // copy button puts on the clipboard when the page carries that text, else the
 // text content of the <pre>.
-func codeText(pre *html.Node) string {
+func (e *extractor) codeText(pre *html.Node) string {
 	if text, ok := copyPayload(pre); ok {
 		return text
 	}
-	return preText(pre)
+	return e.preText(pre)
 }
 
 // preText is the exact text content of a <pre>: text nodes concatenated in
 // order, so highlight spans flatten, and <br> as "\n". Nothing is trimmed.
-// Parts that are never text are left out; see neverText.
-func preText(pre *html.Node) string {
+// Parts that are never text are left out: see neverText, and the adapter's
+// plan may name more, such as its framework's line numbers.
+func (e *extractor) preText(pre *html.Node) string {
 	var b strings.Builder
 	var walk func(*html.Node)
 	walk = func(n *html.Node) {
@@ -41,7 +42,7 @@ func preText(pre *html.Node) string {
 				b.WriteString(c.Data)
 			case c.Type == html.ElementNode && c.DataAtom == atom.Br:
 				b.WriteByte('\n')
-			case neverText(c):
+			case neverText(c), e.plan != nil && e.plan.NotText[c]:
 			default:
 				walk(c)
 			}

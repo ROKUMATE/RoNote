@@ -33,7 +33,8 @@ Site crawling, AI summaries, chat, handwritten OCR, pseudocode conversion. Do no
 | `scripts/` | repo scripts |
 | `internal/ir/` | the document model every importer produces (docs/adr/0004-ir-and-links.md) |
 | `internal/fetch/` | the only way to fetch a user-supplied URL: SSRF guard, limits, robots.txt, rate limit |
-| `internal/extract/` | generic HTML to IR extractor |
+| `internal/extract/` | HTML to IR extractor: generic rules, refined by a framework adapter when one matches |
+| `internal/extract/adapter/` | docs-framework adapters as configuration: detection, content root, chrome, callouts, tabs and code rules |
 | `testdata/golden/` | extractor fixtures: `input.html`, `meta.json`, `expected.json`; third-party excerpts are listed in `SOURCES.md` |
 | `docs/adr/` | architecture decision records |
 | `.githooks/` | git hooks, installed by `make setup` |

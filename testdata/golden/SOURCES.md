@@ -16,6 +16,7 @@ Synthetic framework pages reproduce the DOM structure of a real page, with inven
 | mdbook-v04-reading-files | an mdBook 0.4 page: boring lines, file names in and out of a paragraph, a note, a table |
 | mdn-closures-synthetic | https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures (MDN: code examples with language headers, notecards, feedback footer); MDN text is CC BY-SA |
 | mdn-live-sample-synthetic | an MDN live sample: HTML, CSS and JS examples and the sample frame |
+| docbook-chapter | a DocBook XSL chapter: navigation header and footer, table of contents, admonitions, screen and program listings |
 | docsy-tabpane | https://www.docsy.dev/docs/content/shortcodes/ (Docsy: tabpane, alerts, Chroma line numbers, feedback); the site's footer reserves all rights |
 
 ## Excerpts of real pages
@@ -41,3 +42,4 @@ Trimmed copies of public documentation pages:
 | mdbook-rust-data-types | https://doc.rust-lang.org/book/ch03-02-data-types.html, "Data Types" from The Rust Programming Language by Steve Klabnik, Carol Nichols and Chris Krycho, with contributions from the Rust Community | The whole section | MIT or Apache License 2.0, per https://github.com/rust-lang/book (LICENSE-MIT, LICENSE-APACHE) | 2026-11-03 |
 | docsy-k8s-pods | https://kubernetes.io/docs/concepts/workloads/pods/, "Pods" by The Kubernetes Authors | "Pods" to "Workload resources for managing pods", with the page's feedback and last-modified blocks | Creative Commons Attribution 4.0 | 2026-11-03 |
 | godev-getting-started | https://go.dev/doc/tutorial/getting-started, "Tutorial: Get started with Go" by The Go Authors | The whole article | Text: Creative Commons Attribution 4.0. Code: BSD license. Per https://go.dev/copyright | 2026-11-03 |
+| docbook-postgres-select | https://www.postgresql.org/docs/current/tutorial-select.html, "2.5. Querying a Table" by The PostgreSQL Global Development Group | The page's content column: breadcrumb and version lists, the manual page, the correction form | PostgreSQL License, per https://www.postgresql.org/about/licence/ | 2026-11-03 |

@@ -1,0 +1,109 @@
+{
+  "ir_version": 1,
+  "title": "Chapter 3. Backups",
+  "source": {
+    "url": "https://shelf.example.org/manual/backups.html",
+    "final_url": "https://shelf.example.org/manual/backups.html",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "a23489554ddac531eb576917990c816f179706ea5070c31dc3a0bd099716a635"
+  },
+  "extractor": {
+    "name": "docbook",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "eefce4026ec3",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "backups",
+      "content": [
+        {
+          "text": "Chapter 3. Backups"
+        }
+      ]
+    },
+    {
+      "id": "d11a993033ad",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A store can be copied while it is running."
+        }
+      ]
+    },
+    {
+      "id": "376324642c59",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "backups-dump",
+      "content": [
+        {
+          "text": "3.1. Dumping a Store"
+        }
+      ]
+    },
+    {
+      "id": "f86708cf74a4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Write the whole store to one file:"
+        }
+      ]
+    },
+    {
+      "id": "b229704999fe",
+      "kind": "code",
+      "text": "$ shelfdump --all > store.dump\n"
+    },
+    {
+      "id": "b17874dd5310",
+      "kind": "callout",
+      "variant": "note",
+      "title": "Note",
+      "children": [
+        {
+          "id": "805437c88b7d",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "The dump holds data and settings, not log files."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "36d5ee2e78d6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Read it back with:"
+        }
+      ]
+    },
+    {
+      "id": "f63a0c599f0e",
+      "kind": "code",
+      "text": "shelf --restore store.dump\n\t--verify\n"
+    },
+    {
+      "id": "3b074ee07299",
+      "kind": "callout",
+      "variant": "warning",
+      "title": "Warning",
+      "children": [
+        {
+          "id": "58561aea394e",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Restoring replaces every record in the target store."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

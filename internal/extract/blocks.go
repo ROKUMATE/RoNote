@@ -267,7 +267,7 @@ func (e *extractor) list(n *html.Node) *ir.Block {
 	flushStray := func() {
 		stray.flush()
 		if len(stray.out) > 0 {
-			b.Items = append(b.Items, stray.out)
+			b.Items = append(b.Items, ir.Item{Children: stray.out})
 			stray.out = nil
 		}
 	}
@@ -275,7 +275,7 @@ func (e *extractor) list(n *html.Node) *ir.Block {
 		if c.Type == html.ElementNode && c.DataAtom == atom.Li && !e.skip(c) {
 			flushStray()
 			if item := e.blocks(c); len(item) > 0 {
-				b.Items = append(b.Items, item)
+				b.Items = append(b.Items, ir.Item{Children: item})
 			}
 			continue
 		}
@@ -305,16 +305,17 @@ func (e *extractor) definitionList(n *html.Node) *ir.Block {
 			for i := range term {
 				term[i].Marks = withMark(term[i].Marks, ir.MarkBold)
 			}
-			b.Items = append(b.Items, []ir.Block{{Kind: ir.KindParagraph, Content: term}})
+			b.Items = append(b.Items, ir.Item{Children: []ir.Block{{Kind: ir.KindParagraph, Content: term}}})
 		case atom.Dd:
 			desc := e.blocks(c)
 			if len(desc) == 0 {
 				continue
 			}
 			if len(b.Items) == 0 {
-				b.Items = append(b.Items, nil)
+				b.Items = append(b.Items, ir.Item{})
 			}
-			b.Items[len(b.Items)-1] = append(b.Items[len(b.Items)-1], desc...)
+			last := &b.Items[len(b.Items)-1]
+			last.Children = append(last.Children, desc...)
 		default:
 			if more := e.definitionList(c); more != nil {
 				b.Items = append(b.Items, more.Items...)

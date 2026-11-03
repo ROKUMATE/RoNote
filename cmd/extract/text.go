@@ -47,9 +47,15 @@ func blockText(b ir.Block) string {
 			if b.Ordered {
 				marker = fmt.Sprintf("%d. ", i+1)
 			}
-			items = append(items, indent(blocksText(item), marker, strings.Repeat(" ", len(marker))))
+			items = append(items, indent(blocksText(item.Children), marker, strings.Repeat(" ", len(marker))))
 		}
 		return strings.Join(items, "\n")
+	case ir.KindTabs:
+		var tabs []string
+		for _, item := range b.Items {
+			tabs = append(tabs, "=== "+item.Label+"\n"+indent(blocksText(item.Children), "    ", "    "))
+		}
+		return strings.Join(tabs, "\n")
 	case ir.KindTable:
 		var lines []string
 		for i, row := range append(append([][]ir.Cell{}, b.Head...), b.Rows...) {

@@ -57,7 +57,7 @@ func (a *idAssigner) assign(b *Block) {
 	b.ID = id
 
 	for _, item := range b.Items {
-		a.nested(item)
+		a.nested(item.Children)
 	}
 	a.nested(b.Children)
 }
@@ -79,7 +79,13 @@ func blockText(b *Block) string {
 	case KindList:
 		var parts []string
 		for _, item := range b.Items {
-			parts = append(parts, blocksText(item))
+			parts = append(parts, blocksText(item.Children))
+		}
+		return strings.Join(parts, "\n")
+	case KindTabs:
+		var parts []string
+		for _, item := range b.Items {
+			parts = append(parts, normalize(item.Label)+"\n"+blocksText(item.Children))
 		}
 		return strings.Join(parts, "\n")
 	case KindTable:

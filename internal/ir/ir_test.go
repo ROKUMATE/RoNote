@@ -43,13 +43,20 @@ func sampleDoc() *Doc {
 				{Text: " to ", Marks: []Mark{MarkBold, MarkStrike, MarkSub, MarkSup, MarkCode}},
 				{Text: "mail", Link: &Link{Href: "mailto:a@example.org", Kind: LinkExternal}},
 			}},
-			{Kind: KindList, Ordered: true, Items: [][]Block{{para("one")}, {para("two"), {Kind: KindList, Items: [][]Block{{para("nested")}}}}}},
+			{Kind: KindList, Ordered: true, Items: []Item{
+				{Children: []Block{para("one")}},
+				{Children: []Block{para("two"), {Kind: KindList, Items: []Item{{Children: []Block{para("nested")}}}}}},
+			}},
 			{Kind: KindCode, Lang: "go", Title: "main.go", Text: "func main() {\n\tprintln(\"hi\")\n}\n"},
 			{Kind: KindTable, Head: [][]Cell{{{text("Name")}, {text("Value")}}}, Rows: [][]Cell{{{text("a")}, {}}}},
 			{Kind: KindCallout, Variant: VariantWarning, Title: "Careful", Children: []Block{para("Hot.")}},
 			{Kind: KindImage, Src: "https://example.com/a.png", Alt: "A diagram", Caption: []Inline{text("Figure 1")}},
 			{Kind: KindQuote, Children: []Block{para("Quoted.")}},
 			{Kind: KindDivider},
+			{Kind: KindTabs, Items: []Item{
+				{Label: "npm", Children: []Block{{Kind: KindCode, Lang: "sh", Text: "npm install\n"}}},
+				{Label: "pnpm", Children: []Block{{Kind: KindCode, Lang: "sh", Text: "pnpm install\n"}}},
+			}},
 		},
 		Warnings: []Warning{{Code: WarningLowConfidence, Message: "no main element"}},
 	}
@@ -87,8 +94,13 @@ func TestValidate(t *testing.T) {
 		{name: "javascript external link", mutate: func(d *Doc) { d.Blocks[1].Content[7].Link.Href = "javascript:alert(1)" }, wantErr: "is not an absolute http(s) or mailto URL"},
 		{name: "unknown link kind", mutate: func(d *Doc) { d.Blocks[1].Content[3].Link.Kind = "sideways" }, wantErr: `unknown link kind "sideways"`},
 		{name: "list without items", mutate: func(d *Doc) { d.Blocks[2].Items = nil }, wantErr: "blocks[2]: list has no items"},
-		{name: "empty list item", mutate: func(d *Doc) { d.Blocks[2].Items[0] = nil }, wantErr: "blocks[2].items[0]: list item is empty"},
-		{name: "nested block problem", mutate: func(d *Doc) { d.Blocks[2].Items[1][1].Items[0][0].Kind = "x" }, wantErr: `blocks[2].items[1][1].items[0][0]: unknown kind "x"`},
+		{name: "empty list item", mutate: func(d *Doc) { d.Blocks[2].Items[0].Children = nil }, wantErr: "blocks[2].items[0]: list item is empty"},
+		{name: "list item with a label", mutate: func(d *Doc) { d.Blocks[2].Items[0].Label = "one" }, wantErr: "blocks[2].items[0]: list item has a label"},
+		{
+			name:    "nested block problem",
+			mutate:  func(d *Doc) { d.Blocks[2].Items[1].Children[1].Items[0].Children[0].Kind = "x" },
+			wantErr: `blocks[2].items[1].children[1].items[0].children[0]: unknown kind "x"`,
+		},
 		{name: "empty code text", mutate: func(d *Doc) { d.Blocks[3].Text = "" }, wantErr: "blocks[3]: code text is empty"},
 		{name: "table without rows", mutate: func(d *Doc) { d.Blocks[4].Head, d.Blocks[4].Rows = nil, nil }, wantErr: "blocks[4]: table has no rows"},
 		{name: "bad cell run", mutate: func(d *Doc) { d.Blocks[4].Rows[0][0][0].Text = "" }, wantErr: "blocks[4].rows[0][0][0]: text is empty"},
@@ -97,6 +109,10 @@ func TestValidate(t *testing.T) {
 		{name: "relative image src", mutate: func(d *Doc) { d.Blocks[6].Src = "a.png" }, wantErr: `blocks[6].src: "a.png" is not an absolute http(s) URL`},
 		{name: "data image src", mutate: func(d *Doc) { d.Blocks[6].Src = "data:image/png;base64,AA" }, wantErr: "is not an absolute http(s) URL"},
 		{name: "empty quote", mutate: func(d *Doc) { d.Blocks[7].Children = nil }, wantErr: "blocks[7]: quote has no children"},
+		{name: "tabs without tabs", mutate: func(d *Doc) { d.Blocks[9].Items = nil }, wantErr: "blocks[9]: tabs block has no tabs"},
+		{name: "tab without a label", mutate: func(d *Doc) { d.Blocks[9].Items[1].Label = "" }, wantErr: "blocks[9].items[1]: tab has no label"},
+		{name: "empty tab", mutate: func(d *Doc) { d.Blocks[9].Items[0].Children = nil }, wantErr: "blocks[9].items[0]: tab is empty"},
+		{name: "problem inside a tab", mutate: func(d *Doc) { d.Blocks[9].Items[0].Children[0].Text = "" }, wantErr: "blocks[9].items[0].children[0]: code text is empty"},
 	}
 
 	for _, tt := range tests {
@@ -204,6 +220,20 @@ func TestAssignIDs(t *testing.T) {
 	t.Run("nested blocks get IDs", func(t *testing.T) {
 		if a[8] == "" || a[8] == a[7] {
 			t.Errorf("callout child ID %q, callout ID %q", a[8], a[7])
+		}
+	})
+	t.Run("tab labels are part of the ID", func(t *testing.T) {
+		tabs := func(label string) []Block {
+			return []Block{{Kind: KindTabs, Items: []Item{{Label: label, Children: []Block{para("Same.")}}}}}
+		}
+		npm, yarn := tabs("npm"), tabs("yarn")
+		AssignIDs(npm)
+		AssignIDs(yarn)
+		if npm[0].ID == yarn[0].ID {
+			t.Errorf("tabs labelled npm and yarn share ID %s", npm[0].ID)
+		}
+		if npm[0].Items[0].Children[0].ID == "" {
+			t.Error("a block inside a tab has no ID")
 		}
 	})
 	t.Run("a code title is part of the ID", func(t *testing.T) {

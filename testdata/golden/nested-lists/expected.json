@@ -28,100 +28,112 @@
       "kind": "list",
       "ordered": true,
       "items": [
-        [
-          {
-            "id": "78c0a44a6a93",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "Install Go."
-              }
-            ]
-          },
-          {
-            "id": "2ddbf3ee5bcd",
-            "kind": "list",
-            "items": [
-              [
+        {
+          "children": [
+            {
+              "id": "78c0a44a6a93",
+              "kind": "paragraph",
+              "content": [
                 {
-                  "id": "f85a61afd765",
-                  "kind": "paragraph",
-                  "content": [
-                    {
-                      "text": "macOS: use the package installer."
-                    }
-                  ]
+                  "text": "Install Go."
                 }
-              ],
-              [
+              ]
+            },
+            {
+              "id": "2ddbf3ee5bcd",
+              "kind": "list",
+              "items": [
                 {
-                  "id": "c223a59f82e5",
-                  "kind": "paragraph",
-                  "content": [
+                  "children": [
                     {
-                      "text": "Linux:"
+                      "id": "f85a61afd765",
+                      "kind": "paragraph",
+                      "content": [
+                        {
+                          "text": "macOS: use the package installer."
+                        }
+                      ]
                     }
                   ]
                 },
                 {
-                  "id": "55bf153fc0c0",
-                  "kind": "list",
-                  "ordered": true,
-                  "items": [
-                    [
-                      {
-                        "id": "fec09a99ad7b",
-                        "kind": "paragraph",
-                        "content": [
-                          {
-                            "text": "Download the archive."
-                          }
-                        ]
-                      }
-                    ],
-                    [
-                      {
-                        "id": "cd56465c5ffd",
-                        "kind": "paragraph",
-                        "content": [
-                          {
-                            "text": "Extract it:"
-                          }
-                        ]
-                      },
-                      {
-                        "id": "752d539b8d7b",
-                        "kind": "code",
-                        "lang": "shell",
-                        "text": "tar -C /usr/local -xzf go.tar.gz\n"
-                      }
-                    ]
+                  "children": [
+                    {
+                      "id": "c223a59f82e5",
+                      "kind": "paragraph",
+                      "content": [
+                        {
+                          "text": "Linux:"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "55bf153fc0c0",
+                      "kind": "list",
+                      "ordered": true,
+                      "items": [
+                        {
+                          "children": [
+                            {
+                              "id": "fec09a99ad7b",
+                              "kind": "paragraph",
+                              "content": [
+                                {
+                                  "text": "Download the archive."
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "children": [
+                            {
+                              "id": "cd56465c5ffd",
+                              "kind": "paragraph",
+                              "content": [
+                                {
+                                  "text": "Extract it:"
+                                }
+                              ]
+                            },
+                            {
+                              "id": "752d539b8d7b",
+                              "kind": "code",
+                              "lang": "shell",
+                              "text": "tar -C /usr/local -xzf go.tar.gz\n"
+                            }
+                          ]
+                        }
+                      ]
+                    }
                   ]
                 }
               ]
-            ]
-          }
-        ],
-        [
-          {
-            "id": "ff1e4a1292f4",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "Check the version with "
-              },
-              {
-                "text": "go version",
-                "marks": [
-                  "code"
-                ]
-              },
-              {
-                "text": "."
-              }
-            ]
-          }
-        ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "ff1e4a1292f4",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Check the version with "
+                },
+                {
+                  "text": "go version",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        }
       ]
     }
   ]

@@ -53,7 +53,7 @@ func blockLine(b ir.Block) string {
 		}
 		var items []string
 		for _, item := range b.Items {
-			items = append(items, strings.Join(summary(item), " / "))
+			items = append(items, strings.Join(summary(item.Children), " / "))
 		}
 		return tag + "[" + strings.Join(items, "; ") + "]"
 	case ir.KindTable:

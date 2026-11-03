@@ -18,36 +18,40 @@
       "kind": "list",
       "ordered": true,
       "items": [
-        [
-          {
-            "id": "91c3e400b6da",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "Documentation",
-                "link": {
-                  "href": "https://go.dev/doc/",
-                  "kind": "same_domain"
+        {
+          "children": [
+            {
+              "id": "91c3e400b6da",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Documentation",
+                  "link": {
+                    "href": "https://go.dev/doc/",
+                    "kind": "same_domain"
+                  }
                 }
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "id": "8f7fab92f1c3",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "Effective Go",
-                "link": {
-                  "href": "https://go.dev/doc/effective_go",
-                  "kind": "same_domain"
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "8f7fab92f1c3",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Effective Go",
+                  "link": {
+                    "href": "https://go.dev/doc/effective_go",
+                    "kind": "same_domain"
+                  }
                 }
-              }
-            ]
-          }
-        ]
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -344,125 +348,131 @@
       "id": "eb1d3bca4ef8",
       "kind": "list",
       "items": [
-        [
-          {
-            "id": "7e916e4ab15f",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "Indentation",
-                "marks": [
-                  "bold"
-                ]
-              }
-            ]
-          },
-          {
-            "id": "fc903c973ab8",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "We use tabs for indentation and "
-              },
-              {
-                "text": "gofmt",
-                "marks": [
-                  "code"
-                ]
-              },
-              {
-                "text": " emits them by default. Use spaces only if you must."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "id": "5ecc79e06888",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "Line length",
-                "marks": [
-                  "bold"
-                ]
-              }
-            ]
-          },
-          {
-            "id": "61693d55338f",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "Go has no line length limit. Don't worry about overflowing a punched card. If a line feels too long, wrap it and indent with an extra tab."
-              }
-            ]
-          }
-        ],
-        [
-          {
-            "id": "4591d3bece63",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "Parentheses",
-                "marks": [
-                  "bold"
-                ]
-              }
-            ]
-          },
-          {
-            "id": "2589dd00864a",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "Go needs fewer parentheses than C and Java: control structures ("
-              },
-              {
-                "text": "if",
-                "marks": [
-                  "code"
-                ]
-              },
-              {
-                "text": ", "
-              },
-              {
-                "text": "for",
-                "marks": [
-                  "code"
-                ]
-              },
-              {
-                "text": ", "
-              },
-              {
-                "text": "switch",
-                "marks": [
-                  "code"
-                ]
-              },
-              {
-                "text": ") do not have parentheses in their syntax. Also, the operator precedence hierarchy is shorter and clearer, so"
-              }
-            ]
-          },
-          {
-            "id": "6f5db1907e36",
-            "kind": "code",
-            "text": "x<<8 + y<<16\n"
-          },
-          {
-            "id": "d1ac74b3712a",
-            "kind": "paragraph",
-            "content": [
-              {
-                "text": "means what the spacing implies, unlike in the other languages."
-              }
-            ]
-          }
-        ]
+        {
+          "children": [
+            {
+              "id": "7e916e4ab15f",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Indentation",
+                  "marks": [
+                    "bold"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "fc903c973ab8",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "We use tabs for indentation and "
+                },
+                {
+                  "text": "gofmt",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " emits them by default. Use spaces only if you must."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "5ecc79e06888",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Line length",
+                  "marks": [
+                    "bold"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "61693d55338f",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Go has no line length limit. Don't worry about overflowing a punched card. If a line feels too long, wrap it and indent with an extra tab."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "4591d3bece63",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Parentheses",
+                  "marks": [
+                    "bold"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "2589dd00864a",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Go needs fewer parentheses than C and Java: control structures ("
+                },
+                {
+                  "text": "if",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ", "
+                },
+                {
+                  "text": "for",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ", "
+                },
+                {
+                  "text": "switch",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ") do not have parentheses in their syntax. Also, the operator precedence hierarchy is shorter and clearer, so"
+                }
+              ]
+            },
+            {
+              "id": "6f5db1907e36",
+              "kind": "code",
+              "text": "x<<8 + y<<16\n"
+            },
+            {
+              "id": "d1ac74b3712a",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "means what the spacing implies, unlike in the other languages."
+                }
+              ]
+            }
+          ]
+        }
       ]
     },
     {

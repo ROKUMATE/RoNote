@@ -10,6 +10,8 @@ import (
 	"testing"
 	"testing/synctest"
 	"time"
+
+	"github.com/rokumate/ronote/internal/httpapi/gen"
 )
 
 var discardLogger = slog.New(slog.DiscardHandler)
@@ -46,7 +48,7 @@ func TestRoutes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			rec := record(New(discardLogger, dbUp), newRequest(t, tt.method, tt.target))
+			rec := record(New(Options{Logger: discardLogger, DB: dbUp}), newRequest(t, tt.method, tt.target))
 
 			if rec.Code != tt.wantStatus {
 				t.Errorf("status = %d, want %d", rec.Code, tt.wantStatus)
@@ -105,7 +107,7 @@ func TestReadyz(t *testing.T) {
 			t.Parallel()
 			synctest.Test(t, func(t *testing.T) {
 				start := time.Now()
-				rec := record(New(discardLogger, tt.db), newRequest(t, http.MethodGet, "/readyz"))
+				rec := record(New(Options{Logger: discardLogger, DB: tt.db}), newRequest(t, http.MethodGet, "/readyz"))
 
 				if elapsed := time.Since(start); elapsed != tt.wantElapsed {
 					t.Errorf("answered after %v, want %v", elapsed, tt.wantElapsed)
@@ -126,7 +128,7 @@ func TestReadyz(t *testing.T) {
 func TestNewServerSetsLimits(t *testing.T) {
 	t.Parallel()
 
-	srv := NewServer(New(discardLogger, dbUp), discardLogger)
+	srv := NewServer(New(Options{Logger: discardLogger, DB: dbUp}), discardLogger)
 
 	limits := map[string]int64{
 		"ReadHeaderTimeout": int64(srv.ReadHeaderTimeout),
@@ -153,9 +155,9 @@ func record(h http.Handler, r *http.Request) *httptest.ResponseRecorder {
 	return rec
 }
 
-func decodeError(t *testing.T, rec *httptest.ResponseRecorder) errorBody {
+func decodeError(t *testing.T, rec *httptest.ResponseRecorder) gen.ErrorBody {
 	t.Helper()
-	var env errorEnvelope
+	var env gen.Error
 	if err := json.Unmarshal(rec.Body.Bytes(), &env); err != nil {
 		t.Fatalf("body %q is not an error envelope: %v", rec.Body, err)
 	}

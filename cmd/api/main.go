@@ -9,12 +9,17 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/rokumate/ronote/internal/config"
 	"github.com/rokumate/ronote/internal/db"
 	"github.com/rokumate/ronote/internal/httpapi"
+	"github.com/rokumate/ronote/internal/importer"
+	"github.com/rokumate/ronote/internal/store"
 )
 
 const shutdownTimeout = 10 * time.Second
@@ -42,12 +47,33 @@ func run() error {
 	}
 	defer pool.Close()
 
+	st := store.New(pool)
+	// The API only queues jobs; the worker process runs them.
+	queue, err := importer.NewClient(pool, nil, importer.ClientOptions{Logger: logger})
+	if err != nil {
+		return err
+	}
+	var devUser uuid.UUID
+	if cfg.DevUserEmail != "" {
+		u, err := st.UpsertUserByEmail(ctx, cfg.DevUserEmail, devDisplayName(cfg.DevUserEmail))
+		if err != nil {
+			return fmt.Errorf("dev user: %w", err)
+		}
+		devUser = u.ID
+		logger.Info("dev identity on: every /api/v1 request acts as this user", "email", u.Email)
+	}
+
 	var lc net.ListenConfig
 	ln, err := lc.Listen(ctx, "tcp", cfg.HTTPAddr)
 	if err != nil {
 		return fmt.Errorf("listen: %w", err)
 	}
-	srv := httpapi.NewServer(httpapi.New(logger, pool), logger)
+	srv := httpapi.NewServer(httpapi.New(httpapi.Options{
+		Logger:  logger,
+		DB:      pool,
+		Backend: backend{Store: st, Service: importer.NewService(st, queue)},
+		DevUser: devUser,
+	}), logger)
 
 	serveErr := make(chan error, 1)
 	go func() { serveErr <- srv.Serve(ln) }()
@@ -71,4 +97,16 @@ func run() error {
 	}
 	logger.Info("api stopped")
 	return nil
+}
+
+// backend serves /api/v1 from the store and the import service.
+type backend struct {
+	*store.Store
+	*importer.Service
+}
+
+// devDisplayName is the part of an email before the @.
+func devDisplayName(email string) string {
+	name, _, _ := strings.Cut(email, "@")
+	return name
 }

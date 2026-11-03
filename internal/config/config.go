@@ -38,6 +38,10 @@ type Config struct {
 	// SourceTTL is how long a fetched page stays fresh: imports within it
 	// reuse the stored copy without asking the site.
 	SourceTTL time.Duration
+	// DevUserEmail names the user every API request acts as until real
+	// sign-in exists. Only dev and test may set it; without it the API
+	// answers 401.
+	DevUserEmail string
 }
 
 const (
@@ -73,6 +77,8 @@ func Load(getenv func(string) string) (Config, error) {
 	check("RONOTE_FETCH_ALLOW_PRIVATE", err)
 	ttl, err := parseTTL(withDefault(getenv("RONOTE_SOURCE_TTL"), defaultSourceTTL))
 	check("RONOTE_SOURCE_TTL", err)
+	devUser := strings.TrimSpace(getenv("RONOTE_DEV_USER_EMAIL"))
+	check("RONOTE_DEV_USER_EMAIL", validateDevUser(devUser, env))
 
 	if len(errs) > 0 {
 		return Config{}, fmt.Errorf("invalid config:\n%w", errors.Join(errs...))
@@ -84,7 +90,22 @@ func Load(getenv func(string) string) (Config, error) {
 		DatabaseURL:               dbURL,
 		FetchAllowPrivateNetworks: allowPrivate,
 		SourceTTL:                 ttl,
+		DevUserEmail:              devUser,
 	}, nil
+}
+
+// validateDevUser allows a dev identity only in dev and test: anywhere else
+// it would let anyone act as that user.
+func validateDevUser(email string, env Env) error {
+	switch {
+	case email == "":
+		return nil
+	case env != EnvDev && env != EnvTest:
+		return errors.New("may only be set when RONOTE_ENV is dev or test")
+	case strings.Count(email, "@") != 1 || strings.ContainsAny(email, " \t") || strings.HasPrefix(email, "@") || strings.HasSuffix(email, "@"):
+		return fmt.Errorf("%q is not an email address", email)
+	}
+	return nil
 }
 
 // Logger returns the service logger writing to w: text in dev, JSON

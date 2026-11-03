@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // readyTimeout bounds the database ping behind /readyz.
@@ -16,13 +18,27 @@ type Pinger interface {
 	Ping(ctx context.Context) error
 }
 
-// New returns the API handler. Requests and panics are logged through logger;
-// /readyz pings db.
-func New(logger *slog.Logger, db Pinger) http.Handler {
+// Options are what the API handler serves with.
+type Options struct {
+	// Logger logs requests and panics.
+	Logger *slog.Logger
+	// DB answers /readyz.
+	DB Pinger
+	// Backend serves /api/v1.
+	Backend Backend
+	// DevUser is the user every /api/v1 request acts as until real sign-in
+	// exists; uuid.Nil answers 401. Config allows one in dev and test only.
+	DevUser uuid.UUID
+}
+
+// New returns the API handler: /healthz, /readyz and the routes of
+// api/openapi.yaml under /api/v1.
+func New(o Options) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", healthz)
-	mux.HandleFunc("GET /readyz", readyz(logger, db))
-	return withMiddleware(logger, router{mux: mux})
+	mux.HandleFunc("GET /readyz", readyz(o.Logger, o.DB))
+	mux.Handle("/api/v1/", requireUser(o.DevUser, router{mux: apiRoutes(o.Logger, o.Backend)}))
+	return withMiddleware(o.Logger, router{mux: mux})
 }
 
 // router answers with the error envelope when the mux has no route for a

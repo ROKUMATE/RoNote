@@ -32,6 +32,7 @@ Site crawling, AI summaries, chat, handwritten OCR, pseudocode conversion. Do no
 | `deploy/` | deployment config |
 | `scripts/` | repo scripts |
 | `internal/ir/` | the document model every importer produces (docs/adr/0004-ir-and-links.md) |
+| `internal/canon/` | canonical URLs: what sources and imports are keyed by, and the same-host rule for a page's canonical link |
 | `internal/fetch/` | the only way to fetch a user-supplied URL: SSRF guard, limits, robots.txt, rate limit |
 | `internal/extract/` | HTML to IR extractor: generic rules, refined by a framework adapter when one matches |
 | `internal/extract/adapter/` | docs-framework adapters as configuration: detection, content root, chrome, callouts, tabs and code rules |

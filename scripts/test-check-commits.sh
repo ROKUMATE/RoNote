@@ -24,15 +24,20 @@ commit() {
   git_ rev-parse --short HEAD
 }
 
-# expect NAME STATUS RANGE TEXT...: check-commits.sh on RANGE exits with
-# STATUS and prints every TEXT.
+# expect NAME STATUS RANGE TEXT...: $script on RANGE (no argument when RANGE
+# is empty), with TMPDIR=$tmp, exits with STATUS and prints every TEXT. A
+# passing run writes nothing to stderr; a failing one writes nothing to stdout,
+# so its whole report stays in order on stderr.
+script=$scripts/check-commits.sh
+tmp=${TMPDIR:-/tmp}
 expect() {
   name=$1
   want=$2
   range=$3
   shift 3
-  out=$(cd "$repo" && sh "$scripts/check-commits.sh" "$range" 2>&1)
+  (cd "$repo" && TMPDIR=$tmp sh "$script" ${range:+"$range"}) >"$work/out" 2>"$work/err"
   status=$?
+  out=$(cat "$work/out" "$work/err")
   missing=
   for text in "$@"; do
     case $out in
@@ -40,22 +45,44 @@ expect() {
       *) missing="$missing [$text]" ;;
     esac
   done
-  if [ "$status" -eq "$want" ] && [ -z "$missing" ]; then
+  if [ "$status" -eq 0 ]; then stray=err; else stray=out; fi
+  if [ "$status" -eq "$want" ] && [ -z "$missing" ] && [ ! -s "$work/$stray" ]; then
     passed=$((passed + 1))
     printf 'ok    %s\n' "$name"
   else
     failed=$((failed + 1))
-    printf 'FAIL  %s (exit %s, want %s; missing%s)\n' "$name" "$status" "$want" "${missing:- nothing}"
-    printf '%s\n' "$out" | sed 's/^/      /'
+    printf 'FAIL  %s (exit %s, want %s; missing%s; std%s %s)\n' "$name" "$status" "$want" \
+      "${missing:- nothing}" "$stray" "$([ -s "$work/$stray" ] && echo 'not empty' || echo 'empty')"
+    sed 's/^/      out: /' "$work/out"
+    sed 's/^/      err: /' "$work/err"
   fi
 }
+
+expect 'usage' 2 '' 'usage: check-commits.sh RANGE'
 
 root=$(commit 'Chore: Start')
 commit 'Feat: Add page importer' >/dev/null
 commit 'Fix: Retry slow fetches' >/dev/null
 expect 'all good' 0 "$root..HEAD" 'ok (2 commits'
+expect 'unknown range' 2 'nope..HEAD'
 
 good=$(git_ rev-parse --short HEAD)
+
+# A copy of the script next to a hook that crashes, then next to none.
+layout=$work/layout
+mkdir -p "$layout/scripts" "$layout/.githooks"
+cp "$scripts/check-commits.sh" "$layout/scripts/"
+printf '#!/bin/sh\nexit 3\n' >"$layout/.githooks/commit-msg"
+chmod +x "$layout/.githooks/commit-msg"
+script=$layout/scripts/check-commits.sh
+expect 'hook crashes' 2 "$root..HEAD" 'exited 3'
+rm "$layout/.githooks/commit-msg"
+expect 'hook missing' 2 "$root..HEAD" 'exited 127'
+script=$scripts/check-commits.sh
+
+tmp=$work/missing
+expect 'temp dir unusable' 2 "$root..HEAD"
+tmp=${TMPDIR:-/tmp}
 body=$(commit 'Feat: Add notes
 
 They live in the right margin.')

@@ -159,10 +159,12 @@ func (s apiServer) ListDocuments(ctx context.Context, req gen.ListDocumentsReque
 	return out, nil
 }
 
+// importJSON and summaryJSON give times in UTC: the driver returns them in the
+// process's local zone, and the API always answers in UTC.
 func importJSON(imp store.Import) gen.Import {
 	out := gen.Import{
 		ID: imp.ID, RequestedURL: imp.RequestedURL, CanonicalURL: imp.CanonicalURL,
-		Status: gen.ImportStatus(imp.Status), CreatedAt: imp.CreatedAt, UpdatedAt: imp.UpdatedAt,
+		Status: gen.ImportStatus(imp.Status), CreatedAt: imp.CreatedAt.UTC(), UpdatedAt: imp.UpdatedAt.UTC(),
 	}
 	if imp.ErrorCode != "" {
 		out.ErrorCode = &imp.ErrorCode
@@ -175,6 +177,6 @@ func importJSON(imp store.Import) gen.Import {
 
 func summaryJSON(d store.DocumentSummary) gen.DocumentSummary {
 	return gen.DocumentSummary{
-		ID: d.ID, Title: d.Title, SourceURL: d.SourceURL, Version: d.Version, CreatedAt: d.CreatedAt, UpdatedAt: d.UpdatedAt,
+		ID: d.ID, Title: d.Title, SourceURL: d.SourceURL, Version: d.Version, CreatedAt: d.CreatedAt.UTC(), UpdatedAt: d.UpdatedAt.UTC(),
 	}
 }

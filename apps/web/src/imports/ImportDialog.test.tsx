@@ -167,7 +167,8 @@ test("a page already in the library opens its document with a notice", async () 
 
   await waitFor(() => expect(router.state.location.pathname).toBe("/doc/doc-1"));
   expect(dialog).toHaveProperty("open", false);
-  expect((await screen.findByRole("status")).textContent).toContain("Already in your library");
+  const notice = await screen.findByText("Already in your library");
+  expect(notice.getAttribute("role")).toBe("status");
   expect(subscriptions).toEqual([]);
 });
 

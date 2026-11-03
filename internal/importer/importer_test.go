@@ -13,6 +13,7 @@ import (
 	"github.com/riverqueue/river/rivertype"
 
 	"github.com/rokumate/ronote/internal/fetch"
+	"github.com/rokumate/ronote/internal/httpapi/gen"
 	"github.com/rokumate/ronote/internal/store"
 )
 
@@ -48,7 +49,13 @@ func TestClassify(t *testing.T) {
 			if got := classify(tt.err); got != tt.want {
 				t.Errorf("classify(%v) = %+v, want %+v", tt.err, got, tt.want)
 			}
+			if !gen.ImportErrorCode(tt.want.code).Valid() {
+				t.Errorf("code %q is not in the spec's ImportErrorCode enum", tt.want.code)
+			}
 		})
+	}
+	if !gen.ImportErrorCode(codeInternal).Valid() {
+		t.Errorf("code %q is not in the spec's ImportErrorCode enum", codeInternal)
 	}
 }
 

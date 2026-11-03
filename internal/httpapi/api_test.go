@@ -13,6 +13,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/rokumate/ronote/internal/httpapi/gen"
 	"github.com/rokumate/ronote/internal/importer"
 	"github.com/rokumate/ronote/internal/ir"
 	"github.com/rokumate/ronote/internal/store"
@@ -139,7 +140,7 @@ func TestCreateImport(t *testing.T) {
 		result     importer.Requested
 		err        error
 		wantStatus int
-		wantCode   string
+		wantCode   gen.ErrorCode
 	}{
 		{name: "queued", body: `{"url":"https://go.dev/doc#x"}`, result: importer.Requested{Import: queued}, wantStatus: http.StatusAccepted},
 		{name: "already imported", body: `{"url":"https://go.dev/doc"}`, result: importer.Requested{Import: done, Existing: true}, wantStatus: http.StatusOK},
@@ -269,7 +270,7 @@ func TestListDocuments(t *testing.T) {
 	if rec := apiRequest(t, h, http.MethodGet, "/api/v1/documents", ""); len(decodeJSON[list](t, rec).Documents) != 5 {
 		t.Errorf("default page = %s, want all 5 (limit 20)", rec.Body)
 	}
-	for target, code := range map[string]string{
+	for target, code := range map[string]gen.ErrorCode{
 		"/api/v1/documents?limit=0":         "invalid_parameter",
 		"/api/v1/documents?limit=101":       "invalid_parameter",
 		"/api/v1/documents?limit=ten":       "invalid_parameter",

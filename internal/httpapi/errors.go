@@ -9,7 +9,7 @@ import (
 
 // writeError writes the error envelope of api/openapi.yaml. Every error
 // response goes through it or apiError.
-func writeError(w http.ResponseWriter, r *http.Request, status int, code, message string) {
+func writeError(w http.ResponseWriter, r *http.Request, status int, code gen.ErrorCode, message string) {
 	writeJSON(w, status, gen.Error{Error: gen.ErrorBody{
 		Code:      code,
 		Message:   message,

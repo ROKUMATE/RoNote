@@ -72,7 +72,7 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[Args]) (err error) {
 	defer func() {
 		// Whatever went wrong on the last attempt, the import must end.
 		if err != nil && job.Attempt >= job.MaxAttempts {
-			w.fail(context.WithoutCancel(ctx), owner, id, "internal_error")
+			w.fail(context.WithoutCancel(ctx), owner, id, codeInternal)
 		}
 	}()
 

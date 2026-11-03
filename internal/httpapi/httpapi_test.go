@@ -32,7 +32,7 @@ func TestRoutes(t *testing.T) {
 		target     string
 		wantStatus int
 		wantBody   string
-		wantCode   string
+		wantCode   gen.ErrorCode
 		wantAllow  string
 	}{
 		{name: "healthz", method: http.MethodGet, target: "/healthz", wantStatus: http.StatusOK, wantBody: `{"status":"ok"}` + "\n"},
@@ -83,7 +83,7 @@ func TestReadyz(t *testing.T) {
 		name        string
 		db          pingFunc
 		wantStatus  int
-		wantCode    string
+		wantCode    gen.ErrorCode
 		wantElapsed time.Duration
 	}{
 		{name: "database up", db: dbUp, wantStatus: http.StatusOK},

@@ -206,11 +206,27 @@ components:
       required: [code, message, request_id]
       properties:
         code:
-          type: string
+          $ref: "#/components/schemas/ErrorCode"
         message:
           type: string
         request_id:
           type: string
+    ErrorCode:
+      type: string
+      description: >-
+        Why a request failed. Each response lists the codes it can carry.
+      enum:
+        - invalid_request
+        - invalid_url
+        - unsupported_scheme
+        - url_too_long
+        - ip_literal_host
+        - invalid_parameter
+        - invalid_cursor
+        - not_found
+        - method_not_allowed
+        - unauthenticated
+        - internal_error
     CreateImportRequest:
       type: object
       required: [url]
@@ -221,6 +237,26 @@ components:
     ImportStatus:
       type: string
       enum: [queued, fetching, extracting, done, failed]
+    ImportErrorCode:
+      type: string
+      description: >-
+        Why an import failed; set when its status is failed.
+      enum:
+        - invalid_url
+        - blocked_address
+        - disallowed_by_robots
+        - too_large
+        - unsupported_type
+        - too_many_redirects
+        - not_found
+        - http_error
+        - extract_failed
+        - timeout
+        - rate_limited
+        - upstream_error
+        - robots_unavailable
+        - network_error
+        - internal_error
     Import:
       type: object
       required: [id, requested_url, canonical_url, status, created_at, updated_at]
@@ -235,13 +271,7 @@ components:
         status:
           $ref: "#/components/schemas/ImportStatus"
         error_code:
-          type: string
-          description: >-
-            Set when status is failed: invalid_url, blocked_address,
-            disallowed_by_robots, too_large, unsupported_type,
-            too_many_redirects, not_found, http_error, extract_failed,
-            timeout, rate_limited, upstream_error, robots_unavailable,
-            network_error or internal_error.
+          $ref: "#/components/schemas/ImportErrorCode"
         document_id:
           type: string
           format: uuid
@@ -273,7 +303,7 @@ components:
         status:
           $ref: "#/components/schemas/ImportStatus"
         error_code:
-          type: string
+          $ref: "#/components/schemas/ImportErrorCode"
         document_id:
           type: string
           format: uuid

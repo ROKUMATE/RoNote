@@ -30,12 +30,35 @@ type User = sqlcdb.User
 
 // Store runs queries against the database.
 type Store struct {
-	q *sqlcdb.Queries
+	pool *pgxpool.Pool // nil for a Store bound to a transaction
+	q    *sqlcdb.Queries
 }
 
 // New returns a Store that uses pool.
 func New(pool *pgxpool.Pool) *Store {
-	return &Store{q: sqlcdb.New(pool)}
+	return &Store{pool: pool, q: sqlcdb.New(pool)}
+}
+
+// InTx runs fn in one transaction and commits it when fn returns nil. fn
+// gets a Store bound to the transaction, and the transaction itself so that
+// a job queue can commit its own writes with the same transaction. fn's
+// error is returned unchanged.
+func (s *Store) InTx(ctx context.Context, fn func(tx *Store, raw pgx.Tx) error) error {
+	if s.pool == nil {
+		return errors.New("store: InTx called inside a transaction")
+	}
+	var fnErr error
+	err := pgx.BeginFunc(ctx, s.pool, func(tx pgx.Tx) error {
+		fnErr = fn(&Store{q: s.q.WithTx(tx)}, tx)
+		return fnErr
+	})
+	if fnErr != nil {
+		return fnErr
+	}
+	if err != nil {
+		return mapErr("transaction", err)
+	}
+	return nil
 }
 
 // CreateUser inserts a user. It returns ErrConflict when another user has

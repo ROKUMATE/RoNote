@@ -1,8 +1,10 @@
 package store
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/jackc/pgx/v5"
@@ -53,5 +55,29 @@ func TestMapErr(t *testing.T) {
 				t.Errorf("mapErr() = %v exposes a pgx error", got)
 			}
 		})
+	}
+}
+
+func TestGzip(t *testing.T) {
+	t.Parallel()
+	body := []byte(strings.Repeat("<p>Hello, ünïcode</p>\n", 1000))
+	compressed, err := gzipBytes(body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(compressed) >= len(body) {
+		t.Errorf("compressed %d bytes to %d", len(body), len(compressed))
+	}
+	back, err := gunzip(compressed)
+	if err != nil || !bytes.Equal(back, body) {
+		t.Fatalf("gunzip() = %d bytes, %v; want the original %d bytes", len(back), err, len(body))
+	}
+
+	tooBig, err := gzipBytes(make([]byte, maxBody+1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := gunzip(tooBig); err == nil {
+		t.Error("gunzip() of a body over 5 MiB succeeded")
 	}
 }

@@ -10,6 +10,15 @@ import (
 	"github.com/google/uuid"
 )
 
+type SourceSnapshot struct {
+	ID          uuid.UUID
+	SourceID    uuid.UUID
+	BodySHA256  string
+	BodyGzip    []byte
+	ContentType string
+	FetchedAt   time.Time
+}
+
 type User struct {
 	ID          uuid.UUID
 	Email       string

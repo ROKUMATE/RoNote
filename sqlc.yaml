@@ -10,6 +10,15 @@ sql:
         sql_package: pgx/v5
         # The schema includes River's tables, which no query uses.
         omit_unused_structs: true
+        rename:
+          canonical_url: CanonicalURL
+          final_url: FinalURL
+          requested_url: RequestedURL
+          url: URL
+          etag: ETag
+          body_sha256: BodySHA256
+          ir: IR
+          ir_version: IRVersion
         overrides:
           - db_type: uuid
             go_type: github.com/google/uuid.UUID

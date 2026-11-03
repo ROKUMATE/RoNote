@@ -20,7 +20,7 @@ import (
 
 // All lists the adapters in detection order: within each detection phase,
 // the first adapter that matches wins.
-var All = []*Adapter{starlight, docusaurus}
+var All = []*Adapter{starlight, docusaurus, material}
 
 // Adapter describes one documentation framework. Selectors are CSS
 // selectors as cascadia parses them; one string may hold a comma-separated
@@ -31,7 +31,7 @@ type Adapter struct {
 
 	// Detection signals. Detect tries every adapter's Generators first, then
 	// every adapter's Signature, then every adapter's Hosts.
-	Generators []string // prefixes of <meta name="generator"> content, in any case
+	Generators []string // text a <meta name="generator"> contains, in any case
 	Signature  string   // matches only this framework's pages
 	Hosts      []string // page hosts, without a leading "www."
 
@@ -130,17 +130,18 @@ type CodePlan struct {
 }
 
 // Detect returns the adapter for a page, or nil. It tries every adapter's
-// generator prefixes, then every adapter's signature, then every adapter's
-// hosts, so a page's own generator tag outranks its structure, which
-// outranks where it is hosted. host is the page's host name.
+// generators, then every adapter's signature, then every adapter's hosts, so
+// a page's own generator tag outranks its structure, which outranks where it
+// is hosted. A generator matches when a generator tag contains it, as in
+// "mkdocs-1.6.1, mkdocs-material-9.6.14". host is the page's host name.
 func Detect(adapters []*Adapter, doc *html.Node, host string) *Adapter {
 	var generators []string
 	for _, meta := range cascadia.QueryAll(doc, metaGenerator) {
 		generators = append(generators, strings.ToLower(attr(meta, "content")))
 	}
 	for _, a := range adapters {
-		for _, prefix := range a.Generators {
-			if slices.ContainsFunc(generators, func(g string) bool { return strings.HasPrefix(g, strings.ToLower(prefix)) }) {
+		for _, name := range a.Generators {
+			if slices.ContainsFunc(generators, func(g string) bool { return strings.Contains(g, strings.ToLower(name)) }) {
 				return a
 			}
 		}

@@ -33,6 +33,7 @@ Site crawling, AI summaries, chat, handwritten OCR, pseudocode conversion. Do no
 | `scripts/` | repo scripts |
 | `internal/ir/` | the document model every importer produces (docs/adr/0004-ir-and-links.md) |
 | `internal/importer/` | the import pipeline: the River job that fetches, extracts and stores a document, and the service the API queues imports with |
+| `internal/events/` | import status changes from Postgres (LISTEN import_status, one connection per API process) to the API's event streams |
 | `internal/canon/` | canonical URLs: what sources and imports are keyed by, and the same-host rule for a page's canonical link |
 | `internal/fetch/` | the only way to fetch a user-supplied URL: SSRF guard, limits, robots.txt, rate limit |
 | `internal/extract/` | HTML to IR extractor: generic rules, refined by a framework adapter when one matches |

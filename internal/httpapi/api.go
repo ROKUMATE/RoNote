@@ -28,11 +28,14 @@ type Backend interface {
 	ListDocuments(ctx context.Context, owner uuid.UUID, after *store.DocumentCursor, limit int) ([]store.DocumentSummary, error)
 }
 
-// apiRoutes returns a mux with the generated routes of api/openapi.yaml.
-// Errors from parsing a request become the error envelope.
-func apiRoutes(logger *slog.Logger, backend Backend) *http.ServeMux {
+// apiRoutes returns a mux with the routes of api/openapi.yaml: the
+// generated ones, and the hand-written event stream. Errors from parsing a
+// request become the error envelope.
+func apiRoutes(o Options) *http.ServeMux {
+	logger := o.Logger
 	mux := http.NewServeMux()
-	strict := gen.NewStrictHandlerWithOptions(apiServer{backend: backend}, nil, gen.StrictHTTPServerOptions{
+	mux.Handle("GET /api/v1/imports/{id}/events", importEvents(o.Backend, o.Events, o.Done, heartbeat))
+	strict := gen.NewStrictHandlerWithOptions(apiServer{backend: o.Backend}, nil, gen.StrictHTTPServerOptions{
 		RequestErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, _ error) {
 			writeError(w, r, http.StatusBadRequest, "invalid_request", "the request body is not valid JSON for this operation")
 		},

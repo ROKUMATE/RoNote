@@ -17,6 +17,7 @@ import (
 
 	"github.com/rokumate/ronote/internal/config"
 	"github.com/rokumate/ronote/internal/db"
+	"github.com/rokumate/ronote/internal/events"
 	"github.com/rokumate/ronote/internal/httpapi"
 	"github.com/rokumate/ronote/internal/importer"
 	"github.com/rokumate/ronote/internal/store"
@@ -63,6 +64,15 @@ func run() error {
 		logger.Info("dev identity on: every /api/v1 request acts as this user", "email", u.Email)
 	}
 
+	// One connection listens for import status changes; event streams share it.
+	broker := events.NewBroker()
+	listening := make(chan struct{})
+	go func() {
+		defer close(listening)
+		broker.Listen(ctx, pool, logger)
+	}()
+	streamsDone := make(chan struct{})
+
 	var lc net.ListenConfig
 	ln, err := lc.Listen(ctx, "tcp", cfg.HTTPAddr)
 	if err != nil {
@@ -72,8 +82,12 @@ func run() error {
 		Logger:  logger,
 		DB:      pool,
 		Backend: backend{Store: st, Service: importer.NewService(st, queue)},
+		Events:  broker,
+		Done:    streamsDone,
 		DevUser: devUser,
 	}), logger)
+	// Shutdown waits for open connections; ending the event streams lets it.
+	srv.RegisterOnShutdown(func() { close(streamsDone) })
 
 	serveErr := make(chan error, 1)
 	go func() { serveErr <- srv.Serve(ln) }()
@@ -95,6 +109,7 @@ func run() error {
 	if err := <-serveErr; !errors.Is(err, http.ErrServerClosed) {
 		return fmt.Errorf("serve: %w", err)
 	}
+	<-listening
 	logger.Info("api stopped")
 	return nil
 }

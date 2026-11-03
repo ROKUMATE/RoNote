@@ -7,6 +7,8 @@ generate:
   strict-server: true
 output-options:
   name-normalizer: ToCamelCaseWithInitialisms
+  # Keep schemas only the hand-written event stream uses, such as ImportEvent.
+  skip-prune: true
   # The event stream is written by hand; the spec only documents it.
   exclude-operation-ids:
     - getImportEvents

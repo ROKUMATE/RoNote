@@ -149,6 +149,13 @@ type Import struct {
 	UpdatedAt    time.Time          `json:"updated_at"`
 }
 
+// ImportEvent defines model for ImportEvent.
+type ImportEvent struct {
+	DocumentID *openapi_types.UUID `json:"document_id,omitempty"`
+	ErrorCode  *string             `json:"error_code,omitempty"`
+	Status     ImportStatus        `json:"status"`
+}
+
 // ImportResponse defines model for ImportResponse.
 type ImportResponse struct {
 	Import Import `json:"import"`

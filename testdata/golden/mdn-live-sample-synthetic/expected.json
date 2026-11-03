@@ -1,0 +1,133 @@
+{
+  "ir_version": 1,
+  "title": "Greeting button",
+  "source": {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Greeting",
+    "final_url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Greeting",
+    "canonical_url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Greeting",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "13318352f9413cd8939f5df55ad436ca8b41c8cd19a4b622dc11003b741d4f37"
+  },
+  "extractor": {
+    "name": "mdn",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "96ff722c3431",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "greeting-button",
+      "content": [
+        {
+          "text": "Greeting button"
+        }
+      ]
+    },
+    {
+      "id": "73e0c6949b12",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This example wires a button to a "
+        },
+        {
+          "text": "click",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " handler."
+        }
+      ]
+    },
+    {
+      "id": "e3a37439a952",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "markup",
+      "content": [
+        {
+          "text": "Markup",
+          "link": {
+            "href": "#markup",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "d63323e56ed3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The page has one button and one output line:"
+        }
+      ]
+    },
+    {
+      "id": "9fc6c95c865f",
+      "kind": "code",
+      "lang": "html",
+      "text": "<button id=\"greet\">Greet</button>\n<p id=\"out\"></p>\n"
+    },
+    {
+      "id": "2668ba3091f2",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "style",
+      "content": [
+        {
+          "text": "Style",
+          "link": {
+            "href": "#style",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "c33626704106",
+      "kind": "code",
+      "lang": "css",
+      "text": "#out {\n  font: 1rem monospace;\n}\n"
+    },
+    {
+      "id": "5ffeb16930fb",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "script",
+      "content": [
+        {
+          "text": "Script",
+          "link": {
+            "href": "#script",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "0d03992835cd",
+      "kind": "code",
+      "lang": "js",
+      "text": "const out = document.getElementById(\"out\");\ndocument.getElementById(\"greet\").addEventListener(\"click\", () => {\n  out.textContent = \"Hello!\";\n});\n"
+    },
+    {
+      "id": "f30ea487742e",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "result",
+      "content": [
+        {
+          "text": "Result",
+          "link": {
+            "href": "#result",
+            "kind": "anchor"
+          }
+        }
+      ]
+    }
+  ]
+}

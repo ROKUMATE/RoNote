@@ -1,0 +1,195 @@
+{
+  "ir_version": 1,
+  "title": "Tally functions",
+  "source": {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Tally_functions",
+    "final_url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Tally_functions",
+    "canonical_url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Tally_functions",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "2e303ff7e99b7a92efe9a48b77e6f0c729e30e358d839aa70857801735f57a05"
+  },
+  "extractor": {
+    "name": "mdn",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "c04ae4700fdd",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "tally-functions",
+      "content": [
+        {
+          "text": "Tally functions"
+        }
+      ]
+    },
+    {
+      "id": "f36ab62cfa6b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A "
+        },
+        {
+          "text": "tally function",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " counts how often it was called."
+        }
+      ]
+    },
+    {
+      "id": "c9beb67dd12c",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "counting_with_a_closure",
+      "content": [
+        {
+          "text": "Counting with a closure",
+          "link": {
+            "href": "#counting_with_a_closure",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "7ccee36f98cf",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A function made inside another function keeps the variables of the outer one alive:"
+        }
+      ]
+    },
+    {
+      "id": "e645a8eade57",
+      "kind": "code",
+      "lang": "js",
+      "text": "function makeTally() {\n  let total = 0; // stays alive between calls\n  return () => ++total;\n}\n\nconst tally = makeTally();\ntally(); // 1\ntally(); // 2\n"
+    },
+    {
+      "id": "2f8476ac4be9",
+      "kind": "callout",
+      "variant": "note",
+      "children": [
+        {
+          "id": "119c2d0e2e9d",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Note:",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "text": " Each call to "
+            },
+            {
+              "text": "makeTally()",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " starts a new, separate "
+            },
+            {
+              "text": "total",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "8a1568edf6d0",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "closures_in_loops",
+      "content": [
+        {
+          "text": "Closures in loops",
+          "link": {
+            "href": "#closures_in_loops",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "10296cc553a1",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "With "
+        },
+        {
+          "text": "let",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", every pass of the loop gets its own binding:"
+        }
+      ]
+    },
+    {
+      "id": "d3b9ba544cda",
+      "kind": "code",
+      "lang": "js",
+      "text": "for (let step = 0; step < 3; step++) {\n  setTimeout(() => console.log(step), 10);\n}\n"
+    },
+    {
+      "id": "65741c856c77",
+      "kind": "callout",
+      "variant": "warning",
+      "children": [
+        {
+          "id": "ae9c9664967b",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Warning:",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "text": " With "
+            },
+            {
+              "text": "var",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", all three callbacks print "
+            },
+            {
+              "text": "3",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": "."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

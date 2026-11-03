@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en-US" data-theme="light dark"><head><meta charset="utf-8"><title>Tally functions - JavaScript | MDN</title><link rel="canonical" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Tally_functions"><meta property="og:site_name" content="MDN Web Docs"></head>
+<body class="page-layout"><header class="page-layout__header"><nav class="navigation" aria-label="Main"><a href="/en-US/">MDN Web Docs</a></nav></header>
+<div class="page-layout__main"><div class="layout__2-sidebars-inline reference-layout"><nav class="layout__left-sidebar" aria-label="Sidebar"><ol><li><a href="/en-US/docs/Web/JavaScript/Guide">JavaScript Guide</a></li></ol></nav>
+<main id="content" class="layout__content">
+<div class="layout__header reference-layout__header">
+<mdn-survey></mdn-survey>
+<h1>Tally functions</h1>
+<section class="content-section"><p>A <strong>tally function</strong> counts how often it was called.</p></section>
+</div>
+<aside class="layout__right-sidebar reference-layout__toc"><nav aria-label="In this article"><h2>In this article</h2><ul><li><a href="#first">First</a></li></ul></nav></aside>
+<div class="layout__body reference-layout__body">
+<section class="content-section" aria-labelledby="counting_with_a_closure"><h2 id="counting_with_a_closure"><a href="#counting_with_a_closure">Counting with a closure</a></h2><p>A function made inside another function keeps the variables of the outer one alive:</p><div class="code-example"><div class="example-header"><span class="language-name">js</span></div><pre class="brush: js notranslate"><code>function makeTally() {
+  let total = 0; // stays alive between calls
+  return () =&gt; ++total;
+}
+
+const tally = makeTally();
+tally(); // 1
+tally(); // 2
+</code></pre></div><div class="notecard note">
+<p><strong>Note:</strong>
+Each call to <code>makeTally()</code> starts a new, separate <code>total</code>.</p>
+</div></section><section class="content-section" aria-labelledby="closures_in_loops"><h2 id="closures_in_loops"><a href="#closures_in_loops">Closures in loops</a></h2><p>With <code>let</code>, every pass of the loop gets its own binding:</p><div class="code-example"><div class="example-header"><span class="language-name">js</span></div><pre class="brush: js notranslate"><code>for (let step = 0; step &lt; 3; step++) {
+  setTimeout(() =&gt; console.log(step), 10);
+}
+</code></pre></div><div class="notecard warning">
+<p><strong>Warning:</strong>
+With <code>var</code>, all three callbacks print <code>3</code>.</p>
+</div></section>
+<section class="content-section article-footer" aria-labelledby="feedback"><div class="article-footer__inner"><h2 id="feedback">Help improve MDN</h2><p><a href="/en-US/docs/MDN/Community/Getting_started">Learn how to contribute</a></p><p class="last-modified-date">This page was last modified on <time datetime="2026-10-04T00:00:00.000Z">Oct 4, 2026</time> by <a href="/en-US/docs/Web/JavaScript/Guide/Tally_functions/contributors.txt">MDN contributors</a>.</p><p><a href="https://github.com/mdn/content/blob/main/files/en-us/web/javascript/guide/tally_functions/index.md">View this page on GitHub</a> • <a href="https://github.com/mdn/content/issues/new">Report a problem with this content</a></p></div></section>
+</div>
+</main>
+</div></div>
+<footer class="page-layout__footer"><p>Site footer</p></footer></body></html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en-US" data-theme="light dark"><head><meta charset="utf-8"><title>Greeting button - JavaScript | MDN</title><link rel="canonical" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Greeting"><meta property="og:site_name" content="MDN Web Docs"></head>
+<body class="page-layout"><header class="page-layout__header"><nav class="navigation" aria-label="Main"><a href="/en-US/">MDN Web Docs</a></nav></header>
+<div class="page-layout__main"><div class="layout__2-sidebars-inline reference-layout"><nav class="layout__left-sidebar" aria-label="Sidebar"><ol><li><a href="/en-US/docs/Web/JavaScript/Guide">JavaScript Guide</a></li></ol></nav>
+<main id="content" class="layout__content">
+<div class="layout__header reference-layout__header">
+<mdn-survey></mdn-survey>
+<h1>Greeting button</h1>
+<section class="content-section"><p>This example wires a button to a <code>click</code> handler.</p></section>
+</div>
+<aside class="layout__right-sidebar reference-layout__toc"><nav aria-label="In this article"><h2>In this article</h2><ul><li><a href="#first">First</a></li></ul></nav></aside>
+<div class="layout__body reference-layout__body">
+<section class="content-section" aria-labelledby="markup"><h2 id="markup"><a href="#markup">Markup</a></h2><p>The page has one button and one output line:</p><div class="code-example"><div class="example-header"><span class="language-name">html</span></div><pre class="brush: html notranslate"><code>&lt;button id="greet"&gt;Greet&lt;/button&gt;
+&lt;p id="out"&gt;&lt;/p&gt;
+</code></pre></div></section><section class="content-section" aria-labelledby="style"><h2 id="style"><a href="#style">Style</a></h2><div class="code-example"><div class="example-header"><span class="language-name">css</span></div><pre class="brush: css notranslate"><code>#out {
+  font: 1rem monospace;
+}
+</code></pre></div></section><section class="content-section" aria-labelledby="script"><h2 id="script"><a href="#script">Script</a></h2><div class="code-example"><div class="example-header"><span class="language-name">js</span></div><pre class="brush: js notranslate"><code>const out = document.getElementById("out");
+document.getElementById("greet").addEventListener("click", () =&gt; {
+  out.textContent = "Hello!";
+});
+</code></pre></div><h3 id="result"><a href="#result">Result</a></h3><div class="code-example"><div class="example-header"></div><iframe class="sample-code-frame" title="Greeting sample" id="frame_greeting" width="100%" height="80" src="https://live.mdnplay.dev/en-US/docs/Web/JavaScript/Guide/Greeting/runner.html?id=greeting" loading="lazy"></iframe></div></section>
+<section class="content-section article-footer" aria-labelledby="feedback"><div class="article-footer__inner"><h2 id="feedback">Help improve MDN</h2><p><a href="/en-US/docs/MDN/Community/Getting_started">Learn how to contribute</a></p><p class="last-modified-date">This page was last modified on <time datetime="2026-10-04T00:00:00.000Z">Oct 4, 2026</time> by <a href="/en-US/docs/Web/JavaScript/Guide/Greeting/contributors.txt">MDN contributors</a>.</p><p><a href="https://github.com/mdn/content/blob/main/files/en-us/web/javascript/guide/greeting/index.md">View this page on GitHub</a> • <a href="https://github.com/mdn/content/issues/new">Report a problem with this content</a></p></div></section>
+</div>
+</main>
+</div></div>
+<footer class="page-layout__footer"><p>Site footer</p></footer></body></html>

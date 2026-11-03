@@ -141,7 +141,7 @@ type Import struct {
 	// DocumentID Set when status is done.
 	DocumentID *openapi_types.UUID `json:"document_id,omitempty"`
 
-	// ErrorCode Set when status is failed: invalid_url, blocked_address, disallowed_by_robots, too_large, unsupported_type, too_many_redirects, not_found, http_error, extract_failed, timeout, rate_limited, upstream_error, network_error or internal_error.
+	// ErrorCode Set when status is failed: invalid_url, blocked_address, disallowed_by_robots, too_large, unsupported_type, too_many_redirects, not_found, http_error, extract_failed, timeout, rate_limited, upstream_error, robots_unavailable, network_error or internal_error.
 	ErrorCode    *string            `json:"error_code,omitempty"`
 	ID           openapi_types.UUID `json:"id"`
 	RequestedURL string             `json:"requested_url"`

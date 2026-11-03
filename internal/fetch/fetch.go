@@ -37,9 +37,13 @@ var (
 	ErrBlockedAddress     = errors.New("blocked address")
 	ErrTooManyRedirects   = errors.New("too many redirects")
 	ErrDisallowedByRobots = errors.New("disallowed by robots.txt")
-	ErrTooLarge           = errors.New("response too large")
-	ErrUnsupportedType    = errors.New("unsupported content type")
-	ErrTimeout            = errors.New("fetch timed out")
+	// ErrRobotsUnavailable means robots.txt answered with a server error.
+	// RFC 9309 says to treat the site as disallowed until it can be read,
+	// so nothing is fetched; unlike a disallow, it is worth trying again.
+	ErrRobotsUnavailable = errors.New("robots.txt unavailable")
+	ErrTooLarge          = errors.New("response too large")
+	ErrUnsupportedType   = errors.New("unsupported content type")
+	ErrTimeout           = errors.New("fetch timed out")
 )
 
 // StatusError reports a response status that is neither 2xx nor a 304 the

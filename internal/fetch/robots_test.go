@@ -81,7 +81,7 @@ func TestFetchHonoursRobots(t *testing.T) {
 		{name: "disallowed path", robots: text("User-agent: *\nDisallow: /private/"), path: "/private/x", wantErr: ErrDisallowedByRobots},
 		{name: "missing robots.txt allows", robots: status(http.StatusNotFound), path: "/docs/"},
 		{name: "gone robots.txt allows", robots: status(http.StatusGone), path: "/docs/"},
-		{name: "server error disallows", robots: status(http.StatusServiceUnavailable), path: "/docs/", wantErr: ErrDisallowedByRobots},
+		{name: "server error blocks until robots.txt answers", robots: status(http.StatusServiceUnavailable), path: "/docs/", wantErr: ErrRobotsUnavailable},
 		{name: "forbidden robots.txt disallows", robots: status(http.StatusForbidden), path: "/docs/", wantErr: ErrDisallowedByRobots},
 	}
 

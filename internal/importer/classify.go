@@ -40,6 +40,8 @@ func classify(err error) failure {
 		return failure{code: "too_many_redirects", permanent: true}
 	case errors.Is(err, errExtract):
 		return failure{code: "extract_failed", permanent: true}
+	case errors.Is(err, fetch.ErrRobotsUnavailable):
+		return failure{code: "robots_unavailable"}
 	case errors.Is(err, fetch.ErrTimeout), errors.Is(err, context.DeadlineExceeded):
 		return failure{code: "timeout"}
 	case errors.As(err, &status):

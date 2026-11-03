@@ -1,10 +1,11 @@
-import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
-import { type ByRoleOptions, render, screen } from "@testing-library/react";
+import { type ByRoleOptions, screen } from "@testing-library/react";
 import { expect, test } from "vitest";
-import { createAppRouter } from "../router";
+import { json, stubApi } from "../test/api";
+import { renderApp } from "../test/render";
 
 test("renders its landmarks", async () => {
-  render(<RouterProvider router={createAppRouter(createMemoryHistory())} />);
+  stubApi({ "GET /documents": () => json({ documents: [] }) });
+  renderApp("/");
   await screen.findByRole("main");
 
   const landmarks: [string, ByRoleOptions?][] = [

@@ -3,6 +3,7 @@ import specText from "../../../../api/openapi.yaml?raw";
 
 interface SchemaNode {
   enum?: unknown[];
+  maxLength?: number;
   properties?: Record<string, SchemaNode>;
   items?: SchemaNode;
   allOf?: SchemaNode[];
@@ -10,6 +11,13 @@ interface SchemaNode {
 
 /** The schemas of api/openapi.yaml, read the way the generator reads them. */
 export const specSchemas: Record<string, SchemaNode> = parse(specText).components.schemas;
+
+/** The values of the named string enum in the spec. */
+export function specEnum(name: string): string[] {
+  const values = specSchemas[name]?.enum;
+  if (!values) throw new Error(`api/openapi.yaml has no enum schema ${name}`);
+  return values.map(String);
+}
 
 /** Every string enum in the spec, top-level or nested in a schema, by where it is. */
 export function allSpecEnums(): Map<string, string[]> {

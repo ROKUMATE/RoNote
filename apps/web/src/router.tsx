@@ -6,6 +6,7 @@ import {
   lazyRouteComponent,
   type RouterHistory,
 } from "@tanstack/react-router";
+import { DocumentPage } from "./pages/DocumentPage";
 import { Library } from "./pages/Library";
 import { NotFound } from "./pages/NotFound";
 import { AppShell } from "./shell/AppShell";
@@ -16,6 +17,12 @@ const libraryRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: Library,
+});
+
+const documentRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/doc/$id",
+  component: DocumentPage,
 });
 
 /**
@@ -32,6 +39,7 @@ function styleguideRoute() {
 
 const routeTree = rootRoute.addChildren([
   libraryRoute,
+  documentRoute,
   ...(import.meta.env.DEV ? [styleguideRoute()] : []),
 ]);
 
@@ -42,5 +50,9 @@ export function createAppRouter(history: RouterHistory = createBrowserHistory())
 declare module "@tanstack/react-router" {
   interface Register {
     router: ReturnType<typeof createAppRouter>;
+  }
+  interface HistoryState {
+    /** Set when an import found a page already in the library. */
+    notice?: "existing";
   }
 }

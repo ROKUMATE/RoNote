@@ -78,6 +78,7 @@ Create a directory when its first file needs it, not before.
 | `make build` (P0x) | build the Go binaries and the web bundle |
 | `make migrate-up` / `migrate-down` / `migrate-status` | apply, roll back the latest, or list goose migrations against `RONOTE_DATABASE_URL` |
 | `make migrate-new name=...` | create the next sequential SQL migration in `migrations/` |
+| `make river-migration first=N last=M` | add a migration holding River's own migrations N to M, from the River version go.mod pins. Goose owns all schema, River's tables included; after a River upgrade, `make test-integration` names the versions to add |
 | `make sqlc` | regenerate `internal/store/sqlcdb` from `migrations/` and `internal/store/queries/`; commit the result |
 | `make check-generated` | regenerate sqlc output and fail if it differs from what is committed |
 | `make check-go-version` | print the Go toolchain and fail unless it is go.mod's `toolchain` |
@@ -92,7 +93,7 @@ Targets marked (P0x) do not exist yet. The phase that adds a target removes its 
 
 Web targets, `make lint` and `make test` check that `node --version` matches `.nvmrc` first; with nvm, `nvm install && nvm use` picks it up.
 
-Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`: deadcode, goose, sqlc. golangci-lint is the exception: `make tools` installs the version pinned in the Makefile into `./bin`.
+Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with `go tool <name>`: deadcode, goose, sqlc, river. golangci-lint is the exception: `make tools` installs the version pinned in the Makefile into `./bin`.
 
 ## Commits
 

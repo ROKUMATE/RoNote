@@ -8,6 +8,8 @@ sql:
         package: sqlcdb
         out: internal/store/sqlcdb
         sql_package: pgx/v5
+        # The schema includes River's tables, which no query uses.
+        omit_unused_structs: true
         overrides:
           - db_type: uuid
             go_type: github.com/google/uuid.UUID

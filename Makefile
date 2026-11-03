@@ -105,6 +105,13 @@ migrate-new: ## Create a SQL migration: make migrate-new name=add_documents
 	@test -n "$(name)" || { echo "usage: make migrate-new name=add_documents" >&2; exit 1; }
 	go tool goose -dir migrations -s create $(name) sql
 
+river-migration: ## Add a migration with River's schema: make river-migration first=2 last=8
+	@test -n "$(first)" && test -n "$(last)" || { echo "usage: make river-migration first=2 last=8" >&2; exit 1; }
+	@file=$$(go tool goose -dir migrations -s create river_$(first)_to_$(last) sql 2>&1 | sed -n 's/.*Created new file: //p'); \
+		test -n "$$file" || { echo "make river-migration: goose did not create a file" >&2; exit 1; }; \
+		sh scripts/river-migration.sh $(first) $(last) >"$$file" || { rm -f "$$file"; exit 1; }; \
+		echo "make river-migration: wrote $$file"
+
 sqlc: ## Regenerate internal/store/sqlcdb from migrations and queries
 	go tool sqlc generate
 
@@ -161,7 +168,7 @@ web-e2e: ## Run web end-to-end tests (Playwright, Chromium)
 	$(WEB) e2e
 
 .PHONY: help setup hooks-test check-commits tools check test test-go test-web run-api extract lint lint-go lint-web fmt
-.PHONY: dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new sqlc
+.PHONY: dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: check-generated check-go-version ci-cache-keys
 .PHONY: test-integration test-live test-clean web-install web-deps web-browsers check-node-version
 .PHONY: web-dev web-build web-e2e

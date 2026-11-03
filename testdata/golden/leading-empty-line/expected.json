@@ -9,7 +9,7 @@
   },
   "extractor": {
     "name": "generic",
-    "version": "1"
+    "version": "2"
   },
   "blocks": [
     {
@@ -24,17 +24,17 @@
       ]
     },
     {
-      "id": "ffce6331eb1c",
+      "id": "bfe8c8eadcb2",
       "kind": "code",
       "text": "one newline dropped"
     },
     {
-      "id": "1d1af3f5c553",
+      "id": "dc4b80ac1132",
       "kind": "code",
       "text": "\none of two newlines dropped"
     },
     {
-      "id": "81533383c22d",
+      "id": "e28e92e28a88",
       "kind": "code",
       "text": "\nkept, because it follows code, not pre"
     },

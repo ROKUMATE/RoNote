@@ -47,6 +47,11 @@ func TestBlockText(t *testing.T) {
 			want:  "```go\nfunc f() {\n\treturn  \n}\n```",
 		},
 		{
+			name:  "code with a title",
+			block: ir.Block{Kind: ir.KindCode, Lang: "go", Title: "main.go", Text: "package main\n"},
+			want:  "```go title=\"main.go\"\npackage main\n```",
+		},
+		{
 			name:  "nested lists",
 			block: ir.Block{Kind: ir.KindList, Ordered: true, Items: [][]ir.Block{{para("One")}, {para("Two"), {Kind: ir.KindList, Items: [][]ir.Block{{para("Inner")}}}}}},
 			want:  "1. One\n2. Two\n   - Inner",

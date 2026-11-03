@@ -10,7 +10,7 @@
   },
   "extractor": {
     "name": "generic",
-    "version": "1"
+    "version": "2"
   },
   "blocks": [
     {
@@ -89,7 +89,7 @@
       ]
     },
     {
-      "id": "b5e7c7771782",
+      "id": "56a498047661",
       "kind": "code",
       "lang": "python3",
       "text": ">>> x = int(input(\"Please enter an integer: \"))\nPlease enter an integer: 42\n>>> if x < 0:\n...     x = 0\n...     print('Negative changed to zero')\n... elif x == 0:\n...     print('Zero')\n... elif x == 1:\n...     print('Single')\n... else:\n...     print('More')\n...\nMore\n"
@@ -263,7 +263,7 @@
       ]
     },
     {
-      "id": "1488cc8b5c40",
+      "id": "fdcd449f8cdb",
       "kind": "code",
       "lang": "python3",
       "text": ">>> # Measure some strings:\n>>> words = ['cat', 'window', 'defenestrate']\n>>> for w in words:\n...     print(w, len(w))\n...\ncat 3\nwindow 6\ndefenestrate 12\n"
@@ -278,7 +278,7 @@
       ]
     },
     {
-      "id": "b9d09d4d38e3",
+      "id": "d5052a25f8ff",
       "kind": "code",
       "lang": "python3",
       "text": "# Create a sample collection\nusers = {'Hans': 'active', 'Éléonore': 'inactive', '景太郎': 'active'}\n\n# Strategy:  Iterate over a copy\nfor user, status in users.copy().items():\n    if status == 'inactive':\n        del users[user]\n\n# Strategy:  Create a new collection\nactive_users = {}\nfor user, status in users.items():\n    if status == 'active':\n        active_users[user] = status\n"

@@ -9,7 +9,7 @@
   },
   "extractor": {
     "name": "generic",
-    "version": "1"
+    "version": "2"
   },
   "blocks": [
     {
@@ -24,7 +24,7 @@
       ]
     },
     {
-      "id": "70ee657103f1",
+      "id": "84ae99fc9a98",
       "kind": "list",
       "ordered": true,
       "items": [
@@ -39,7 +39,7 @@
             ]
           },
           {
-            "id": "ebfafc14928d",
+            "id": "2ddbf3ee5bcd",
             "kind": "list",
             "items": [
               [
@@ -64,7 +64,7 @@
                   ]
                 },
                 {
-                  "id": "e40969a3c924",
+                  "id": "55bf153fc0c0",
                   "kind": "list",
                   "ordered": true,
                   "items": [
@@ -90,7 +90,7 @@
                         ]
                       },
                       {
-                        "id": "9c382dd4d90d",
+                        "id": "752d539b8d7b",
                         "kind": "code",
                         "lang": "shell",
                         "text": "tar -C /usr/local -xzf go.tar.gz\n"

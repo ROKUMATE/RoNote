@@ -2,6 +2,7 @@ package extract_test
 
 import (
 	"bytes"
+	"slices"
 	"strings"
 	"testing"
 
@@ -114,17 +115,30 @@ func contentRoot(input []byte) tokenRoot {
 //     skipped element, a hidden or aria-hidden=true element, an element that
 //     only holds inline content, or, when the root is <body>, a header or
 //     footer;
-//   - the text is every text token inside the <pre>, decoded, with <br> as
-//     "\n" and one "\n" dropped when it is the very next thing after the
-//     <pre> start tag;
+//   - inside a code frame (<figure class="frame">) whose copy button carries
+//     the clipboard text in data-code, the text is that attribute with each
+//     U+007F as "\n";
+//   - otherwise the text is every text token inside the <pre>, decoded, with
+//     <br> as "\n" and one "\n" dropped when it is the very next thing after
+//     the <pre> start tag, leaving out what is inside an element styled
+//     user-select: none or with class linenos;
 //   - a <pre> with no text gives no code block.
 func codeByTokens(input []byte) []string {
 	type element struct {
 		tag                      string
 		root, excluded, inlineOK bool
+		notText                  bool // inside a <pre>, drawn beside the code
+		frame                    bool
+	}
+	// frame is the innermost open code frame: the index in codes of its
+	// <pre>, and its copy payload.
+	type frame struct {
+		depth, code int
+		payload     *string
 	}
 	root := contentRoot(input)
 	var stack []element
+	var frames []frame
 	var codes []string
 	var code *strings.Builder
 	codeDepth := -1
@@ -141,11 +155,23 @@ func codeByTokens(input []byte) []string {
 		}
 		return false
 	}
+	// finish records the open <pre>, even when empty: a frame's payload may
+	// still replace it. Empty texts are dropped at the end.
 	finish := func() {
-		if text := code.String(); text != "" {
-			codes = append(codes, text)
+		codes = append(codes, code.String())
+		if len(frames) > 0 {
+			frames[len(frames)-1].code = len(codes) - 1
 		}
 		code, codeDepth = nil, -1
+	}
+	result := func() []string {
+		var out []string
+		for _, c := range codes {
+			if c != "" {
+				out = append(out, c)
+			}
+		}
+		return out
 	}
 
 	z := html.NewTokenizer(bytes.NewReader(input))
@@ -158,9 +184,9 @@ func codeByTokens(input []byte) []string {
 			if code != nil {
 				finish()
 			}
-			return codes
+			return result()
 		case html.TextToken:
-			if code != nil {
+			if code != nil && !stack[len(stack)-1].notText {
 				text := string(z.Text())
 				if justOpened {
 					text = strings.TrimPrefix(text, "\n")
@@ -171,17 +197,21 @@ func codeByTokens(input []byte) []string {
 			tag, attrs := tagAndAttrs(z)
 			isRoot := ordinal == root.ordinal
 			ordinal++
-			if code != nil && tag == "br" {
+			var parent element
+			if len(stack) > 0 {
+				parent = stack[len(stack)-1]
+			}
+			if payload, ok := attrs["data-code"]; ok && len(frames) > 0 {
+				frames[len(frames)-1].payload = &payload
+			}
+			if code != nil && tag == "br" && !parent.notText {
 				code.WriteString("\n")
 			}
 			if voidElements[tag] {
 				continue
 			}
-			var parent element
-			if len(stack) > 0 {
-				parent = stack[len(stack)-1]
-			}
 			_, hidden := attrs["hidden"]
+			style := strings.ToLower(strings.Join(strings.Fields(attrs["style"]), ""))
 			e := element{
 				tag:  tag,
 				root: isRoot,
@@ -189,8 +219,14 @@ func codeByTokens(input []byte) []string {
 					strings.EqualFold(attrs["aria-hidden"], "true") ||
 					(root.fallback && (tag == "header" || tag == "footer")),
 				inlineOK: parent.inlineOK || tokenInlineOnly[tag],
+				notText: code != nil && (parent.notText || strings.Contains(style, "user-select:none") ||
+					slices.Contains(strings.Fields(attrs["class"]), "linenos")),
+				frame: tag == "figure" && slices.Contains(strings.Fields(attrs["class"]), "frame"),
 			}
 			stack = append(stack, e)
+			if e.frame {
+				frames = append(frames, frame{depth: len(stack) - 1, code: -1})
+			}
 			if tag == "pre" && code == nil && inRoot() && !e.excluded && !e.inlineOK {
 				code = &strings.Builder{}
 				codeDepth = len(stack) - 1
@@ -204,6 +240,13 @@ func codeByTokens(input []byte) []string {
 				}
 				if code != nil && i <= codeDepth {
 					finish()
+				}
+				for len(frames) > 0 && frames[len(frames)-1].depth >= i {
+					f := frames[len(frames)-1]
+					if f.payload != nil && f.code >= 0 {
+						codes[f.code] = strings.ReplaceAll(*f.payload, "\x7f", "\n")
+					}
+					frames = frames[:len(frames)-1]
 				}
 				stack = stack[:i]
 				break

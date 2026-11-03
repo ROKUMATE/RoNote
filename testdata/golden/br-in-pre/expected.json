@@ -9,7 +9,7 @@
   },
   "extractor": {
     "name": "generic",
-    "version": "1"
+    "version": "2"
   },
   "blocks": [
     {
@@ -24,12 +24,12 @@
       ]
     },
     {
-      "id": "d03c0dfd2056",
+      "id": "6153fe08d631",
       "kind": "code",
       "text": "first\nsecond\nthird\n\nfourth"
     },
     {
-      "id": "4c55d388ded0",
+      "id": "2ca1c5661255",
       "kind": "code",
       "text": "// one\nreturn x\n"
     }

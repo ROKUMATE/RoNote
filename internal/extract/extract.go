@@ -18,7 +18,7 @@ import (
 
 const (
 	extractorName    = "generic"
-	extractorVersion = "1"
+	extractorVersion = "2"
 )
 
 // Elements dropped wherever they appear in the content.
@@ -48,9 +48,12 @@ var removedTags = map[atom.Atom]bool{
 // gives a document with no blocks and a parse_failed warning; Extract only
 // fails for a bad src or a read error.
 //
-// A code block's text is the exact text content of its <pre>. Two changes
-// come from HTML parsing itself: the parser drops one newline right after
-// <pre>, and it turns CR LF and lone CR into LF.
+// A code block's text is what the page's copy button puts on the clipboard
+// when the page carries that text (Expressive Code's data-code), else the
+// exact text content of its <pre> without the parts that are never text, such
+// as line numbers and prompts drawn apart from the code. Two changes come
+// from HTML parsing itself: the parser drops one newline right after <pre>,
+// and it turns CR LF and lone CR into LF.
 func Extract(r io.Reader, src ir.Source) (*ir.Doc, error) {
 	raw, err := io.ReadAll(r)
 	if err != nil {

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 
 	"github.com/rokumate/ronote/internal/ir"
@@ -34,7 +35,11 @@ func blockText(b ir.Block) string {
 	case ir.KindParagraph:
 		return inline(b.Content)
 	case ir.KindCode:
-		return "```" + b.Lang + "\n" + strings.TrimSuffix(b.Text, "\n") + "\n```"
+		fence := "```" + b.Lang
+		if b.Title != "" {
+			fence += " title=" + strconv.Quote(b.Title)
+		}
+		return fence + "\n" + strings.TrimSuffix(b.Text, "\n") + "\n```"
 	case ir.KindList:
 		var items []string
 		for i, item := range b.Items {

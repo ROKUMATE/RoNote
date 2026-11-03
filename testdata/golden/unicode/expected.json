@@ -9,7 +9,7 @@
   },
   "extractor": {
     "name": "generic",
-    "version": "1"
+    "version": "2"
   },
   "blocks": [
     {
@@ -42,7 +42,7 @@
       ]
     },
     {
-      "id": "ba198bc90084",
+      "id": "df28f520dc79",
       "kind": "code",
       "lang": "python",
       "text": "# -*- coding: utf-8 -*-\ngreeting = \"こんにちは\"  # 挨拶\nemoji = \"👩‍💻🚀\"\nname = \"Zoë Ångström\"\narabic = \"مرحبا\"\n"

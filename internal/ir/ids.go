@@ -75,7 +75,7 @@ func blockText(b *Block) string {
 	case KindHeading, KindParagraph:
 		return normalize(inlineText(b.Content))
 	case KindCode:
-		return b.Lang + "\n" + b.Text
+		return b.Lang + "\n" + normalize(b.Title) + "\n" + b.Text
 	case KindList:
 		var parts []string
 		for _, item := range b.Items {

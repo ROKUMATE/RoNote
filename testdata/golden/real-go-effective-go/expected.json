@@ -10,7 +10,7 @@
   },
   "extractor": {
     "name": "generic",
-    "version": "1"
+    "version": "2"
   },
   "blocks": [
     {
@@ -289,7 +289,7 @@
       ]
     },
     {
-      "id": "56d39b81008c",
+      "id": "3a626984835e",
       "kind": "code",
       "text": "type T struct {\n    name string // name of the object\n    value int // its value\n}\n"
     },
@@ -309,7 +309,7 @@
       ]
     },
     {
-      "id": "83dcbd4f02a6",
+      "id": "336aedd548ed",
       "kind": "code",
       "text": "type T struct {\n    name    string // name of the object\n    value   int    // its value\n}\n"
     },
@@ -341,7 +341,7 @@
       ]
     },
     {
-      "id": "de592245ffa0",
+      "id": "eb1d3bca4ef8",
       "kind": "list",
       "items": [
         [
@@ -449,7 +449,7 @@
             ]
           },
           {
-            "id": "5c31c89f2244",
+            "id": "6f5db1907e36",
             "kind": "code",
             "text": "x<<8 + y<<16\n"
           },

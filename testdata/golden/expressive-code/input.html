@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Expressive Code frames</title></head>
+<body>
+<main>
+<h1>Expressive Code frames</h1>
+<p>An editor frame with a file name. Each line is its own element, with no newline between lines.</p>
+<div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.css"><script type="module" src="/_astro/ec.js"></script><figure class="frame has-title not-content"><figcaption class="header"><span class="title">greet.py</span></figcaption><pre data-language="python"><code><div class="ec-line"><div class="code"><span style="--0:#ff7b72">def</span><span style="--0:#d2a8ff"> greet</span><span>(name):</span></div></div><div class="ec-line"><div class="code"><span class="indent">    </span><span style="--0:#ff7b72">return</span><span> f&#39;Hello, {name}!&#39;</span></div></div><div class="ec-line"><div class="code">
+</div></div><div class="ec-line"><div class="code"><span>print(greet(&#34;Ada&#34;))</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="def greet(name):    return f&#x27;Hello, {name}!&#x27;print(greet(&#x22;Ada&#x22;))"><div></div></button></div></figure></div>
+<p>A terminal frame has no title; its label is for screen readers only.</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="bash"><code><div class="ec-line"><div class="code"><span style="--0:#ffa657">pip</span><span> install requests</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="pip install requests"><div></div></button></div></figure></div>
+<p>Line numbers sit in a gutter inside each line; the copy text leaves them out and keeps tabs and trailing spaces.</p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="go"><code><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">1</div></div><div class="code"><span>package main</span></div></div><div class="ec-line"><div class="gutter"><div class="ln" aria-hidden="true">2</div></div><div class="code"><span>	// a tab, then trailing spaces   </span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="package main	// a tab, then trailing spaces   "><div></div></button></div></figure></div>
+</main>
+</body>
+</html>

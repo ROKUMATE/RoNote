@@ -1,0 +1,73 @@
+{
+  "ir_version": 1,
+  "title": "Expressive Code frames",
+  "source": {
+    "url": "https://docs.example.com/fixtures/expressive-code",
+    "final_url": "https://docs.example.com/fixtures/expressive-code",
+    "fetched_at": "2026-11-02T00:00:00Z",
+    "body_sha256": "fa9de9b5363de472576b60fb048ab05c26202c4340362e5729870c562df37b51"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "2"
+  },
+  "blocks": [
+    {
+      "id": "ed3ccf5218cc",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "expressive-code-frames",
+      "content": [
+        {
+          "text": "Expressive Code frames"
+        }
+      ]
+    },
+    {
+      "id": "2b42836a69e7",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "An editor frame with a file name. Each line is its own element, with no newline between lines."
+        }
+      ]
+    },
+    {
+      "id": "fb25ceb8dc6b",
+      "kind": "code",
+      "lang": "python",
+      "text": "def greet(name):\n    return f'Hello, {name}!'\n\nprint(greet(\"Ada\"))",
+      "title": "greet.py"
+    },
+    {
+      "id": "41be35e58b36",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A terminal frame has no title; its label is for screen readers only."
+        }
+      ]
+    },
+    {
+      "id": "691be7acaf4e",
+      "kind": "code",
+      "lang": "bash",
+      "text": "pip install requests"
+    },
+    {
+      "id": "d902f11bad3f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Line numbers sit in a gutter inside each line; the copy text leaves them out and keeps tabs and trailing spaces."
+        }
+      ]
+    },
+    {
+      "id": "6ba9606bdc65",
+      "kind": "code",
+      "lang": "go",
+      "text": "package main\n\t// a tab, then trailing spaces   "
+    }
+  ]
+}

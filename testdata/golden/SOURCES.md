@@ -14,6 +14,8 @@ Synthetic framework pages reproduce the DOM structure of a real page, with inven
 | docusaurus-v3-install | a Docusaurus 3 docs page: tabs, admonition, titled and numbered code, live editor |
 | sphinx-linenos | a Sphinx page: inline and table line numbers, a code caption, admonitions, a console session |
 | mdbook-v04-reading-files | an mdBook 0.4 page: boring lines, file names in and out of a paragraph, a note, a table |
+| mdn-closures-synthetic | https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures (MDN: code examples with language headers, notecards, feedback footer); MDN text is CC BY-SA |
+| mdn-live-sample-synthetic | an MDN live sample: HTML, CSS and JS examples and the sample frame |
 | docsy-tabpane | https://www.docsy.dev/docs/content/shortcodes/ (Docsy: tabpane, alerts, Chroma line numbers, feedback); the site's footer reserves all rights |
 
 ## Excerpts of real pages

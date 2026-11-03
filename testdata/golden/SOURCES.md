@@ -12,6 +12,7 @@ Synthetic framework pages reproduce the DOM structure of a real page, with inven
 |---|---|
 | starlight-rag | https://myengineeringpath.dev/programming/python/rag-pipeline-tutorial/ (Starlight) |
 | docusaurus-v3-install | a Docusaurus 3 docs page: tabs, admonition, titled and numbered code, live editor |
+| sphinx-linenos | a Sphinx page: inline and table line numbers, a code caption, admonitions, a console session |
 
 ## Excerpts of real pages
 
@@ -30,3 +31,4 @@ Trimmed copies of public documentation pages:
 | docusaurus-code-blocks | https://docusaurus.io/docs/markdown-features/code-blocks, "Code blocks" by Meta Platforms, Inc. and the Docusaurus contributors | "Code title" to "Supported Languages" | Creative Commons Attribution 4.0, per https://github.com/facebook/docusaurus/blob/main/LICENSE-docs | 2026-11-03 |
 | material-fastapi-first-steps | https://fastapi.tiangolo.com/tutorial/first-steps/, "First Steps" by Sebastián Ramírez and the FastAPI contributors | "First Steps" to "Check it" | MIT, per https://github.com/fastapi/fastapi/blob/master/LICENSE | 2026-11-03 |
 | material-code-blocks | https://squidfunk.github.io/mkdocs-material/reference/code-blocks/, "Code blocks" by Martin Donath | "Configuration" and "Code copy button"; "Adding a title" to "Highlighting specific lines" | MIT, per https://github.com/squidfunk/mkdocs-material/blob/master/LICENSE | 2026-11-03 |
+| sphinx-requests-quickstart | https://requests.readthedocs.io/en/latest/user/quickstart/, "Quickstart" by Kenneth Reitz and the Requests contributors | "Quickstart" to "Raw Response Content" | Apache License 2.0, per https://github.com/psf/requests/blob/main/LICENSE | 2026-11-03 |

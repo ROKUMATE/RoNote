@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" data-content_root="../../"><head><meta charset="utf-8" /><title>Quickstart &#8212; Requests 2.33.0 documentation</title><link rel="canonical" href="https://requests.readthedocs.io/en/latest/user/quickstart/" /><script src="../../_static/documentation_options.js?v=b81d1745"></script></head><body><div class="document"><div class="documentwrapper"><div class="bodywrapper"><div class="body" role="main">
+            
+  <section id="quickstart">
+<span id="id1"></span><h1>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading">¶</a></h1>
+<p id="module-requests.models">Eager to get started? This page gives a good introduction in how to get started
+with Requests.</p>
+<p>First, make sure that:</p>
+<ul class="simple">
+<li><p>Requests is <a class="reference internal" href="../install/#install"><span class="std std-ref">installed</span></a></p></li>
+<li><p>Requests is <a class="reference internal" href="../../community/updates/#updates"><span class="std std-ref">up-to-date</span></a></p></li>
+</ul>
+<p>Let’s get started with some simple examples.</p>
+<section id="make-a-request">
+<h2>Make a Request<a class="headerlink" href="#make-a-request" title="Link to this heading">¶</a></h2>
+<p>Making a request with Requests is very simple.</p>
+<p>Begin by importing the Requests module:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+</pre></div>
+</div>
+<p>Now, let’s try to get a webpage. For this example, let’s get GitHub’s public
+timeline:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'https://api.github.com/events'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, we have a <a class="reference internal" href="../../api/#requests.Response" title="requests.Response"><code class="xref py py-class docutils literal notranslate"><span class="pre">Response</span></code></a> object called <code class="docutils literal notranslate"><span class="pre">r</span></code>. We can
+get all the information we need from this object.</p>
+<p>Requests’ simple API means that all forms of HTTP request are as obvious. For
+example, this is how you make an HTTP POST request:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'https://httpbin.org/post'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">'key'</span><span class="p">:</span> <span class="s1">'value'</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Nice, right? What about the other HTTP request types: PUT, DELETE, HEAD and
+OPTIONS? These are all just as simple:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">'https://httpbin.org/put'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">'key'</span><span class="p">:</span> <span class="s1">'value'</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s1">'https://httpbin.org/delete'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="s1">'https://httpbin.org/get'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="s1">'https://httpbin.org/get'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>That’s all well and good, but it’s also only the start of what Requests can
+do.</p>
+</section>
+<section id="passing-parameters-in-urls">
+<h2>Passing Parameters In URLs<a class="headerlink" href="#passing-parameters-in-urls" title="Link to this heading">¶</a></h2>
+<p>You often want to send some sort of data in the URL’s query string. If
+you were constructing the URL by hand, this data would be given as key/value
+pairs in the URL after a question mark, e.g. <code class="docutils literal notranslate"><span class="pre">httpbin.org/get?key=val</span></code>.
+Requests allows you to provide these arguments as a dictionary of strings,
+using the <code class="docutils literal notranslate"><span class="pre">params</span></code> keyword argument. As an example, if you wanted to pass
+<code class="docutils literal notranslate"><span class="pre">key1=value1</span></code> and <code class="docutils literal notranslate"><span class="pre">key2=value2</span></code> to <code class="docutils literal notranslate"><span class="pre">httpbin.org/get</span></code>, you would use the
+following code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'key1'</span><span class="p">:</span> <span class="s1">'value1'</span><span class="p">,</span> <span class="s1">'key2'</span><span class="p">:</span> <span class="s1">'value2'</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'https://httpbin.org/get'</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can see that the URL has been correctly encoded by printing the URL:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+<span class="go">https://httpbin.org/get?key2=value2&amp;key1=value1</span>
+</pre></div>
+</div>
+<p>Note that any dictionary key whose value is <code class="docutils literal notranslate"><span class="pre">None</span></code> will not be added to the
+URL’s query string.</p>
+<p>You can also pass a list of items as a value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'key1'</span><span class="p">:</span> <span class="s1">'value1'</span><span class="p">,</span> <span class="s1">'key2'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'value2'</span><span class="p">,</span> <span class="s1">'value3'</span><span class="p">]}</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'https://httpbin.org/get'</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+<span class="go">https://httpbin.org/get?key1=value1&amp;key2=value2&amp;key2=value3</span>
+</pre></div>
+</div>
+</section>
+<section id="response-content">
+<h2>Response Content<a class="headerlink" href="#response-content" title="Link to this heading">¶</a></h2>
+<p>We can read the content of the server’s response. Consider the GitHub timeline
+again:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'https://api.github.com/events'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">text</span>
+<span class="go">'[{"repository":{"open_issues":0,"url":"https://github.com/...</span>
+</pre></div>
+</div>
+<p>Requests will automatically decode content from the server. Most unicode
+charsets are seamlessly decoded.</p>
+<p>When you make a request, Requests makes educated guesses about the encoding of
+the response based on the HTTP headers. The text encoding guessed by Requests
+is used when you access <code class="docutils literal notranslate"><span class="pre">r.text</span></code>. You can find out what encoding Requests is
+using, and change it, using the <code class="docutils literal notranslate"><span class="pre">r.encoding</span></code> property:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">encoding</span>
+<span class="go">'utf-8'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="s1">'ISO-8859-1'</span>
+</pre></div>
+</div>
+<p>If you change the encoding, Requests will use the new value of <code class="docutils literal notranslate"><span class="pre">r.encoding</span></code>
+whenever you call <code class="docutils literal notranslate"><span class="pre">r.text</span></code>. You might want to do this in any situation where
+you can apply special logic to work out what the encoding of the content will
+be. For example, HTML and XML have the ability to specify their encoding in
+their body. In situations like this, you should use <code class="docutils literal notranslate"><span class="pre">r.content</span></code> to find the
+encoding, and then set <code class="docutils literal notranslate"><span class="pre">r.encoding</span></code>. This will let you use <code class="docutils literal notranslate"><span class="pre">r.text</span></code> with
+the correct encoding.</p>
+<p>Requests will also use custom encodings in the event that you need them. If
+you have created your own encoding and registered it with the <code class="docutils literal notranslate"><span class="pre">codecs</span></code>
+module, you can simply use the codec name as the value of <code class="docutils literal notranslate"><span class="pre">r.encoding</span></code> and
+Requests will handle the decoding for you.</p>
+</section>
+<section id="binary-response-content">
+<h2>Binary Response Content<a class="headerlink" href="#binary-response-content" title="Link to this heading">¶</a></h2>
+<p>You can also access the response body as bytes, for non-text requests:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">content</span>
+<span class="go">b'[{"repository":{"open_issues":0,"url":"https://github.com/...</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">gzip</span></code> and <code class="docutils literal notranslate"><span class="pre">deflate</span></code> transfer-encodings are automatically decoded for you.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">br</span></code>  transfer-encoding is automatically decoded for you if a Brotli library
+like <a class="reference external" href="https://pypi.org/project/brotli">brotli</a> or <a class="reference external" href="https://pypi.org/project/brotlicffi">brotlicffi</a> is installed.</p>
+<p>For example, to create an image from binary data returned by a request, you can
+use the following code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="json-response-content">
+<h2>JSON Response Content<a class="headerlink" href="#json-response-content" title="Link to this heading">¶</a></h2>
+<p>There’s also a builtin JSON decoder, in case you’re dealing with JSON data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'https://api.github.com/events'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<span class="go">[{'repository': {'open_issues': 0, 'url': 'https://github.com/...</span>
+</pre></div>
+</div>
+<p>In case the JSON decoding fails, <code class="docutils literal notranslate"><span class="pre">r.json()</span></code> raises an exception. For example, if
+the response gets a 204 (No Content), or if the response contains invalid JSON,
+attempting <code class="docutils literal notranslate"><span class="pre">r.json()</span></code> raises <code class="docutils literal notranslate"><span class="pre">requests.exceptions.JSONDecodeError</span></code>. This wrapper exception
+provides interoperability for multiple exceptions that may be thrown by different
+python versions and json serialization libraries.</p>
+<p>It should be noted that the success of the call to <code class="docutils literal notranslate"><span class="pre">r.json()</span></code> does <strong>not</strong>
+indicate the success of the response. Some servers may return a JSON object in a
+failed response (e.g. error details with HTTP 500). Such JSON will be decoded
+and returned. To check that a request is successful, use
+<code class="docutils literal notranslate"><span class="pre">r.raise_for_status()</span></code> or check <code class="docutils literal notranslate"><span class="pre">r.status_code</span></code> is what you expect.</p>
+</section>
+<section id="raw-response-content">
+<h2>Raw Response Content<a class="headerlink" href="#raw-response-content" title="Link to this heading">¶</a></h2>
+<p>In the rare case that you’d like to get the raw socket response from the
+server, you can access <code class="docutils literal notranslate"><span class="pre">r.raw</span></code>. If you want to do this, make sure you set
+<code class="docutils literal notranslate"><span class="pre">stream=True</span></code> in your initial request. Once you do, you can do this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'https://api.github.com/events'</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">raw</span>
+<span class="go">&lt;urllib3.response.HTTPResponse object at 0x101194810&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">raw</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">b'\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\x03'</span>
+</pre></div>
+</div>
+<p>In general, however, you should use a pattern like this to save what is being
+streamed to a file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">iter_content</span><span class="p">(</span><span class="n">chunk_size</span><span class="o">=</span><span class="mi">128</span><span class="p">):</span>
+        <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Using <code class="docutils literal notranslate"><span class="pre">Response.iter_content</span></code> will handle a lot of what you would otherwise
+have to handle when using <code class="docutils literal notranslate"><span class="pre">Response.raw</span></code> directly. When streaming a
+download, the above is the preferred and recommended way to retrieve the
+content. Note that <code class="docutils literal notranslate"><span class="pre">chunk_size</span></code> can be freely adjusted to a number that
+may better fit your use cases.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>An important note about using <code class="docutils literal notranslate"><span class="pre">Response.iter_content</span></code> versus <code class="docutils literal notranslate"><span class="pre">Response.raw</span></code>.
+<code class="docutils literal notranslate"><span class="pre">Response.iter_content</span></code> will automatically decode the <code class="docutils literal notranslate"><span class="pre">gzip</span></code> and <code class="docutils literal notranslate"><span class="pre">deflate</span></code>
+transfer-encodings.  <code class="docutils literal notranslate"><span class="pre">Response.raw</span></code> is a raw stream of bytes – it does not
+transform the response content.  If you really need access to the bytes as they
+were returned, use <code class="docutils literal notranslate"><span class="pre">Response.raw</span></code>.</p>
+</div>
+</section>
+</section>
+</div></div></div><div class="sphinxsidebar" role="navigation" aria-label="Main"><div class="sphinxsidebarwrapper"><h3>Navigation</h3><ul><li><a href="../../">Requests</a></li></ul></div></div></div><div class="footer">&copy;MMXVIX. A Kenneth Reitz Project.</div></body></html>

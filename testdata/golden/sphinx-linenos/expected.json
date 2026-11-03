@@ -1,0 +1,142 @@
+{
+  "ir_version": 1,
+  "title": "Line numbers",
+  "source": {
+    "url": "https://toolkit.example.org/docs/linenos.html",
+    "final_url": "https://toolkit.example.org/docs/linenos.html",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "8fc25200a88e9c73160cfa95556ccc35dfc6f8b0128154ff34937c8cf12e3a48"
+  },
+  "extractor": {
+    "name": "sphinx",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "4efb99f214dc",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "line-numbers",
+      "content": [
+        {
+          "text": "Line numbers"
+        }
+      ]
+    },
+    {
+      "id": "4292740ac78f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The toolkit reads a config file and prints a report."
+        }
+      ]
+    },
+    {
+      "id": "f1628c9b6b8a",
+      "kind": "callout",
+      "variant": "note",
+      "title": "Note",
+      "children": [
+        {
+          "id": "d7db14e1c560",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Every example runs with Python 3.12 or later."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "56443aef799f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Line numbers drawn inline sit before each line:"
+        }
+      ]
+    },
+    {
+      "id": "f884f5438658",
+      "kind": "code",
+      "lang": "python",
+      "text": "import toolkit\n\nreport = toolkit.run(\"config.toml\")\n"
+    },
+    {
+      "id": "0db051b1066f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In table style they get a cell of their own:"
+        }
+      ]
+    },
+    {
+      "id": "03bb35a014d3",
+      "kind": "code",
+      "lang": "python",
+      "text": "for line in report:\n    print(line)\n"
+    },
+    {
+      "id": "9f060f6496e1",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "captions",
+      "content": [
+        {
+          "text": "Captions"
+        }
+      ]
+    },
+    {
+      "id": "94a307e1c6e1",
+      "kind": "code",
+      "lang": "toml",
+      "text": "verbose = true\n",
+      "title": "config.toml"
+    },
+    {
+      "id": "5bab0fe3de67",
+      "kind": "callout",
+      "variant": "warning",
+      "title": "Warning",
+      "children": [
+        {
+          "id": "e2c626fc1441",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Keep the file out of version control."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "17d9209a66ff",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "An interactive session keeps its prompts and output:"
+        }
+      ]
+    },
+    {
+      "id": "a963c581fd6c",
+      "kind": "code",
+      "lang": "pycon",
+      "text": ">>> len(report)\n3\n"
+    },
+    {
+      "id": "99a02807fea3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Added in version 1.2."
+        }
+      ]
+    }
+  ]
+}

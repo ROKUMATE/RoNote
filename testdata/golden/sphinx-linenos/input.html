@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" data-content_root="../"><head><meta charset="utf-8" /><title>Line numbers &#8212; Example Toolkit 1.2 documentation</title>
+<link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+<script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script></head>
+<body><div class="related" role="navigation" aria-label="Related"><h3>Navigation</h3><ul><li><a href="../index.html">Example Toolkit 1.2</a> &#187;</li></ul></div>
+<div class="document"><div class="documentwrapper"><div class="bodywrapper"><div class="body" role="main">
+<section id="line-numbers">
+<h1>Line numbers<a class="headerlink" href="#line-numbers" title="Link to this heading">¶</a></h1>
+<p>The toolkit reads a config file and prints a report.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Every example runs with Python 3.12 or later.</p>
+</div>
+<p>Line numbers drawn inline sit before each line:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">toolkit</span>
+<span class="linenos">2</span>
+<span class="linenos">3</span><span class="n">report</span> <span class="o">=</span> <span class="n">toolkit</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;config.toml&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In table style they get a cell of their own:</p>
+<div class="highlight-python notranslate"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">report</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</pre></div></td></tr></table></div>
+</div>
+<section id="captions">
+<h2>Captions<a class="headerlink" href="#captions" title="Link to this heading">¶</a></h2>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">config.toml</span><a class="headerlink" href="#id1" title="Link to this code">¶</a></div>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">verbose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Keep the file out of version control.</p>
+</div>
+<p>An interactive session keeps its prompts and output:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 1.2.</span></p>
+</div>
+</section>
+</section>
+<div class="clearer"></div></div></div></div>
+<div class="sphinxsidebar" role="navigation" aria-label="Main"><div class="sphinxsidebarwrapper"><h3>This page</h3><ul><li><a href="../_sources/linenos.rst.txt">Show source</a></li></ul></div></div>
+</div><div class="footer">&#169; Copyright 2026, Example. Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.0.</div></body></html>

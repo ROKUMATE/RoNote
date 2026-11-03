@@ -26,7 +26,7 @@ var fieldsByKind = map[Kind][]string{
 var (
 	marks    = []Mark{MarkBold, MarkItalic, MarkCode, MarkKbd, MarkStrike, MarkSub, MarkSup}
 	variants = []Variant{VariantNote, VariantTip, VariantInfo, VariantWarning, VariantDanger}
-	warnings = []WarningCode{WarningLowConfidence, WarningParseFailed}
+	warnings = []WarningCode{WarningLowConfidence, WarningParseFailed, WarningAdapterFallback}
 )
 
 // Validate reports every way doc breaks the IR's rules, joined into one

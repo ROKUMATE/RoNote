@@ -106,6 +106,11 @@ func (w *walker) element(n *html.Node) {
 		w.inlineElement(n)
 		return
 	}
+	if blocks, ok := w.e.planned(n); ok {
+		w.flush()
+		w.out = append(w.out, blocks...)
+		return
+	}
 	switch tag := n.DataAtom; {
 	case tag == atom.Br:
 		w.in.lineBreak()
@@ -135,7 +140,7 @@ func (w *walker) inlineElement(n *html.Node) {
 	case tag == atom.Img:
 	case tag == atom.Pre:
 		w.in.marks = append(w.in.marks, ir.MarkCode)
-		w.in.raw(codeText(n))
+		w.in.raw(w.e.codeText(n))
 		w.in.marks = w.in.marks[:len(w.in.marks)-1]
 	case tag == atom.A:
 		w.withLink(n, func() { w.children(n) })
@@ -455,9 +460,7 @@ var calloutVariants = map[string]ir.Variant{
 }
 
 // callout converts n if it is a callout: a class token from calloutMarkers,
-// or role=note or role=alert. The variant comes from words in the class
-// tokens (default note); a direct child whose class mentions "title" or
-// "heading" becomes the title.
+// or role=note or role=alert.
 func (e *extractor) callout(n *html.Node) *ir.Block {
 	classes := strings.Fields(strings.ToLower(attr(n, "class")))
 	role := strings.ToLower(attr(n, "role"))
@@ -468,10 +471,17 @@ func (e *extractor) callout(n *html.Node) *ir.Block {
 	if !isCallout {
 		return nil
 	}
+	return e.calloutBlock(n, nil)
+}
 
+// calloutBlock converts n to a callout. The variant comes from words in its
+// class tokens (default note). The title is the text of title, which the
+// caller keeps out of the body, or when title is nil, of the first direct
+// child whose class mentions "title" or "heading".
+func (e *extractor) calloutBlock(n, title *html.Node) *ir.Block {
 	b := ir.Block{Kind: ir.KindCallout, Variant: ir.VariantNote}
 findVariant:
-	for _, c := range classes {
+	for _, c := range strings.Fields(strings.ToLower(attr(n, "class"))) {
 		for word := range strings.FieldsFuncSeq(c, func(r rune) bool { return r == '-' || r == '_' }) {
 			if v, ok := calloutVariants[word]; ok {
 				b.Variant = v
@@ -479,10 +489,13 @@ findVariant:
 			}
 		}
 	}
+	if title != nil {
+		b.Title = collapse(textContent(title))
+	}
 
 	w := walker{e: e}
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		if b.Title == "" && c.Type == html.ElementNode && !e.skip(c) && isTitleClass(attr(c, "class")) {
+		if title == nil && b.Title == "" && c.Type == html.ElementNode && !e.skip(c) && isTitleClass(attr(c, "class")) {
 			b.Title = collapse(textContent(c))
 			continue
 		}

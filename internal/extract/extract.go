@@ -1,5 +1,6 @@
 // Package extract turns an HTML page into IR blocks with generic rules that
-// work on any documentation site. Framework adapters (P07) refine the result.
+// work on any documentation site, refined by the adapter for the page's
+// framework when there is one (package adapter).
 // docs/adr/0004-ir-and-links.md records the rules.
 package extract
 
@@ -13,6 +14,7 @@ import (
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 
+	"github.com/rokumate/ronote/internal/extract/adapter"
 	"github.com/rokumate/ronote/internal/ir"
 )
 
@@ -40,9 +42,16 @@ var removedTags = map[atom.Atom]bool{
 // src.FinalURL must be absolute because links and images resolve against it,
 // or against <base href> when the page has one.
 //
-// The content root is the first <main>, else <article>, else [role=main].
-// Without one, Extract uses <body> minus header and footer and adds a
-// low_confidence warning; it does not guess further.
+// When an adapter recognises the page's framework, its plan decides the
+// content root, the chrome to drop and how callouts, tabs and code blocks
+// are built, and doc.Extractor names the adapter. When the page lacks the
+// structure the adapter expects, or the plan would leave out a heading or
+// code block the generic rules keep, Extract uses the generic rules and adds
+// an adapter_fallback warning.
+//
+// The generic content root is the first <main>, else <article>, else
+// [role=main]. Without one, Extract uses <body> minus header and footer and
+// adds a low_confidence warning; it does not guess further.
 //
 // A page the HTML parser rejects, such as one nested deeper than it allows,
 // gives a document with no blocks and a parse_failed warning; Extract only
@@ -55,6 +64,11 @@ var removedTags = map[atom.Atom]bool{
 // from HTML parsing itself: the parser drops one newline right after <pre>,
 // and it turns CR LF and lone CR into LF.
 func Extract(r io.Reader, src ir.Source) (*ir.Doc, error) {
+	return extractWith(r, src, adapter.All)
+}
+
+// extractWith is Extract with the given adapters.
+func extractWith(r io.Reader, src ir.Source, adapters []*adapter.Adapter) (*ir.Doc, error) {
 	raw, err := io.ReadAll(r)
 	if err != nil {
 		return nil, fmt.Errorf("read page: %w", err)
@@ -76,15 +90,23 @@ func Extract(r io.Reader, src ir.Source) (*ir.Doc, error) {
 	}
 
 	e := &extractor{links: newLinker(doc, page), anchors: map[string]bool{}, nextSuffix: map[string]int{}}
-	root := findFirst(doc, func(n *html.Node) bool { return n.DataAtom == atom.Main })
-	if root == nil {
-		root = findFirst(doc, func(n *html.Node) bool { return n.DataAtom == atom.Article })
+	root, found := genericRoot(doc)
+	if a := adapter.Detect(adapters, doc, page.Hostname()); a != nil {
+		plan, err := a.Apply(doc)
+		if err == nil {
+			err = e.checkPlan(plan, root, !found)
+		}
+		if err != nil {
+			out.Warnings = append(out.Warnings, ir.Warning{
+				Code:    ir.WarningAdapterFallback,
+				Message: fmt.Sprintf("%s adapter: %v; used the generic rules", a.Name, err),
+			})
+		} else {
+			e.plan, root, found = plan, plan.Root, true
+			out.Extractor = ir.Extractor{Name: a.Name, Version: a.Version}
+		}
 	}
-	if root == nil {
-		root = findFirst(doc, func(n *html.Node) bool { return strings.EqualFold(attr(n, "role"), "main") })
-	}
-	if root == nil {
-		root = findFirst(doc, func(n *html.Node) bool { return n.DataAtom == atom.Body })
+	if !found {
 		e.withoutChrome = true
 		out.Warnings = append(out.Warnings, ir.Warning{
 			Code:    ir.WarningLowConfidence,
@@ -99,8 +121,25 @@ func Extract(r io.Reader, src ir.Source) (*ir.Doc, error) {
 	return out, nil
 }
 
+// genericRoot is the first <main>, else <article>, else [role=main]; found
+// is false when there is none and root is <body>.
+func genericRoot(doc *html.Node) (root *html.Node, found bool) {
+	for _, match := range []func(*html.Node) bool{
+		func(n *html.Node) bool { return n.DataAtom == atom.Main },
+		func(n *html.Node) bool { return n.DataAtom == atom.Article },
+		func(n *html.Node) bool { return strings.EqualFold(attr(n, "role"), "main") },
+	} {
+		if root := findFirst(doc, match); root != nil {
+			return root, true
+		}
+	}
+	return findFirst(doc, func(n *html.Node) bool { return n.DataAtom == atom.Body }), false
+}
+
 type extractor struct {
 	links *linker
+	// plan is the adapter's plan for the page, or nil for the generic rules.
+	plan *adapter.Plan
 	// withoutChrome drops header and footer too, when the root is <body>.
 	withoutChrome bool
 	// anchors holds every heading anchor given out, to keep them unique, and
@@ -110,9 +149,20 @@ type extractor struct {
 }
 
 // skip reports whether n and everything inside it stays out of the result.
+// The plan's removals come first; an element the plan converts is never
+// skipped, even when the generic rules would drop it, like an <aside> that
+// is a framework's callout.
 func (e *extractor) skip(n *html.Node) bool {
 	if n.Type != html.ElementNode {
 		return false
+	}
+	if e.plan != nil {
+		if e.plan.Removed[n] {
+			return true
+		}
+		if e.plan.Claims(n) {
+			return false
+		}
 	}
 	switch {
 	case removedTags[n.DataAtom]:

@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 	"net"
 	"net/http"
 	"os"
@@ -32,7 +31,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	logger := newLogger(cfg)
+	logger := cfg.Logger(os.Stdout)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -72,12 +71,4 @@ func run() error {
 	}
 	logger.Info("api stopped")
 	return nil
-}
-
-func newLogger(cfg config.Config) *slog.Logger {
-	opts := &slog.HandlerOptions{Level: cfg.LogLevel}
-	if cfg.Env == config.EnvDev {
-		return slog.New(slog.NewTextHandler(os.Stdout, opts))
-	}
-	return slog.New(slog.NewJSONHandler(os.Stdout, opts))
 }

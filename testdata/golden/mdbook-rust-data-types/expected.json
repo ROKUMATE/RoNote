@@ -1,0 +1,2086 @@
+{
+  "ir_version": 1,
+  "title": "Data Types - The Rust Programming Language",
+  "source": {
+    "url": "https://doc.rust-lang.org/book/ch03-02-data-types.html",
+    "final_url": "https://doc.rust-lang.org/book/ch03-02-data-types.html",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "cdc112d627f076bf9892686428232dbd29e3d61889fa752e76bf236c1a2470b6"
+  },
+  "extractor": {
+    "name": "mdbook",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "bee9db192270",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "data-types",
+      "content": [
+        {
+          "text": "Data Types",
+          "link": {
+            "href": "#data-types",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "1577df1b7ea9",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Every value in Rust is of a certain "
+        },
+        {
+          "text": "data type",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ", which tells Rust what kind of data is being specified so that it knows how to work with that data. We’ll look at two data type subsets: scalar and compound."
+        }
+      ]
+    },
+    {
+      "id": "4361840528c1",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Keep in mind that Rust is a "
+        },
+        {
+          "text": "statically typed",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " language, which means that it must know the types of all variables at compile time. The compiler can usually infer what type we want to use based on the value and how we use it. In cases when many types are possible, such as when we converted a "
+        },
+        {
+          "text": "String",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " to a numeric type using "
+        },
+        {
+          "text": "parse",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in the "
+        },
+        {
+          "text": "“Comparing the Guess to the Secret Number”",
+          "link": {
+            "href": "https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html#comparing-the-guess-to-the-secret-number",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " section in Chapter 2, we must add a type annotation, like this:"
+        }
+      ]
+    },
+    {
+      "id": "d8efa7340254",
+      "kind": "code",
+      "lang": "rust",
+      "text": "let guess: u32 = \"42\".parse().expect(\"Not a number!\");\n"
+    },
+    {
+      "id": "9cd23fa3f827",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If we don’t add the "
+        },
+        {
+          "text": ": u32",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " type annotation shown in the preceding code, Rust will display the following error, which means the compiler needs more information from us to know which type we want to use:"
+        }
+      ]
+    },
+    {
+      "id": "9bd81b9e00f5",
+      "kind": "code",
+      "lang": "console",
+      "text": "$ cargo build\n   Compiling no_type_annotations v0.1.0 (file:///projects/no_type_annotations)\nerror[E0284]: type annotations needed\n --> src/main.rs:2:9\n  |\n2 |     let guess = \"42\".parse().expect(\"Not a number!\");\n  |         ^^^^^        ----- type must be known at this point\n  |\n  = note: cannot satisfy `<_ as FromStr>::Err == _`\nhelp: consider giving `guess` an explicit type\n  |\n2 |     let guess: /* Type */ = \"42\".parse().expect(\"Not a number!\");\n  |              ++++++++++++\n\nFor more information about this error, try `rustc --explain E0284`.\nerror: could not compile `no_type_annotations` (bin \"no_type_annotations\") due to 1 previous error\n"
+    },
+    {
+      "id": "9e51fc98d8d5",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You’ll see different type annotations for other data types."
+        }
+      ]
+    },
+    {
+      "id": "e5f1c2b3b9e3",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "scalar-types",
+      "content": [
+        {
+          "text": "Scalar Types",
+          "link": {
+            "href": "#scalar-types",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "935c8cf182ce",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A "
+        },
+        {
+          "text": "scalar",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " type represents a single value. Rust has four primary scalar types: integers, floating-point numbers, Booleans, and characters. You may recognize these from other programming languages. Let’s jump into how they work in Rust."
+        }
+      ]
+    },
+    {
+      "id": "8a69a6262049",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "integer-types",
+      "content": [
+        {
+          "text": "Integer Types",
+          "link": {
+            "href": "#integer-types",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "6fb543a18067",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "An "
+        },
+        {
+          "text": "integer",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " is a number without a fractional component. We used one integer type in Chapter 2, the "
+        },
+        {
+          "text": "u32",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " type. This type declaration indicates that the value it’s associated with should be an unsigned integer (signed integer types start with "
+        },
+        {
+          "text": "i",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " instead of "
+        },
+        {
+          "text": "u",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ") that takes up 32 bits of space. Table 3-1 shows the built-in integer types in Rust. We can use any of these variants to declare the type of an integer value."
+        }
+      ]
+    },
+    {
+      "id": "a509f385610b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Table 3-1: Integer Types in Rust"
+        }
+      ]
+    },
+    {
+      "id": "6c26c489a7a9",
+      "kind": "table",
+      "head": [
+        [
+          [
+            {
+              "text": "Length"
+            }
+          ],
+          [
+            {
+              "text": "Signed"
+            }
+          ],
+          [
+            {
+              "text": "Unsigned"
+            }
+          ]
+        ]
+      ],
+      "rows": [
+        [
+          [
+            {
+              "text": "8-bit"
+            }
+          ],
+          [
+            {
+              "text": "i8",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "u8",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "16-bit"
+            }
+          ],
+          [
+            {
+              "text": "i16",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "u16",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "32-bit"
+            }
+          ],
+          [
+            {
+              "text": "i32",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "u32",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "64-bit"
+            }
+          ],
+          [
+            {
+              "text": "i64",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "u64",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "128-bit"
+            }
+          ],
+          [
+            {
+              "text": "i128",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "u128",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "Architecture-dependent"
+            }
+          ],
+          [
+            {
+              "text": "isize",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "usize",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "5f489a0af32c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Each variant can be either signed or unsigned and has an explicit size. "
+        },
+        {
+          "text": "Signed",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "unsigned",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " refer to whether it’s possible for the number to be negative—in other words, whether the number needs to have a sign with it (signed) or whether it will only ever be positive and can therefore be represented without a sign (unsigned). It’s like writing numbers on paper: When the sign matters, a number is shown with a plus sign or a minus sign; however, when it’s safe to assume the number is positive, it’s shown with no sign. Signed numbers are stored using "
+        },
+        {
+          "text": "two’s complement",
+          "link": {
+            "href": "https://en.wikipedia.org/wiki/Two%27s_complement",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " representation."
+        }
+      ]
+    },
+    {
+      "id": "02861aa37186",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Each signed variant can store numbers from −(2"
+        },
+        {
+          "text": "n − 1",
+          "marks": [
+            "sup"
+          ]
+        },
+        {
+          "text": ") to 2"
+        },
+        {
+          "text": "n − 1",
+          "marks": [
+            "sup"
+          ]
+        },
+        {
+          "text": " − 1 inclusive, where "
+        },
+        {
+          "text": "n",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " is the number of bits that variant uses. So, an "
+        },
+        {
+          "text": "i8",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " can store numbers from −(2"
+        },
+        {
+          "text": "7",
+          "marks": [
+            "sup"
+          ]
+        },
+        {
+          "text": ") to 2"
+        },
+        {
+          "text": "7",
+          "marks": [
+            "sup"
+          ]
+        },
+        {
+          "text": " − 1, which equals −128 to 127. Unsigned variants can store numbers from 0 to 2"
+        },
+        {
+          "text": "n",
+          "marks": [
+            "sup"
+          ]
+        },
+        {
+          "text": " − 1, so a "
+        },
+        {
+          "text": "u8",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " can store numbers from 0 to 2"
+        },
+        {
+          "text": "8",
+          "marks": [
+            "sup"
+          ]
+        },
+        {
+          "text": " − 1, which equals 0 to 255."
+        }
+      ]
+    },
+    {
+      "id": "6042d5ea0398",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Additionally, the "
+        },
+        {
+          "text": "isize",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "usize",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " types depend on the architecture of the computer your program is running on: 64 bits if you’re on a 64-bit architecture and 32 bits if you’re on a 32-bit architecture."
+        }
+      ]
+    },
+    {
+      "id": "5b146b729868",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can write integer literals in any of the forms shown in Table 3-2. Note that number literals that can be multiple numeric types allow a type suffix, such as "
+        },
+        {
+          "text": "57u8",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", to designate the type. Number literals can also use "
+        },
+        {
+          "text": "_",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " as a visual separator to make the number easier to read, such as "
+        },
+        {
+          "text": "1_000",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", which will have the same value as if you had specified "
+        },
+        {
+          "text": "1000",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "a1650370f8df",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Table 3-2: Integer Literals in Rust"
+        }
+      ]
+    },
+    {
+      "id": "3287868418f4",
+      "kind": "table",
+      "head": [
+        [
+          [
+            {
+              "text": "Number literals"
+            }
+          ],
+          [
+            {
+              "text": "Example"
+            }
+          ]
+        ]
+      ],
+      "rows": [
+        [
+          [
+            {
+              "text": "Decimal"
+            }
+          ],
+          [
+            {
+              "text": "98_222",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "Hex"
+            }
+          ],
+          [
+            {
+              "text": "0xff",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "Octal"
+            }
+          ],
+          [
+            {
+              "text": "0o77",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "Binary"
+            }
+          ],
+          [
+            {
+              "text": "0b1111_0000",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "Byte ("
+            },
+            {
+              "text": "u8",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " only)"
+            }
+          ],
+          [
+            {
+              "text": "b'A'",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "8514af4cd602",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "So how do you know which type of integer to use? If you’re unsure, Rust’s defaults are generally good places to start: Integer types default to "
+        },
+        {
+          "text": "i32",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". The primary situation in which you’d use "
+        },
+        {
+          "text": "isize",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " or "
+        },
+        {
+          "text": "usize",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is when indexing some sort of collection."
+        }
+      ]
+    },
+    {
+      "id": "8b415cee0b6a",
+      "kind": "heading",
+      "level": 5,
+      "anchor": "integer-overflow",
+      "content": [
+        {
+          "text": "Integer Overflow",
+          "link": {
+            "href": "#integer-overflow",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "99a109edc1bf",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Let’s say you have a variable of type "
+        },
+        {
+          "text": "u8",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " that can hold values between 0 and 255. If you try to change the variable to a value outside that range, such as 256, "
+        },
+        {
+          "text": "integer overflow",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " will occur, which can result in one of two behaviors. When you’re compiling in debug mode, Rust includes checks for integer overflow that cause your program to "
+        },
+        {
+          "text": "panic",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " at runtime if this behavior occurs. Rust uses the term "
+        },
+        {
+          "text": "panicking",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " when a program exits with an error; we’ll discuss panics in more depth in the "
+        },
+        {
+          "text": "“Unrecoverable Errors with ",
+          "link": {
+            "href": "https://doc.rust-lang.org/book/ch09-01-unrecoverable-errors-with-panic.html",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "panic!",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://doc.rust-lang.org/book/ch09-01-unrecoverable-errors-with-panic.html",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "”",
+          "link": {
+            "href": "https://doc.rust-lang.org/book/ch09-01-unrecoverable-errors-with-panic.html",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " section in Chapter 9."
+        }
+      ]
+    },
+    {
+      "id": "54fa91df3d89",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "When you’re compiling in release mode with the "
+        },
+        {
+          "text": "--release",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " flag, Rust does "
+        },
+        {
+          "text": "not",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " include checks for integer overflow that cause panics. Instead, if overflow occurs, Rust performs "
+        },
+        {
+          "text": "two’s complement wrapping",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ". In short, values greater than the maximum value the type can hold “wrap around” to the minimum of the values the type can hold. In the case of a "
+        },
+        {
+          "text": "u8",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", the value 256 becomes 0, the value 257 becomes 1, and so on. The program won’t panic, but the variable will have a value that probably isn’t what you were expecting it to have. Relying on integer overflow’s wrapping behavior is considered an error."
+        }
+      ]
+    },
+    {
+      "id": "286ebb2d3329",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "To explicitly handle the possibility of overflow, you can use these families of methods provided by the standard library for primitive numeric types:"
+        }
+      ]
+    },
+    {
+      "id": "79ec655bd12d",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "96404e542e39",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Wrap in all compilation modes with the "
+                },
+                {
+                  "text": "wrapping_*",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " methods, such as "
+                },
+                {
+                  "text": "wrapping_add",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "1a7fead97cb9",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Return the "
+                },
+                {
+                  "text": "None",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " value if there is overflow with the "
+                },
+                {
+                  "text": "checked_*",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " methods."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "c1c455d00efb",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Return the value and a Boolean indicating whether there was overflow with the "
+                },
+                {
+                  "text": "overflowing_*",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " methods."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "ef67aedac0e7",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Saturate at the value’s minimum or maximum values with the "
+                },
+                {
+                  "text": "saturating_*",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " methods."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "8a31bcd65658",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "floating-point-types",
+      "content": [
+        {
+          "text": "Floating-Point Types",
+          "link": {
+            "href": "#floating-point-types",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "8794aa432a3f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Rust also has two primitive types for "
+        },
+        {
+          "text": "floating-point numbers",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ", which are numbers with decimal points. Rust’s floating-point types are "
+        },
+        {
+          "text": "f32",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "f64",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", which are 32 bits and 64 bits in size, respectively. The default type is "
+        },
+        {
+          "text": "f64",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " because on modern CPUs, it’s roughly the same speed as "
+        },
+        {
+          "text": "f32",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " but is capable of more precision. All floating-point types are signed."
+        }
+      ]
+    },
+    {
+      "id": "6f3f7b460c45",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Here’s an example that shows floating-point numbers in action:"
+        }
+      ]
+    },
+    {
+      "id": "243649dcea17",
+      "kind": "code",
+      "lang": "rust",
+      "text": "fn main() {\n    let x = 2.0; // f64\n\n    let y: f32 = 3.0; // f32\n}",
+      "title": "Filename: src/main.rs"
+    },
+    {
+      "id": "0d917d8d3d27",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Floating-point numbers are represented according to the IEEE-754 standard."
+        }
+      ]
+    },
+    {
+      "id": "37ba943578db",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "numeric-operations",
+      "content": [
+        {
+          "text": "Numeric Operations",
+          "link": {
+            "href": "#numeric-operations",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ec90b7f02993",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Rust supports the basic mathematical operations you’d expect for all the number types: addition, subtraction, multiplication, division, and remainder. Integer division truncates toward zero to the nearest integer. The following code shows how you’d use each numeric operation in a "
+        },
+        {
+          "text": "let",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " statement:"
+        }
+      ]
+    },
+    {
+      "id": "4bf709f17e9d",
+      "kind": "code",
+      "lang": "rust",
+      "text": "fn main() {\n    // addition\n    let sum = 5 + 10;\n\n    // subtraction\n    let difference = 95.5 - 4.3;\n\n    // multiplication\n    let product = 4 * 30;\n\n    // division\n    let quotient = 56.7 / 32.2;\n    let truncated = -5 / 3; // Results in -1\n\n    // remainder\n    let remainder = 43 % 5;\n}",
+      "title": "Filename: src/main.rs"
+    },
+    {
+      "id": "b12f060ba593",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Each expression in these statements uses a mathematical operator and evaluates to a single value, which is then bound to a variable. "
+        },
+        {
+          "text": "Appendix B",
+          "link": {
+            "href": "https://doc.rust-lang.org/book/appendix-02-operators.html",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " contains a list of all operators that Rust provides."
+        }
+      ]
+    },
+    {
+      "id": "2399cf1651c6",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "the-boolean-type",
+      "content": [
+        {
+          "text": "The Boolean Type",
+          "link": {
+            "href": "#the-boolean-type",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "37b6d1344c4c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "As in most other programming languages, a Boolean type in Rust has two possible values: "
+        },
+        {
+          "text": "true",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "false",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". Booleans are one byte in size. The Boolean type in Rust is specified using "
+        },
+        {
+          "text": "bool",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". For example:"
+        }
+      ]
+    },
+    {
+      "id": "bf7bb677db20",
+      "kind": "code",
+      "lang": "rust",
+      "text": "fn main() {\n    let t = true;\n\n    let f: bool = false; // with explicit type annotation\n}",
+      "title": "Filename: src/main.rs"
+    },
+    {
+      "id": "a9ae7c4c986b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The main way to use Boolean values is through conditionals, such as an "
+        },
+        {
+          "text": "if",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " expression. We’ll cover how "
+        },
+        {
+          "text": "if",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " expressions work in Rust in the "
+        },
+        {
+          "text": "“Control Flow”",
+          "link": {
+            "href": "https://doc.rust-lang.org/book/ch03-05-control-flow.html#control-flow",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " section."
+        }
+      ]
+    },
+    {
+      "id": "fb702fd93345",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "the-character-type",
+      "content": [
+        {
+          "text": "The Character Type",
+          "link": {
+            "href": "#the-character-type",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "27b68b9838ce",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Rust’s "
+        },
+        {
+          "text": "char",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " type is the language’s most primitive alphabetic type. Here are some examples of declaring "
+        },
+        {
+          "text": "char",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " values:"
+        }
+      ]
+    },
+    {
+      "id": "79608e4fb2b1",
+      "kind": "code",
+      "lang": "rust",
+      "text": "fn main() {\n    let c = 'z';\n    let z: char = 'ℤ'; // with explicit type annotation\n    let heart_eyed_cat = '😻';\n}",
+      "title": "Filename: src/main.rs"
+    },
+    {
+      "id": "561e2319e311",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Note that we specify "
+        },
+        {
+          "text": "char",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " literals with single quotation marks, as opposed to string literals, which use double quotation marks. Rust’s "
+        },
+        {
+          "text": "char",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " type is 4 bytes in size and represents a Unicode scalar value, which means it can represent a lot more than just ASCII. Accented letters; Chinese, Japanese, and Korean characters; emojis; and zero-width spaces are all valid "
+        },
+        {
+          "text": "char",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " values in Rust. Unicode scalar values range from "
+        },
+        {
+          "text": "U+0000",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " to "
+        },
+        {
+          "text": "U+D7FF",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "U+E000",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " to "
+        },
+        {
+          "text": "U+10FFFF",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " inclusive. However, a “character” isn’t really a concept in Unicode, so your human intuition for what a “character” is may not match up with what a "
+        },
+        {
+          "text": "char",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is in Rust. We’ll discuss this topic in detail in "
+        },
+        {
+          "text": "“Storing UTF-8 Encoded Text with Strings”",
+          "link": {
+            "href": "https://doc.rust-lang.org/book/ch08-02-strings.html#storing-utf-8-encoded-text-with-strings",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " in Chapter 8."
+        }
+      ]
+    },
+    {
+      "id": "2759cfa2bff6",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "compound-types",
+      "content": [
+        {
+          "text": "Compound Types",
+          "link": {
+            "href": "#compound-types",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cc6fc794a452",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Compound types",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " can group multiple values into one type. Rust has two primitive compound types: tuples and arrays."
+        }
+      ]
+    },
+    {
+      "id": "eb5dabe72867",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "the-tuple-type",
+      "content": [
+        {
+          "text": "The Tuple Type",
+          "link": {
+            "href": "#the-tuple-type",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "9b4e6b3366d8",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A "
+        },
+        {
+          "text": "tuple",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " is a general way of grouping together a number of values with a variety of types into one compound type. Tuples have a fixed length: Once declared, they cannot grow or shrink in size."
+        }
+      ]
+    },
+    {
+      "id": "b374549665a7",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "We create a tuple by writing a comma-separated list of values inside parentheses. Each position in the tuple has a type, and the types of the different values in the tuple don’t have to be the same. We’ve added optional type annotations in this example:"
+        }
+      ]
+    },
+    {
+      "id": "733af75fdd88",
+      "kind": "code",
+      "lang": "rust",
+      "text": "fn main() {\n    let tup: (i32, f64, u8) = (500, 6.4, 1);\n}",
+      "title": "Filename: src/main.rs"
+    },
+    {
+      "id": "561e773408cb",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The variable "
+        },
+        {
+          "text": "tup",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " binds to the entire tuple because a tuple is considered a single compound element. To get the individual values out of a tuple, we can use pattern matching to destructure a tuple value, like this:"
+        }
+      ]
+    },
+    {
+      "id": "9429e13d3aad",
+      "kind": "code",
+      "lang": "rust",
+      "text": "fn main() {\n    let tup = (500, 6.4, 1);\n\n    let (x, y, z) = tup;\n\n    println!(\"The value of y is: {y}\");\n}",
+      "title": "Filename: src/main.rs"
+    },
+    {
+      "id": "c2a75caad03e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This program first creates a tuple and binds it to the variable "
+        },
+        {
+          "text": "tup",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". It then uses a pattern with "
+        },
+        {
+          "text": "let",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " to take "
+        },
+        {
+          "text": "tup",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and turn it into three separate variables, "
+        },
+        {
+          "text": "x",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "y",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", and "
+        },
+        {
+          "text": "z",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". This is called "
+        },
+        {
+          "text": "destructuring",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " because it breaks the single tuple into three parts. Finally, the program prints the value of "
+        },
+        {
+          "text": "y",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", which is "
+        },
+        {
+          "text": "6.4",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "debd3457aae9",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "We can also access a tuple element directly by using a period ("
+        },
+        {
+          "text": ".",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ") followed by the index of the value we want to access. For example:"
+        }
+      ]
+    },
+    {
+      "id": "2c0ae71540ca",
+      "kind": "code",
+      "lang": "rust",
+      "text": "fn main() {\n    let x: (i32, f64, u8) = (500, 6.4, 1);\n\n    let five_hundred = x.0;\n\n    let six_point_four = x.1;\n\n    let one = x.2;\n}",
+      "title": "Filename: src/main.rs"
+    },
+    {
+      "id": "40e87ab69000",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This program creates the tuple "
+        },
+        {
+          "text": "x",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and then accesses each element of the tuple using their respective indices. As with most programming languages, the first index in a tuple is 0."
+        }
+      ]
+    },
+    {
+      "id": "bb34998ca923",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The tuple without any values has a special name, "
+        },
+        {
+          "text": "unit",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ". This value and its corresponding type are both written "
+        },
+        {
+          "text": "()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and represent an empty value or an empty return type. Expressions implicitly return the unit value if they don’t return any other value."
+        }
+      ]
+    },
+    {
+      "id": "06d7be889a86",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "the-array-type",
+      "content": [
+        {
+          "text": "The Array Type",
+          "link": {
+            "href": "#the-array-type",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "6c1d192d4f5d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Another way to have a collection of multiple values is with an "
+        },
+        {
+          "text": "array",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ". Unlike a tuple, every element of an array must have the same type. Unlike arrays in some other languages, arrays in Rust have a fixed length."
+        }
+      ]
+    },
+    {
+      "id": "faf1f3f8c448",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "We write the values in an array as a comma-separated list inside square brackets:"
+        }
+      ]
+    },
+    {
+      "id": "2c6ceed63baf",
+      "kind": "code",
+      "lang": "rust",
+      "text": "fn main() {\n    let a = [1, 2, 3, 4, 5];\n}",
+      "title": "Filename: src/main.rs"
+    },
+    {
+      "id": "42b10a393817",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Arrays are useful when you want your data allocated on the stack, the same as the other types we have seen so far, rather than the heap (we will discuss the stack and the heap more in "
+        },
+        {
+          "text": "Chapter 4",
+          "link": {
+            "href": "https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#the-stack-and-the-heap",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ") or when you want to ensure that you always have a fixed number of elements. An array isn’t as flexible as the vector type, though. A vector is a similar collection type provided by the standard library that "
+        },
+        {
+          "text": "is",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " allowed to grow or shrink in size because its contents live on the heap. If you’re unsure whether to use an array or a vector, chances are you should use a vector. "
+        },
+        {
+          "text": "Chapter 8",
+          "link": {
+            "href": "https://doc.rust-lang.org/book/ch08-01-vectors.html",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " discusses vectors in more detail."
+        }
+      ]
+    },
+    {
+      "id": "473d4b593c06",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "However, arrays are more useful when you know the number of elements will not need to change. For example, if you were using the names of the month in a program, you would probably use an array rather than a vector because you know it will always contain 12 elements:"
+        }
+      ]
+    },
+    {
+      "id": "c9ba8e53ecd7",
+      "kind": "code",
+      "lang": "rust",
+      "text": "let months = [\"January\", \"February\", \"March\", \"April\", \"May\", \"June\", \"July\",\n              \"August\", \"September\", \"October\", \"November\", \"December\"];\n"
+    },
+    {
+      "id": "2fc64323bee1",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You write an array’s type using square brackets with the type of each element, a semicolon, and then the number of elements in the array, like so:"
+        }
+      ]
+    },
+    {
+      "id": "341138520970",
+      "kind": "code",
+      "lang": "rust",
+      "text": "let a: [i32; 5] = [1, 2, 3, 4, 5];\n"
+    },
+    {
+      "id": "c519e2b27b8b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Here, "
+        },
+        {
+          "text": "i32",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is the type of each element. After the semicolon, the number "
+        },
+        {
+          "text": "5",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " indicates the array contains five elements."
+        }
+      ]
+    },
+    {
+      "id": "10b81d9db51d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can also initialize an array to contain the same value for each element by specifying the initial value, followed by a semicolon, and then the length of the array in square brackets, as shown here:"
+        }
+      ]
+    },
+    {
+      "id": "5871cacc3370",
+      "kind": "code",
+      "lang": "rust",
+      "text": "let a = [3; 5];\n"
+    },
+    {
+      "id": "5166eed83846",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The array named "
+        },
+        {
+          "text": "a",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " will contain "
+        },
+        {
+          "text": "5",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " elements that will all be set to the value "
+        },
+        {
+          "text": "3",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " initially. This is the same as writing "
+        },
+        {
+          "text": "let a = [3, 3, 3, 3, 3];",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " but in a more concise way."
+        }
+      ]
+    },
+    {
+      "id": "b13ac0f5a7ad",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "array-element-access",
+      "content": [
+        {
+          "text": "Array Element Access",
+          "link": {
+            "href": "#array-element-access",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "e7ef9a91adc4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "An array is a single chunk of memory of a known, fixed size that can be allocated on the stack. You can access elements of an array using indexing, like this:"
+        }
+      ]
+    },
+    {
+      "id": "43f4328221c6",
+      "kind": "code",
+      "lang": "rust",
+      "text": "fn main() {\n    let a = [1, 2, 3, 4, 5];\n\n    let first = a[0];\n    let second = a[1];\n}",
+      "title": "Filename: src/main.rs"
+    },
+    {
+      "id": "eeb07c3fafda",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In this example, the variable named "
+        },
+        {
+          "text": "first",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " will get the value "
+        },
+        {
+          "text": "1",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " because that is the value at index "
+        },
+        {
+          "text": "[0]",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in the array. The variable named "
+        },
+        {
+          "text": "second",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " will get the value "
+        },
+        {
+          "text": "2",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " from index "
+        },
+        {
+          "text": "[1]",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in the array."
+        }
+      ]
+    },
+    {
+      "id": "2f00ff5f9a1f",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "invalid-array-element-access",
+      "content": [
+        {
+          "text": "Invalid Array Element Access",
+          "link": {
+            "href": "#invalid-array-element-access",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "b1016cded760",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Let’s see what happens if you try to access an element of an array that is past the end of the array. Say you run this code, similar to the guessing game in Chapter 2, to get an array index from the user:"
+        }
+      ]
+    },
+    {
+      "id": "aa00a511ea1a",
+      "kind": "code",
+      "lang": "rust",
+      "text": "use std::io;\n\nfn main() {\n    let a = [1, 2, 3, 4, 5];\n\n    println!(\"Please enter an array index.\");\n\n    let mut index = String::new();\n\n    io::stdin()\n        .read_line(&mut index)\n        .expect(\"Failed to read line\");\n\n    let index: usize = index\n        .trim()\n        .parse()\n        .expect(\"Index entered was not a number\");\n\n    let element = a[index];\n\n    println!(\"The value of the element at index {index} is: {element}\");\n}",
+      "title": "Filename: src/main.rs"
+    },
+    {
+      "id": "8b22a40b3d87",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This code compiles successfully. If you run this code using "
+        },
+        {
+          "text": "cargo run",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and enter "
+        },
+        {
+          "text": "0",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "1",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "2",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "3",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", or "
+        },
+        {
+          "text": "4",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", the program will print out the corresponding value at that index in the array. If you instead enter a number past the end of the array, such as "
+        },
+        {
+          "text": "10",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", you’ll see output like this:"
+        }
+      ]
+    },
+    {
+      "id": "b7f83a8c6bd3",
+      "kind": "code",
+      "lang": "console",
+      "text": "thread 'main' panicked at src/main.rs:19:19:\nindex out of bounds: the len is 5 but the index is 10\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "id": "21ad719d5f5b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The program resulted in a runtime error at the point of using an invalid value in the indexing operation. The program exited with an error message and didn’t execute the final "
+        },
+        {
+          "text": "println!",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " statement. When you attempt to access an element using indexing, Rust will check that the index you’ve specified is less than the array length. If the index is greater than or equal to the length, Rust will panic. This check has to happen at runtime, especially in this case, because the compiler can’t possibly know what value a user will enter when they run the code later."
+        }
+      ]
+    },
+    {
+      "id": "ce6121ad3213",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This is an example of Rust’s memory safety principles in action. In many low-level languages, this kind of check is not done, and when you provide an incorrect index, invalid memory can be accessed. Rust protects you against this kind of error by immediately exiting instead of allowing the memory access and continuing. Chapter 9 discusses more of Rust’s error handling and how you can write readable, safe code that neither panics nor allows invalid memory access."
+        }
+      ]
+    }
+  ]
+}

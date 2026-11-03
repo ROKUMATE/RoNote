@@ -64,6 +64,7 @@ type tokenRules struct {
 	skipped    []string // elements, in the same form, whose content is never kept
 	tabPanels  bool     // hidden role=tabpanel elements are content
 	codeTables []string // tables that lay out one code block next to its line numbers
+	notText    []string // classes inside a <pre> that are never text
 }
 
 // adapterRules holds the rules for each adapter's pages.
@@ -75,6 +76,8 @@ var adapterRules = map[string]tokenRules{
 	"material":  {root: "article.md-content__inner", codeTables: []string{"table.highlighttable"}, skipped: []string{"td.linenos"}},
 	"sphinx":    {root: "div.body", codeTables: []string{"table.highlighttable"}, skipped: []string{"td.linenos"}},
 	"vitepress": {root: "div.vp-doc"},
+	// Boring lines are hidden, and the copy button copies what is shown.
+	"mdbook": {root: "main", notText: []string{"boring"}},
 }
 
 // matcher turns tag, tag#id or tag.class into a match function.
@@ -283,7 +286,7 @@ func codeByTokens(input []byte, rules tokenRules) []string {
 					(root.fallback && (tag == "header" || tag == "footer")),
 				inlineOK: parent.inlineOK || (tokenInlineOnly[tag] && !matchesAny(codeTables, tag, attrs)),
 				notText: code != nil && (parent.notText || strings.Contains(style, "user-select:none") ||
-					slices.Contains(strings.Fields(attrs["class"]), "linenos")),
+					slices.ContainsFunc(strings.Fields(attrs["class"]), func(c string) bool { return c == "linenos" || slices.Contains(rules.notText, c) })),
 				frame: tag == "figure" && slices.Contains(strings.Fields(attrs["class"]), "frame"),
 			}
 			stack = append(stack, e)

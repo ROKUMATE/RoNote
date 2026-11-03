@@ -1,0 +1,754 @@
+{
+  "ir_version": 1,
+  "title": "Getting Started",
+  "source": {
+    "url": "https://vite.dev/guide/",
+    "final_url": "https://vite.dev/guide/",
+    "canonical_url": "https://vite.dev/guide/",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "3a3e7c8b347f705c42838fb3bcae08c9d3a71f139b1e2d635afdf2212e2630d4"
+  },
+  "extractor": {
+    "name": "vitepress",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "1f499387e295",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "getting-started",
+      "content": [
+        {
+          "text": "Getting Started"
+        }
+      ]
+    },
+    {
+      "id": "0389f7cb2944",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "overview",
+      "content": [
+        {
+          "text": "Overview"
+        }
+      ]
+    },
+    {
+      "id": "1b5c98a6d044",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Vite (French word for \"quick\", pronounced "
+        },
+        {
+          "text": "/viːt/",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", like \"veet\") is a build tool that aims to provide a faster and leaner development experience for modern web projects. It consists of two major parts:"
+        }
+      ]
+    },
+    {
+      "id": "fa4179d1dc61",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "5bc0d58c5150",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "A dev server that provides "
+                },
+                {
+                  "text": "rich feature enhancements",
+                  "link": {
+                    "href": "https://vite.dev/guide/features",
+                    "kind": "same_domain"
+                  }
+                },
+                {
+                  "text": " over "
+                },
+                {
+                  "text": "native ES modules",
+                  "link": {
+                    "href": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules",
+                    "kind": "external"
+                  }
+                },
+                {
+                  "text": ", for example extremely fast "
+                },
+                {
+                  "text": "Hot Module Replacement (HMR)",
+                  "link": {
+                    "href": "https://vite.dev/guide/features#hot-module-replacement",
+                    "kind": "same_domain"
+                  }
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "3567d3f93ee7",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "A build command that bundles your code with "
+                },
+                {
+                  "text": "Rolldown",
+                  "link": {
+                    "href": "https://rolldown.rs",
+                    "kind": "external"
+                  }
+                },
+                {
+                  "text": ", pre-configured to output highly optimized static assets for production."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "69143f6ded98",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Vite is opinionated and comes with sensible defaults out of the box. Read about what's possible in the "
+        },
+        {
+          "text": "Features Guide",
+          "link": {
+            "href": "https://vite.dev/guide/features",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ". Support for frameworks or integration with other tools is possible through "
+        },
+        {
+          "text": "Plugins",
+          "link": {
+            "href": "https://vite.dev/guide/using-plugins",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ". The "
+        },
+        {
+          "text": "Config Section",
+          "link": {
+            "href": "https://vite.dev/config/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " explains how to adapt Vite to your project if needed."
+        }
+      ]
+    },
+    {
+      "id": "df359619a764",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Vite is also highly extensible via its "
+        },
+        {
+          "text": "Plugin API",
+          "link": {
+            "href": "https://vite.dev/guide/api-plugin",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "JavaScript API",
+          "link": {
+            "href": "https://vite.dev/guide/api-javascript",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " with full typing support."
+        }
+      ]
+    },
+    {
+      "id": "a11ded8ee978",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can learn more about the rationale behind the project in the "
+        },
+        {
+          "text": "Why Vite",
+          "link": {
+            "href": "https://vite.dev/guide/why",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " section."
+        }
+      ]
+    },
+    {
+      "id": "4aa5c185a2f0",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Learn Vite through interactive tutorials on Scrimba",
+          "link": {
+            "href": "https://scrimba.com/intro-to-vite-c03p6pbbdq?via=vite",
+            "kind": "external"
+          }
+        }
+      ]
+    },
+    {
+      "id": "b52ad3224e46",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "scaffolding-your-first-vite-project",
+      "content": [
+        {
+          "text": "Scaffolding Your First Vite Project"
+        }
+      ]
+    },
+    {
+      "id": "dfdc53ff5836",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "npm",
+          "children": [
+            {
+              "id": "22198dd7607f",
+              "kind": "code",
+              "lang": "bash",
+              "text": "npm create vite@latest"
+            }
+          ]
+        },
+        {
+          "label": "Yarn",
+          "children": [
+            {
+              "id": "105259345ecf",
+              "kind": "code",
+              "lang": "bash",
+              "text": "yarn create vite"
+            }
+          ]
+        },
+        {
+          "label": "pnpm",
+          "children": [
+            {
+              "id": "13a5d9c230ad",
+              "kind": "code",
+              "lang": "bash",
+              "text": "pnpm create vite"
+            }
+          ]
+        },
+        {
+          "label": "Bun",
+          "children": [
+            {
+              "id": "05d4181e8931",
+              "kind": "code",
+              "lang": "bash",
+              "text": "bun create vite"
+            }
+          ]
+        },
+        {
+          "label": "Deno",
+          "children": [
+            {
+              "id": "27294eb53499",
+              "kind": "code",
+              "lang": "bash",
+              "text": "deno init --npm vite"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f85a5406be19",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Then follow the prompts!"
+        }
+      ]
+    },
+    {
+      "id": "e56cce2ab47b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Watch an interactive lesson on Scrimba",
+          "link": {
+            "href": "https://scrimba.com/intro-to-vite-c03p6pbbdq/~0yhj?via=vite",
+            "kind": "external"
+          }
+        }
+      ]
+    },
+    {
+      "id": "19927e159052",
+      "kind": "callout",
+      "variant": "tip",
+      "title": "Compatibility Note",
+      "children": [
+        {
+          "id": "b374c00d15b9",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Vite requires "
+            },
+            {
+              "text": "Node.js",
+              "link": {
+                "href": "https://nodejs.org/en/",
+                "kind": "external"
+              }
+            },
+            {
+              "text": " version 20.19+, 22.12+. However, some templates require a higher Node.js version to work, please upgrade if your package manager warns about it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "68a405c5ebba",
+      "kind": "callout",
+      "variant": "note",
+      "title": "Using create vite with command line options",
+      "children": [
+        {
+          "id": "199663cded13",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "You can also directly specify the project name and the template you want to use via additional command line options. For example, to scaffold a Vite + Vue project, run:"
+            }
+          ]
+        },
+        {
+          "id": "a016ccafcafd",
+          "kind": "tabs",
+          "items": [
+            {
+              "label": "npm",
+              "children": [
+                {
+                  "id": "e314ed0c3b5c",
+                  "kind": "code",
+                  "lang": "bash",
+                  "text": "# npm 7+, extra double-dash is needed:\nnpm create vite@latest my-vue-app -- --template vue"
+                }
+              ]
+            },
+            {
+              "label": "Yarn",
+              "children": [
+                {
+                  "id": "c03082c8a3ba",
+                  "kind": "code",
+                  "lang": "bash",
+                  "text": "yarn create vite my-vue-app --template vue"
+                }
+              ]
+            },
+            {
+              "label": "pnpm",
+              "children": [
+                {
+                  "id": "466035e695d9",
+                  "kind": "code",
+                  "lang": "bash",
+                  "text": "pnpm create vite my-vue-app --template vue"
+                }
+              ]
+            },
+            {
+              "label": "Bun",
+              "children": [
+                {
+                  "id": "e811b814afc2",
+                  "kind": "code",
+                  "lang": "bash",
+                  "text": "bun create vite my-vue-app --template vue"
+                }
+              ]
+            },
+            {
+              "label": "Deno",
+              "children": [
+                {
+                  "id": "300b2c68d65f",
+                  "kind": "code",
+                  "lang": "bash",
+                  "text": "deno init --npm vite my-vue-app --template vue"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "846005205235",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "See "
+            },
+            {
+              "text": "create-vite",
+              "link": {
+                "href": "https://github.com/vitejs/vite/tree/main/packages/create-vite",
+                "kind": "external"
+              }
+            },
+            {
+              "text": " for more details on each supported template: "
+            },
+            {
+              "text": "vanilla",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "vanilla-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "vue",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "vue-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "react",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "react-compiler",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "react-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "react-compiler-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "preact",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "preact-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "lit",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "lit-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "svelte",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "svelte-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "solid",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "solid-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "qwik",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "qwik-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": "."
+            }
+          ]
+        },
+        {
+          "id": "87a2e0b9d590",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "You can use "
+            },
+            {
+              "text": ".",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " for the project name to scaffold in the current directory."
+            }
+          ]
+        },
+        {
+          "id": "9a0102244d76",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "To create a project without interactive prompts, you can use the "
+            },
+            {
+              "text": "--no-interactive",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " flag."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6b2d3d868f39",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "community-templates",
+      "content": [
+        {
+          "text": "Community Templates"
+        }
+      ]
+    },
+    {
+      "id": "40319bef20c3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "create-vite is a tool to quickly start a project from a basic template for popular frameworks. Check out Awesome Vite for "
+        },
+        {
+          "text": "community maintained templates",
+          "link": {
+            "href": "https://github.com/vitejs/awesome-vite#templates",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " that include other tools or target different frameworks."
+        }
+      ]
+    },
+    {
+      "id": "f0f55820a830",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "For a template at "
+        },
+        {
+          "text": "https://github.com/user/project",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", you can try it out online using "
+        },
+        {
+          "text": "https://github.stackblitz.com/user/project",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " (adding "
+        },
+        {
+          "text": ".stackblitz",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " after "
+        },
+        {
+          "text": "github",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " to the URL of the project)."
+        }
+      ]
+    },
+    {
+      "id": "af62ba4318ee",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can also use a tool like "
+        },
+        {
+          "text": "tiged",
+          "link": {
+            "href": "https://github.com/tiged/tiged",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " to scaffold your project with one of the templates. Assuming the project is on GitHub and uses "
+        },
+        {
+          "text": "main",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " as the default branch, you can create a local copy using:"
+        }
+      ]
+    },
+    {
+      "id": "dcfbc22c33b3",
+      "kind": "code",
+      "lang": "bash",
+      "text": "npx tiged user/project my-project\ncd my-project\n\nnpm install\nnpm run dev"
+    }
+  ]
+}

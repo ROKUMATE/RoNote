@@ -77,6 +77,7 @@ func TestPlannedPage(t *testing.T) {
 			<div role="tabpanel" aria-labelledby="t1"><pre>npm i</pre></div>
 			<div role="tabpanel" aria-labelledby="t2" hidden><pre>pnpm i</pre></div></div>
 		<div class="tabset"><span role="tab"> </span><div role="tabpanel"><p>Unlabelled.</p></div></div>
+		<div class="tabset"><span role="tab">a.go</span><div role="tabpanel" class="codebox"><span class="file">a.go</span><pre>a</pre></div></div>
 		<div class="codebox"><div class="file">main.go</div><button>Copy</button><pre class="language-go"><span class="ln">1</span>package main</pre></div>
 		<table class="lines language-sql"><tr><td><pre>1</pre></td><td class="code"><div><pre>x := 1</pre></div></td></tr></table>
 		<span class="filename">Filename: src/main.rs</span><pre class="listing">fn main() {}</pre>
@@ -86,7 +87,7 @@ func TestPlannedPage(t *testing.T) {
 		t.Errorf("extractor = %v, warnings = %v; want testfw 3 and none", doc.Extractor, doc.Warnings)
 	}
 	want := `heading(Title) paragraph(Text.) callout(tip "Tip": paragraph(Inside.)) ` +
-		`tabs(npm: code( "" "npm i") | pnpm: code( "" "pnpm i")) paragraph(Unlabelled.) ` +
+		`tabs(npm: code( "" "npm i") | pnpm: code( "" "pnpm i")) paragraph(Unlabelled.) tabs(a.go: code( "a.go" "a")) ` +
 		`code(go "main.go" "package main") code(sql "" "x := 1") code( "Filename: src/main.rs" "fn main() {}")`
 	if got := outline(doc.Blocks); got != want {
 		t.Errorf("blocks =\n%s\nwant\n%s", got, want)

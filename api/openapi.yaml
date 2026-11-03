@@ -1,0 +1,492 @@
+openapi: 3.1.0
+info:
+  title: RoNote API
+  version: 1.0.0
+  description: |
+    Import documentation pages and read them back as documents. Every route
+    needs a signed-in user; until real sign-in exists, dev and test inject
+    RONOTE_DEV_USER_EMAIL, and staging and prod answer 401.
+
+    Errors always use the Error envelope. Its code is stable; its message is
+    for people.
+servers:
+  - url: /api/v1
+paths:
+  /imports:
+    post:
+      operationId: createImport
+      summary: Import a page
+      description: |
+        Queues an import of the URL. If the user already has a document for
+        it, nothing is queued and the answer is 200 with that document's
+        import and document ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateImportRequest"
+      responses:
+        "200":
+          description: The user already has this page.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResponse"
+        "202":
+          description: The import is queued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResponse"
+        "400":
+          description: >-
+            The request or its URL is invalid. Codes: invalid_request,
+            invalid_url, unsupported_scheme, url_too_long, ip_literal_host.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+  /imports/{id}:
+    get:
+      operationId: getImport
+      summary: Get an import
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: The import.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResponse"
+        "400":
+          $ref: "#/components/responses/InvalidParameter"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /imports/{id}/events:
+    get:
+      operationId: getImportEvents
+      summary: Follow an import's progress
+      description: |
+        A server-sent event stream. It sends the import's current status at
+        once, then every status change, as `event: status` with an
+        ImportEvent as data, and closes after done or failed. A comment line
+        (`: heartbeat`) every 15 seconds keeps idle connections open.
+        This handler is written by hand; the spec documents it.
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: The event stream.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+              example: |
+                event: status
+                data: {"status":"queued"}
+
+                event: status
+                data: {"status":"done","document_id":"0192f1c4-7d3e-7c5a-9b1e-3f2a6d4c8e10"}
+        "400":
+          $ref: "#/components/responses/InvalidParameter"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /documents:
+    get:
+      operationId: listDocuments
+      summary: List the user's documents, newest first
+      parameters:
+        - name: cursor
+          in: query
+          description: The next_cursor of the previous page.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: One page of documents.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentList"
+        "400":
+          description: "The cursor or limit is invalid. Codes: invalid_cursor, invalid_parameter."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+  /documents/{id}:
+    get:
+      operationId: getDocument
+      summary: Get a document with its content
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: The document.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        "400":
+          $ref: "#/components/responses/InvalidParameter"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  parameters:
+    ID:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    Unauthenticated:
+      description: "No signed-in user. Code: unauthenticated."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: "No such resource for this user. Code: not_found."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    InvalidParameter:
+      description: "A path or query parameter is malformed. Code: invalid_parameter."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, request_id]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            request_id:
+              type: string
+    CreateImportRequest:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          maxLength: 2048
+    ImportStatus:
+      type: string
+      enum: [queued, fetching, extracting, done, failed]
+    Import:
+      type: object
+      required: [id, requested_url, canonical_url, status, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        requested_url:
+          type: string
+        canonical_url:
+          type: string
+        status:
+          $ref: "#/components/schemas/ImportStatus"
+        error_code:
+          type: string
+          description: >-
+            Set when status is failed: invalid_url, blocked_address,
+            disallowed_by_robots, too_large, unsupported_type,
+            too_many_redirects, not_found, http_error, extract_failed,
+            timeout, rate_limited, upstream_error, network_error or
+            internal_error.
+        document_id:
+          type: string
+          format: uuid
+          description: Set when status is done.
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ImportResponse:
+      type: object
+      required: [import]
+      properties:
+        import:
+          $ref: "#/components/schemas/Import"
+    ImportEvent:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: "#/components/schemas/ImportStatus"
+        error_code:
+          type: string
+        document_id:
+          type: string
+          format: uuid
+    DocumentSummary:
+      type: object
+      required: [id, title, source_url, version, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        source_url:
+          type: string
+          description: The canonical URL of the page the document came from.
+        version:
+          type: integer
+          description: Counts edits, for optimistic concurrency; starts at 1.
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Document:
+      allOf:
+        - $ref: "#/components/schemas/DocumentSummary"
+        - type: object
+          required: [content]
+          properties:
+            content:
+              $ref: "#/components/schemas/IRDocument"
+    DocumentList:
+      type: object
+      required: [documents]
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentSummary"
+        next_cursor:
+          type: string
+          description: Present when there are more documents.
+
+    # The IR, version 1 (docs/adr/0004-ir-and-links.md). Go uses package
+    # internal/ir for these; TestIRSchemaMatchesGoldens checks they agree.
+    IRDocument:
+      x-go-type: ir.Doc
+      x-go-type-import:
+        path: github.com/rokumate/ronote/internal/ir
+      type: object
+      additionalProperties: false
+      required: [ir_version, title, source, extractor, blocks]
+      properties:
+        ir_version:
+          type: integer
+          enum: [1]
+        title:
+          type: string
+        source:
+          $ref: "#/components/schemas/IRSource"
+        extractor:
+          $ref: "#/components/schemas/IRExtractor"
+        blocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/IRBlock"
+        warnings:
+          type: array
+          items:
+            $ref: "#/components/schemas/IRWarning"
+    IRSource:
+      x-go-type: ir.Source
+      x-go-type-import:
+        path: github.com/rokumate/ronote/internal/ir
+      type: object
+      additionalProperties: false
+      required: [url, final_url, fetched_at, body_sha256]
+      properties:
+        url:
+          type: string
+        final_url:
+          type: string
+        canonical_url:
+          type: string
+        fetched_at:
+          type: string
+          format: date-time
+        body_sha256:
+          type: string
+        etag:
+          type: string
+        last_modified:
+          type: string
+    IRExtractor:
+      x-go-type: ir.Extractor
+      x-go-type-import:
+        path: github.com/rokumate/ronote/internal/ir
+      type: object
+      additionalProperties: false
+      required: [name, version]
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+    IRWarning:
+      x-go-type: ir.Warning
+      x-go-type-import:
+        path: github.com/rokumate/ronote/internal/ir
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum: [low_confidence, parse_failed, adapter_fallback]
+        message:
+          type: string
+    IRBlock:
+      x-go-type: ir.Block
+      x-go-type-import:
+        path: github.com/rokumate/ronote/internal/ir
+      type: object
+      additionalProperties: false
+      required: [id, kind]
+      description: >-
+        One block. kind decides which other fields may be set: heading has
+        level, anchor and content; paragraph content; list ordered and items;
+        tabs items with labels; code lang, title, title_link and text; table
+        head and rows; callout variant, title and children; quote children;
+        image src, alt and caption; divider nothing.
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+          enum: [heading, paragraph, list, code, table, callout, image, quote, divider, tabs]
+        level:
+          type: integer
+          minimum: 1
+          maximum: 6
+        anchor:
+          type: string
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/IRInline"
+        ordered:
+          type: boolean
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/IRItem"
+        lang:
+          type: string
+        title:
+          type: string
+        title_link:
+          $ref: "#/components/schemas/IRLink"
+        text:
+          type: string
+        head:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/IRCell"
+        rows:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/IRCell"
+        variant:
+          type: string
+          enum: [note, tip, info, warning, danger]
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/IRBlock"
+        src:
+          type: string
+        alt:
+          type: string
+        caption:
+          type: array
+          items:
+            $ref: "#/components/schemas/IRInline"
+    IRItem:
+      x-go-type: ir.Item
+      x-go-type-import:
+        path: github.com/rokumate/ronote/internal/ir
+      type: object
+      additionalProperties: false
+      required: [children]
+      properties:
+        label:
+          type: string
+          description: Set on tabs only.
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/IRBlock"
+    IRCell:
+      x-go-type: ir.Cell
+      x-go-type-import:
+        path: github.com/rokumate/ronote/internal/ir
+      description: A table cell's inline runs; an empty cell is null.
+      type: [array, "null"]
+      items:
+        $ref: "#/components/schemas/IRInline"
+    IRInline:
+      x-go-type: ir.Inline
+      x-go-type-import:
+        path: github.com/rokumate/ronote/internal/ir
+      type: object
+      additionalProperties: false
+      required: [text]
+      properties:
+        text:
+          type: string
+        marks:
+          type: array
+          items:
+            type: string
+            enum: [bold, italic, code, kbd, strike, sub, sup]
+        link:
+          $ref: "#/components/schemas/IRLink"
+    IRLink:
+      x-go-type: ir.Link
+      x-go-type-import:
+        path: github.com/rokumate/ronote/internal/ir
+      type: object
+      additionalProperties: false
+      required: [href, kind]
+      properties:
+        href:
+          type: string
+        kind:
+          type: string
+          enum: [anchor, same_domain, external]

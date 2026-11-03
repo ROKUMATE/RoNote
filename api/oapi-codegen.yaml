@@ -1,0 +1,12 @@
+# go tool oapi-codegen -config api/oapi-codegen.yaml api/openapi.yaml (make generate)
+package: gen
+output: internal/httpapi/gen/api.gen.go
+generate:
+  models: true
+  std-http-server: true
+  strict-server: true
+output-options:
+  name-normalizer: ToCamelCaseWithInitialisms
+  # The event stream is written by hand; the spec only documents it.
+  exclude-operation-ids:
+    - getImportEvents

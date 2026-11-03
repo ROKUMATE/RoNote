@@ -11,20 +11,15 @@ test("renders the shell", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1, name: "Library" })).toBeVisible();
 });
 
-test("explains the disabled import button", async ({ page }) => {
+test("the import button opens the import dialog", async ({ page }) => {
   await page.goto("/");
-  const button = page.getByRole("button", { name: "Import page" });
-  const tooltip = page.getByRole("tooltip");
+  await page.getByRole("button", { name: "Import page" }).click();
+  const dialog = page.getByRole("dialog", { name: "Import page" });
 
-  await expect(button).toHaveAttribute("aria-disabled", "true");
-  await expect(button).toHaveAccessibleDescription("Coming in P08");
-  await expect(tooltip).toBeHidden();
-  await button.focus();
-  await expect(tooltip).toBeVisible();
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByLabel("Page URL")).toBeFocused();
   await page.keyboard.press("Escape");
-  await expect(tooltip).toBeHidden();
-  await button.hover();
-  await expect(tooltip).toBeVisible();
+  await expect(dialog).toBeHidden();
 });
 
 test("shows a not found page for unknown paths", async ({ page }) => {

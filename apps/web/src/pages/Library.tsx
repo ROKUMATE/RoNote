@@ -1,8 +1,5 @@
-import { FilePlusIcon } from "@phosphor-icons/react/FilePlus";
+import { ImportButton } from "../imports/ImportDialog";
 import { PageTitle } from "../ui/PageTitle";
-import { Tooltip } from "../ui/Tooltip";
-
-const importHint = import.meta.env.DEV ? "Coming in P08" : "Not available yet";
 
 export function Library() {
   return (
@@ -12,19 +9,7 @@ export function Library() {
         No pages yet. Import a documentation page or a printed PDF to start.
       </p>
       <div className="mt-6">
-        <Tooltip label={importHint}>
-          {(trigger) => (
-            <button
-              type="button"
-              aria-disabled="true"
-              {...trigger}
-              className="inline-flex cursor-not-allowed items-center gap-2 rounded-sm border border-rule px-3 py-1.5 text-ink-2 text-ui-lg"
-            >
-              <FilePlusIcon size={16} aria-hidden />
-              Import page
-            </button>
-          )}
-        </Tooltip>
+        <ImportButton />
       </div>
     </div>
   );

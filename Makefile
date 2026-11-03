@@ -60,11 +60,12 @@ extract: ## Print a page's IR: make extract url=https://... [format=text]
 
 lint: lint-go lint-web ## Lint Go and web code
 
-lint-go: ## Lint Go code and CI workflows (golangci-lint, deadcode, actionlint)
+lint-go: ## Lint Go code and CI workflows (golangci-lint, deadcode, go mod tidy, actionlint)
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) run
 	@dead=$$(go tool deadcode -test -tags integration ./...) && [ -z "$$dead" ] || \
 		{ printf '%s\n' "$$dead" >&2; echo "make lint-go: deadcode failed or found unreachable functions" >&2; exit 1; }
+	go mod tidy -diff
 	go tool actionlint
 
 lint-web: ## Lint web code (Biome, tsc, knip)
@@ -107,11 +108,10 @@ migrate-new: ## Create a SQL migration: make migrate-new name=add_documents
 sqlc: ## Regenerate internal/store/sqlcdb from migrations and queries
 	go tool sqlc generate
 
-check-generated: ## Fail if sqlc output or go.mod/go.sum need regenerating
+check-generated: ## Fail if sqlc output needs regenerating
 	go tool sqlc generate
 	@test -z "$$(git status --porcelain -- internal/store/sqlcdb)" || \
 		{ git status --short -- internal/store/sqlcdb; echo "make check-generated: sqlc output is stale; run make sqlc and commit it" >&2; exit 1; }
-	go mod tidy -diff
 
 check-go-version: ## Print the Go toolchain; fail unless it is the one go.mod pins
 	@want=$$($(go_toolchain)); have=$$(go env GOVERSION); \

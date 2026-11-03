@@ -1,0 +1,131 @@
+{
+  "ir_version": 1,
+  "title": "Reading Files",
+  "source": {
+    "url": "https://guide.example.org/ch02-reading.html",
+    "final_url": "https://guide.example.org/ch02-reading.html",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "c321c32b1f7276a77ab14ae6d6ec3ce515d7639264883b716c70d7371c728133"
+  },
+  "extractor": {
+    "name": "mdbook",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "5cf481ac539f",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "reading-files",
+      "content": [
+        {
+          "text": "Reading Files",
+          "link": {
+            "href": "#reading-files",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "55c4ceabd7e6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A program reads a file in one call. The listing hides the lines that only make it compile."
+        }
+      ]
+    },
+    {
+      "id": "a18b40176671",
+      "kind": "code",
+      "lang": "rust",
+      "text": "let text = fs::read_to_string(\"notes.txt\")?;\nprintln!(\"{} bytes\", text.len());\n",
+      "title": "Filename: src/main.rs"
+    },
+    {
+      "id": "2ad88aef0b17",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Run it:"
+        }
+      ]
+    },
+    {
+      "id": "d5b7259cdf58",
+      "kind": "code",
+      "lang": "console",
+      "text": "$ cargo run\n   Compiling notes v0.1.0\n42 bytes\n"
+    },
+    {
+      "id": "bd7b98b7d3cc",
+      "kind": "quote",
+      "children": [
+        {
+          "id": "c821f4599a37",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Note: the file must be UTF-8."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d779b044f47a",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "dependencies",
+      "content": [
+        {
+          "text": "Dependencies",
+          "link": {
+            "href": "#dependencies",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "c81a9e8fdead",
+      "kind": "code",
+      "lang": "toml",
+      "text": "[dependencies]\nserde = \"1\"\n",
+      "title": "Filename: Cargo.toml"
+    },
+    {
+      "id": "4b4f84dc5efa",
+      "kind": "table",
+      "head": [
+        [
+          [
+            {
+              "text": "Crate"
+            }
+          ],
+          [
+            {
+              "text": "Use"
+            }
+          ]
+        ]
+      ],
+      "rows": [
+        [
+          [
+            {
+              "text": "serde"
+            }
+          ],
+          [
+            {
+              "text": "Parsing"
+            }
+          ]
+        ]
+      ]
+    }
+  ]
+}

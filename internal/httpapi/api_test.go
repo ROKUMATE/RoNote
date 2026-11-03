@@ -288,3 +288,67 @@ func TestCursorRoundTrip(t *testing.T) {
 		t.Errorf("round trip = %+v, %v; want %+v", got, err, c)
 	}
 }
+
+// TestTimestampsAreUTC requires every timestamp in a response to be RFC 3339
+// in UTC, whatever zone the database driver returned it in.
+func TestTimestampsAreUTC(t *testing.T) {
+	t.Parallel()
+	ist := time.FixedZone("IST", 5*3600+1800)
+	doc := testDoc(1)
+	doc.CreatedAt, doc.UpdatedAt = doc.CreatedAt.In(ist), doc.UpdatedAt.In(ist)
+	imp := store.Import{ID: uuid.New(), Status: store.ImportDone, DocumentID: doc.ID, CreatedAt: t0.In(ist), UpdatedAt: t0.In(ist)}
+	existing := true
+	b := &fakeBackend{
+		imports: map[uuid.UUID]store.Import{imp.ID: imp},
+		docs:    []store.Document{doc},
+		request: func(string) (importer.Requested, error) {
+			return importer.Requested{Import: imp, Existing: existing}, nil
+		},
+	}
+	h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+
+	requests := []struct{ method, target, body string }{
+		{http.MethodPost, "/api/v1/imports", `{"url":"https://docs.example.com/1"}`},
+		{http.MethodGet, "/api/v1/imports/" + imp.ID.String(), ""},
+		{http.MethodGet, "/api/v1/documents", ""},
+		{http.MethodGet, "/api/v1/documents/" + doc.ID.String(), ""},
+	}
+	check := func(name string, body any) {
+		found := 0
+		walkTimestamps(body, func(key, value string) {
+			found++
+			got, err := time.Parse(time.RFC3339Nano, value)
+			if err != nil || !strings.HasSuffix(value, "Z") || !got.Equal(t0) && !got.Equal(doc.CreatedAt) {
+				t.Errorf("%s: %s = %q, want an RFC 3339 UTC time", name, key, value)
+			}
+		})
+		if found == 0 {
+			t.Errorf("%s: no timestamps found", name)
+		}
+	}
+	for _, r := range requests {
+		rec := apiRequest(t, h, r.method, r.target, r.body)
+		check(r.method+" "+r.target, decodeJSON[any](t, rec))
+	}
+	existing = false
+	rec := apiRequest(t, h, http.MethodPost, "/api/v1/imports", `{"url":"https://docs.example.com/1"}`)
+	check("POST /api/v1/imports (queued)", decodeJSON[any](t, rec))
+}
+
+// walkTimestamps calls f for every string field whose key ends in _at.
+func walkTimestamps(v any, f func(key, value string)) {
+	switch v := v.(type) {
+	case map[string]any:
+		for k, child := range v {
+			if s, ok := child.(string); ok && strings.HasSuffix(k, "_at") {
+				f(k, s)
+				continue
+			}
+			walkTimestamps(child, f)
+		}
+	case []any:
+		for _, child := range v {
+			walkTimestamps(child, f)
+		}
+	}
+}

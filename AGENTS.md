@@ -72,7 +72,7 @@ Create a directory when its first file needs it, not before.
 | `make web-deps` | `pnpm install --frozen-lockfile` |
 | `make web-browsers` | Playwright's Chromium; `WITH_DEPS=1` also installs its system packages (CI) |
 | `make check-node-version` | print the Node version and fail unless it is `.nvmrc`'s |
-| `make web-dev` | Vite dev server on `127.0.0.1:5173`; the styleguide is at `/_styleguide` |
+| `make web-dev` | Vite dev server on `127.0.0.1:5173`; the styleguide is at `/_styleguide`. It proxies `/api` to the API at `RONOTE_API_ORIGIN` (default `http://127.0.0.1:8080`), so run `make run-api` and `make run-worker` too |
 | `make web-build` | production build into `apps/web/dist`; fails if styleguide code ends up in it or the gzip size passes the budget in `scripts/web-budget.sh` (JS 150 kB, CSS 20 kB) |
 | `make web-e2e` | Playwright end-to-end and axe tests in Chromium against the dev server; kept out of `make test` |
 | `make run-worker` | run the import worker (River queue `imports`); `RONOTE_ENV` defaults to `dev` |

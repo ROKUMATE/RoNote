@@ -1,0 +1,91 @@
+{
+  "ir_version": 1,
+  "title": "Release notes",
+  "source": {
+    "url": "https://site.example.com/release-notes/",
+    "final_url": "https://site.example.com/release-notes/",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "c6f798fad099aacea8353fd84c64624d3f166d781497d03c393d9c64e19aaca9"
+  },
+  "extractor": {
+    "name": "generic",
+    "version": "2"
+  },
+  "blocks": [
+    {
+      "id": "67a752df3569",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "release-notes",
+      "content": [
+        {
+          "text": "Release notes"
+        }
+      ]
+    },
+    {
+      "id": "c992fb96805a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This page uses a custom layout, so Starlight's content container is missing and the generic rules apply."
+        }
+      ]
+    },
+    {
+      "id": "f7e7d84a104c",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "version-2-0",
+      "content": [
+        {
+          "text": "Version 2.0"
+        }
+      ]
+    },
+    {
+      "id": "098c7a222945",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "5e7d526616b7",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Faster imports."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "0d7374788f56",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Smaller downloads."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1db3db5afc22",
+      "kind": "code",
+      "lang": "sh",
+      "text": "notes upgrade --to 2.0\n"
+    }
+  ],
+  "warnings": [
+    {
+      "code": "adapter_fallback",
+      "message": "starlight adapter: \".sl-markdown-content\" not found in the root; used the generic rules"
+    }
+  ]
+}

@@ -1,0 +1,419 @@
+{
+  "ir_version": 1,
+  "title": "PostgreSQL: Documentation: 18: 2.5. Querying a Table",
+  "source": {
+    "url": "https://www.postgresql.org/docs/current/tutorial-select.html",
+    "final_url": "https://www.postgresql.org/docs/current/tutorial-select.html",
+    "canonical_url": "https://www.postgresql.org/docs/current/tutorial-select.html",
+    "fetched_at": "2026-11-03T00:00:00Z",
+    "body_sha256": "6e93a11dd90521ab549a5437609bbc0adde2351620c75b3699b63cc4db7b8964"
+  },
+  "extractor": {
+    "name": "docbook",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "96841dc0fd4c",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "2-5-querying-a-table",
+      "content": [
+        {
+          "text": "2.5. Querying a Table"
+        }
+      ]
+    },
+    {
+      "id": "fcf57dabc45b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "To retrieve data from a table, the table is "
+        },
+        {
+          "text": "queried",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ". An SQL "
+        },
+        {
+          "text": "SELECT",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " statement is used to do this. The statement is divided into a select list (the part that lists the columns to be returned), a table list (the part that lists the tables from which to retrieve the data), and an optional qualification (the part that specifies any restrictions). For example, to retrieve all the rows of table "
+        },
+        {
+          "text": "weather",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", type:"
+        }
+      ]
+    },
+    {
+      "id": "a5390aebaec5",
+      "kind": "code",
+      "text": "SELECT * FROM weather;\n"
+    },
+    {
+      "id": "69d2dda08b28",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Here "
+        },
+        {
+          "text": "*",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is a shorthand for “all columns”. "
+        },
+        {
+          "text": "[2]",
+          "marks": [
+            "sup"
+          ],
+          "link": {
+            "href": "#ftn.id-1.4.4.6.2.10",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": " So the same result would be had with:"
+        }
+      ]
+    },
+    {
+      "id": "f603fb4816df",
+      "kind": "code",
+      "text": "SELECT city, temp_lo, temp_hi, prcp, date FROM weather;\n"
+    },
+    {
+      "id": "f3b6f217fcbd",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The output should be:"
+        }
+      ]
+    },
+    {
+      "id": "813f16ed97c1",
+      "kind": "code",
+      "text": "     city      | temp_lo | temp_hi | prcp |    date\n---------------+---------+---------+------+------------\n San Francisco |      46 |      50 | 0.25 | 1994-11-27\n San Francisco |      43 |      57 |    0 | 1994-11-29\n Hayward       |      37 |      54 |      | 1994-11-29\n(3 rows)\n"
+    },
+    {
+      "id": "6c4ade5c0db8",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can write expressions, not just simple column references, in the select list. For example, you can do:"
+        }
+      ]
+    },
+    {
+      "id": "ae699907a7c6",
+      "kind": "code",
+      "text": "SELECT city, (temp_hi+temp_lo)/2 AS temp_avg, date FROM weather;\n"
+    },
+    {
+      "id": "843cda9f225d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This should give:"
+        }
+      ]
+    },
+    {
+      "id": "dd7872e67c66",
+      "kind": "code",
+      "text": "     city      | temp_avg |    date\n---------------+----------+------------\n San Francisco |       48 | 1994-11-27\n San Francisco |       50 | 1994-11-29\n Hayward       |       45 | 1994-11-29\n(3 rows)\n"
+    },
+    {
+      "id": "b335566f73e5",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Notice how the "
+        },
+        {
+          "text": "AS",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause is used to relabel the output column. (The "
+        },
+        {
+          "text": "AS",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause is optional.)"
+        }
+      ]
+    },
+    {
+      "id": "cad356f26b5f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A query can be “qualified” by adding a "
+        },
+        {
+          "text": "WHERE",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause that specifies which rows are wanted. The "
+        },
+        {
+          "text": "WHERE",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause contains a Boolean (truth value) expression, and only rows for which the Boolean expression is true are returned. The usual Boolean operators ("
+        },
+        {
+          "text": "AND",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "OR",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", and "
+        },
+        {
+          "text": "NOT",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ") are allowed in the qualification. For example, the following retrieves the weather of San Francisco on rainy days:"
+        }
+      ]
+    },
+    {
+      "id": "8dce527cf10a",
+      "kind": "code",
+      "text": "SELECT * FROM weather\n    WHERE city = 'San Francisco' AND prcp > 0.0;\n"
+    },
+    {
+      "id": "0ce460aef475",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Result:"
+        }
+      ]
+    },
+    {
+      "id": "f3514a3c24a9",
+      "kind": "code",
+      "text": "     city      | temp_lo | temp_hi | prcp |    date\n---------------+---------+---------+------+------------\n San Francisco |      46 |      50 | 0.25 | 1994-11-27\n(1 row)\n"
+    },
+    {
+      "id": "d3ec0f15caa3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can request that the results of a query be returned in sorted order:"
+        }
+      ]
+    },
+    {
+      "id": "9585993209f3",
+      "kind": "code",
+      "text": "SELECT * FROM weather\n    ORDER BY city;\n"
+    },
+    {
+      "id": "46ed4a82c8e3",
+      "kind": "code",
+      "text": "     city      | temp_lo | temp_hi | prcp |    date\n---------------+---------+---------+------+------------\n Hayward       |      37 |      54 |      | 1994-11-29\n San Francisco |      43 |      57 |    0 | 1994-11-29\n San Francisco |      46 |      50 | 0.25 | 1994-11-27\n"
+    },
+    {
+      "id": "24593a76dd2f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In this example, the sort order isn't fully specified, and so you might get the San Francisco rows in either order. But you'd always get the results shown above if you do:"
+        }
+      ]
+    },
+    {
+      "id": "eeab6756e893",
+      "kind": "code",
+      "text": "SELECT * FROM weather\n    ORDER BY city, temp_lo;\n"
+    },
+    {
+      "id": "2b88f6438067",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can request that duplicate rows be removed from the result of a query:"
+        }
+      ]
+    },
+    {
+      "id": "aeb36fa64996",
+      "kind": "code",
+      "text": "SELECT DISTINCT city\n    FROM weather;\n"
+    },
+    {
+      "id": "2d10947107ea",
+      "kind": "code",
+      "text": "     city\n---------------\n Hayward\n San Francisco\n(2 rows)\n"
+    },
+    {
+      "id": "6b345cdfe6c8",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Here again, the result row ordering might vary. You can ensure consistent results by using "
+        },
+        {
+          "text": "DISTINCT",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "ORDER BY",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " together: "
+        },
+        {
+          "text": "[3]",
+          "marks": [
+            "sup"
+          ],
+          "link": {
+            "href": "#ftn.id-1.4.4.6.6.7",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "86067fdfcca5",
+      "kind": "code",
+      "text": "SELECT DISTINCT city\n    FROM weather\n    ORDER BY city;\n"
+    },
+    {
+      "id": "9fca23e25729",
+      "kind": "divider"
+    },
+    {
+      "id": "c8e0a3a3b02c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "[2]",
+          "marks": [
+            "sup"
+          ],
+          "link": {
+            "href": "#id-1.4.4.6.2.10",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": " While "
+        },
+        {
+          "text": "SELECT *",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is useful for off-the-cuff queries, it is widely considered bad style in production code, since adding a column to the table would change the results."
+        }
+      ]
+    },
+    {
+      "id": "179703c468ca",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "[3]",
+          "marks": [
+            "sup"
+          ],
+          "link": {
+            "href": "#id-1.4.4.6.6.7",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": " In some database systems, including older versions of PostgreSQL, the implementation of "
+        },
+        {
+          "text": "DISTINCT",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " automatically orders the rows and so "
+        },
+        {
+          "text": "ORDER BY",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is unnecessary. But this is not required by the SQL standard, and current PostgreSQL does not guarantee that "
+        },
+        {
+          "text": "DISTINCT",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " causes the rows to be ordered."
+        }
+      ]
+    }
+  ]
+}

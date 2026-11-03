@@ -82,6 +82,8 @@ var adapterRules = map[string]tokenRules{
 	"docsy": {root: "div.td-content", codeTables: []string{"table.lntable"}, notText: []string{"lnt", "ln"}},
 	"godev": {root: "article.Doc"},
 	"mdn":   {root: "main#content"},
+	// The page is the division between the navigation header and footer.
+	"docbook": {skipped: []string{"div.navheader", "div.navfooter"}},
 }
 
 // matcher turns tag, tag#id or tag.class into a match function.

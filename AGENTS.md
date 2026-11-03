@@ -101,6 +101,7 @@ Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with 
 - One logical change per commit. Tests go in the same commit as the code they test.
 - Never use `--no-verify`, never amend, never push.
 - Run `make check` before pushing.
+- Never pipe verification commands (make targets, tests, linters) through `tail`, `head`, `grep` or `less`: the pipeline reports the last command's status and hides the failure. Run `make check` unpiped and read its exit code.
 - `.githooks/commit-msg` enforces the format (docs/adr/0003-commit-convention.md). With `COMMIT_MSG_STRICT=1` it checks a stored message without stripping anything; `scripts/check-commits.sh RANGE` runs it that way over every commit in a range.
 
 ## Code
@@ -160,7 +161,7 @@ Each job checks the toolchain it uses against its pin: Go against go.mod's `tool
 
 ## Done means
 
-- `make check` (lint, test, hooks-test) is green.
+- `make check` (lint, test, hooks-test), run unpiped, exits 0.
 - CONTEXT.md is rewritten for the new state.
 - Every commit follows the format above.
 - You end with a 5-line summary of what changed and what's next.

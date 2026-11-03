@@ -16,7 +16,7 @@ Product and process:
 - Source is verbatim and code byte-identical (ADR 0002), enforced by `TestCodeIsVerbatim`.
 - Commits are one line, `Type: Summary`; the hook (strict mode in CI) enforces it (ADR 0003).
 - PRs merge by rebase only, so main's history keeps one-line commits. The red push run after the PR #1 merge commit was the reason; the repository is set to rebase merges only since P06.
-- License: MIT. Agents never push. Run `make check` before pushing.
+- License: MIT. Agents never push. Run `make check` before pushing, unpiped, and read its exit code: a lint failure piped through `tail` once reached a commit.
 
 IR (`internal/ir`, ADR 0004):
 - Closed block set: heading, paragraph, list, code, table, callout, image, quote, divider. Inline runs carry marks and links (anchor, same_domain or external).

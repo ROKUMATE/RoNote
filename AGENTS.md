@@ -135,12 +135,25 @@ Go CLIs are pinned as `tool` directives in go.mod (`go get -tool`) and run with 
 - Integration tests live behind the `integration` build tag and use testcontainers through `internal/pgtest`: `pgtest.Main` in TestMain starts one migrated Postgres per package and `DB.Reset` truncates every table before a test, so DB tests in a package run serially.
 - Ryuk is off on podman, so nothing reaps containers: every container a test starts must be terminated in cleanup, failures included. `make test-clean` removes leftovers.
 - Unit tests never touch the network or paid APIs. Loopback `httptest` servers are fine; DNS lookups and outside hosts are not.
-- Extractor changes: `go test ./internal/extract -update` rewrites `testdata/golden/*/expected.json`; review that diff like code. `TestCodeIsVerbatim` must stay green, and run `go test -run '^$' -fuzz=FuzzExtract -fuzztime=60s ./internal/extract` before committing.
+- Extractor changes: `go test ./internal/extract -update` rewrites `testdata/golden/*/expected.json`; review that diff like code. `TestCodeIsVerbatim` and `TestGoldenHasNoJunk` must stay green, and run `go test -run '^$' -fuzz=FuzzExtract -fuzztime=60s ./internal/extract` before committing.
 - Web: Vitest + Testing Library for units and components; Playwright (Chromium) with `@axe-core/playwright` for end-to-end and accessibility. Pages must have zero axe violations in light and dark. No screenshot assertions: they differ between macOS and Linux CI.
 
 ## Verbatim rule
 
 Source text is never rewritten. Code blocks stay byte-identical, enforced by `TestCodeIsVerbatim` in `internal/extract` (docs/adr/0002-verbatim-source.md, docs/adr/0004-ir-and-links.md).
+- A code block's text is the page's copy payload when it has one, else the `<pre>` text without line numbers, copy labels, unselectable prompts and frame chrome.
+- Visible text stays. Never rewrite code with patterns.
+
+## Docs-framework adapters
+
+- An adapter is configuration in `internal/extract/adapter`. Transforms such as callouts, tabs, code titles and line-number tables live once, in `internal/extract`. When a framework needs something new, add it there as a config field, not as adapter code.
+- `Remove` is the only way an adapter drops content. Every entry gets a comment saying what chrome it is.
+- Detection order is generator, then signature, then host, across all adapters; registry order breaks ties.
+- Each adapter ships with:
+  - at least two golden fixtures. Use a trimmed real excerpt only if the license allows it, recorded in `testdata/golden/SOURCES.md`; otherwise write synthetic HTML with the same DOM and invented text;
+  - its own rules in `adapterRules` (`verbatim_test.go`), written apart from its configuration;
+  - a page in `live_test.go`.
+- After changing an adapter, run `make test-live`. Every page must show its adapter, code found equal to the expected count, a clean verbatim check, zero junk, and only expected warnings. If robots.txt blocks a page, report it; never work around it.
 
 ## CI
 

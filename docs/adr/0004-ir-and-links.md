@@ -1,17 +1,32 @@
-# 0004: IR, block IDs and link rules
+# 0004: IR, block IDs, link rules and framework adapters
 
-Accepted, 2026-11-02
+Accepted, 2026-11-02. Updated 2026-11-03 for framework adapters (P07).
 
 ## Context
 
-The HTML extractor (P06), framework adapters (P07) and PDF import (P12) must all produce one document shape. Annotations need block identities that survive re-imports. Links decide what a student can import next.
+The HTML extractor (P06), framework adapters (P07) and PDF import (P12) must all produce one document shape. Annotations need block identities that survive re-imports. Links decide what a student can import next. Real documentation sites wrap their content in framework chrome: anchor labels, copy buttons, line numbers, tabs, feedback widgets.
 
 ## Decision
 
-- `internal/ir` is a document of blocks from a closed set: heading, paragraph, list, code, table, callout, image, quote, divider. Blocks hold inline runs with marks (bold, italic, code, kbd, strike, sub, sup) and links, and never raw HTML. `Validate` enforces each kind's fields, absolute http(s) URLs and unique IDs. `ir_version` is 1.
-- A block ID is the first 12 hex chars of sha256(heading path, kind, text). Prose text has its whitespace collapsed; code text is used exactly. Repeats get `-2`, `-3` in document order.
+- `internal/ir` is a document of blocks from a closed set: heading, paragraph, list, code, table, callout, image, quote, divider, tabs. Blocks hold inline runs with marks (bold, italic, code, kbd, strike, sub, sup) and links, never raw HTML. List and tab items are `{label, children}`, and only tabs have a label. Code may have a title such as a file name. `Validate` enforces each kind's fields, absolute http(s) URLs and unique IDs. `ir_version` is 1.
+- A block ID is the first 12 hex chars of sha256(heading path, kind, text). Prose text has its whitespace collapsed; code text is used exactly, with its language and title. Repeats get `-2`, `-3` in document order.
 - Links resolve against `<base href>`, else the page's final URL. `#x`, or this page plus a fragment, becomes an anchor `#x`. The same host as the page, ignoring port and one leading `www.`, is `same_domain`. Other http(s) and mailto links are `external`. Other schemes lose the link and keep the text. Hrefs are kept as resolved.
-- A code block's text is the exact text content of its `<pre>`, with `<br>` as `\n`. Only HTML parsing changes it: one newline right after `<pre>` is dropped, and CR and CRLF become LF.
+- **Code text is what the page's copy button puts on the clipboard, when the page carries it.** Expressive Code keeps that text in the copy button's `data-code`, with U+007F for each line break. Otherwise the text is the `<pre>`'s text content (with `<br>` as `\n`), minus what is never text:
+  - line-number gutters;
+  - copy-button labels;
+  - prompts drawn as separate, unselectable elements;
+  - frame chrome;
+  - lines the framework hides and its copy button leaves out (mdBook's boring lines).
+
+  Visible text stays, including prompts written into the code (`>>>`) and diff lines a copy button skips. Copy buttons that rewrite text with patterns, such as stripping `$ `, are not followed. HTML parsing itself drops one newline right after `<pre>` and turns CR and CRLF into LF.
+- **Adapters are configuration in `internal/extract/adapter`:** detection signals, a content root, required elements, chrome to remove, and callout, tab and code rules. The extractor carries out every adapter's plan, so the transforms exist once.
+  - Detection runs in phases across all adapters: generator meta tag, then DOM signature, then host. Within a phase, registry order decides. `doc.extractor` names the adapter and its version.
+  - An adapter falls back to the generic rules, with an `adapter_fallback` warning, in three cases:
+    - its root or a required element is missing;
+    - its root leaves out a heading or `<pre>` that the generic rules keep and that no removal accounts for;
+    - removed chrome holds a `<pre>`.
+
+    An adapter drops content only through its Remove list.
 - Fetches reach private networks only with `AllowPrivateNetworks`, which config permits in dev and test only.
 
 ## Consequences
@@ -19,4 +34,6 @@ The HTML extractor (P06), framework adapters (P07) and PDF import (P12) must all
 - Adapters and the PDF importer only have to emit valid IR.
 - Editing a block changes its own ID and its containers' IDs. Renaming a heading changes the IDs below it, so annotations will need re-anchoring.
 - Subdomains (docs.x.com vs api.x.com) count as external.
-- Extractor changes regenerate `testdata/golden` with `-update` and a reviewed diff. `TestCodeIsVerbatim` keeps code exact.
+- A site redesign that breaks an adapter's selectors shows up as an `adapter_fallback` warning, not as lost content. `make test-live` checks real pages for drift.
+- A new adapter needs at least two golden fixtures and its own rules in `TestCodeIsVerbatim`'s independent walker.
+- Extractor changes regenerate `testdata/golden` with `-update` and a reviewed diff. `TestCodeIsVerbatim` keeps code exact and `TestGoldenHasNoJunk` keeps chrome out.

@@ -64,6 +64,7 @@ type site struct {
 	srv *httptest.Server
 
 	mu          sync.Mutex
+	robotsDown  int // robots.txt answers 503 this many more times
 	pages       map[string]string
 	failures    map[string][]int // statuses to answer with before the page
 	retryAfter  string
@@ -80,12 +81,17 @@ func newSite(t *testing.T) *site {
 }
 
 func (s *site) serve(w http.ResponseWriter, r *http.Request) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if r.URL.Path == "/robots.txt" {
+		if s.robotsDown > 0 {
+			s.robotsDown--
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
+		}
 		_, _ = fmt.Fprint(w, "User-agent: *\nDisallow: /private\n")
 		return
 	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
 	key := r.Host + r.URL.Path
 	s.hits[key] = append(s.hits[key], time.Now())
 	if queued := s.failures[key]; len(queued) > 0 {
@@ -394,6 +400,21 @@ func TestRetries(t *testing.T) {
 		hits := h.site.hitTimes("/busy")
 		if len(hits) != 2 || hits[1].Sub(hits[0]) < 2*time.Second {
 			t.Errorf("hits = %v, want a retry at least 2s after the 429", hits)
+		}
+	})
+
+	t.Run("robots.txt down for a moment", func(t *testing.T) {
+		// other.test: docs.test's robots.txt is already cached.
+		h.site.set("other.test", "/later", htmlPage("Later", "ok()\n"))
+		h.site.mu.Lock()
+		h.site.robotsDown = 1
+		h.site.mu.Unlock()
+		imp := h.wait(h.ada, h.request(h.ada, h.site.url("other.test", "/later")).Import.ID)
+		if imp.Status != store.ImportDone {
+			t.Fatalf("import = %+v, want done once robots.txt answers again", imp)
+		}
+		if jobs := h.waitJobs(imp.ID); fmt.Sprint(jobs) != "[completed/2]" {
+			t.Errorf("jobs = %v, want completed on the second attempt", jobs)
 		}
 	})
 

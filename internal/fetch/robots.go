@@ -190,9 +190,10 @@ func (f *Fetcher) checkRobots(ctx context.Context, u *url.URL) error {
 }
 
 // fetchRobots reads a site's robots.txt. A missing file (404 or 410) allows
-// everything; any other failure status disallows everything, and a 5xx
-// answer is not cached so the next fetch asks again. Transport errors are
-// returned as they are.
+// everything, and any other client error disallows everything. A server
+// error (5xx) gives ErrRobotsUnavailable: nothing may be fetched until
+// robots.txt can be read, and the answer is not cached so the next fetch asks
+// again. Transport errors are returned as they are.
 func (f *Fetcher) fetchRobots(ctx context.Context, robotsURL *url.URL) (policy robotsPolicy, cacheable bool, err error) {
 	if err := f.limiter.wait(ctx, robotsURL.Hostname()); err != nil {
 		return robotsPolicy{}, false, err
@@ -217,9 +218,11 @@ func (f *Fetcher) fetchRobots(ctx context.Context, robotsURL *url.URL) (policy r
 		return parseRobots(body), true, nil
 	case code == http.StatusNotFound || code == http.StatusGone:
 		return robotsPolicy{}, true, nil
+	case code >= 500:
+		return robotsPolicy{}, false, fmt.Errorf("%w: %s answered %d", ErrRobotsUnavailable, robotsURL, code)
 	default:
 		reason := fmt.Sprintf("%s answered %d", robotsURL, code)
-		return robotsPolicy{disallowAll: true, reason: reason}, code < 500, nil
+		return robotsPolicy{disallowAll: true, reason: reason}, true, nil
 	}
 }
 

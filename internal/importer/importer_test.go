@@ -27,6 +27,7 @@ func TestClassify(t *testing.T) {
 		{"invalid URL", wrap(fetch.ErrInvalidURL), failure{code: "invalid_url", permanent: true}},
 		{"blocked address", wrap(fetch.ErrBlockedAddress), failure{code: "blocked_address", permanent: true}},
 		{"robots", wrap(fetch.ErrDisallowedByRobots), failure{code: "disallowed_by_robots", permanent: true}},
+		{"robots.txt unavailable", wrap(fetch.ErrRobotsUnavailable), failure{code: "robots_unavailable"}},
 		{"too large", wrap(fetch.ErrTooLarge), failure{code: "too_large", permanent: true}},
 		{"unsupported type", wrap(fetch.ErrUnsupportedType), failure{code: "unsupported_type", permanent: true}},
 		{"redirects", wrap(fetch.ErrTooManyRedirects), failure{code: "too_many_redirects", permanent: true}},

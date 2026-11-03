@@ -224,8 +224,8 @@ components:
             Set when status is failed: invalid_url, blocked_address,
             disallowed_by_robots, too_large, unsupported_type,
             too_many_redirects, not_found, http_error, extract_failed,
-            timeout, rate_limited, upstream_error, network_error or
-            internal_error.
+            timeout, rate_limited, upstream_error, robots_unavailable,
+            network_error or internal_error.
         document_id:
           type: string
           format: uuid

@@ -26,6 +26,11 @@ type Options struct {
 	DB Pinger
 	// Backend serves /api/v1.
 	Backend Backend
+	// Events feeds the import event streams.
+	Events Events
+	// Done closes when the server begins to shut down, which ends event
+	// streams so the shutdown need not wait for their clients.
+	Done <-chan struct{}
 	// DevUser is the user every /api/v1 request acts as until real sign-in
 	// exists; uuid.Nil answers 401. Config allows one in dev and test only.
 	DevUser uuid.UUID
@@ -37,7 +42,7 @@ func New(o Options) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", healthz)
 	mux.HandleFunc("GET /readyz", readyz(o.Logger, o.DB))
-	mux.Handle("/api/v1/", requireUser(o.DevUser, router{mux: apiRoutes(o.Logger, o.Backend)}))
+	mux.Handle("/api/v1/", requireUser(o.DevUser, router{mux: apiRoutes(o)}))
 	return withMiddleware(o.Logger, router{mux: mux})
 }
 

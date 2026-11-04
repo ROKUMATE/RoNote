@@ -4,20 +4,23 @@ Current state of the project. Rewrite this file at the end of each phase; never 
 
 ## Current milestone
 
-P10, reader and editor: done.
-- `/doc/$id` reads and edits a document in place: Tiptap (MIT core), with code, tables, tabs, images and dividers as locked atoms, autosave, edited marks and Revert to source (ADR 0006).
-- Effective Go (500 top-level blocks, 153 code blocks), production build, median of 5 cold loads on this Mac:
-  - without throttling, first paint of the document (LCP) 108 ms and interactive (editor editable, main thread idle) 121 ms;
-  - at 4x CPU throttling, 336 ms and 368 ms.
-- In the browser, Effective Go reads well, but its code is not highlighted: go.dev declares no language and RoNote never guesses one. vite.dev's guide shows the lazy highlighting: no grammar loads at the top of the page, and after scrolling 8 of its 9 blocks are highlighted, each language its own chunk, with every highlighted block spelling its stored text exactly.
-- An edited Effective Go paragraph autosaved. Reverted, it matched its extraction block exactly and was marked unedited again.
-- Bundle, gzip:
-  - initial JS 119.4 kB of 150;
-  - document route 126.1 kB of 135;
+P11, same-domain links and code languages: done.
+- **CI fixed.** `TestExtractStaysLinear` failed on CI at 3.0x and 3.5x. It timed one size against twice that size while sharing a small VM with every package's tests, under `-race`, whose overhead is not proportional to the work.
+  - It is now `TestPerfExtractStaysLinear`, behind the `perf` build tag. `make test-perf` runs it alone (`-p 1`, no race detector), and CI's go job runs that as its own step. The limit is still under 3x, with no retries.
+  - **Proof:** `make test-integration` ran 10 times in a row with `GOMAXPROCS=2` and four CPU hogs, with no failures, both after the fix and again on the finished phase. `make test-perf` also ran 10 times clean. A deliberately quadratic writer still fails it, at 3.8x.
+  - One attempt on the finished phase failed 3 of 10 right after the Mac slept, from the VM clock skew noted under open questions; the rerun, kept awake, was clean.
+- **Same-domain links follow into the library:** a resolve endpoint, link styling by library status, import on click with inline steps, the `#fragment` after navigation, and back to the same place (ADR 0006).
+- **Code language picker:** per block, or "Use for all unlabelled code in this document", saved in DocContent's new optional `code_langs` (ADR 0006).
+- **In the browser:**
+  - **vite.dev's guide:** 15 same-domain links were importable. Clicking "rich feature enhancements" showed "Fetching the page…" then "Extracting the content…", made one `POST /imports`, and opened "Features". Back, the link showed as internal.
+  - **Effective Go:** one "apply to all: go" relabelled all 153 code blocks in 55 ms and saved 153 `code_langs`. Scrolling through, all 153 were highlighted, and each one's rendered text and Copy matched its stored text exactly. After a reload, all 153 were still "Go · yours".
+- **Bundle, gzip:**
+  - initial JS 119.6 kB of 150;
+  - document route 129.6 kB of 135 (126.1 in P10);
   - highlighter core 54.5 kB of 60;
-  - CSS 9.2 kB of 20;
-  - 42 Shiki language chunks, 273 kB in all, each loaded only when a page needs it.
-- `make web-e2e` passes 35 tests. `make test-live` still passes all 11 pages.
+  - CSS 9.5 kB of 20;
+  - 43 Shiki language chunks, 275 kB in all (Makefile's grammar is new).
+- **Checks:** `make web-e2e` passes 50 tests, and `make test-live` still passes all 11 pages.
 
 ## Decisions so far
 
@@ -28,6 +31,7 @@ Product and process:
 - PRs merge by rebase only, so main keeps one-line commits.
 - CI runs on the pinned `ubuntu-26.04` image. `.github/actionlint.yaml` declares that label until actionlint knows it (rhysd/actionlint#682).
 - License: MIT. Agents never push. Run `make check` unpiped and read its exit code.
+- Timing tests check growth (2n against n), never wall time, and run only in `make test-perf`: tagged `perf`, one package at a time, no race detector. `make check` includes it.
 
 IR (`internal/ir`, ADR 0004):
 - **Blocks:** a closed set of heading, paragraph, list, code, table, callout, image, quote, divider and tabs.
@@ -103,6 +107,7 @@ Import pipeline (ADR 0005):
   - permanent errors fail at once; transient ones (5xx, 429 with Retry-After, timeouts, robots.txt 5xx) retry up to 3 attempts.
 - **API** (`api/openapi.yaml`, OpenAPI 3.1, spec-first with oapi-codegen v2.8.2):
   - `POST /api/v1/imports` (202, or 200 with the existing document), `GET /imports/{id}`, `GET /imports/{id}/events` (SSE), `GET /documents` (cursor pages), `GET /documents/{id}`;
+  - `POST /documents/resolve` (since P11): up to 200 URLs, each answered in order with its canonical URL and the caller's document, if any. It canonicalizes like imports and matches like an import's "already in your library" (`ResolveDocuments`, one `unnest` query, owner-scoped);
   - errors use one envelope; its codes are the `ErrorCode` enum, and an import's failure codes the `ImportErrorCode` enum, so Go uses generated constants and a classifier test keeps the worker's codes in the spec;
   - every timestamp is RFC 3339 in UTC (`Z`), whatever zone the database driver returns;
   - every operation declares its 500 `internal_error` answer; a contract test validates every response the API's tests produce against the spec, statuses included;
@@ -116,8 +121,9 @@ Import pipeline (ADR 0005):
     - code, tables, tabs and images inside a source block, at any depth, equal their extraction blocks byte for byte (`source_block_modified`);
     - an unedited source block equals its extraction block (also `source_block_modified`);
     - user blocks use only paragraph, heading, list, quote, callout and divider (`block_kind_not_allowed`, the spec's `UserBlockKind`);
-    - anything else invalid answers `invalid_content`.
-  - **Revert:** `POST /documents/{id}/blocks/{blockId}/revert` puts the extraction's block back exactly and bumps the version.
+    - anything else invalid answers `invalid_content`;
+    - `code_langs` (since P11), optional: each key is a code block's id, at any depth, and each value one of the spec's 30 `CodeLang`s, else `invalid_content`. An optional field like this needs no new `doc_version` (ADR 0006).
+  - **Revert:** `POST /documents/{id}/blocks/{blockId}/revert` puts the extraction's block back exactly and bumps the version, keeping the chosen code languages.
   - `GET /documents/{id}` returns the extraction's warnings next to the content.
 - **Identity until P16:** dev and test inject `RONOTE_DEV_USER_EMAIL`; without it, and always in staging and prod, `/api/v1` answers 401.
 - **Tests that catch regressions:** three deliberate breaks were each caught.
@@ -133,8 +139,18 @@ Web app (`apps/web`, since P09):
 - **Import dialog:** a native `<dialog>`. The URL is checked like the server does (http or https, at most 2048 characters), but the server decides. After a 202 the steps show inline, with a polite status line; on done it opens the document. A 200 opens the document with "Already in your library". A failure gets one sentence per error code (`src/api/messages.ts`). Closing never cancels: the library shows the import as a pending row until it ends.
 - **Library:** title, source host and imported date per row, "Load more" for the next cursor, still placeholder rows while loading, one sentence and Retry on error. The sidebar lists the 8 newest documents at the sidebar breakpoint.
 - **Document page (`/doc/$id`):** title, source link (new tab, `noopener noreferrer`), host, imported date, block counts by kind (nested blocks included), and a notice when the extraction fell back to the generic rules (`adapter_fallback`, `low_confidence`).
+- **Same-domain links** (since P11, ADR 0006):
+  - **Status:** the document page resolves its same-domain hrefs once, deduplicated, in batches of 200, as a query under the documents key, so a finished import refreshes it. In the editor, status shows as decorations, never marks, so nothing counts as an edit. In locked blocks, the IR renderer reads the same map from context. A link already in the library is underlined; one not imported yet gets a dotted underline and a "↓". External links open a new tab.
+  - **Click** (`follow.ts`, `useFollow.ts`):
+    - a plain press is stopped before the editor, so the caret stays where it was, and the link's text stays editable from the keyboard;
+    - a link in the library opens its document;
+    - otherwise it imports, with the steps in a small status box under the link, through the same `ImportTracker`;
+    - a failure shows the dialog's sentence and "Open original";
+    - Cmd/Ctrl-click and middle-click open the original.
+  - **Arrival:** a `#fragment` scrolls to its heading and puts the caret there (`useScrollAnchor`); an unknown fragment does nothing.
+  - **Back:** returns to the same place, recorded per history entry as the top-level block at the top of the viewport and its offset, since unrendered blocks keep placeholder heights.
 - **Dev:** Vite proxies `/api` to `RONOTE_API_ORIGIN` (default the API's `127.0.0.1:8080`) and streams, so the event stream works through it.
-- **End-to-end:** `make web-e2e` recreates `ronote_e2e` in the dev stack's Postgres (CI: a service container), builds the API and worker, and Playwright starts them with the test-only environment (`RONOTE_FETCH_ALLOW_PRIVATE=true`, user `e2e@ronote.local`), plus `e2e/fixture-site.ts`, which serves golden fixtures on `localhost:18090` (`/pages/`, `/slow/` 3s later, `/private/` behind robots.txt, 404 otherwise). Every test imports a URL of its own, so tests do not depend on each other. axe runs on the library, the dialog (form and progress) and a document in light and dark, with reduced motion so the dialog is never measured mid-fade.
+- **End-to-end:** `make web-e2e` recreates `ronote_e2e` in the dev stack's Postgres (CI: a service container), builds the API and worker, and Playwright starts them with the test-only environment (`RONOTE_FETCH_ALLOW_PRIVATE=true`, user `e2e@ronote.local`), plus `e2e/fixture-site.ts`, which serves golden fixtures on `localhost:18090` (`/pages/`, `/slow/` 3s later, `/private/` behind robots.txt; since P11 `/linked/` for the two linked pages in `e2e/fixtures`, which carry the test's `?run=` into their links, and `/files/sample.pdf`; 404 otherwise). Every test imports a URL of its own, so tests do not depend on each other. axe runs on the library, the dialog (form and progress) and a document in light and dark, with reduced motion so the dialog is never measured mid-fade.
 - **Tests that catch regressions:** three deliberate breaks were each caught.
   - Dropping one error-code message: `tsc` and the messages test.
   - Leaving the event stream open after done: the subscribeImport test sees the reconnect's second done.
@@ -156,7 +172,13 @@ Reader and editor (`apps/web/src/document`, since P10; `/doc/$id` is a lazy chun
   - tabs: Radix Tabs, panels drawn by a read-only IR renderer;
   - images: lazy, `referrerpolicy="no-referrer"`, alt text;
   - links: anchors move the caret to their heading; other links open a new tab with `noopener noreferrer`.
-- **Highlighting:** Shiki core with the JavaScript regex engine, as a lazy chunk. A grammar loads per language once a block is within 600px of the viewport. The six code colours are tokens, in light and dark. A block without a declared language stays plain.
+- **Highlighting:** Shiki core with the JavaScript regex engine, as a lazy chunk. A grammar loads per language once a block is within 600px of the viewport. The six code colours are tokens, in light and dark. A block without a declared language stays plain unless the user chooses one. Tokens are kept with their language, so a new choice never shows stale colours.
+- **Code languages** (since P11):
+  - The language label is a button opening a listbox (`CodeLangPicker.tsx`): arrows, Home/End, a letter for the next language starting with it, Enter, and Escape. Its block is exempt from `content-visibility` while the list is open, so the list is not clipped.
+  - The page's language comes first, marked "(page)", and choosing it takes the user's choice back. A choice of the user's shows as "Go · yours" in `--color-gen`.
+  - "Use for all unlabelled code in this document" covers every code block with no page language and no choice yet.
+  - `useEditing` holds the choices and autosaves them with the content. A deleted block's choice is left out of the save.
+  - Copy still copies the stored text.
 - **Insert:** "+" below the block under the pointer or cursor, or "/" in an empty paragraph, opens a menu of exactly the six user kinds.
 - **Autosave** (`save.ts`):
   - saves 1s after the last change, and at once on blur or when the page is hidden (keepalive);
@@ -165,13 +187,26 @@ Reader and editor (`apps/web/src/document`, since P10; `/doc/$id` is a lazy chun
   - a refused save says why.
 - **Outline:** h2 and h3 in the sidebar (portalled there from the lazy chunk). The current heading is the last one above a third of the viewport, measured on every scrolled frame. A click scrolls there and puts the caret in the heading.
 - **Long documents:** `content-visibility: auto` on code, tables, tabs and images only. Applied to text blocks, Chrome misplaced the caret in a just-created paragraph under load, and typing landed in the wrong place.
+- **Load time,** measured in P10 on Effective Go (500 top-level blocks, 153 code blocks), production build, median of 5 cold loads on this Mac:
+  - without throttling, LCP 108 ms and interactive 121 ms;
+  - at 4x CPU throttling, 336 ms and 368 ms.
 - **Budgets:** `apps/web/scripts/budget.ts` replaced `scripts/web-budget.sh` and reads Vite's manifest per chunk group (ADR 0006).
 - **Tests that catch regressions:** four deliberate breaks were each caught.
   - The server accepting changed source code: the Go rule and API tests, and the e2e forge test (200 instead of 422).
   - The editor not marking edits: five unit tests, and the e2e test whose edit never saves.
   - The mapping losing `title_link`: the round trip of both Kubernetes goldens.
   - A save without a version: `tsc`, the page test (version undefined), and the e2e test.
+- **Tests that catch regressions, P11:** four deliberate breaks were each caught.
+  - Resolve without its `owner_id` predicate: the store integration test, where another user's document leaked.
+  - The fragment dropped after navigation, in two places:
+    - the scroll on arrival: the fragment page test and the e2e `#usage` test;
+    - the link's hash on navigation: the follow page test and the same e2e test.
+  - `code_langs` accepting any block id: the doccontent tests (a paragraph, top-level and nested) and the API's 422 test.
+  - The quadratic extraction writer: `make test-perf` at 3.8x.
 - **Found while building:**
+  - P11: going back landed about 90 px off. Placeholder heights of not-yet-rendered blocks above the reader shifted the pixel offset, so places are now kept by block.
+  - P11: switching a highlighted block to plain text kept the old colours. Tokens are now kept with their language.
+  - P11: in Vitest, two dynamic imports of a mocked module started in one tick gave the second one the real module. Tests bring one block into view at a time.
   - Tiptap's `useEditor` reapplied options rebuilt on each render, which redrew the document mid-typing; the options are now built once.
   - The outline lost track after a fast jump (fixed, test first).
   - Tiptap's link extension pulled in linkifyjs, which is gone.
@@ -180,7 +215,10 @@ Unchanged: `/healthz`, `/readyz`, the P04 tokens and styleguide, the extractor a
 
 ## Open questions
 
-- go.dev declares no code languages, so its pages are not highlighted. Inferring a language was turned down: RoNote never guesses.
+- go.dev declares no code languages. RoNote still never guesses one; the user can choose, per block or for all unlabelled code at once.
+- Link status is resolved when a document opens and again after an import finishes. A page imported from another tab shows as not imported until then, and following it opens the existing document.
+- Following a link that fails leaves its message under the link until the next link is followed.
+- After macOS sleeps, the podman VM's clock can lag for a few minutes. Integration tests then fail with imports "still queued" and `created_at` in the past, because River schedules jobs by the host's clock. Rerun once the clocks agree (`podman machine ssh date -u`).
 - A user's document keeps the IR it was made from; re-importing returns it. Syncing to a newer snapshot will have to merge user blocks and edits, and DocContent keeps what that needs.
 - A deleted source block can only come back by undo in the same session; there is no "restore from source" for missing blocks yet.
 - Images inside source blocks are locked like code, tables and tabs, a step beyond the P10 brief, because the editor shows them as atoms.
@@ -192,4 +230,4 @@ Unchanged: `/healthz`, `/readyz`, the P04 tokens and styleguide, the extractor a
 
 ## Next step
 
-P11: same-domain links import on click, inside the reader built in P10.
+P12, per its brief. v1 still lacks highlights and annotations (the notes margin), running code blocks, and printed-PDF import, which the PDF link's message already promises.

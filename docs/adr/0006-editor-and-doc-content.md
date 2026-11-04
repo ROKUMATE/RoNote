@@ -1,6 +1,6 @@
 # 0006: Editor and document content format
 
-Accepted, 2026-11-04
+Accepted, 2026-11-04. Amended in P11: optional DocContent fields, code languages, link following.
 
 ## Context
 
@@ -26,6 +26,22 @@ The extraction IR is frozen at version 1 (ADR 0004), so the edit history cannot 
   - User blocks get fresh UUIDv7 ids.
   - Migration 00005 converts stored IR documents, every block `origin: source`, `edited: false`. Its down migration rebuilds the IR from the extraction's metadata and the current blocks.
   - The document's title stays in `documents.title`. Source, extractor and warnings stay in its extraction; the API returns the warnings with the document.
+- **Optional fields need no new `doc_version`.** DocContent v1 may gain a field without a version bump or a migration when all of these hold:
+  - it is optional;
+  - leaving it out means exactly what v1 meant before it existed;
+  - it changes no block;
+  - a reader that does not know it can ignore it.
+
+  Anything else is a new `doc_version` with a migration, tested up and down. Migration 00005's down direction rebuilds the IR from the blocks, so it drops these fields; they hold only the user's preferences, never source.
+- **Code languages,** the first such field: `code_langs`, `{block_id: CodeLang}`.
+  - It holds the language the user chose for a code block, over the page's own. `CodeLang` is a spec enum of 30 languages; `plaintext` means no highlighting.
+  - On every save the server checks each key is the id of a code block in the document, at any depth, and each value is a `CodeLang`. Otherwise it answers 422 `invalid_content`.
+  - The code text is untouched. The locked-block and honest-flag rules are unchanged, and Revert keeps the chosen languages.
+  - In the editor, the language label is a button opening a listbox:
+    - the page's language is the default, and choosing it again takes the user's choice back;
+    - a user's choice shows as "Go · yours" in the generated-content colour. It is not an edit mark, since the source is unchanged;
+    - "Use for all unlabelled code in this document" sets the language for every code block with no page language and no choice yet.
+  - A deleted code block's choice is left out of the save, and undo brings both back.
 - **Rules the server enforces on every save,** `PATCH /api/v1/documents/{id}` with `{content, version}`:
   - **Concurrency:** the version must be the current one, else 409 `version_conflict` with `current_version`. A save never overwrites a newer version.
   - **Known sources:** every source block names a block of the document's extraction, at most once, else 422 `unknown_source_block`.
@@ -45,17 +61,34 @@ The extraction IR is frozen at version 1 (ADR 0004), so the edit history cannot 
   - Each language loads as its own chunk on demand, and a block is highlighted only when it nears the viewport.
   - The theme maps to six token colours, light and dark.
   - Highlighting only wraps the verbatim text in spans; a test checks the highlighted text equals the block text.
-  - A block without a declared language stays plain: RoNote never guesses one. go.dev's pages declare none, so their code is not highlighted.
-- **Long documents:** off-screen code, tables, tabs and images use `content-visibility: auto`. Text blocks do not: Chrome can misplace the caret in a block it has not rendered yet, such as the empty paragraph Enter just made, and typing then lands in the wrong place.
+  - A block without a declared language stays plain: RoNote never guesses one. go.dev's pages declare none, so their code stays plain until the user chooses a language.
+  - Highlighted tokens are kept with their language, so a new choice never shows the old one's colours.
+- **Same-domain links follow into the library.**
+  - `POST /api/v1/documents/resolve` takes at most 200 URLs and answers, in order, each one's canonical URL and the caller's document for it, if any.
+    - It canonicalizes exactly as imports do.
+    - It matches exactly as an import's "already in your library" does: a source's canonical or final URL, or an earlier import of the URL.
+    - It is scoped to the owner like every documents query.
+  - The document page resolves its same-domain links once, deduplicated. The editor shows the result as decorations, never marks, so the content does not change and nothing counts as an edit:
+    - a link to a page in the library is underlined;
+    - one not imported yet gets a dotted underline and a small "↓".
+  - What a click on a link does:
+    - **Plain click:** follows the link. The press is stopped before the editor sees it, so the caret never moves. The link's text stays editable from the keyboard.
+    - **In the library:** opens that document.
+    - **Not imported yet:** imports it, with the steps shown next to the link (`subscribeImport`, the same tracker as the dialog), then opens it. A failure shows the dialog's sentence and "Open original".
+    - **Cmd/Ctrl-click and middle-click:** open the original page in a new tab.
+    - **Other-domain links:** open in a new tab, `noopener noreferrer`.
+  - A link's `#fragment` goes along: the new document scrolls to that heading and puts the caret there. An unknown fragment does nothing.
+  - **Back:** returns to the place the reader left. That place is recorded as the top-level block at the top of the viewport and its offset, not as pixels, because blocks the browser has not rendered yet (`content-visibility`) keep placeholder heights.
+- **Long documents:** off-screen code, tables, tabs and images use `content-visibility: auto`. Text blocks do not: Chrome can misplace the caret in a block it has not rendered yet, such as the empty paragraph Enter just made, and typing then lands in the wrong place. A block with an open language picker is made visible, since containment would clip the list.
 - **Budgets,** gzip, checked per chunk by `make web-build` (`apps/web/scripts/budget.ts`, from Vite's manifest):
   - initial JS at most 150 kB;
-  - the document route at most 135 kB. Tiptap's core and ProseMirror are about two thirds of it, the floor for a ProseMirror editor. The rest is the React bindings, Radix Tabs and RoNote's own document code. The budget leaves about 7% for P11 on top of the 126 kB it measured. Only the extensions in use are imported, one subpath each; Tiptap's link extension is replaced by a small mark, since its autolinking pulled in linkifyjs (13 kB);
+  - the document route at most 135 kB. Tiptap's core and ProseMirror are about two thirds of it, the floor for a ProseMirror editor. The rest is the React bindings, Radix Tabs and RoNote's own document code. The budget left about 7% on top of the 126 kB measured in P10; after P11 it measures 129.6 kB. Only the extensions in use are imported, one subpath each; Tiptap's link extension is replaced by a small mark, since its autolinking pulled in linkifyjs (13 kB);
   - the highlighter core at most 60 kB;
   - Shiki's language chunks are listed, not budgeted.
 
 ## Consequences
 
 - Edits are visible: an edited source block shows a rule and an "edited" label, and can be reverted.
-- Code, tables and tabs cannot be changed in v1, by the editor or by forging an API call.
+- Code, tables and tabs cannot be changed in v1, by the editor or by forging an API call. Choosing a language changes how code is drawn, never its text.
 - A deleted source block cannot be restored except by undo in the same session.
 - Syncing a document to a newer snapshot (re-import) will have to merge user blocks and edits; DocContent keeps what that needs.

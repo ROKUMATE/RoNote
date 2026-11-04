@@ -83,7 +83,7 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
   const hrefs = useMemo(() => sameDomainHrefs(doc.content.blocks), [doc.content.blocks]);
   const targets = useQuery(linkTargets(doc.id, hrefs)).data;
   const { follow, following } = useFollow(targets);
-  useScrollAnchor(editor !== undefined);
+  useScrollAnchor(editor?.view);
   return (
     <article className="max-w-[68ch]">
       {existing && (

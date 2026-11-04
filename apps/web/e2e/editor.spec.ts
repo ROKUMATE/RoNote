@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, type Page, test } from "@playwright/test";
 import {
+  caretHeading,
   chooseTheme,
   expectNoAxeViolations,
   expectNoHorizontalScroll,
@@ -153,11 +154,7 @@ test("clicking the outline scrolls to the heading and puts the caret there", asy
   const heading = page.getByRole("heading", { name: "Try it" });
   await expect(heading).toBeInViewport();
   await expect(page.getByLabel("Document text")).toBeFocused();
-  expect(
-    await page.evaluate(
-      () => getSelection()?.anchorNode?.parentElement?.closest("h2")?.textContent,
-    ),
-  ).toBe("Try it");
+  expect(await caretHeading(page)).toBe("Try it");
   await expect(outline.getByRole("link", { name: "Try it" })).toHaveAttribute(
     "aria-current",
     "location",

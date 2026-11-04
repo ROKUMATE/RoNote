@@ -100,7 +100,7 @@ func Revert(doc *Doc, extraction *ir.Doc, blockID string) (*Doc, error) {
 		return nil, ErrNoSourceBlock
 	}
 	edited := false
-	out := &Doc{DocVersion: doc.DocVersion, Blocks: slices.Clone(doc.Blocks)}
+	out := &Doc{DocVersion: doc.DocVersion, Blocks: slices.Clone(doc.Blocks), CodeLangs: doc.CodeLangs}
 	out.Blocks[i] = Block{Block: extraction.Blocks[j], Origin: OriginSource, Edited: &edited, SourceBlockID: extraction.Blocks[j].ID}
 	return out, nil
 }

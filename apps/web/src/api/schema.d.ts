@@ -271,7 +271,16 @@ export interface components {
             /** @enum {integer} */
             doc_version: 1;
             blocks: components["schemas"]["DocBlock"][];
+            /** @description The languages the user chose for code blocks, by block id, over the page's. Every key is the id of a code block in blocks, at any depth. Optional and additive, so doc_version stays 1 (ADR 0006); the code itself never changes. */
+            code_langs?: {
+                [key: string]: components["schemas"]["CodeLang"];
+            };
         };
+        /**
+         * @description A language a user may choose for a code block. plaintext means no highlighting.
+         * @enum {string}
+         */
+        CodeLang: "go" | "python" | "javascript" | "typescript" | "tsx" | "jsx" | "bash" | "console" | "c" | "cpp" | "csharp" | "java" | "kotlin" | "rust" | "swift" | "ruby" | "php" | "sql" | "json" | "yaml" | "toml" | "ini" | "xml" | "html" | "css" | "dockerfile" | "makefile" | "markdown" | "diff" | "plaintext";
         /**
          * @description The kinds a user block may use, nested blocks included. Source code, tables, tabs and images come only from the page.
          * @enum {string}
@@ -441,6 +450,7 @@ export type SavedDocument = components['schemas']['SavedDocument'];
 export type VersionConflict = components['schemas']['VersionConflict'];
 export type DocumentList = components['schemas']['DocumentList'];
 export type DocContent = components['schemas']['DocContent'];
+export type CodeLang = components['schemas']['CodeLang'];
 export type UserBlockKind = components['schemas']['UserBlockKind'];
 export type DocBlock = components['schemas']['DocBlock'];
 export type IrDocument = components['schemas']['IRDocument'];

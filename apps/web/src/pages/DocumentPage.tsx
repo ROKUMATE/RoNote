@@ -8,6 +8,7 @@ import { ApiError } from "../api/client";
 import { requestErrorMessages } from "../api/messages";
 import { documentQuery, linkTargets } from "../api/queries";
 import type { Document, IrWarning } from "../api/schema";
+import { CodeLangsContext } from "../document/codeLangs";
 import { blockCounts } from "../document/counts";
 import { sameDomainHrefs } from "../document/links";
 import { Outline } from "../document/Outline";
@@ -78,7 +79,7 @@ function opensWithTitle(doc: Document): boolean {
 
 function Header({ doc, existing }: { doc: Document; existing: boolean }) {
   const fallback = doc.warnings.some((w) => genericWarnings.has(w.code));
-  const { status, onEditor, revert } = useEditing(doc);
+  const { status, onEditor, revert, codeLangs } = useEditing(doc);
   const [editor, setEditor] = useState<Editor>();
   const hrefs = useMemo(() => sameDomainHrefs(doc.content.blocks), [doc.content.blocks]);
   const targets = useQuery(linkTargets(doc.id, hrefs)).data;
@@ -125,17 +126,19 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
         </p>
       )}
       <div className="mt-8">
-        <Reader
-          content={doc.content}
-          onEditor={(e) => {
-            onEditor(e);
-            setEditor(e);
-          }}
-          onRevert={revert}
-          linkTargets={targets}
-          onFollow={(href, link) => void follow(href, link)}
-          following={following}
-        />
+        <CodeLangsContext value={codeLangs}>
+          <Reader
+            content={doc.content}
+            onEditor={(e) => {
+              onEditor(e);
+              setEditor(e);
+            }}
+            onRevert={revert}
+            linkTargets={targets}
+            onFollow={(href, link) => void follow(href, link)}
+            following={following}
+          />
+        </CodeLangsContext>
         {editor && <Outline editor={editor} />}
       </div>
     </article>

@@ -129,3 +129,20 @@ func TestUserKindsMatchTheSpec(t *testing.T) {
 		t.Errorf("doccontent.UserKinds = %v, the spec's UserBlockKind = %v", got, want)
 	}
 }
+
+// TestCodeLangsMatchTheSpec keeps the languages the server accepts in
+// code_langs the spec's CodeLang, which the editor's language picker offers.
+func TestCodeLangsMatchTheSpec(t *testing.T) {
+	t.Parallel()
+	spec, err := loadContract()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var want []string
+	for _, v := range spec.Components.Schemas["CodeLang"].Value.Enum {
+		want = append(want, v.(string))
+	}
+	if !slices.Equal(doccontent.CodeLangs, want) {
+		t.Errorf("doccontent.CodeLangs = %v, the spec's CodeLang = %v", doccontent.CodeLangs, want)
+	}
+}

@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -71,6 +72,50 @@ func TestValidate(t *testing.T) {
 
 	if err := Validate(&Doc{DocVersion: 2}); err == nil {
 		t.Error("Validate() accepts doc_version 2")
+	}
+}
+
+func TestValidateCodeLangs(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name  string
+		langs map[string]string
+		want  Code
+	}{
+		{name: "none"},
+		{name: "a top-level code block", langs: map[string]string{"c1": "go"}},
+		{name: "code in a list and in tabs", langs: map[string]string{"c2": "bash", "c3": "plaintext"}},
+		{name: "an unknown block", langs: map[string]string{"c9": "go"}, want: CodeInvalidContent},
+		{name: "a block that is not code", langs: map[string]string{"p1": "go"}, want: CodeInvalidContent},
+		{name: "a nested block that is not code", langs: map[string]string{"p2": "go"}, want: CodeInvalidContent},
+		{name: "a language RoNote does not offer", langs: map[string]string{"c1": "cobol"}, want: CodeInvalidContent},
+		{name: "a language under another name", langs: map[string]string{"c1": "golang"}, want: CodeInvalidContent},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			doc := FromIR(sampleExtraction())
+			doc.CodeLangs = tt.langs
+			err := Validate(doc)
+			var p *Problem
+			switch {
+			case tt.want == "" && err != nil:
+				t.Errorf("Validate() = %v, want nil", err)
+			case tt.want != "" && (!errors.As(err, &p) || p.Code != tt.want):
+				t.Errorf("Validate() = %v, want a %s problem", err, tt.want)
+			}
+		})
+	}
+}
+
+func TestCodeLangsAreOptional(t *testing.T) {
+	t.Parallel()
+	data, err := json.Marshal(FromIR(sampleExtraction()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(data), "code_langs") {
+		t.Errorf("a document without chosen languages writes code_langs: %s", data)
 	}
 }
 

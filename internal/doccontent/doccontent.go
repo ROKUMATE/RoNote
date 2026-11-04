@@ -5,6 +5,7 @@ package doccontent
 
 import (
 	"fmt"
+	"maps"
 	"slices"
 
 	"github.com/google/uuid"
@@ -29,6 +30,10 @@ const (
 type Doc struct {
 	DocVersion int     `json:"doc_version"`
 	Blocks     []Block `json:"blocks"`
+	// CodeLangs are the languages the user chose for code blocks, by block
+	// id, over the page's. An optional field added to version 1, which
+	// readers that do not know it ignore (ADR 0006). The code never changes.
+	CodeLangs map[string]string `json:"code_langs,omitempty"`
 }
 
 // Block is a top-level block: an IR block and its origin. Origin and edits
@@ -42,6 +47,14 @@ type Block struct {
 	// SourceBlockID is set on source blocks only: the id of the extraction's
 	// block it came from, which is also its own id.
 	SourceBlockID string `json:"source_block_id,omitempty"`
+}
+
+// CodeLangs are the languages a user may choose for a code block, in the
+// spec's CodeLang order; plaintext means no highlighting.
+var CodeLangs = []string{
+	"go", "python", "javascript", "typescript", "tsx", "jsx", "bash", "console", "c", "cpp",
+	"csharp", "java", "kotlin", "rust", "swift", "ruby", "php", "sql", "json", "yaml",
+	"toml", "ini", "xml", "html", "css", "dockerfile", "makefile", "markdown", "diff", "plaintext",
 }
 
 // UserKinds are the kinds a user block may use, nested blocks included.
@@ -86,7 +99,8 @@ func FromIR(doc *ir.Doc) *Doc {
 }
 
 // Validate checks doc's shape: the IR rules for every block, the origin
-// fields, and the kinds user blocks may use. It returns a *Problem or nil.
+// fields, the kinds user blocks may use, and the code languages the user
+// chose. It returns a *Problem or nil.
 func Validate(doc *Doc) error {
 	if doc.DocVersion != Version {
 		return problem(CodeInvalidContent, "doc_version is %d, want %d", doc.DocVersion, Version)
@@ -101,6 +115,36 @@ func Validate(doc *Doc) error {
 	for i := range doc.Blocks {
 		if err := validateOrigin(fmt.Sprintf("blocks[%d]", i), &doc.Blocks[i]); err != nil {
 			return err
+		}
+	}
+	if err := validateCodeLangs(doc); err != nil {
+		return err
+	}
+	return nil
+}
+
+// validateCodeLangs checks every chosen language is one of CodeLangs, for
+// a code block of doc at any depth.
+func validateCodeLangs(doc *Doc) *Problem {
+	code := map[string]bool{}
+	var walk func(b *ir.Block)
+	walk = func(b *ir.Block) {
+		if b.Kind == ir.KindCode {
+			code[b.ID] = true
+		}
+		for _, child := range children(b) {
+			walk(child)
+		}
+	}
+	for i := range doc.Blocks {
+		walk(&doc.Blocks[i].Block)
+	}
+	for _, id := range slices.Sorted(maps.Keys(doc.CodeLangs)) {
+		switch lang := doc.CodeLangs[id]; {
+		case !code[id]:
+			return problem(CodeInvalidContent, "code_langs: %q is not a code block of the document", id)
+		case !slices.Contains(CodeLangs, lang):
+			return problem(CodeInvalidContent, "code_langs[%q]: %q is not a language RoNote offers", id, lang)
 		}
 	}
 	return nil

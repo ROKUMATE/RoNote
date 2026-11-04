@@ -20,6 +20,108 @@ import (
 	"github.com/rokumate/ronote/internal/ir"
 )
 
+// Defines values for CodeLang.
+const (
+	Bash       CodeLang = "bash"
+	C          CodeLang = "c"
+	CSS        CodeLang = "css"
+	Console    CodeLang = "console"
+	Cpp        CodeLang = "cpp"
+	Csharp     CodeLang = "csharp"
+	Diff       CodeLang = "diff"
+	Dockerfile CodeLang = "dockerfile"
+	Go         CodeLang = "go"
+	HTML       CodeLang = "html"
+	Ini        CodeLang = "ini"
+	JSON       CodeLang = "json"
+	Java       CodeLang = "java"
+	Javascript CodeLang = "javascript"
+	Jsx        CodeLang = "jsx"
+	Kotlin     CodeLang = "kotlin"
+	Makefile   CodeLang = "makefile"
+	Markdown   CodeLang = "markdown"
+	Php        CodeLang = "php"
+	Plaintext  CodeLang = "plaintext"
+	Python     CodeLang = "python"
+	Ruby       CodeLang = "ruby"
+	Rust       CodeLang = "rust"
+	SQL        CodeLang = "sql"
+	Swift      CodeLang = "swift"
+	Toml       CodeLang = "toml"
+	Tsx        CodeLang = "tsx"
+	Typescript CodeLang = "typescript"
+	XML        CodeLang = "xml"
+	Yaml       CodeLang = "yaml"
+)
+
+// Valid indicates whether the value is a known member of the CodeLang enum.
+func (e CodeLang) Valid() bool {
+	switch e {
+	case Bash:
+		return true
+	case C:
+		return true
+	case CSS:
+		return true
+	case Console:
+		return true
+	case Cpp:
+		return true
+	case Csharp:
+		return true
+	case Diff:
+		return true
+	case Dockerfile:
+		return true
+	case Go:
+		return true
+	case HTML:
+		return true
+	case Ini:
+		return true
+	case JSON:
+		return true
+	case Java:
+		return true
+	case Javascript:
+		return true
+	case Jsx:
+		return true
+	case Kotlin:
+		return true
+	case Makefile:
+		return true
+	case Markdown:
+		return true
+	case Php:
+		return true
+	case Plaintext:
+		return true
+	case Python:
+		return true
+	case Ruby:
+		return true
+	case Rust:
+		return true
+	case SQL:
+		return true
+	case Swift:
+		return true
+	case Toml:
+		return true
+	case Tsx:
+		return true
+	case Typescript:
+		return true
+	case XML:
+		return true
+	case Yaml:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ErrorCode.
 const (
 	ErrorCodeBlockKindNotAllowed ErrorCode = "block_kind_not_allowed"
@@ -193,6 +295,9 @@ func (e UserBlockKind) Valid() bool {
 		return false
 	}
 }
+
+// CodeLang A language a user may choose for a code block. plaintext means no highlighting.
+type CodeLang string
 
 // CreateImportRequest defines model for CreateImportRequest.
 type CreateImportRequest struct {

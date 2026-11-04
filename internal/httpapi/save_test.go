@@ -2,6 +2,7 @@ package httpapi
 
 import (
 	"encoding/json"
+	"maps"
 	"net/http"
 	"slices"
 	"testing"
@@ -83,6 +84,15 @@ func TestSaveDocument(t *testing.T) {
 			c.Blocks[0].Content = nil
 			*c.Blocks[0].Edited = true
 		})},
+		{name: "a chosen language", version: 3, wantStatus: http.StatusOK, content: edited(func(c *doccontent.Doc) {
+			c.CodeLangs = map[string]string{"c1": "bash"}
+		})},
+		{name: "a language for a block that is not code", version: 3, wantStatus: http.StatusUnprocessableEntity, wantCode: gen.ErrorCodeInvalidContent, content: edited(func(c *doccontent.Doc) {
+			c.CodeLangs = map[string]string{"p1": "bash"}
+		})},
+		{name: "a language RoNote does not offer", version: 3, wantStatus: http.StatusUnprocessableEntity, wantCode: gen.ErrorCodeInvalidContent, content: edited(func(c *doccontent.Doc) {
+			c.CodeLangs = map[string]string{"c1": "cobol"}
+		})},
 		{name: "another user's document", version: 3, target: "/api/v1/documents/" + uuid.NewString(), content: edited(func(*doccontent.Doc) {}), wantStatus: http.StatusNotFound, wantCode: gen.ErrorCodeNotFound},
 	}
 	for _, tt := range tests {
@@ -110,7 +120,10 @@ func TestSaveDocument(t *testing.T) {
 				return
 			}
 			if got := decodeJSON[gen.SavedDocument](t, rec); got.Version != 4 || len(b.saves) != 1 {
-				t.Errorf("saved = %+v after %d saves, want version 4", got, len(b.saves))
+				t.Fatalf("saved = %+v after %d saves, want version 4", got, len(b.saves))
+			}
+			if want := tt.content().CodeLangs; !maps.Equal(b.saves[0].CodeLangs, want) {
+				t.Errorf("saved code_langs = %v, want %v", b.saves[0].CodeLangs, want)
 			}
 		})
 	}

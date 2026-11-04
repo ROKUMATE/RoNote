@@ -1,3 +1,4 @@
+import { ApiError } from "./client";
 import type { ErrorCode, ImportErrorCode } from "./schema";
 
 /** Why an import failed, one plain sentence per code. */
@@ -41,8 +42,15 @@ export const requestErrorMessages: Record<ErrorCode, string> = {
 };
 
 /** The API did not answer, or something else answered for it. */
-export const unreachableMessage = "RoNote's server isn't answering. Try again in a moment.";
+const unreachableMessage = "RoNote's server isn't answering. Try again in a moment.";
 
 /** The progress stream gave up before the import finished. */
 export const lostMessage =
   "Lost track of this import. Reload the library to see whether it finished.";
+
+/** Why a request failed, in one sentence. */
+export function requestErrorMessage(error: unknown): string {
+  return error instanceof ApiError && error.body
+    ? requestErrorMessages[error.body.code]
+    : unreachableMessage;
+}

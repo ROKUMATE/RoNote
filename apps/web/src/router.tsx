@@ -44,7 +44,8 @@ const routeTree = rootRoute.addChildren([
 ]);
 
 export function createAppRouter(history: RouterHistory = createBrowserHistory()) {
-  return createRouter({ routeTree, history });
+  // Back and forward return to where the reader was on each page.
+  return createRouter({ routeTree, history, scrollRestoration: true });
 }
 
 declare module "@tanstack/react-router" {

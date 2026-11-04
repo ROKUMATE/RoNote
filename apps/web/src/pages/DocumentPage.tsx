@@ -14,6 +14,8 @@ import { Outline } from "../document/Outline";
 import { Reader } from "../document/Reader";
 import type { SaveStatus } from "../document/save";
 import { useEditing } from "../document/useEditing";
+import { useFollow } from "../document/useFollow";
+import { useScrollAnchor } from "../document/useScrollAnchor";
 import { formatDate, hostOf } from "../format";
 import { buttonClass } from "../ui/button";
 import { PageTitle } from "../ui/PageTitle";
@@ -80,6 +82,8 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
   const [editor, setEditor] = useState<Editor>();
   const hrefs = useMemo(() => sameDomainHrefs(doc.content.blocks), [doc.content.blocks]);
   const targets = useQuery(linkTargets(doc.id, hrefs)).data;
+  const { follow, following } = useFollow(targets);
+  useScrollAnchor(editor !== undefined);
   return (
     <article className="max-w-[68ch]">
       {existing && (
@@ -129,6 +133,8 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
           }}
           onRevert={revert}
           linkTargets={targets}
+          onFollow={(href, link) => void follow(href, link)}
+          following={following}
         />
         {editor && <Outline editor={editor} />}
       </div>

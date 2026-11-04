@@ -126,6 +126,115 @@
     margin-bottom: 0;
   }
 
+  .reader .reader-content:focus {
+    outline: none;
+  }
+
+  /* Long documents: off-screen blocks skip layout and paint until near. */
+  .reader .reader-content > * {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 3em;
+  }
+
+  .reader .code-block {
+    margin: 1rem 0;
+  }
+
+  .reader .code-block pre {
+    margin: 0;
+  }
+
+  .reader .code-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-ui);
+    color: var(--color-ink-2);
+  }
+
+  .reader .code-title {
+    font-family: var(--font-mono);
+    color: var(--color-ink);
+  }
+
+  .reader .code-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-sm);
+    color: var(--color-ink-2);
+  }
+
+  .reader .code-copy:hover {
+    background-color: var(--color-paper-2);
+    color: var(--color-ink);
+  }
+
+  .reader .table-scroll {
+    margin: 1rem 0;
+    overflow-x: auto;
+  }
+
+  .reader .table-scroll table {
+    margin: 0;
+  }
+
+  .reader .callout-title {
+    font-family: var(--font-sans);
+    font-weight: 600;
+  }
+
+  .reader .tabs {
+    margin: 1rem 0;
+  }
+
+  .reader .tabs-list {
+    display: flex;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--color-rule);
+    font-family: var(--font-sans);
+    font-size: var(--text-ui-lg);
+  }
+
+  .reader .tabs-trigger {
+    padding: 0.25rem 0.75rem;
+    margin-bottom: -1px;
+    border-bottom: 2px solid transparent;
+    color: var(--color-ink-2);
+  }
+
+  .reader .tabs-trigger[data-state="active"] {
+    border-bottom-color: var(--color-accent);
+    color: var(--color-ink);
+  }
+
+  .reader figure img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .reader figcaption {
+    font-family: var(--font-sans);
+    font-size: var(--text-ui);
+    color: var(--color-ink-2);
+  }
+
+  .reader blockquote {
+    border-left: 2px solid var(--color-rule);
+    padding-left: 1rem;
+    color: var(--color-ink-2);
+  }
+
+  .reader hr {
+    border: 0;
+    border-top: 1px solid var(--color-rule);
+    margin: 2rem 0;
+  }
+
   /* Machine-made content: a thin left rule and a small label (DESIGN.md). */
   .reader .generated {
     border-left: 2px solid var(--color-gen);

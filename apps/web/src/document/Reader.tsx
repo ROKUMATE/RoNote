@@ -1,6 +1,11 @@
+import { PlusIcon } from "@phosphor-icons/react/Plus";
+import type { Editor } from "@tiptap/core";
 import type { EditorView } from "@tiptap/pm/view";
 import { EditorContent, useEditor } from "@tiptap/react";
+import { type MouseEvent, useEffect, useRef, useState } from "react";
 import type { DocContent } from "../api/schema";
+import { BlockMenu } from "./BlockMenu";
+import { type InsertAt, insertUserBlock, SlashMenu, topLevelBlockAt } from "./insert";
 import { toEditor } from "./mapping";
 import { readerExtensions } from "./views";
 
@@ -9,7 +14,7 @@ import { readerExtensions } from "./views";
  * moves focus there; any other link opens in a new tab. Same-domain import
  * on click comes later (P11).
  */
-function followLink(_view: EditorView, event: MouseEvent): boolean {
+function followLink(_view: EditorView, event: globalThis.MouseEvent): boolean {
   const link = (event.target as Element | null)?.closest?.("a[href]");
   if (!link) return false;
   event.preventDefault();
@@ -27,10 +32,25 @@ function followLink(_view: EditorView, event: MouseEvent): boolean {
   return true;
 }
 
-/** The document's body, read and edited in place. */
-export function Reader({ content }: { content: DocContent }) {
+/**
+ * The document's body, read and edited in place. A "+" below the block under
+ * the pointer or the cursor, or "/" in an empty paragraph, opens the menu of
+ * blocks a user can add.
+ */
+export function Reader({
+  content,
+  onEditor,
+}: {
+  content: DocContent;
+  onEditor?: (editor: Editor) => void;
+}) {
+  const wrapper = useRef<HTMLDivElement>(null);
+  const [menu, setMenu] = useState<{ at: InsertAt; top: number }>();
+  const [target, setTarget] = useState<{ pos: number; top: number }>();
+  const open = useRef<(at: InsertAt) => void>(() => {});
+
   const editor = useEditor({
-    extensions: readerExtensions,
+    extensions: [...readerExtensions, SlashMenu.configure({ open: (at) => open.current(at) })],
     content: toEditor(content),
     immediatelyRender: true,
     shouldRerenderOnTransaction: false,
@@ -39,5 +59,64 @@ export function Reader({ content }: { content: DocContent }) {
       handleDOMEvents: { click: followLink },
     },
   });
-  return <EditorContent editor={editor} className="reader" />;
+
+  /** The bottom of the top-level block at pos, from the top of the reader. */
+  const bottomOf = (pos: number) => {
+    const block = editor.view.nodeDOM(pos);
+    const top = wrapper.current?.getBoundingClientRect().top ?? 0;
+    return block instanceof HTMLElement ? block.getBoundingClientRect().bottom - top : 0;
+  };
+  open.current = (at) => setMenu({ at, top: bottomOf("replace" in at ? at.replace : at.after) });
+
+  useEffect(() => {
+    onEditor?.(editor);
+    const follow = () => {
+      const pos = topLevelBlockAt(editor, editor.state.selection.from);
+      setTarget(pos === undefined ? undefined : { pos, top: bottomOf(pos) });
+    };
+    const forget = () => setTarget(undefined);
+    editor.on("selectionUpdate", follow);
+    editor.on("update", forget);
+    return () => {
+      editor.off("selectionUpdate", follow);
+      editor.off("update", forget);
+    };
+  });
+
+  const hover = (event: MouseEvent) => {
+    const hit = editor.view.posAtCoords({ left: event.clientX, top: event.clientY });
+    const pos = hit ? topLevelBlockAt(editor, hit.inside >= 0 ? hit.inside : hit.pos) : undefined;
+    if (pos !== undefined && pos !== target?.pos) setTarget({ pos, top: bottomOf(pos) });
+  };
+
+  return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: hovering only places the "+" button; the cursor and "/" do the same from the keyboard.
+    <div ref={wrapper} className="relative" onMouseMove={hover}>
+      <EditorContent editor={editor} className="reader" />
+      {target && !menu && (
+        <button
+          type="button"
+          aria-label="Add a block below"
+          onClick={() => open.current({ after: target.pos })}
+          style={{ top: target.top - 12 }}
+          className="absolute -left-8 rounded-sm p-1 text-ink-2 hover:bg-paper-2 hover:text-ink max-sidebar:right-0 max-sidebar:left-auto"
+        >
+          <PlusIcon size={16} aria-hidden />
+        </button>
+      )}
+      {menu && (
+        <BlockMenu
+          top={menu.top}
+          onChoose={(kind) => {
+            setMenu(undefined);
+            insertUserBlock(editor, kind, menu.at);
+          }}
+          onClose={() => {
+            setMenu(undefined);
+            editor.commands.focus();
+          }}
+        />
+      )}
+    </div>
+  );
 }

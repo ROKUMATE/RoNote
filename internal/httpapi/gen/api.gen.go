@@ -164,6 +164,36 @@ func (e ImportStatus) Valid() bool {
 	}
 }
 
+// Defines values for UserBlockKind.
+const (
+	Callout   UserBlockKind = "callout"
+	Divider   UserBlockKind = "divider"
+	Heading   UserBlockKind = "heading"
+	List      UserBlockKind = "list"
+	Paragraph UserBlockKind = "paragraph"
+	Quote     UserBlockKind = "quote"
+)
+
+// Valid indicates whether the value is a known member of the UserBlockKind enum.
+func (e UserBlockKind) Valid() bool {
+	switch e {
+	case Callout:
+		return true
+	case Divider:
+		return true
+	case Heading:
+		return true
+	case List:
+		return true
+	case Paragraph:
+		return true
+	case Quote:
+		return true
+	default:
+		return false
+	}
+}
+
 // CreateImportRequest defines model for CreateImportRequest.
 type CreateImportRequest struct {
 	URL string `json:"url"`
@@ -317,6 +347,9 @@ type SaveDocumentRequest struct {
 type SavedDocument struct {
 	Version int `json:"version"`
 }
+
+// UserBlockKind The kinds a user block may use, nested blocks included. Source code, tables, tabs and images come only from the page.
+type UserBlockKind string
 
 // VersionConflict defines model for VersionConflict.
 type VersionConflict struct {

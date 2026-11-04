@@ -45,10 +45,12 @@ The extraction IR is frozen at version 1 (ADR 0004), so the edit history cannot 
   - Each language loads as its own chunk on demand, and a block is highlighted only when it nears the viewport.
   - The theme maps to six token colours, light and dark.
   - Highlighting only wraps the verbatim text in spans; a test checks the highlighted text equals the block text.
-- **Budgets,** gzip, checked per chunk by `make web-build`:
+  - A block without a declared language stays plain: RoNote never guesses one. go.dev's pages declare none, so their code is not highlighted.
+- **Long documents:** off-screen code, tables, tabs and images use `content-visibility: auto`. Text blocks do not: Chrome can misplace the caret in a block it has not rendered yet, such as the empty paragraph Enter just made, and typing then lands in the wrong place.
+- **Budgets,** gzip, checked per chunk by `make web-build` (`apps/web/scripts/budget.ts`, from Vite's manifest):
   - initial JS at most 150 kB;
-  - the document route chunk has its own budget (CONTEXT.md records the number and why);
-  - the highlighter core is a chunk of its own;
+  - the document route at most 135 kB. Tiptap's core and ProseMirror are about two thirds of it, the floor for a ProseMirror editor. The rest is the React bindings, Radix Tabs and RoNote's own document code. The budget leaves about 7% for P11 on top of the 126 kB it measured. Only the extensions in use are imported, one subpath each; Tiptap's link extension is replaced by a small mark, since its autolinking pulled in linkifyjs (13 kB);
+  - the highlighter core at most 60 kB;
   - Shiki's language chunks are listed, not budgeted.
 
 ## Consequences

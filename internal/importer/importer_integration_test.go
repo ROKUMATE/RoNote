@@ -22,8 +22,8 @@ import (
 	"github.com/riverqueue/river"
 	"github.com/riverqueue/river/rivertype"
 
+	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/fetch"
-	"github.com/rokumate/ronote/internal/ir"
 	"github.com/rokumate/ronote/internal/pgtest"
 	"github.com/rokumate/ronote/internal/store"
 )
@@ -278,12 +278,16 @@ func TestImport(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if doc.Title != "Guide" || doc.SourceURL != url || ir.Validate(doc.Content) != nil ||
+	if doc.Title != "Guide" || doc.SourceURL != url || doccontent.Validate(doc.Content) != nil ||
 		len(doc.Content.Blocks) != 3 || doc.Content.Blocks[2].Text != "fmt.Println(\"hi\")\n" {
 		t.Errorf("document = %+v with %d blocks", doc.DocumentSummary, len(doc.Content.Blocks))
 	}
-	if doc.Content.Source.URL != url {
-		t.Errorf("IR source URL = %q, want the canonical %q, not the user's exact request", doc.Content.Source.URL, url)
+	extraction, err := h.store.DocumentExtraction(t.Context(), h.ada.ID, imp.DocumentID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if extraction.Source.URL != url {
+		t.Errorf("IR source URL = %q, want the canonical %q, not the user's exact request", extraction.Source.URL, url)
 	}
 	for table, want := range map[string]int{"sources": 1, "source_snapshots": 1, "extractions": 1, "documents": 1, "imports": 1} {
 		if got := h.count(table); got != want {

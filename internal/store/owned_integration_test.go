@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 
-	"github.com/rokumate/ronote/internal/ir"
+	"github.com/rokumate/ronote/internal/doccontent"
 )
 
 // fixture is one user with a source, a snapshot and an extraction to make
@@ -90,7 +90,7 @@ func TestDocuments(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if doc.Title != "Guide" || doc.Version != 1 || doc.SourceURL != f.source.CanonicalURL || ir.Validate(doc.Content) != nil {
+	if doc.Title != "Guide" || doc.Version != 1 || doc.SourceURL != f.source.CanonicalURL || doccontent.Validate(doc.Content) != nil {
 		t.Errorf("document = %+v", doc.DocumentSummary)
 	}
 	if got, err := f.s.FindOwnerDocumentForURL(ctx, f.ada.ID, f.source.CanonicalURL); err != nil || got != id {

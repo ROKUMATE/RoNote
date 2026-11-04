@@ -32,6 +32,7 @@ Site crawling, AI summaries, chat, handwritten OCR, pseudocode conversion. Do no
 | `deploy/` | deployment config |
 | `scripts/` | repo scripts |
 | `internal/ir/` | the document model every importer produces (docs/adr/0004-ir-and-links.md) |
+| `internal/doccontent/` | a user's document: IR blocks marked source or user, and the rules a save must keep (docs/adr/0006-editor-and-doc-content.md) |
 | `internal/importer/` | the import pipeline: the River job that fetches, extracts and stores a document, and the service the API queues imports with |
 | `internal/events/` | import status changes from Postgres (LISTEN import_status, one connection per API process) to the API's event streams |
 | `internal/canon/` | canonical URLs: what sources and imports are keyed by, and the same-host rule for a page's canonical link |
@@ -170,7 +171,7 @@ In users' documents, source code, tables, tabs and images are locked: the server
 
 ## IR version
 
-`ir_version` 1 is frozen (docs/adr/0004-ir-and-links.md): documents are stored as IR. Changing the IR's shape means a new version and, in the same change, a documented upgrade path for stored documents. Extractor changes that keep the shape need neither.
+`ir_version` 1 is frozen (docs/adr/0004-ir-and-links.md): extractions are stored as IR, and documents as DocContent, whose blocks are IR blocks (`internal/doccontent`, docs/adr/0006-editor-and-doc-content.md). Changing the IR's shape means a new version and, in the same change, a documented upgrade path for stored extractions and documents. Extractor changes that keep the shape need neither. Changing DocContent's shape means a new `doc_version` and a migration, tested up and down.
 
 ## Docs-framework adapters
 

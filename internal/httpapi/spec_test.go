@@ -8,6 +8,9 @@ import (
 	"testing"
 
 	"github.com/getkin/kin-openapi/openapi3"
+
+	"github.com/rokumate/ronote/internal/doccontent"
+	"github.com/rokumate/ronote/internal/ir"
 )
 
 // TestIRSchemaMatchesGoldens validates every golden extraction against the
@@ -30,6 +33,7 @@ func TestIRSchemaMatchesGoldens(t *testing.T) {
 	if err != nil || len(files) == 0 {
 		t.Fatalf("no golden files: %v", err)
 	}
+	docSchema := spec.Components.Schemas["DocContent"].Value
 	var first map[string]any
 	for _, file := range files {
 		data, err := fs.ReadFile(goldens, file)
@@ -43,6 +47,13 @@ func TestIRSchemaMatchesGoldens(t *testing.T) {
 		if err := schema.VisitJSON(doc); err != nil {
 			t.Errorf("%s does not match the IRDocument schema: %v", file, err)
 		}
+		var extraction ir.Doc
+		if err := json.Unmarshal(data, &extraction); err != nil {
+			t.Fatal(err)
+		}
+		if err := docSchema.VisitJSON(asJSON(t, doccontent.FromIR(&extraction))); err != nil {
+			t.Errorf("%s as a new document does not match the DocContent schema: %v", file, err)
+		}
 		if first == nil {
 			first = doc
 		}
@@ -52,4 +63,47 @@ func TestIRSchemaMatchesGoldens(t *testing.T) {
 	if err := schema.VisitJSON(first); err == nil {
 		t.Error("a document with an unknown field matches the schema; want additionalProperties: false to refuse it")
 	}
+}
+
+// TestDocBlockIsIRBlockPlusOrigin keeps DocBlock's properties those of
+// IRBlock plus the three that say where a block came from.
+func TestDocBlockIsIRBlockPlusOrigin(t *testing.T) {
+	t.Parallel()
+	spec, err := loadContract()
+	if err != nil {
+		t.Fatal(err)
+	}
+	irBlock := spec.Components.Schemas["IRBlock"].Value
+	docBlock := spec.Components.Schemas["DocBlock"].Value
+	for name, prop := range irBlock.Properties {
+		got, ok := docBlock.Properties[name]
+		if !ok {
+			t.Errorf("DocBlock lacks IRBlock's %s", name)
+			continue
+		}
+		a, _ := json.Marshal(prop)
+		b, _ := json.Marshal(got)
+		if string(a) != string(b) {
+			t.Errorf("DocBlock's %s = %s, IRBlock's is %s", name, b, a)
+		}
+	}
+	for name := range docBlock.Properties {
+		if _, ok := irBlock.Properties[name]; !ok && name != "origin" && name != "edited" && name != "source_block_id" {
+			t.Errorf("DocBlock has %s, which IRBlock has not", name)
+		}
+	}
+}
+
+// asJSON is v as decoded JSON, the form schema validation takes.
+func asJSON(t *testing.T, v any) any {
+	t.Helper()
+	data, err := json.Marshal(v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var out any
+	if err := json.Unmarshal(data, &out); err != nil {
+		t.Fatal(err)
+	}
+	return out
 }

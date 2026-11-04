@@ -52,6 +52,15 @@ func Validate(doc *Doc) error {
 	return errors.Join(v.errs...)
 }
 
+// ValidateBlocks checks blocks the way Validate checks a document's: each
+// block's fields for its kind, links and URLs, and ids unique across all of
+// them, nested ones included.
+func ValidateBlocks(blocks []Block) error {
+	v := validator{ids: map[string]string{}}
+	v.blocks("blocks", blocks)
+	return errors.Join(v.errs...)
+}
+
 type validator struct {
 	errs []error
 	ids  map[string]string // block ID -> path of the block that has it

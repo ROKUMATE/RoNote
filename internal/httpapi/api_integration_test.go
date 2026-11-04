@@ -14,6 +14,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/fetch"
 	"github.com/rokumate/ronote/internal/importer"
 	"github.com/rokumate/ronote/internal/ir"
@@ -114,8 +115,8 @@ func TestAPIImportsEndToEnd(t *testing.T) {
 
 	rec = apiRequest(t, adaAPI, http.MethodGet, "/api/v1/documents/"+imp.DocumentID, "")
 	doc := decodeJSON[struct {
-		Title   string `json:"title"`
-		Content ir.Doc `json:"content"`
+		Title   string         `json:"title"`
+		Content doccontent.Doc `json:"content"`
 	}](t, rec)
 	if rec.Code != http.StatusOK || doc.Title != "Guide" || len(doc.Content.Blocks) != 2 || doc.Content.Blocks[1].Text != "go run .\n" {
 		t.Errorf("GET document = %d %+v", rec.Code, doc)

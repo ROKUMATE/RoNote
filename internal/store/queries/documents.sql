@@ -25,9 +25,12 @@ ON CONFLICT ON CONSTRAINT documents_owner_source_key DO UPDATE SET owner_id = EX
 RETURNING id, (xmax = 0)::boolean AS created;
 
 -- name: GetDocument :one
-SELECT d.id, d.title, s.canonical_url AS source_url, d.version, d.created_at, d.updated_at, d.content
+-- The document, with the warnings of the extraction it was made from.
+SELECT d.id, d.title, s.canonical_url AS source_url, d.version, d.created_at, d.updated_at, d.content,
+    COALESCE(e.ir -> 'warnings', '[]'::jsonb)::jsonb AS warnings
 FROM documents d
 JOIN sources s ON s.id = d.source_id
+JOIN extractions e ON e.id = d.extraction_id
 WHERE d.owner_id = $1 AND d.id = $2;
 
 -- name: ListDocuments :many
@@ -39,3 +42,10 @@ WHERE d.owner_id = sqlc.arg(owner_id)
   AND (d.created_at, d.id) < (sqlc.arg(before_created_at)::timestamptz, sqlc.arg(before_id)::uuid)
 ORDER BY d.created_at DESC, d.id DESC
 LIMIT sqlc.arg(max_rows);
+
+-- name: DocumentExtraction :one
+-- The IR of the extraction the owner's document was made from.
+SELECT e.ir
+FROM documents d
+JOIN extractions e ON e.id = d.extraction_id
+WHERE d.owner_id = $1 AND d.id = $2;

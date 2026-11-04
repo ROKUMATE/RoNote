@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/ir"
 	"github.com/rokumate/ronote/internal/store/sqlcdb"
 )
@@ -27,11 +28,13 @@ type DocumentSummary struct {
 // Document is a user's own copy of an imported page.
 type Document struct {
 	DocumentSummary
-	Content *ir.Doc
+	Content *doccontent.Doc
+	// Warnings are the extraction's: what the extractor was unsure of.
+	Warnings []ir.Warning
 }
 
 // NewDocument is what a document is created from: the extraction of a
-// source, whose IR becomes the content.
+// source, whose blocks become the content as unedited source blocks.
 type NewDocument struct {
 	OwnerID      uuid.UUID
 	SourceID     uuid.UUID
@@ -53,7 +56,7 @@ var listStart = DocumentCursor{CreatedAt: time.Date(9999, 1, 1, 0, 0, 0, 0, time
 // the one they already have, so retried imports never make a second one.
 // created reports whether this call made it.
 func (s *Store) CreateDocumentIfAbsent(ctx context.Context, d NewDocument) (id uuid.UUID, created bool, err error) {
-	content, err := json.Marshal(d.Content)
+	content, err := json.Marshal(doccontent.FromIR(d.Content))
 	if err != nil {
 		return uuid.Nil, false, fmt.Errorf("create document: %w", err)
 	}
@@ -88,16 +91,21 @@ func (s *Store) GetDocument(ctx context.Context, owner, id uuid.UUID) (Document,
 	if err != nil {
 		return Document{}, mapErr("get document", err)
 	}
-	var content ir.Doc
+	var content doccontent.Doc
 	if err := json.Unmarshal(row.Content, &content); err != nil {
 		return Document{}, fmt.Errorf("document %s: %w", row.ID, err)
+	}
+	var warnings []ir.Warning
+	if err := json.Unmarshal(row.Warnings, &warnings); err != nil {
+		return Document{}, fmt.Errorf("document %s warnings: %w", row.ID, err)
 	}
 	return Document{
 		DocumentSummary: DocumentSummary{
 			ID: row.ID, Title: row.Title, SourceURL: row.SourceURL, Version: int(row.Version),
 			CreatedAt: row.CreatedAt, UpdatedAt: row.UpdatedAt,
 		},
-		Content: &content,
+		Content:  &content,
+		Warnings: warnings,
 	}, nil
 }
 
@@ -123,4 +131,18 @@ func (s *Store) ListDocuments(ctx context.Context, owner uuid.UUID, after *Docum
 		}
 	}
 	return docs, nil
+}
+
+// DocumentExtraction returns the IR of the extraction owner's document id
+// was made from, or ErrNotFound, also when the document is someone else's.
+func (s *Store) DocumentExtraction(ctx context.Context, owner, id uuid.UUID) (*ir.Doc, error) {
+	raw, err := s.q.DocumentExtraction(ctx, sqlcdb.DocumentExtractionParams{OwnerID: owner, ID: id})
+	if err != nil {
+		return nil, mapErr("document extraction", err)
+	}
+	var doc ir.Doc
+	if err := json.Unmarshal(raw, &doc); err != nil {
+		return nil, fmt.Errorf("extraction of document %s: %w", id, err)
+	}
+	return &doc, nil
 }

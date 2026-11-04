@@ -13,6 +13,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/httpapi/gen"
 	"github.com/rokumate/ronote/internal/importer"
 	"github.com/rokumate/ronote/internal/ir"
@@ -86,7 +87,7 @@ func testDoc(i int) store.Document {
 			ID: uuid.New(), Title: content.Title, SourceURL: fmt.Sprintf("https://docs.example.com/%d", i), Version: 1,
 			CreatedAt: t0.Add(time.Duration(-i) * time.Minute), UpdatedAt: t0,
 		},
-		Content: content,
+		Content: doccontent.FromIR(content),
 	}
 }
 
@@ -199,9 +200,9 @@ func TestGetImportAndDocument(t *testing.T) {
 	}
 	rec = apiRequest(t, h, http.MethodGet, "/api/v1/documents/"+doc.ID.String(), "")
 	got := decodeJSON[struct {
-		Title   string `json:"title"`
-		Version int    `json:"version"`
-		Content ir.Doc `json:"content"`
+		Title   string         `json:"title"`
+		Version int            `json:"version"`
+		Content doccontent.Doc `json:"content"`
 	}](t, rec)
 	if rec.Code != http.StatusOK || got.Title != "Doc 1" || got.Version != 1 || got.Content.Blocks[0].Text != "x := 1\n" {
 		t.Errorf("GET document = %d %+v", rec.Code, got)

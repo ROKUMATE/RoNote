@@ -81,6 +81,27 @@ func migrate(ctx context.Context, pool *pgxpool.Pool) (err error) {
 	return nil
 }
 
+// MigrateTo moves d's schema up or down to goose version version, so a test
+// can check a migration in both directions.
+func (d *DB) MigrateTo(ctx context.Context, version int64) (err error) {
+	sqlDB := stdlib.OpenDBFromPool(d.Pool)
+	defer func() { err = errors.Join(err, sqlDB.Close()) }()
+	provider, err := goose.NewProvider(goose.DialectPostgres, sqlDB, os.DirFS(filepath.Join(repoRoot(), "migrations")))
+	if err != nil {
+		return fmt.Errorf("load migrations: %w", err)
+	}
+	current, err := provider.GetDBVersion(ctx)
+	if err != nil {
+		return fmt.Errorf("read version: %w", err)
+	}
+	if version < current {
+		_, err = provider.DownTo(ctx, version)
+	} else {
+		_, err = provider.UpTo(ctx, version)
+	}
+	return err
+}
+
 // Main starts one DB for the package's tests, stores it in *db, runs the
 // tests and closes the DB before exiting, whatever the tests did.
 func Main(m *testing.M, db **DB) {

@@ -172,12 +172,48 @@ export interface components {
             updated_at: string;
         };
         Document: components["schemas"]["DocumentSummary"] & {
-            content: components["schemas"]["IRDocument"];
+            content: components["schemas"]["DocContent"];
+            /** @description What the extractor was unsure of when it made the document's source blocks. */
+            warnings: components["schemas"]["IRWarning"][];
         };
         DocumentList: {
             documents: components["schemas"]["DocumentSummary"][];
             /** @description Present when there are more documents. */
             next_cursor?: string;
+        };
+        DocContent: {
+            /** @enum {integer} */
+            doc_version: 1;
+            blocks: components["schemas"]["DocBlock"][];
+        };
+        /** @description A top-level block: an IRBlock's fields, plus where it came from. Source blocks set edited and source_block_id (equal to id); user blocks set neither, and have UUIDv7 ids. A spec test keeps these properties IRBlock's plus the three. */
+        DocBlock: {
+            /** @enum {string} */
+            origin: "source" | "user";
+            /** @description Set on source blocks only; whether the user changed the block. */
+            edited?: boolean;
+            /** @description Set on source blocks only; the extraction block it came from. */
+            source_block_id?: string;
+            id: string;
+            /** @enum {string} */
+            kind: "heading" | "paragraph" | "list" | "code" | "table" | "callout" | "image" | "quote" | "divider" | "tabs";
+            level?: number;
+            anchor?: string;
+            content?: components["schemas"]["IRInline"][];
+            ordered?: boolean;
+            items?: components["schemas"]["IRItem"][];
+            lang?: string;
+            title?: string;
+            title_link?: components["schemas"]["IRLink"];
+            text?: string;
+            head?: components["schemas"]["IRCell"][][];
+            rows?: components["schemas"]["IRCell"][][];
+            /** @enum {string} */
+            variant?: "note" | "tip" | "info" | "warning" | "danger";
+            children?: components["schemas"]["IRBlock"][];
+            src?: string;
+            alt?: string;
+            caption?: components["schemas"]["IRInline"][];
         };
         IRDocument: {
             /** @enum {integer} */
@@ -306,6 +342,8 @@ export type ImportEvent = components['schemas']['ImportEvent'];
 export type DocumentSummary = components['schemas']['DocumentSummary'];
 export type Document = components['schemas']['Document'];
 export type DocumentList = components['schemas']['DocumentList'];
+export type DocContent = components['schemas']['DocContent'];
+export type DocBlock = components['schemas']['DocBlock'];
 export type IrDocument = components['schemas']['IRDocument'];
 export type IrSource = components['schemas']['IRSource'];
 export type IrExtractor = components['schemas']['IRExtractor'];

@@ -4,11 +4,20 @@ Current state of the project. Rewrite this file at the end of each phase; never 
 
 ## Current milestone
 
-P09, import UI and library: done.
-- The web app imports a page through a dialog with live progress, lists the library a cursor page at a time, and opens a document's header page. The reader itself is P10.
-- In the browser, importing go.dev's Effective Go shows `queued → fetching → extracting` live, then lands on its header: 60 headings, 298 paragraphs, 3 lists, 153 code blocks, 1 quote. Importing it again opens the same document with "Already in your library".
-- `make web-e2e` runs against the full stack: Postgres, migrations, API, worker, a fixture site and Vite. 23 tests pass, also with the import and accessibility specs repeated four times.
-- Bundle, gzip: JS 119.2 kB of 150 (P08: 100.8), CSS 8.2 kB of 20 (P08: 7.8).
+P10, reader and editor: done.
+- `/doc/$id` reads and edits a document in place: Tiptap (MIT core), with code, tables, tabs, images and dividers as locked atoms, autosave, edited marks and Revert to source (ADR 0006).
+- Effective Go (500 top-level blocks, 153 code blocks), production build, median of 5 cold loads on this Mac:
+  - without throttling, first paint of the document (LCP) 108 ms and interactive (editor editable, main thread idle) 121 ms;
+  - at 4x CPU throttling, 336 ms and 368 ms.
+- In the browser, Effective Go reads well, but its code is not highlighted: go.dev declares no language and RoNote never guesses one. vite.dev's guide shows the lazy highlighting: no grammar loads at the top of the page, and after scrolling 8 of its 9 blocks are highlighted, each language its own chunk, with every highlighted block spelling its stored text exactly.
+- An edited Effective Go paragraph autosaved. Reverted, it matched its extraction block exactly and was marked unedited again.
+- Bundle, gzip:
+  - initial JS 119.4 kB of 150;
+  - document route 126.1 kB of 135;
+  - highlighter core 54.5 kB of 60;
+  - CSS 9.2 kB of 20;
+  - 42 Shiki language chunks, 273 kB in all, each loaded only when a page needs it.
+- `make web-e2e` passes 35 tests. `make test-live` still passes all 11 pages.
 
 ## Decisions so far
 
@@ -24,7 +33,7 @@ IR (`internal/ir`, ADR 0004):
 - **Blocks:** a closed set of heading, paragraph, list, code, table, callout, image, quote, divider and tabs.
   - List and tab items are `{label, children}`; only tabs have a label.
   - Code has `lang`, an optional `title` (a file name or frame label) and an optional `title_link` (`{href, kind}`) when the title links to that file.
-- **Frozen at `ir_version` 1** since P08: documents are stored as IR, so any shape change needs a version bump and an upgrade path for stored documents.
+- **Frozen at `ir_version` 1** since P08: extractions are stored as IR, and documents as DocContent, whose blocks are IR blocks. Any IR shape change needs a version bump and an upgrade path for both.
 - **Inline runs** carry marks and links (anchor, same_domain or external).
 - **`Validate`** checks every rule.
 - **Block IDs:** sha256 of heading path, kind and text (code includes its language and title), with `-n` for repeats.
@@ -99,6 +108,17 @@ Import pipeline (ADR 0005):
   - every operation declares its 500 `internal_error` answer; a contract test validates every response the API's tests produce against the spec, statuses included;
   - the spec's IR schema maps onto `internal/ir`, and every golden extraction must validate against it.
 - **Progress:** a trigger NOTIFYs `import_status` in the same transaction; one LISTEN connection per API process fans out to SSE streams, with a 15s heartbeat.
+- **Editing** (`internal/doccontent`, ADR 0006):
+  - **DocContent v1** is `{doc_version: 1, blocks}`. Each top-level block is an IR block plus `origin` (source or user), and for source blocks `edited` and `source_block_id`. Migration 00005 converted stored documents; its down migration rebuilds the IR and keeps edits. Both directions are tested.
+  - **Save:** `PATCH /documents/{id}` takes `{content, version}`. A stale version answers 409 `version_conflict` with `current_version`.
+  - **What a save must keep:**
+    - every source block names an extraction block, at most once (`unknown_source_block`);
+    - code, tables, tabs and images inside a source block, at any depth, equal their extraction blocks byte for byte (`source_block_modified`);
+    - an unedited source block equals its extraction block (also `source_block_modified`);
+    - user blocks use only paragraph, heading, list, quote, callout and divider (`block_kind_not_allowed`, the spec's `UserBlockKind`);
+    - anything else invalid answers `invalid_content`.
+  - **Revert:** `POST /documents/{id}/blocks/{blockId}/revert` puts the extraction's block back exactly and bumps the version.
+  - `GET /documents/{id}` returns the extraction's warnings next to the content.
 - **Identity until P16:** dev and test inject `RONOTE_DEV_USER_EMAIL`; without it, and always in staging and prod, `/api/v1` answers 401.
 - **Tests that catch regressions:** three deliberate breaks were each caught.
   - Dropping the one-document-per-owner-and-source constraint.
@@ -120,16 +140,56 @@ Web app (`apps/web`, since P09):
   - Leaving the event stream open after done: the subscribeImport test sees the reconnect's second done.
   - Skipping the invalidation after done: the dialog tests, and the e2e test whose sidebar never lists the new document.
 
-Unchanged: `/healthz`, `/readyz`, the P04 tokens, shell and styleguide, the extractor and pipeline.
+Reader and editor (`apps/web/src/document`, since P10; `/doc/$id` is a lazy chunk):
+- **Mapping:** `mapping.ts` converts IR ⇄ Tiptap JSON, and every golden fixture round-trips through a real editor unchanged. Unedited source blocks are saved exactly as loaded, never re-serialized.
+- **Schema** (`schema.ts`):
+  - paragraph, heading (with its anchor), list (one node, `ordered`), quote and callout (its title fixed) are editable;
+  - code, table, tabs, image and divider are atoms carrying their IR block, with no paste rules;
+  - links are a small mark of RoNote's own: http(s) or a `#fragment`, the kind kept.
+- **Identity plugin** (`identity.ts`):
+  - a top-level source block is edited exactly when it differs from how it loaded, so undo clears the mark; a block that loaded edited stays edited until reverted;
+  - every block gets a unique id, and the half a split copies becomes a user block with a UUIDv7;
+  - pasting drops locked blocks.
+- **Edited marks:** an edited source block has a thin `--color-gen` rule and, above it, "edited" and "Revert to source". Revert asks first, then saves pending edits and calls the API.
+- **Views:**
+  - code: title (linked from `title_link`), language label, Copy (the stored text), the focusable scrolling `pre`;
+  - tabs: Radix Tabs, panels drawn by a read-only IR renderer;
+  - images: lazy, `referrerpolicy="no-referrer"`, alt text;
+  - links: anchors move the caret to their heading; other links open a new tab with `noopener noreferrer`.
+- **Highlighting:** Shiki core with the JavaScript regex engine, as a lazy chunk. A grammar loads per language once a block is within 600px of the viewport. The six code colours are tokens, in light and dark. A block without a declared language stays plain.
+- **Insert:** "+" below the block under the pointer or cursor, or "/" in an empty paragraph, opens a menu of exactly the six user kinds.
+- **Autosave** (`save.ts`):
+  - saves 1s after the last change, and at once on blur or when the page is hidden (keepalive);
+  - the header shows Saving… / Saved / Offline, retrying, with backoff for network and 5xx errors;
+  - a 409 shows "This document changed in another tab." with Reload, and saving stops;
+  - a refused save says why.
+- **Outline:** h2 and h3 in the sidebar (portalled there from the lazy chunk). The current heading is the last one above a third of the viewport, measured on every scrolled frame. A click scrolls there and puts the caret in the heading.
+- **Long documents:** `content-visibility: auto` on code, tables, tabs and images only. Applied to text blocks, Chrome misplaced the caret in a just-created paragraph under load, and typing landed in the wrong place.
+- **Budgets:** `apps/web/scripts/budget.ts` replaced `scripts/web-budget.sh` and reads Vite's manifest per chunk group (ADR 0006).
+- **Tests that catch regressions:** four deliberate breaks were each caught.
+  - The server accepting changed source code: the Go rule and API tests, and the e2e forge test (200 instead of 422).
+  - The editor not marking edits: five unit tests, and the e2e test whose edit never saves.
+  - The mapping losing `title_link`: the round trip of both Kubernetes goldens.
+  - A save without a version: `tsc`, the page test (version undefined), and the e2e test.
+- **Found while building:**
+  - Tiptap's `useEditor` reapplied options rebuilt on each render, which redrew the document mid-typing; the options are now built once.
+  - The outline lost track after a fast jump (fixed, test first).
+  - Tiptap's link extension pulled in linkifyjs, which is gone.
+
+Unchanged: `/healthz`, `/readyz`, the P04 tokens and styleguide, the extractor and pipeline.
 
 ## Open questions
 
-- A user's document keeps the IR it was made from; re-importing returns it. Syncing to a newer snapshot belongs with editing (P10+).
+- go.dev declares no code languages, so its pages are not highlighted. Inferring a language was turned down: RoNote never guesses.
+- A user's document keeps the IR it was made from; re-importing returns it. Syncing to a newer snapshot will have to merge user blocks and edits, and DocContent keeps what that needs.
+- A deleted source block can only come back by undo in the same session; there is no "restore from source" for missing blocks yet.
+- Images inside source blocks are locked like code, tables and tabs, a step beyond the P10 brief, because the editor shows them as atoms.
+- The "edited" label sits above the block, not in the notes margin, which annotations (P12+) will use.
 - The fetch rate limit is per worker process; more than one worker process needs a shared limit.
 - Pages of a recognised framework in another layout, such as a Docusaurus blog post, fall back to generic with `adapter_fallback`.
-- A failed or lost import is shown until dismissed, but only in the session that started it; after a reload only the server knows. A list of the user's recent imports would need a new endpoint.
-- The URL length check counts characters in the browser and bytes on the server, so a long non-ASCII URL can pass the dialog and be refused by the API (which then explains).
+- A failed or lost import is shown until dismissed, but only in the session that started it.
+- The URL length check counts characters in the browser and bytes on the server.
 
 ## Next step
 
-P10: the reader. It renders the IR on `/doc/$id` below the header, once, through `.reader` (`src/styles/reader.css`), with code blocks byte-identical.
+P11: same-domain links import on click, inside the reader built in P10.

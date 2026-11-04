@@ -61,6 +61,32 @@
     text-underline-offset: 0.15em;
   }
 
+  /* Same-domain links (ADR 0006): a solid underline when the page is in the
+     library, dotted with a small marker when following it imports it. The
+     editor marks the text inside the link, so the link's own underline
+     gives way to the marked text's. */
+  .reader a[data-kind="same_domain"] {
+    text-decoration-line: none;
+  }
+
+  .reader [data-link] {
+    text-decoration-line: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .reader [data-link="import"] {
+    text-decoration-style: dotted;
+  }
+
+  .reader a:has([data-link="import"])::after,
+  .reader a[data-link="import"]::after {
+    content: "↓";
+    margin-left: 0.1em;
+    font-family: var(--font-sans);
+    font-size: 0.75em;
+    color: var(--color-ink-2);
+  }
+
   .reader :not(pre) > code {
     font-family: var(--font-mono);
     font-size: 0.9em;

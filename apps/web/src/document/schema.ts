@@ -11,6 +11,7 @@ import Strike from "@tiptap/extension-strike";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import Text from "@tiptap/extension-text";
+import { linkAttributes } from "./links";
 
 /*
  * The editor's schema: one node per IR block kind and one mark per IR mark
@@ -156,9 +157,7 @@ const IRLink = Mark.create({
     ];
   },
   renderHTML({ mark }) {
-    return mark.attrs.kind === "anchor"
-      ? ["a", { href: mark.attrs.href }, 0]
-      : ["a", { href: mark.attrs.href, target: "_blank", rel: "noopener noreferrer" }, 0];
+    return ["a", linkAttributes(mark.attrs.href, mark.attrs.kind), 0];
   },
 });
 

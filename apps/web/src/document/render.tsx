@@ -1,7 +1,8 @@
 import * as Tabs from "@radix-ui/react-tabs";
-import { Fragment } from "react";
-import type { IrBlock, IrCell, IrInline } from "../api/schema";
+import { createContext, Fragment, useContext } from "react";
+import type { IrBlock, IrCell, IrInline, IrLink } from "../api/schema";
 import { CodeBlock } from "../ui/CodeBlock";
+import { type LinkTargets, linkAttributes, linkStatus } from "./links";
 import { useHighlight } from "./useHighlight";
 
 /*
@@ -9,23 +10,32 @@ import { useHighlight } from "./useHighlight";
  * panels of tabs, table cells and image captions.
  */
 
-/** Where a link goes: anchors stay in the document, the rest open a new tab. */
-function linkProps(link: NonNullable<IrInline["link"]>) {
-  return link.kind === "anchor"
-    ? { href: link.href }
-    : { href: link.href, target: "_blank", rel: "noopener noreferrer" };
-}
-
 function Inlines({ runs }: { runs: readonly IrInline[] | null | undefined }) {
   return (runs ?? []).map((run, i) => {
     let node: React.ReactNode = run.text;
     for (const mark of run.marks ?? []) {
       node = wrap(mark, node);
     }
-    if (run.link) node = <a {...linkProps(run.link)}>{node}</a>;
+    if (run.link) node = <Link link={run.link}>{node}</Link>;
     // biome-ignore lint/suspicious/noArrayIndexKey: runs have no identity, and never reorder.
     return <span key={i}>{node}</span>;
   });
+}
+
+/** Where locked blocks' same-domain links lead, from the document page. */
+export const LinkTargetsContext = createContext<LinkTargets | undefined>(undefined);
+
+function Link({ link, children }: { link: IrLink; children: React.ReactNode }) {
+  const targets = useContext(LinkTargetsContext);
+  const status = link.kind === "same_domain" ? linkStatus(link.href, targets).state : "unknown";
+  return (
+    <a
+      {...linkAttributes(link.href, link.kind)}
+      data-link={status === "unknown" ? undefined : status}
+    >
+      {children}
+    </a>
+  );
 }
 
 function wrap(mark: NonNullable<IrInline["marks"]>[number], node: React.ReactNode) {

@@ -28,7 +28,7 @@ export async function chooseTheme(page: Page, theme: "light" | "dark") {
  * A fixture page's URL on the fixture site. Each call gives a URL no test
  * has imported yet, so tests do not depend on each other or on earlier runs.
  */
-export function fixtureURL(kind: "pages" | "slow" | "private", fixture: string) {
+export function fixtureURL(kind: "pages" | "slow" | "private" | "linked", fixture: string) {
   return `${stack.fixtures}/${kind}/${fixture}/?run=${crypto.randomUUID()}`;
 }
 

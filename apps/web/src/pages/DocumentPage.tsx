@@ -1,12 +1,15 @@
 import { ArrowSquareOutIcon } from "@phosphor-icons/react/ArrowSquareOut";
 import { InfoIcon } from "@phosphor-icons/react/Info";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Link, useParams, useRouterState } from "@tanstack/react-router";
 import { ApiError } from "../api/client";
-import { documentQuery, revertBlock } from "../api/queries";
+import { requestErrorMessages } from "../api/messages";
+import { documentQuery } from "../api/queries";
 import type { Document, IrWarning } from "../api/schema";
 import { blockCounts } from "../document/counts";
 import { Reader } from "../document/Reader";
+import type { SaveStatus } from "../document/save";
+import { useEditing } from "../document/useEditing";
 import { formatDate, hostOf } from "../format";
 import { buttonClass } from "../ui/button";
 import { PageTitle } from "../ui/PageTitle";
@@ -17,7 +20,7 @@ const genericWarnings: ReadonlySet<IrWarning["code"]> = new Set([
   "low_confidence",
 ]);
 
-/** A document's header. The reader that shows its content comes in P10. */
+/** A document: its header, then its content to read and edit. */
 export function DocumentPage() {
   const { id } = useParams({ from: "/doc/$id" });
   const doc = useQuery(documentQuery(id));
@@ -50,7 +53,7 @@ export function DocumentPage() {
       </div>
     );
   }
-  return <Header doc={doc.data} existing={existing} />;
+  return <Header key={doc.data.id} doc={doc.data} existing={existing} />;
 }
 
 /**
@@ -69,14 +72,7 @@ function opensWithTitle(doc: Document): boolean {
 
 function Header({ doc, existing }: { doc: Document; existing: boolean }) {
   const fallback = doc.warnings.some((w) => genericWarnings.has(w.code));
-  const queryClient = useQueryClient();
-  const revert = async (blockId: string) => {
-    const reverted = await revertBlock(doc.id, blockId);
-    queryClient.setQueryData(documentQuery(doc.id).queryKey, reverted);
-    const block = reverted.content.blocks.find((b) => b.id === blockId);
-    if (!block) throw new Error(`block ${blockId} is not in the reverted document`);
-    return block;
-  };
+  const { status, onEditor, revert } = useEditing(doc);
   return (
     <article className="max-w-[68ch]">
       {existing && (
@@ -109,6 +105,7 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
             <li key={count}>{count}</li>
           ))}
         </ul>
+        <SaveState status={status} />
       </header>
       {fallback && (
         <p role="note" className="mt-6 flex gap-2 border-rule border-l-2 pl-3 text-ui-lg">
@@ -117,7 +114,7 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
         </p>
       )}
       <div className="mt-8">
-        <Reader key={doc.id} content={doc.content} onRevert={revert} />
+        <Reader content={doc.content} onEditor={onEditor} onRevert={revert} />
       </div>
     </article>
   );
@@ -136,5 +133,39 @@ function Placeholder() {
         <div className="h-3 w-1/3 rounded-sm bg-paper-2" />
       </div>
     </div>
+  );
+}
+
+const saveLabels: Record<Exclude<SaveStatus["state"], "conflict" | "refused">, string> = {
+  idle: "",
+  dirty: "",
+  saving: "Saving…",
+  saved: "Saved",
+  offline: "Offline, retrying",
+};
+
+/**
+ * Where saving stands. A conflict or a refused save stops autosave; Reload
+ * shows the document as the server has it, and nothing is overwritten.
+ */
+function SaveState({ status }: { status: SaveStatus }) {
+  if (status.state === "conflict" || status.state === "refused") {
+    const message =
+      status.state === "conflict"
+        ? requestErrorMessages.version_conflict
+        : requestErrorMessages[status.code ?? "invalid_content"];
+    return (
+      <div role="alert" className="mt-3 flex flex-wrap items-center gap-3 text-ui-lg">
+        {message}
+        <button type="button" onClick={() => window.location.reload()} className={buttonClass}>
+          Reload
+        </button>
+      </div>
+    );
+  }
+  return (
+    <p role="status" className="mt-2 min-h-5 text-ink-2 text-ui">
+      {saveLabels[status.state]}
+    </p>
   );
 }

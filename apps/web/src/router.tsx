@@ -6,7 +6,6 @@ import {
   lazyRouteComponent,
   type RouterHistory,
 } from "@tanstack/react-router";
-import { DocumentPage } from "./pages/DocumentPage";
 import { Library } from "./pages/Library";
 import { NotFound } from "./pages/NotFound";
 import { AppShell } from "./shell/AppShell";
@@ -19,10 +18,11 @@ const libraryRoute = createRoute({
   component: Library,
 });
 
+/** The document reader and editor, with everything it needs, is its own chunk. */
 const documentRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/doc/$id",
-  component: DocumentPage,
+  component: lazyRouteComponent(() => import("./pages/DocumentPage"), "DocumentPage"),
 });
 
 /**

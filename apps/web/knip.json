@@ -2,6 +2,5 @@
   "$schema": "./node_modules/knip/schema.json",
   "entry": ["playwright.config.ts", "e2e/*.spec.ts", "e2e/fixture-site.ts"],
   "playwright": false,
-  "ignore": ["src/api/schema.d.ts"],
-  "ignoreDependencies": ["@radix-ui/react-tabs", "@tiptap/extensions", "@tiptap/react"]
+  "ignore": ["src/api/schema.d.ts"]
 }

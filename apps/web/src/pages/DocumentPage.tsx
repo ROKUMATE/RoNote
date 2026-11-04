@@ -6,6 +6,7 @@ import { ApiError } from "../api/client";
 import { documentQuery } from "../api/queries";
 import type { Document, IrWarning } from "../api/schema";
 import { blockCounts } from "../document/counts";
+import { Reader } from "../document/Reader";
 import { formatDate, hostOf } from "../format";
 import { buttonClass } from "../ui/button";
 import { PageTitle } from "../ui/PageTitle";
@@ -52,6 +53,20 @@ export function DocumentPage() {
   return <Header doc={doc.data} existing={existing} />;
 }
 
+/**
+ * Whether the document opens with its title as a level-1 heading, as most
+ * pages do. Then that heading is the page's title, and the header does not
+ * repeat it.
+ */
+function opensWithTitle(doc: Document): boolean {
+  const first = doc.content.blocks[0];
+  return (
+    first?.kind === "heading" &&
+    first.level === 1 &&
+    (first.content ?? []).map((run) => run.text).join("") === doc.title
+  );
+}
+
 function Header({ doc, existing }: { doc: Document; existing: boolean }) {
   const fallback = doc.warnings.some((w) => genericWarnings.has(w.code));
   return (
@@ -62,7 +77,7 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
         </p>
       )}
       <header>
-        <PageTitle>{doc.title || hostOf(doc.source_url)}</PageTitle>
+        {!opensWithTitle(doc) && <PageTitle>{doc.title || hostOf(doc.source_url)}</PageTitle>}
         <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-ink-2 text-ui-lg">
           <span>
             From{" "}
@@ -93,6 +108,9 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
           Imported with the generic extractor; some page chrome may remain.
         </p>
       )}
+      <div className="mt-8">
+        <Reader key={doc.id} content={doc.content} />
+      </div>
     </article>
   );
 }

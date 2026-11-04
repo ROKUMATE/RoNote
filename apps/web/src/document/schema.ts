@@ -136,6 +136,11 @@ const IRLink = Link.extend({
       kind: { default: "external", rendered: false },
     };
   },
+  renderHTML({ mark }) {
+    return mark.attrs.kind === "anchor"
+      ? ["a", { href: mark.attrs.href }, 0]
+      : ["a", { href: mark.attrs.href, target: "_blank", rel: "noopener noreferrer" }, 0];
+  },
 }).configure({ openOnClick: false, autolink: false, linkOnPaste: false });
 
 /** A block the editor shows but never edits; its IR block is its data. */

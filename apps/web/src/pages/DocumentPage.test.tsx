@@ -84,3 +84,12 @@ test("says when there is no such document", async () => {
   expect(await main.findByText(/There's no document here\./)).toBeDefined();
   expect(main.getByRole("link", { name: "Go to the library" }).getAttribute("href")).toBe("/");
 });
+
+test("shows the title itself when the document does not open with it", async () => {
+  const doc = documentWith();
+  doc.content.blocks = doc.content.blocks.slice(1);
+  const main = await openDocument(json(doc));
+
+  expect(await main.findByRole("heading", { level: 1, name: "Effective Go" })).toBeDefined();
+  expect(main.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+});

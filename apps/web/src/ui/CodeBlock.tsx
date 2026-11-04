@@ -1,9 +1,53 @@
-/** A code block that keeps its line breaks and scrolls sideways when too wide. */
-export function CodeBlock({ code }: { code: string }) {
+import { CopyIcon } from "@phosphor-icons/react/Copy";
+import { type ReactNode, useState } from "react";
+
+type CodeBlockProps = {
+  code: string;
+  lang?: string | undefined;
+  title?: string | undefined;
+  /** Where the title links to, when the page linked it to the file. */
+  titleHref?: string | undefined;
+  /** The code drawn another way, such as highlighted; code is still what Copy copies. */
+  children?: ReactNode;
+};
+
+/**
+ * A code block that keeps its line breaks and scrolls sideways when too
+ * wide, with its title, language and a Copy button when it has a header.
+ */
+export function CodeBlock({ code, lang, title, titleHref, children }: CodeBlockProps) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+  };
   return (
-    // biome-ignore lint/a11y/noNoninteractiveTabindex: content that scrolls must be reachable by keyboard (WCAG 2.1.1; axe scrollable-region-focusable).
-    <pre tabIndex={0}>
-      <code>{code}</code>
-    </pre>
+    <div className="code-block">
+      <div className="code-header">
+        {title &&
+          (titleHref ? (
+            <a href={titleHref} target="_blank" rel="noopener noreferrer" className="code-title">
+              {title}
+            </a>
+          ) : (
+            <span className="code-title">{title}</span>
+          ))}
+        {lang && <span className="code-lang">{lang}</span>}
+        <button
+          type="button"
+          onClick={() => void copy()}
+          onBlur={() => setCopied(false)}
+          aria-label={copied ? "Copied code" : "Copy code"}
+          className="code-copy"
+        >
+          <CopyIcon size={16} aria-hidden />
+          {copied ? "Copied" : "Copy"}
+        </button>
+      </div>
+      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: content that scrolls must be reachable by keyboard (WCAG 2.1.1; axe scrollable-region-focusable). */}
+      <pre tabIndex={0}>
+        <code>{children ?? code}</code>
+      </pre>
+    </div>
   );
 }

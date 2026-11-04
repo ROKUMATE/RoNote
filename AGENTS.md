@@ -143,6 +143,7 @@ docs/adr/0005-import-pipeline.md describes the pipeline both serve.
 - Colours, fonts, text sizes, radii and breakpoints come only from `src/styles/tokens.css`. Tailwind's default palette and scales are cleared, so there are no raw colours and no palette classes.
 - Imported documents are styled through `.reader` in `src/styles/reader.css`, not utility classes. Code never shows ligatures.
 - No component library. Radix Primitives only when a component needs accessible behaviour the platform does not give (native `popover`, `<fieldset>` radios and `<details>` come first).
+- The editor is Tiptap's MIT core, one extension package per feature, never Tiptap Pro. Radix Tabs is the one Radix component, for the WAI-ARIA tabs pattern (docs/adr/0006-editor-and-doc-content.md).
 - Phosphor icons at 16px, imported one per file: `import { BooksIcon } from "@phosphor-icons/react/Books"`.
 - Every `localStorage` access goes in try/catch and falls back to the default.
 - Dev-only code sits behind `import.meta.env.DEV` so production builds drop it; `make web-build` checks the styleguide is gone.

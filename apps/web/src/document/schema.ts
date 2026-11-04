@@ -68,7 +68,13 @@ const BlockIdentity = Extension.create({
             parseHTML: () => null,
           },
           origin: { default: null, rendered: false },
-          edited: { default: null, rendered: false },
+          edited: {
+            default: null,
+            rendered: true,
+            renderHTML: (attrs) =>
+              attrs.origin === "source" && attrs.edited ? { "data-edited": "true" } : {},
+            parseHTML: () => null,
+          },
           sourceBlockId: { default: null, rendered: false },
         },
       },

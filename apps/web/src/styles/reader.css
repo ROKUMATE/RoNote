@@ -253,6 +253,57 @@
     margin: 2rem 0;
   }
 
+  /* A source block the user changed: a thin left rule, and in the margin an
+     "edited" label with Revert to source (ADR 0006). */
+  .reader [data-edited="true"] {
+    border-left: 2px solid var(--color-gen);
+    padding-left: 0.75rem;
+    margin-left: calc(-0.75rem - 2px);
+  }
+
+  .reader .edited-mark {
+    position: relative;
+    height: 0;
+    font-family: var(--font-sans);
+    font-size: var(--text-ui);
+    line-height: 1.4;
+    color: var(--color-gen);
+  }
+
+  .reader .edited-mark > * {
+    position: absolute;
+    top: 0.5rem;
+    left: -8rem;
+    width: 7rem;
+    text-align: right;
+  }
+
+  .reader .edited-mark > button {
+    top: 1.75rem;
+    color: var(--color-ink-2);
+    text-decoration-line: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  @media (width < 68.75rem) {
+    .reader .edited-mark {
+      display: flex;
+      gap: 0.75rem;
+      height: auto;
+      margin-top: 1rem;
+    }
+
+    .reader .edited-mark > * {
+      position: static;
+      width: auto;
+      text-align: left;
+    }
+
+    .reader .edited-mark + [data-edited="true"] {
+      margin-top: 0.25rem;
+    }
+  }
+
   /* Machine-made content: a thin left rule and a small label (DESIGN.md). */
   .reader .generated {
     border-left: 2px solid var(--color-gen);

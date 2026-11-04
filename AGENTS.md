@@ -164,6 +164,7 @@ docs/adr/0005-import-pipeline.md describes the pipeline both serve.
 ## Verbatim rule
 
 Source text is never rewritten. Code blocks stay byte-identical, enforced by `TestCodeIsVerbatim` in `internal/extract` (docs/adr/0002-verbatim-source.md, docs/adr/0004-ir-and-links.md).
+In users' documents, source code, tables, tabs and images are locked: the server refuses a save that changes them, and an edited source block is marked and can be reverted (docs/adr/0006-editor-and-doc-content.md).
 - A code block's text is the page's copy payload when it has one, else the `<pre>` text without line numbers, copy labels, unselectable prompts and frame chrome.
 - Visible text stays. Never rewrite code with patterns; the one exception, FastAPI's terminal blocks, is in ADR 0004.
 

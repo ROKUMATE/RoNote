@@ -1,5 +1,5 @@
 import type { Node } from "@tiptap/core";
-import { UndoRedo } from "@tiptap/extensions";
+import { UndoRedo } from "@tiptap/extensions/undo-redo";
 import {
   NodeViewContent,
   type NodeViewProps,

@@ -5,7 +5,7 @@ import Code from "@tiptap/extension-code";
 import Document from "@tiptap/extension-document";
 import Heading from "@tiptap/extension-heading";
 import Italic from "@tiptap/extension-italic";
-import { ListItem } from "@tiptap/extension-list";
+import { ListItem } from "@tiptap/extension-list/item";
 import Paragraph from "@tiptap/extension-paragraph";
 import Strike from "@tiptap/extension-strike";
 import Subscript from "@tiptap/extension-subscript";

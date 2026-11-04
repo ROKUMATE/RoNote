@@ -76,7 +76,7 @@ Create a directory when its first file needs it, not before.
 | `make check-node-version` | print the Node version and fail unless it is `.nvmrc`'s |
 | `make web-dev` | Vite dev server on `127.0.0.1:5173`; the styleguide is at `/_styleguide`. It proxies `/api` to the API at `RONOTE_API_ORIGIN` (default `http://127.0.0.1:8080`), so run `make run-api` and `make run-worker` too |
 | `make web-build` | production build into `apps/web/dist`; fails if styleguide code ends up in it or a chunk group passes its gzip budget in `apps/web/scripts/budget.ts`, read from Vite's manifest: initial JS 150 kB, the document route, the highlighter core and CSS each their own; Shiki's language chunks are listed, not budgeted |
-| `make web-e2e` | Playwright end-to-end and axe tests in Chromium against the full stack: it recreates and migrates the `ronote_e2e` database (`E2E_DATABASE_URL`; locally in the dev stack's Postgres, so run `make dev-up` first), builds the API and worker, and Playwright starts them (API on 18080, worker), the fixture site (`apps/web/e2e/fixture-site.ts` on `localhost:18090`, serving `testdata/golden` pages) and Vite on 5180. Kept out of `make test` |
+| `make web-e2e` | Playwright end-to-end and axe tests in Chromium against the full stack: it recreates and migrates the `ronote_e2e` database (`E2E_DATABASE_URL`; locally in the dev stack's Postgres, so run `make dev-up` first), builds the API and worker, and Playwright starts them (API on 18080, worker), the fixture site (`apps/web/e2e/fixture-site.ts` on `localhost:18090`, serving `testdata/golden` pages and the linked pages in `apps/web/e2e/fixtures`) and Vite on 5180. Kept out of `make test` |
 | `make run-worker` | run the import worker (River queue `imports`); `RONOTE_ENV` defaults to `dev` |
 | `make run-api` | run the API on `127.0.0.1:8080`; `RONOTE_ENV` defaults to `dev` |
 | `make extract url=... [format=text]` | fetch one page with the production fetcher rules and print its IR as JSON, or as readable text |
@@ -173,7 +173,7 @@ In users' documents, source code, tables, tabs and images are locked: the server
 
 ## IR version
 
-`ir_version` 1 is frozen (docs/adr/0004-ir-and-links.md): extractions are stored as IR, and documents as DocContent, whose blocks are IR blocks (`internal/doccontent`, docs/adr/0006-editor-and-doc-content.md). Changing the IR's shape means a new version and, in the same change, a documented upgrade path for stored extractions and documents. Extractor changes that keep the shape need neither. Changing DocContent's shape means a new `doc_version` and a migration, tested up and down.
+`ir_version` 1 is frozen (docs/adr/0004-ir-and-links.md): extractions are stored as IR, and documents as DocContent, whose blocks are IR blocks (`internal/doccontent`, docs/adr/0006-editor-and-doc-content.md). Changing the IR's shape means a new version and, in the same change, a documented upgrade path for stored extractions and documents. Extractor changes that keep the shape need neither. Changing DocContent's shape means a new `doc_version` and a migration, tested up and down. The one exception is an optional field whose absence means what v1 meant before it, that changes no block and that readers can ignore, such as `code_langs`: it needs neither (ADR 0006).
 
 ## Docs-framework adapters
 

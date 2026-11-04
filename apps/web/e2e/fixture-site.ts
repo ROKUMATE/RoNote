@@ -13,7 +13,8 @@ import { stack } from "./stack.ts";
  * and, for following links, two pages of its own that link to each other:
  *   /linked/<page>/       e2e/fixtures/<page>.html, each {{run}} replaced by
  *                         the request's run parameter, so a test's links
- *                         lead to pages no other test has imported
+ *                         lead to pages no other test has imported; page B
+ *                         answers late, so following a link can be watched
  *   /files/sample.pdf     a PDF, which RoNote does not import
  * Anything else answers 404. Query strings are otherwise ignored, so every
  * test imports a URL of its own.
@@ -44,6 +45,7 @@ const server = createServer(async (request, response) => {
   if (page) {
     const html = await readFile(new URL(`${page}.html`, linked), "utf8").catch(() => undefined);
     if (html) {
+      if (page === "linked-b") await sleep(slowDelay);
       response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
       response.end(html.replaceAll("{{run}}", encodeURIComponent(searchParams.get("run") ?? "")));
       return;

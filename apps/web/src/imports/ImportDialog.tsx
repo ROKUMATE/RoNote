@@ -6,8 +6,7 @@ import { XIcon } from "@phosphor-icons/react/X";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { type FormEvent, type RefObject, useEffect, useId, useRef, useState } from "react";
-import { ApiError } from "../api/client";
-import { requestErrorMessages, unreachableMessage } from "../api/messages";
+import { requestErrorMessage, requestErrorMessages } from "../api/messages";
 import { createImport } from "../api/queries";
 import type { ErrorCode } from "../api/schema";
 import { buttonClass } from "../ui/button";
@@ -33,12 +32,6 @@ function urlProblem(raw: string): ErrorCode | undefined {
   }
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return "unsupported_scheme";
   return parsed.hostname ? undefined : "invalid_url";
-}
-
-function requestErrorMessage(error: unknown): string {
-  return error instanceof ApiError && error.body
-    ? requestErrorMessages[error.body.code]
-    : unreachableMessage;
 }
 
 /** The "Import page" button and the dialog it opens. */

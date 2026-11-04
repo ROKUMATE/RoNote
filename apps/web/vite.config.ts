@@ -15,7 +15,7 @@ const proxy = {
 
 export default defineConfig({
   plugins: [react(), tailwindcss({ optimize: false })],
-  build: { target: browsers },
+  build: { target: browsers, manifest: true },
   server: { proxy },
   preview: { proxy },
   test: {

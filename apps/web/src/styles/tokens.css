@@ -15,6 +15,12 @@
   --color-mark: light-dark(#f6e7a8, #5a4b16);
   --color-gen: light-dark(#3f5f7a, #8fb0cc);
   --color-selection: color-mix(in oklab, var(--color-accent) 25%, transparent);
+  /* Code highlighting: muted, ink for everything else (ADR 0006). */
+  --color-code-comment: light-dark(#6b675d, #9c9789);
+  --color-code-keyword: light-dark(#7a3f6e, #d4a2c4);
+  --color-code-string: light-dark(#4d6a2c, #a8c483);
+  --color-code-constant: light-dark(#94471f, #e3a37c);
+  --color-code-function: light-dark(#2f5a80, #95bad9);
 
   --font-*: initial;
   --font-serif: "Source Serif 4 Variable", Georgia, "Times New Roman", serif;

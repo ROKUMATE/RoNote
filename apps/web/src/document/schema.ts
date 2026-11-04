@@ -5,7 +5,6 @@ import Code from "@tiptap/extension-code";
 import Document from "@tiptap/extension-document";
 import Heading from "@tiptap/extension-heading";
 import Italic from "@tiptap/extension-italic";
-import Link from "@tiptap/extension-link";
 import { ListItem } from "@tiptap/extension-list";
 import Paragraph from "@tiptap/extension-paragraph";
 import Strike from "@tiptap/extension-strike";
@@ -128,20 +127,34 @@ const Kbd = Mark.create({
   renderHTML: () => ["kbd", 0],
 });
 
-/** A link keeps the IR's kind: anchor, same_domain or external. */
-const IRLink = Link.extend({
+/**
+ * A link with the IR's kind: anchor, same_domain or external. Pasted links
+ * are kept only when they are http(s) or a #fragment, as the IR allows.
+ */
+const IRLink = Mark.create({
+  name: "link",
+  inclusive: false,
   addAttributes() {
-    return {
-      ...this.parent?.(),
-      kind: { default: "external", rendered: false },
-    };
+    return { href: { default: null }, kind: { default: "external" } };
+  },
+  parseHTML() {
+    return [
+      {
+        tag: "a[href]",
+        getAttrs: (el) => {
+          const href = el.getAttribute("href") ?? "";
+          if (href.startsWith("#") && href.length > 1) return { href, kind: "anchor" };
+          return /^https?:\/\//i.test(href) ? { href, kind: "external" } : false;
+        },
+      },
+    ];
   },
   renderHTML({ mark }) {
     return mark.attrs.kind === "anchor"
       ? ["a", { href: mark.attrs.href }, 0]
       : ["a", { href: mark.attrs.href, target: "_blank", rel: "noopener noreferrer" }, 0];
   },
-}).configure({ openOnClick: false, autolink: false, linkOnPaste: false });
+});
 
 /** A block the editor shows but never edits; its IR block is its data. */
 function atom(name: (typeof atomNodes)[number], tag: string) {

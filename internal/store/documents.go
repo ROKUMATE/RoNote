@@ -183,3 +183,18 @@ func (s *Store) SaveDocument(ctx context.Context, owner, id uuid.UUID, content *
 	}
 	return 0, &VersionConflictError{Current: int(current)}
 }
+
+// ResolveDocuments returns, for each of urls that has one, the id of owner's
+// document for it, matched as FindOwnerDocumentForURL matches one URL. urls
+// must be canonical.
+func (s *Store) ResolveDocuments(ctx context.Context, owner uuid.UUID, urls []string) (map[string]uuid.UUID, error) {
+	rows, err := s.q.ResolveDocuments(ctx, sqlcdb.ResolveDocumentsParams{OwnerID: owner, Urls: urls})
+	if err != nil {
+		return nil, mapErr("resolve documents", err)
+	}
+	found := make(map[string]uuid.UUID, len(rows))
+	for _, r := range rows {
+		found[r.URL] = r.DocumentID
+	}
+	return found, nil
+}

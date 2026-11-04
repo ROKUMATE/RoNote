@@ -59,3 +59,23 @@ RETURNING version;
 
 -- name: DocumentVersion :one
 SELECT version FROM documents WHERE owner_id = $1 AND id = $2;
+
+-- name: ResolveDocuments :many
+-- For each canonical URL, the owner's document for it, matched as
+-- FindOwnerDocumentForURL matches one URL. URLs without one are left out.
+SELECT u.url::text AS url, d.id AS document_id
+FROM unnest(sqlc.arg(urls)::text[]) AS u (url)
+JOIN LATERAL (
+    SELECT d.id
+    FROM documents d
+    WHERE d.owner_id = sqlc.arg(owner_id)
+      AND (
+        d.source_id IN (SELECT s.id FROM sources s WHERE s.canonical_url = u.url OR s.final_url = u.url)
+        OR d.id IN (
+          SELECT i.document_id FROM imports i
+          WHERE i.owner_id = sqlc.arg(owner_id) AND i.canonical_url = u.url AND i.document_id IS NOT NULL
+        )
+      )
+    ORDER BY d.created_at, d.id
+    LIMIT 1
+) d ON true;

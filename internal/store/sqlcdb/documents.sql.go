@@ -215,6 +215,57 @@ func (q *Queries) ListDocuments(ctx context.Context, arg ListDocumentsParams) ([
 	return items, nil
 }
 
+const resolveDocuments = `-- name: ResolveDocuments :many
+SELECT u.url::text AS url, d.id AS document_id
+FROM unnest($1::text[]) AS u (url)
+JOIN LATERAL (
+    SELECT d.id
+    FROM documents d
+    WHERE d.owner_id = $2
+      AND (
+        d.source_id IN (SELECT s.id FROM sources s WHERE s.canonical_url = u.url OR s.final_url = u.url)
+        OR d.id IN (
+          SELECT i.document_id FROM imports i
+          WHERE i.owner_id = $2 AND i.canonical_url = u.url AND i.document_id IS NOT NULL
+        )
+      )
+    ORDER BY d.created_at, d.id
+    LIMIT 1
+) d ON true
+`
+
+type ResolveDocumentsParams struct {
+	Urls    []string
+	OwnerID uuid.UUID
+}
+
+type ResolveDocumentsRow struct {
+	URL        string
+	DocumentID uuid.UUID
+}
+
+// For each canonical URL, the owner's document for it, matched as
+// FindOwnerDocumentForURL matches one URL. URLs without one are left out.
+func (q *Queries) ResolveDocuments(ctx context.Context, arg ResolveDocumentsParams) ([]ResolveDocumentsRow, error) {
+	rows, err := q.db.Query(ctx, resolveDocuments, arg.Urls, arg.OwnerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ResolveDocumentsRow
+	for rows.Next() {
+		var i ResolveDocumentsRow
+		if err := rows.Scan(&i.URL, &i.DocumentID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const saveDocument = `-- name: SaveDocument :one
 UPDATE documents
 SET content = $1, version = version + 1, updated_at = now()

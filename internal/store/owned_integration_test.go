@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"testing"
 	"time"
 
@@ -305,5 +306,41 @@ func TestImportStatusNotifies(t *testing.T) {
 	defer cancel()
 	if n, err := conn.WaitForNotification(waitCtx); err == nil {
 		t.Errorf("unexpected extra notification %s", n.Payload)
+	}
+}
+
+// TestResolveDocuments finds the owner's documents for many URLs at once,
+// matched by a source's canonical or final URL or by an earlier import, and
+// never another user's.
+func TestResolveDocuments(t *testing.T) {
+	f := newFixture(t)
+	ctx := t.Context()
+	doc := f.document(t, f.ada)
+	imp, err := f.s.CreateImport(ctx, f.ada.ID, "https://docs.example.com/old-a", "https://docs.example.com/old-a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := f.s.FinishImport(ctx, f.ada.ID, imp.ID, doc); err != nil {
+		t.Fatal(err)
+	}
+	urls := []string{
+		f.source.CanonicalURL,
+		f.source.FinalURL,
+		"https://docs.example.com/old-a",
+		"https://docs.example.com/never-imported",
+	}
+
+	got, err := f.s.ResolveDocuments(ctx, f.ada.ID, urls)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := map[string]uuid.UUID{urls[0]: doc, urls[1]: doc, urls[2]: doc}
+	if !maps.Equal(got, want) {
+		t.Errorf("ResolveDocuments() for the owner = %v, want %v", got, want)
+	}
+
+	other, err := f.s.ResolveDocuments(ctx, f.grace.ID, urls)
+	if err != nil || len(other) != 0 {
+		t.Errorf("ResolveDocuments() for another user = %v, %v; want nothing", other, err)
 	}
 }

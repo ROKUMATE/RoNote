@@ -213,6 +213,37 @@ paths:
                 $ref: "#/components/schemas/Error"
         "500":
           $ref: "#/components/responses/InternalError"
+  /documents/resolve:
+    post:
+      operationId: resolveDocuments
+      summary: Find which links the user already has as documents
+      description: |
+        For each URL, canonicalized the way imports are, the user's document
+        for it, if any. Answers come in request order. A URL an import would
+        refuse gets neither a canonical URL nor a document.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResolveDocumentsRequest"
+      responses:
+        "200":
+          description: One answer per URL, in request order.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResolvedLinks"
+        "400":
+          description: "No URLs, or more than 200. Code: invalid_request."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /documents/{id}/blocks/{blockId}/revert:
     post:
       operationId: revertBlock
@@ -432,6 +463,39 @@ components:
               description: What the extractor was unsure of when it made the document's source blocks.
               items:
                 $ref: "#/components/schemas/IRWarning"
+    ResolveDocumentsRequest:
+      type: object
+      required: [urls]
+      properties:
+        urls:
+          type: array
+          minItems: 1
+          maxItems: 200
+          items:
+            type: string
+            maxLength: 2048
+    ResolvedLinks:
+      type: object
+      required: [links]
+      properties:
+        links:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResolvedLink"
+    ResolvedLink:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          description: The URL as asked.
+        canonical_url:
+          type: string
+          description: The URL canonicalized as imports do; absent when an import would refuse it.
+        document_id:
+          type: string
+          format: uuid
+          description: The user's document for it; absent when they have none.
     DocumentResponse:
       type: object
       required: [document]

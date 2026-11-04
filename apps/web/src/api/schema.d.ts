@@ -233,6 +233,11 @@ export interface components {
             doc_version: 1;
             blocks: components["schemas"]["DocBlock"][];
         };
+        /**
+         * @description The kinds a user block may use, nested blocks included. Source code, tables, tabs and images come only from the page.
+         * @enum {string}
+         */
+        UserBlockKind: "paragraph" | "heading" | "list" | "quote" | "callout" | "divider";
         /** @description A top-level block: an IRBlock's fields, plus where it came from. Source blocks set edited and source_block_id (equal to id); user blocks set neither, and have UUIDv7 ids. A spec test keeps these properties IRBlock's plus the three. */
         DocBlock: {
             /** @enum {string} */
@@ -394,6 +399,7 @@ export type SavedDocument = components['schemas']['SavedDocument'];
 export type VersionConflict = components['schemas']['VersionConflict'];
 export type DocumentList = components['schemas']['DocumentList'];
 export type DocContent = components['schemas']['DocContent'];
+export type UserBlockKind = components['schemas']['UserBlockKind'];
 export type DocBlock = components['schemas']['DocBlock'];
 export type IrDocument = components['schemas']['IRDocument'];
 export type IrSource = components['schemas']['IRSource'];

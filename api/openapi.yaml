@@ -493,6 +493,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DocBlock"
+    UserBlockKind:
+      type: string
+      description: >-
+        The kinds a user block may use, nested blocks included. Source code,
+        tables, tabs and images come only from the page.
+      enum: [paragraph, heading, list, quote, callout, divider]
     DocBlock:
       x-go-type: doccontent.Block
       x-go-type-import:

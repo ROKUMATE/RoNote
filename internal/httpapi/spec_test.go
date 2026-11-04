@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -106,4 +107,25 @@ func asJSON(t *testing.T, v any) any {
 		t.Fatal(err)
 	}
 	return out
+}
+
+// TestUserKindsMatchTheSpec keeps the kinds the server lets user blocks use
+// the spec's UserBlockKind, which the editor's block menu offers.
+func TestUserKindsMatchTheSpec(t *testing.T) {
+	t.Parallel()
+	spec, err := loadContract()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var want []string
+	for _, v := range spec.Components.Schemas["UserBlockKind"].Value.Enum {
+		want = append(want, v.(string))
+	}
+	var got []string
+	for _, k := range doccontent.UserKinds {
+		got = append(got, string(k))
+	}
+	if !slices.Equal(got, want) {
+		t.Errorf("doccontent.UserKinds = %v, the spec's UserBlockKind = %v", got, want)
+	}
 }

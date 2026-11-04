@@ -3,24 +3,5 @@
   "entry": ["playwright.config.ts", "e2e/*.spec.ts", "e2e/fixture-site.ts"],
   "playwright": false,
   "ignore": ["src/api/schema.d.ts"],
-  "ignoreDependencies": [
-    "@radix-ui/react-tabs",
-    "@tiptap/core",
-    "@tiptap/extension-blockquote",
-    "@tiptap/extension-bold",
-    "@tiptap/extension-code",
-    "@tiptap/extension-document",
-    "@tiptap/extension-heading",
-    "@tiptap/extension-italic",
-    "@tiptap/extension-link",
-    "@tiptap/extension-list",
-    "@tiptap/extension-paragraph",
-    "@tiptap/extension-strike",
-    "@tiptap/extension-subscript",
-    "@tiptap/extension-superscript",
-    "@tiptap/extension-text",
-    "@tiptap/extensions",
-    "@tiptap/pm",
-    "@tiptap/react"
-  ]
+  "ignoreDependencies": ["@radix-ui/react-tabs", "@tiptap/extensions", "@tiptap/react"]
 }

@@ -5,6 +5,9 @@ import { useId } from "react";
 import { recentDocuments } from "../api/queries";
 import { Settings } from "./Settings";
 
+/** Where a page can put an outline of itself, below the main navigation. */
+export const outlineSlotId = "outline-slot";
+
 const navLink =
   "flex items-center gap-2 rounded-sm px-2 py-1 text-ui-lg text-ink-2 hover:bg-paper-2 hover:text-ink aria-[current=page]:bg-paper-2 aria-[current=page]:text-ink";
 
@@ -22,7 +25,7 @@ export function AppShell() {
       >
         Skip to content
       </a>
-      <header className="flex items-center gap-4 border-rule border-b px-4 py-2 sidebar:sticky sidebar:top-0 sidebar:h-dvh sidebar:flex-col sidebar:items-stretch sidebar:gap-6 sidebar:border-r sidebar:border-b-0 sidebar:py-6">
+      <header className="flex items-center gap-4 border-rule border-b px-4 py-2 sidebar:sticky sidebar:top-0 sidebar:h-dvh sidebar:flex-col sidebar:overflow-y-auto sidebar:items-stretch sidebar:gap-6 sidebar:border-r sidebar:border-b-0 sidebar:py-6">
         <Link to="/" className="px-2 font-semibold text-ui-lg">
           RoNote
         </Link>
@@ -36,6 +39,8 @@ export function AppShell() {
             </li>
           </ul>
           <RecentDocuments />
+          {/* The document route puts its outline here. */}
+          <div id={outlineSlotId} className="hidden sidebar:block" />
         </nav>
         <Settings />
       </header>

@@ -117,7 +117,7 @@ test("text is editable; code, tables, tabs and images are not", async () => {
   }
 });
 
-test("links: other pages open in a new tab, anchors move within the document", async () => {
+test("links: other pages open in a new tab, anchors move the caret within the document", async () => {
   const open = vi.spyOn(window, "open").mockReturnValue(null);
   render(
     <Reader
@@ -148,5 +148,6 @@ test("links: other pages open in a new tab, anchors move within the document", a
   fireEvent.click(anchor);
   const heading = screen.getByRole("heading", { name: "Setup" });
   expect(heading.scrollIntoView).toHaveBeenCalled();
-  expect(document.activeElement).toBe(heading);
+  expect(document.activeElement).toBe(screen.getByLabelText("Document text"));
+  expect(window.getSelection()?.anchorNode?.parentElement?.closest("h2")).toBe(heading);
 });

@@ -53,7 +53,16 @@ async function typeAtEnd(page: Page, text: string, typed: string) {
   await page.keyboard.type(typed);
 }
 
-async function expectSaved(page: Page) {
+/**
+ * Waits until a save holding text has gone through, and the header says so.
+ * "Saved" alone could belong to a save made before the last keystroke.
+ */
+async function expectSaved(page: Page, text: string) {
+  await page.waitForResponse(
+    (r) =>
+      r.request().method() === "PATCH" && r.ok() && (r.request().postData() ?? "").includes(text),
+    { timeout: 10_000 },
+  );
   await expect(page.getByRole("status").filter({ hasText: "Saved" })).toBeVisible({
     timeout: 10_000,
   });
@@ -69,7 +78,7 @@ test("an edit to a source paragraph persists and shows as edited", async ({ page
   await expect(page.getByText(paragraph)).toBeVisible();
 
   await typeAtEnd(page, paragraph, " Mine too.");
-  await expectSaved(page);
+  await expectSaved(page, " Mine too.");
   await page.reload();
 
   await expect(page.getByText(`${paragraph} Mine too.`)).toBeVisible();
@@ -79,7 +88,7 @@ test("an edit to a source paragraph persists and shows as edited", async ({ page
 test("revert puts the page's text back and removes the mark", async ({ page }) => {
   await openDocument(page);
   await typeAtEnd(page, paragraph, " Mine too.");
-  await expectSaved(page);
+  await expectSaved(page, " Mine too.");
 
   await page.getByRole("button", { name: "Revert to source" }).click();
   await page
@@ -100,7 +109,7 @@ test("a note added after a block persists, with no mark", async ({ page }) => {
   await caretAtEnd(page, paragraph);
   await page.keyboard.press("Enter");
   await page.keyboard.type("My own note.");
-  await expectSaved(page);
+  await expectSaved(page, "My own note.");
   await page.reload();
 
   await expect(page.getByText("My own note.", { exact: true })).toBeVisible();
@@ -133,6 +142,28 @@ test("tabs move with the arrow keys", async ({ page }) => {
   await expect(npm).toHaveAttribute("aria-selected", "true");
 });
 
+test("clicking the outline scrolls to the heading and puts the caret there", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 400 });
+  await openDocument(page);
+  const outline = page.getByRole("navigation", { name: "Outline" });
+  await expect(outline.getByRole("link")).toHaveText(["Configure", "Try it"]);
+
+  await outline.getByRole("link", { name: "Try it" }).click();
+
+  const heading = page.getByRole("heading", { name: "Try it" });
+  await expect(heading).toBeInViewport();
+  await expect(page.getByLabel("Document text")).toBeFocused();
+  expect(
+    await page.evaluate(
+      () => getSelection()?.anchorNode?.parentElement?.closest("h2")?.textContent,
+    ),
+  ).toBe("Try it");
+  await expect(outline.getByRole("link", { name: "Try it" })).toHaveAttribute(
+    "aria-current",
+    "location",
+  );
+});
+
 test("a save from a second tab after the first saved gets the conflict message", async ({
   page,
   context,
@@ -143,7 +174,7 @@ test("a save from a second tab after the first saved gets the conflict message",
   await expect(other.getByText(paragraph)).toBeVisible();
 
   await typeAtEnd(page, paragraph, " From tab one.");
-  await expectSaved(page);
+  await expectSaved(page, " From tab one.");
   await typeAtEnd(other, paragraph, " From tab two.");
 
   const alert = other.getByRole("alert");
@@ -179,7 +210,7 @@ test.describe("accessibility", () => {
       await chooseTheme(page, theme);
       await openDocument(page);
       await typeAtEnd(page, paragraph, " Edited.");
-      await expectSaved(page);
+      await expectSaved(page, " Edited.");
       await expect(page.getByText("edited", { exact: true })).toBeVisible();
       await expectNoAxeViolations(page);
 
@@ -196,7 +227,7 @@ test.describe("accessibility", () => {
     test("the editor fits the screen", async ({ page }) => {
       await openDocument(page);
       await typeAtEnd(page, paragraph, " Edited.");
-      await expectSaved(page);
+      await expectSaved(page, " Edited.");
 
       await expectNoHorizontalScroll(page);
     });

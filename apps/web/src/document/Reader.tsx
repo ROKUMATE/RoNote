@@ -8,8 +8,11 @@ import { BlockMenu } from "./BlockMenu";
 import { ConfirmRevert } from "./ConfirmRevert";
 import { BlockIdentityPlugin, revertMeta } from "./identity";
 import { type InsertAt, insertUserBlock, SlashMenu, topLevelBlockAt } from "./insert";
+import { LinkStatus, setLinkTargets } from "./linkStatus";
+import { followHelpId, type LinkTargets } from "./links";
 import { toEditor, topLevelNode } from "./mapping";
 import { moveTo } from "./moveTo";
+import { LinkTargetsContext } from "./render";
 import { readerExtensions } from "./views";
 
 /**
@@ -40,11 +43,14 @@ export function Reader({
   content,
   onEditor,
   onRevert,
+  linkTargets,
 }: {
   content: DocContent;
   onEditor?: (editor: Editor) => void;
   /** Puts a source block back on the server, and returns it as stored. */
   onRevert?: (blockId: string) => Promise<DocBlock>;
+  /** Where the document's same-domain links lead, once resolved. */
+  linkTargets?: LinkTargets | undefined;
 }) {
   const wrapper = useRef<HTMLDivElement>(null);
   const [menu, setMenu] = useState<{ at: InsertAt; top: number }>();
@@ -59,6 +65,7 @@ export function Reader({
       ...readerExtensions,
       SlashMenu.configure({ open: (at: InsertAt) => open.current(at) }),
       BlockIdentityPlugin.configure({ onRevert: setReverting }),
+      LinkStatus,
     ],
     content: toEditor(content),
     immediatelyRender: true,
@@ -77,6 +84,10 @@ export function Reader({
     return block instanceof HTMLElement ? block.getBoundingClientRect().bottom - top : 0;
   };
   open.current = (at) => setMenu({ at, top: bottomOf("replace" in at ? at.replace : at.after) });
+
+  useEffect(() => {
+    if (linkTargets) setLinkTargets(editor.view, linkTargets);
+  }, [editor, linkTargets]);
 
   const reportEditor = useRef(onEditor);
   useEffect(() => {
@@ -112,7 +123,12 @@ export function Reader({
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: hovering only places the "+" button; the cursor and "/" do the same from the keyboard.
     <div ref={wrapper} className="relative" onMouseMove={hover}>
-      <EditorContent editor={editor} className="reader" />
+      <LinkTargetsContext value={linkTargets}>
+        <EditorContent editor={editor} className="reader" />
+      </LinkTargetsContext>
+      <p id={followHelpId} hidden>
+        Opens this page in RoNote, importing it first if it is not in your library.
+      </p>
       {target && !menu && (
         <button
           type="button"

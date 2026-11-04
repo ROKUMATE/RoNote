@@ -3,12 +3,13 @@ import { InfoIcon } from "@phosphor-icons/react/Info";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams, useRouterState } from "@tanstack/react-router";
 import type { Editor } from "@tiptap/core";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ApiError } from "../api/client";
 import { requestErrorMessages } from "../api/messages";
-import { documentQuery } from "../api/queries";
+import { documentQuery, linkTargets } from "../api/queries";
 import type { Document, IrWarning } from "../api/schema";
 import { blockCounts } from "../document/counts";
+import { sameDomainHrefs } from "../document/links";
 import { Outline } from "../document/Outline";
 import { Reader } from "../document/Reader";
 import type { SaveStatus } from "../document/save";
@@ -77,6 +78,8 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
   const fallback = doc.warnings.some((w) => genericWarnings.has(w.code));
   const { status, onEditor, revert } = useEditing(doc);
   const [editor, setEditor] = useState<Editor>();
+  const hrefs = useMemo(() => sameDomainHrefs(doc.content.blocks), [doc.content.blocks]);
+  const targets = useQuery(linkTargets(doc.id, hrefs)).data;
   return (
     <article className="max-w-[68ch]">
       {existing && (
@@ -125,6 +128,7 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
             setEditor(e);
           }}
           onRevert={revert}
+          linkTargets={targets}
         />
         {editor && <Outline editor={editor} />}
       </div>

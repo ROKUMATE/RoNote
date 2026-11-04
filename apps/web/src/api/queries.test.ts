@@ -5,6 +5,7 @@ import {
   documentPages,
   documentQuery,
   documentsKey,
+  linkTargets,
   recentDocuments,
 } from "./queries";
 
@@ -75,4 +76,26 @@ test("one invalidation refreshes every documents query", async () => {
     .getAll()
     .map((q) => q.isStale());
   expect(stale).toEqual([true, true, true]);
+});
+
+test("link targets are resolved 200 URLs at a time", async () => {
+  const hrefs = Array.from({ length: 450 }, (_, i) => `https://docs.example.com/${i}`);
+  const requests = stubApi({
+    "POST /documents/resolve": async (request) => {
+      const { urls } = (await request.clone().json()) as { urls: string[] };
+      return json({
+        links: urls.map((url) => (url.endsWith("/7") ? { url, document_id: "doc-7" } : { url })),
+      });
+    },
+  });
+
+  const targets = await createQueryClient().fetchQuery(linkTargets("doc-1", hrefs));
+
+  const sizes = await Promise.all(
+    requests.map(async (r) => ((await r.json()) as { urls: string[] }).urls.length),
+  );
+  expect(sizes).toEqual([200, 200, 50]);
+  expect(targets.size).toBe(450);
+  expect(targets.get("https://docs.example.com/7")).toBe("doc-7");
+  expect(targets.get("https://docs.example.com/8")).toBeNull();
 });

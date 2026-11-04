@@ -10,15 +10,21 @@ import { stack } from "./stack.ts";
  *   /pages/<fixture>/     testdata/golden/<fixture>/input.html
  *   /slow/<fixture>/      the same, 3s later, so an import can be watched
  *   /private/<fixture>/   the same, but robots.txt keeps RoNote out
- * Anything else answers 404. Query strings are ignored, so every test
- * imports a URL of its own.
+ * and, for following links, two pages of its own that link to each other:
+ *   /linked/<page>/       e2e/fixtures/<page>.html, each {{run}} replaced by
+ *                         the request's run parameter, so a test's links
+ *                         lead to pages no other test has imported
+ *   /files/sample.pdf     a PDF, which RoNote does not import
+ * Anything else answers 404. Query strings are otherwise ignored, so every
+ * test imports a URL of its own.
  */
 
 const golden = new URL("../../../testdata/golden/", import.meta.url);
+const linked = new URL("./fixtures/", import.meta.url);
 const slowDelay = 3000;
 
 const server = createServer(async (request, response) => {
-  const { pathname } = new URL(request.url ?? "/", stack.fixtures);
+  const { pathname, searchParams } = new URL(request.url ?? "/", stack.fixtures);
   if (pathname === "/robots.txt") {
     response.writeHead(200, { "Content-Type": "text/plain" });
     response.end("User-agent: *\nDisallow: /private/\n");
@@ -33,6 +39,20 @@ const server = createServer(async (request, response) => {
       response.end(page);
       return;
     }
+  }
+  const [, page] = /^\/linked\/([a-z0-9-]+)\/$/.exec(pathname) ?? [];
+  if (page) {
+    const html = await readFile(new URL(`${page}.html`, linked), "utf8").catch(() => undefined);
+    if (html) {
+      response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      response.end(html.replaceAll("{{run}}", encodeURIComponent(searchParams.get("run") ?? "")));
+      return;
+    }
+  }
+  if (pathname === "/files/sample.pdf") {
+    response.writeHead(200, { "Content-Type": "application/pdf" });
+    response.end("%PDF-1.4\n%%EOF\n");
+    return;
   }
   response.writeHead(404, { "Content-Type": "text/plain" });
   response.end("not found\n");

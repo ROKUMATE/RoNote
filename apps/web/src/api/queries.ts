@@ -29,6 +29,30 @@ export const recentDocuments = queryOptions({
       .documents,
 });
 
+/** How many URLs one resolve request may carry, as the spec allows. */
+const resolveBatch = 200;
+
+/**
+ * Where a document's same-domain links lead: for each href, the user's
+ * document for it, or null when they have none. Under the documents key,
+ * so a finished import refreshes it.
+ */
+export function linkTargets(id: string, hrefs: readonly string[]) {
+  return queryOptions({
+    queryKey: [...documentsKey, "links", id],
+    enabled: hrefs.length > 0,
+    queryFn: async () => {
+      const found = new Map<string, string | null>();
+      for (let i = 0; i < hrefs.length; i += resolveBatch) {
+        const urls = hrefs.slice(i, i + resolveBatch);
+        const { links } = dataOrThrow(await api.POST("/documents/resolve", { body: { urls } }));
+        for (const link of links) found.set(link.url, link.document_id ?? null);
+      }
+      return found;
+    },
+  });
+}
+
 /** One document with its content. */
 export function documentQuery(id: string) {
   return queryOptions({

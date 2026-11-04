@@ -1,4 +1,5 @@
 import type { IrBlock } from "../api/schema";
+import { eachBlock } from "./walk";
 
 type Kind = IrBlock["kind"];
 
@@ -23,14 +24,7 @@ const kindNames: Record<Kind, readonly [string, string]> = {
  */
 export function blockCounts(blocks: readonly IrBlock[]): string[] {
   const counts = new Map<Kind, number>();
-  const walk = (list: readonly IrBlock[]) => {
-    for (const block of list) {
-      counts.set(block.kind, (counts.get(block.kind) ?? 0) + 1);
-      for (const item of block.items ?? []) walk(item.children);
-      walk(block.children ?? []);
-    }
-  };
-  walk(blocks);
+  eachBlock(blocks, (block) => counts.set(block.kind, (counts.get(block.kind) ?? 0) + 1));
   return Object.entries(kindNames).flatMap(([kind, [one, many]]) => {
     const n = counts.get(kind as Kind) ?? 0;
     return n === 0 ? [] : [`${n} ${n === 1 ? one : many}`];

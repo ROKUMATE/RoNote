@@ -73,6 +73,17 @@ export async function importPage(page: Page, url: string): Promise<string> {
   return new URL(page.url()).pathname;
 }
 
+/**
+ * Imports linked page A, whose links lead to page B and a PDF and whose
+ * three code blocks declare no language; returns its document's path.
+ */
+export async function openLinkedPage(page: Page): Promise<string> {
+  await page.goto("/");
+  const path = await importPage(page, fixtureURL("linked", "linked-a"));
+  await expect(page.getByRole("heading", { level: 1, name: "Linked guide A" })).toBeVisible();
+  return path;
+}
+
 /** The text of the h2 the caret is in, if any. */
 export function caretHeading(page: Page) {
   return page.evaluate(() => getSelection()?.anchorNode?.parentElement?.closest("h2")?.textContent);

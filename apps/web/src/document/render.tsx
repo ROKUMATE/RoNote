@@ -2,6 +2,8 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { createContext, Fragment, useContext } from "react";
 import type { IrBlock, IrCell, IrInline, IrLink } from "../api/schema";
 import { CodeBlock } from "../ui/CodeBlock";
+import { CodeLangPicker } from "./CodeLangPicker";
+import { CodeLangsContext } from "./codeLangs";
 import { type LinkTargets, linkAttributes, linkStatus } from "./links";
 import { useHighlight } from "./useHighlight";
 
@@ -179,15 +181,19 @@ function Image({ block }: { block: IrBlock }) {
   );
 }
 
-/** A code block, highlighted once it nears the viewport. */
+/**
+ * A code block, highlighted once it nears the viewport, in the language
+ * the user chose or else the page's.
+ */
 function HighlightedCode({ block }: { block: IrBlock }) {
   const code = block.text ?? "";
-  const { ref, lines } = useHighlight(code, block.lang);
+  const choices = useContext(CodeLangsContext);
+  const { ref, lines } = useHighlight(code, choices.chosen[block.id] ?? block.lang);
   return (
     <CodeBlock
       ref={ref}
       code={code}
-      lang={block.lang}
+      language={<CodeLangPicker block={block} choices={choices} />}
       title={block.title}
       titleHref={block.title_link?.href}
     >

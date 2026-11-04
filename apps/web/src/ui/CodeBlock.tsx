@@ -3,7 +3,8 @@ import { type ReactNode, type Ref, useState } from "react";
 
 type CodeBlockProps = {
   code: string;
-  lang?: string | undefined;
+  /** The code's language, as a label or a control to choose it. */
+  language?: ReactNode;
   title?: string | undefined;
   /** Where the title links to, when the page linked it to the file. */
   titleHref?: string | undefined;
@@ -16,7 +17,7 @@ type CodeBlockProps = {
  * A code block that keeps its line breaks and scrolls sideways when too
  * wide, with its title, language and a Copy button when it has a header.
  */
-export function CodeBlock({ code, lang, title, titleHref, children, ref }: CodeBlockProps) {
+export function CodeBlock({ code, language, title, titleHref, children, ref }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     await navigator.clipboard.writeText(code);
@@ -33,7 +34,7 @@ export function CodeBlock({ code, lang, title, titleHref, children, ref }: CodeB
           ) : (
             <span className="code-title">{title}</span>
           ))}
-        {lang && <span className="code-lang">{lang}</span>}
+        {language}
         <button
           type="button"
           onClick={() => void copy()}

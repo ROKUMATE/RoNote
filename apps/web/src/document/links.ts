@@ -1,4 +1,5 @@
 import type { IrBlock, IrInline, IrLink } from "../api/schema";
+import { eachBlock } from "./walk";
 
 /*
  * Same-domain links (ADR 0006): a link to another page of the source site
@@ -23,18 +24,13 @@ export function sameDomainHrefs(blocks: readonly IrBlock[]): string[] {
       if (run.link?.kind === "same_domain") hrefs.add(run.link.href);
     }
   };
-  const walk = (list: readonly IrBlock[]) => {
-    for (const b of list) {
-      runs(b.content);
-      runs(b.caption);
-      for (const row of [...(b.head ?? []), ...(b.rows ?? [])]) {
-        for (const cell of row) runs(cell);
-      }
-      walk(b.children ?? []);
-      for (const item of b.items ?? []) walk(item.children);
+  eachBlock(blocks, (b) => {
+    runs(b.content);
+    runs(b.caption);
+    for (const row of [...(b.head ?? []), ...(b.rows ?? [])]) {
+      for (const cell of row) runs(cell);
     }
-  };
-  walk(blocks);
+  });
   return [...hrefs];
 }
 

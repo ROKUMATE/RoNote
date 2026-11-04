@@ -102,6 +102,7 @@ func TestRevert(t *testing.T) {
 	*doc.Blocks[0].Edited = true
 	note := user(paragraph(newID(), "mine"))
 	doc.Blocks = append(doc.Blocks, note)
+	doc.CodeLangs = map[string]string{"c2": "go"}
 
 	got, err := Revert(doc, extraction, "p1")
 	if err != nil {
@@ -115,6 +116,9 @@ func TestRevert(t *testing.T) {
 	}
 	if !*doc.Blocks[0].Edited {
 		t.Error("Revert changed the document it was given")
+	}
+	if got.CodeLangs["c2"] != "go" {
+		t.Errorf("reverted code_langs = %v, want the chosen languages kept", got.CodeLangs)
 	}
 	for _, id := range []string{note.ID, "nope"} {
 		if _, err := Revert(doc, extraction, id); !errors.Is(err, ErrNoSourceBlock) {

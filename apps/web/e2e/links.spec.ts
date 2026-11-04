@@ -1,21 +1,12 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import {
   caretHeading,
   chooseTheme,
   expectNoAxeViolations,
   expectNoHorizontalScroll,
-  fixtureURL,
-  importPage,
   importTimeout,
+  openLinkedPage,
 } from "./helpers";
-
-/** Imports linked page A, whose links lead to page B and a PDF. */
-async function openLinkedPage(page: Page) {
-  await page.goto("/");
-  const path = await importPage(page, fixtureURL("linked", "linked-a"));
-  await expect(page.getByRole("heading", { level: 1, name: "Linked guide A" })).toBeVisible();
-  return path;
-}
 
 test("same-domain links show whether following them imports", async ({ page }) => {
   await openLinkedPage(page);

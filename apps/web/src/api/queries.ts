@@ -1,6 +1,6 @@
 import { infiniteQueryOptions, QueryClient, queryOptions } from "@tanstack/react-query";
 import { ApiError, api, dataOrThrow } from "./client";
-import type { Document, DocumentSummary, Import } from "./schema";
+import type { DocContent, Document, DocumentSummary, Import } from "./schema";
 
 /** Every documents query sits under this key, so one invalidation refreshes them all. */
 export const documentsKey = ["documents"] as const;
@@ -36,6 +36,26 @@ export function documentQuery(id: string) {
     queryFn: async () =>
       dataOrThrow(await api.GET("/documents/{id}", { params: { path: { id } } })),
   });
+}
+
+/**
+ * Saves a document's content, edited from version; resolves to the new
+ * version. keepalive lets the save finish while the page is going away.
+ */
+export async function saveDocument(
+  id: string,
+  content: DocContent,
+  version: number,
+  { keepalive }: { keepalive: boolean },
+): Promise<number> {
+  const saved = dataOrThrow(
+    await api.PATCH("/documents/{id}", {
+      params: { path: { id } },
+      body: { content, version },
+      keepalive,
+    }),
+  );
+  return saved.version;
 }
 
 /** Puts one source block of a document back as extracted; returns the document. */

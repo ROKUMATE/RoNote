@@ -55,10 +55,12 @@ export function Reader({
   const open = useRef<(at: InsertAt) => void>(() => {});
   const [reverting, setReverting] = useState<string>();
 
-  const editor = useEditor({
+  // Built once: useEditor reapplies options that change between renders,
+  // which would redraw the document and lose the caret mid-typing.
+  const [options] = useState(() => ({
     extensions: [
       ...readerExtensions,
-      SlashMenu.configure({ open: (at) => open.current(at) }),
+      SlashMenu.configure({ open: (at: InsertAt) => open.current(at) }),
       BlockIdentityPlugin.configure({ onRevert: setReverting }),
     ],
     content: toEditor(content),
@@ -68,7 +70,8 @@ export function Reader({
       attributes: { "aria-label": "Document text", class: "reader-content" },
       handleDOMEvents: { click: followLink },
     },
-  });
+  }));
+  const editor = useEditor(options);
 
   /** The bottom of the top-level block at pos, from the top of the reader. */
   const bottomOf = (pos: number) => {
@@ -78,8 +81,12 @@ export function Reader({
   };
   open.current = (at) => setMenu({ at, top: bottomOf("replace" in at ? at.replace : at.after) });
 
+  const reportEditor = useRef(onEditor);
   useEffect(() => {
-    onEditor?.(editor);
+    reportEditor.current?.(editor);
+  }, [editor]);
+
+  useEffect(() => {
     const follow = () => {
       const pos = topLevelBlockAt(editor, editor.state.selection.from);
       setTarget(pos === undefined ? undefined : { pos, top: bottomOf(pos) });

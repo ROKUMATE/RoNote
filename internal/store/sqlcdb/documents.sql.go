@@ -47,6 +47,26 @@ func (q *Queries) CreateDocumentIfAbsent(ctx context.Context, arg CreateDocument
 	return i, err
 }
 
+const documentExtraction = `-- name: DocumentExtraction :one
+SELECT e.ir
+FROM documents d
+JOIN extractions e ON e.id = d.extraction_id
+WHERE d.owner_id = $1 AND d.id = $2
+`
+
+type DocumentExtractionParams struct {
+	OwnerID uuid.UUID
+	ID      uuid.UUID
+}
+
+// The IR of the extraction the owner's document was made from.
+func (q *Queries) DocumentExtraction(ctx context.Context, arg DocumentExtractionParams) ([]byte, error) {
+	row := q.db.QueryRow(ctx, documentExtraction, arg.OwnerID, arg.ID)
+	var ir []byte
+	err := row.Scan(&ir)
+	return ir, err
+}
+
 const findOwnerDocumentForURL = `-- name: FindOwnerDocumentForURL :one
 
 SELECT d.id
@@ -79,9 +99,11 @@ func (q *Queries) FindOwnerDocumentForURL(ctx context.Context, arg FindOwnerDocu
 }
 
 const getDocument = `-- name: GetDocument :one
-SELECT d.id, d.title, s.canonical_url AS source_url, d.version, d.created_at, d.updated_at, d.content
+SELECT d.id, d.title, s.canonical_url AS source_url, d.version, d.created_at, d.updated_at, d.content,
+    COALESCE(e.ir -> 'warnings', '[]'::jsonb)::jsonb AS warnings
 FROM documents d
 JOIN sources s ON s.id = d.source_id
+JOIN extractions e ON e.id = d.extraction_id
 WHERE d.owner_id = $1 AND d.id = $2
 `
 
@@ -98,8 +120,10 @@ type GetDocumentRow struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Content   []byte
+	Warnings  []byte
 }
 
+// The document, with the warnings of the extraction it was made from.
 func (q *Queries) GetDocument(ctx context.Context, arg GetDocumentParams) (GetDocumentRow, error) {
 	row := q.db.QueryRow(ctx, getDocument, arg.OwnerID, arg.ID)
 	var i GetDocumentRow
@@ -111,6 +135,7 @@ func (q *Queries) GetDocument(ctx context.Context, arg GetDocumentParams) (GetDo
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Content,
+		&i.Warnings,
 	)
 	return i, err
 }

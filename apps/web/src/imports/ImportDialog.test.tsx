@@ -27,18 +27,8 @@ const summary = {
 
 const documentWithContent = {
   ...summary,
-  content: {
-    ir_version: 1,
-    title: "Guide",
-    source: {
-      url: summary.source_url,
-      final_url: summary.source_url,
-      fetched_at: "2026-11-03T09:00:00Z",
-      body_sha256: "a".repeat(64),
-    },
-    extractor: { name: "generic", version: "2" },
-    blocks: [],
-  },
+  content: { doc_version: 1, blocks: [] },
+  warnings: [],
 };
 
 beforeEach(() => {

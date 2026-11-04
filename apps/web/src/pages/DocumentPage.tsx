@@ -53,7 +53,7 @@ export function DocumentPage() {
 }
 
 function Header({ doc, existing }: { doc: Document; existing: boolean }) {
-  const fallback = doc.content.warnings?.some((w) => genericWarnings.has(w.code));
+  const fallback = doc.warnings.some((w) => genericWarnings.has(w.code));
   return (
     <article className="max-w-[68ch]">
       {existing && (

@@ -13,22 +13,14 @@ function documentWith(warnings?: IrWarning[]) {
     created_at: "2026-11-03T09:00:00Z",
     updated_at: "2026-11-03T09:00:00Z",
     content: {
-      ir_version: 1,
-      title: "Effective Go",
-      source: {
-        url: "https://go.dev/doc/effective_go",
-        final_url: "https://go.dev/doc/effective_go",
-        fetched_at: "2026-11-03T09:00:00Z",
-        body_sha256: "a".repeat(64),
-      },
-      extractor: { name: "godev", version: "1" },
+      doc_version: 1,
       blocks: [
         { id: "h", kind: "heading", level: 1, content: [{ text: "Effective Go" }] },
         { id: "c1", kind: "code", text: "x := 1\n" },
         { id: "l", kind: "list", items: [{ children: [{ id: "c2", kind: "code", text: "y\n" }] }] },
-      ],
-      ...(warnings ? { warnings } : {}),
+      ].map((b) => ({ ...b, origin: "source", edited: false, source_block_id: b.id })),
     },
+    warnings: warnings ?? [],
   };
 }
 

@@ -332,10 +332,15 @@ components:
       allOf:
         - $ref: "#/components/schemas/DocumentSummary"
         - type: object
-          required: [content]
+          required: [content, warnings]
           properties:
             content:
-              $ref: "#/components/schemas/IRDocument"
+              $ref: "#/components/schemas/DocContent"
+            warnings:
+              type: array
+              description: What the extractor was unsure of when it made the document's source blocks.
+              items:
+                $ref: "#/components/schemas/IRWarning"
     DocumentList:
       type: object
       required: [documents]
@@ -348,6 +353,102 @@ components:
           type: string
           description: Present when there are more documents.
 
+    # A user's document, DocContent version 1
+    # (docs/adr/0006-editor-and-doc-content.md). Go uses package
+    # internal/doccontent for these.
+    DocContent:
+      x-go-type: doccontent.Doc
+      x-go-type-import:
+        path: github.com/rokumate/ronote/internal/doccontent
+      type: object
+      additionalProperties: false
+      required: [doc_version, blocks]
+      properties:
+        doc_version:
+          type: integer
+          enum: [1]
+        blocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocBlock"
+    DocBlock:
+      x-go-type: doccontent.Block
+      x-go-type-import:
+        path: github.com/rokumate/ronote/internal/doccontent
+      type: object
+      additionalProperties: false
+      required: [id, kind, origin]
+      description: >-
+        A top-level block: an IRBlock's fields, plus where it came from.
+        Source blocks set edited and source_block_id (equal to id); user
+        blocks set neither, and have UUIDv7 ids. A spec test keeps these
+        properties IRBlock's plus the three.
+      properties:
+        origin:
+          type: string
+          enum: [source, user]
+        edited:
+          type: boolean
+          description: Set on source blocks only; whether the user changed the block.
+        source_block_id:
+          type: string
+          description: Set on source blocks only; the extraction block it came from.
+        id:
+          type: string
+        kind:
+          type: string
+          enum: [heading, paragraph, list, code, table, callout, image, quote, divider, tabs]
+        level:
+          type: integer
+          minimum: 1
+          maximum: 6
+        anchor:
+          type: string
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/IRInline"
+        ordered:
+          type: boolean
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/IRItem"
+        lang:
+          type: string
+        title:
+          type: string
+        title_link:
+          $ref: "#/components/schemas/IRLink"
+        text:
+          type: string
+        head:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/IRCell"
+        rows:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/IRCell"
+        variant:
+          type: string
+          enum: [note, tip, info, warning, danger]
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/IRBlock"
+        src:
+          type: string
+        alt:
+          type: string
+        caption:
+          type: array
+          items:
+            $ref: "#/components/schemas/IRInline"
     # The IR, version 1 (docs/adr/0004-ir-and-links.md). Go uses package
     # internal/ir for these; TestIRSchemaMatchesGoldens checks they agree.
     IRDocument:

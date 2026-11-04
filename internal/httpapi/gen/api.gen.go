@@ -16,6 +16,7 @@ import (
 
 	"github.com/oapi-codegen/runtime"
 	openapi_types "github.com/oapi-codegen/runtime/types"
+	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/ir"
 )
 
@@ -153,9 +154,15 @@ type CreateImportRequest struct {
 	URL string `json:"url"`
 }
 
+// DocBlock A top-level block: an IRBlock's fields, plus where it came from. Source blocks set edited and source_block_id (equal to id); user blocks set neither, and have UUIDv7 ids. A spec test keeps these properties IRBlock's plus the three.
+type DocBlock = doccontent.Block
+
+// DocContent defines model for DocContent.
+type DocContent = doccontent.Doc
+
 // Document defines model for Document.
 type Document struct {
-	Content   IRDocument         `json:"content"`
+	Content   DocContent         `json:"content"`
 	CreatedAt time.Time          `json:"created_at"`
 	ID        openapi_types.UUID `json:"id"`
 
@@ -166,6 +173,9 @@ type Document struct {
 
 	// Version Counts edits, for optimistic concurrency; starts at 1.
 	Version int `json:"version"`
+
+	// Warnings What the extractor was unsure of when it made the document's source blocks.
+	Warnings []IRWarning `json:"warnings"`
 }
 
 // DocumentList defines model for DocumentList.

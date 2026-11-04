@@ -10,6 +10,7 @@ import (
 
 	"github.com/rokumate/ronote/internal/httpapi/gen"
 	"github.com/rokumate/ronote/internal/importer"
+	"github.com/rokumate/ronote/internal/ir"
 	"github.com/rokumate/ronote/internal/store"
 )
 
@@ -122,6 +123,7 @@ func (s apiServer) GetDocument(ctx context.Context, req gen.GetDocumentRequestOb
 	return gen.GetDocument200JSONResponse{
 		ID: sum.ID, Title: sum.Title, SourceURL: sum.SourceURL, Version: sum.Version,
 		CreatedAt: sum.CreatedAt, UpdatedAt: sum.UpdatedAt, Content: *doc.Content,
+		Warnings: append([]ir.Warning{}, doc.Warnings...),
 	}, nil
 }
 

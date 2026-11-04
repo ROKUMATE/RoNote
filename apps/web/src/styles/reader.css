@@ -130,10 +130,13 @@
     outline: none;
   }
 
-  /* Long documents: off-screen blocks skip layout and paint until near. */
-  .reader .reader-content > * {
+  /* Long documents: off-screen code, tables, tabs and images skip layout
+     and paint until near. Text blocks are left out: Chrome can misplace the
+     caret in a block it has not rendered yet, such as the empty paragraph
+     Enter just made, and typing then lands in the wrong place. */
+  .reader .reader-content > :is(.node-codeBlock, .node-table, .node-tabs, .node-image) {
     content-visibility: auto;
-    contain-intrinsic-size: auto 3em;
+    contain-intrinsic-size: auto 6em;
   }
 
   .reader .code-block {

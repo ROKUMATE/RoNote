@@ -9,25 +9,22 @@ import { ConfirmRevert } from "./ConfirmRevert";
 import { BlockIdentityPlugin, revertMeta } from "./identity";
 import { type InsertAt, insertUserBlock, SlashMenu, topLevelBlockAt } from "./insert";
 import { toEditor, topLevelNode } from "./mapping";
+import { moveTo } from "./moveTo";
 import { readerExtensions } from "./views";
 
 /**
  * A link in the text: an anchor scrolls to its heading in this document and
- * moves focus there; any other link opens in a new tab. Same-domain import
+ * puts the caret there; any other link opens in a new tab. Same-domain import
  * on click comes later (P11).
  */
-function followLink(_view: EditorView, event: globalThis.MouseEvent): boolean {
+function followLink(view: EditorView, event: globalThis.MouseEvent): boolean {
   const link = (event.target as Element | null)?.closest?.("a[href]");
   if (!link) return false;
   event.preventDefault();
   const href = link.getAttribute("href") ?? "";
   if (href.startsWith("#")) {
     const target = document.getElementById(decodeURIComponent(href.slice(1)));
-    if (target) {
-      target.tabIndex = -1;
-      target.scrollIntoView();
-      target.focus({ preventScroll: true });
-    }
+    if (target && view.dom.contains(target)) moveTo(view, target);
     return true;
   }
   window.open(href, "_blank", "noopener,noreferrer");

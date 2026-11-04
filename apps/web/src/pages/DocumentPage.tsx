@@ -2,11 +2,14 @@ import { ArrowSquareOutIcon } from "@phosphor-icons/react/ArrowSquareOut";
 import { InfoIcon } from "@phosphor-icons/react/Info";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams, useRouterState } from "@tanstack/react-router";
+import type { Editor } from "@tiptap/core";
+import { useState } from "react";
 import { ApiError } from "../api/client";
 import { requestErrorMessages } from "../api/messages";
 import { documentQuery } from "../api/queries";
 import type { Document, IrWarning } from "../api/schema";
 import { blockCounts } from "../document/counts";
+import { Outline } from "../document/Outline";
 import { Reader } from "../document/Reader";
 import type { SaveStatus } from "../document/save";
 import { useEditing } from "../document/useEditing";
@@ -73,6 +76,7 @@ function opensWithTitle(doc: Document): boolean {
 function Header({ doc, existing }: { doc: Document; existing: boolean }) {
   const fallback = doc.warnings.some((w) => genericWarnings.has(w.code));
   const { status, onEditor, revert } = useEditing(doc);
+  const [editor, setEditor] = useState<Editor>();
   return (
     <article className="max-w-[68ch]">
       {existing && (
@@ -114,7 +118,15 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
         </p>
       )}
       <div className="mt-8">
-        <Reader content={doc.content} onEditor={onEditor} onRevert={revert} />
+        <Reader
+          content={doc.content}
+          onEditor={(e) => {
+            onEditor(e);
+            setEditor(e);
+          }}
+          onRevert={revert}
+        />
+        {editor && <Outline editor={editor} />}
       </div>
     </article>
   );

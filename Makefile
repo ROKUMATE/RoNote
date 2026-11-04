@@ -172,7 +172,7 @@ web-build: ## Build the web app; fails if dev-only code ships or it is over budg
 	$(WEB) build
 	@! grep -rIil styleguide apps/web/dist || \
 		{ echo "make web-build: dev-only styleguide code found in the files above" >&2; exit 1; }
-	sh scripts/web-budget.sh
+	$(WEB) exec node scripts/budget.ts
 
 web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromium); locally needs make dev-up
 	@$(node_required)

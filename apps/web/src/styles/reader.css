@@ -144,6 +144,24 @@
     margin: 0;
   }
 
+  /* Shiki's CSS-variables theme, mapped onto six token colours. */
+  .reader .code-block {
+    --code-foreground: var(--color-ink);
+    --code-background: transparent;
+    --code-token-punctuation: var(--color-ink);
+    --code-token-parameter: var(--color-ink);
+    --code-token-comment: var(--color-code-comment);
+    --code-token-keyword: var(--color-code-keyword);
+    --code-token-link: var(--color-code-string);
+    --code-token-string: var(--color-code-string);
+    --code-token-string-expression: var(--color-code-string);
+    --code-token-constant: var(--color-code-constant);
+    --code-token-inserted: var(--color-code-string);
+    --code-token-deleted: var(--color-code-constant);
+    --code-token-changed: var(--color-code-keyword);
+    --code-token-function: var(--color-code-function);
+  }
+
   .reader .code-header {
     display: flex;
     align-items: center;

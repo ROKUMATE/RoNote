@@ -1,6 +1,8 @@
 import * as Tabs from "@radix-ui/react-tabs";
+import { Fragment } from "react";
 import type { IrBlock, IrCell, IrInline } from "../api/schema";
 import { CodeBlock } from "../ui/CodeBlock";
+import { useHighlight } from "./useHighlight";
 
 /*
  * Read-only rendering of IR blocks, for what the editor shows whole: the
@@ -88,14 +90,7 @@ export function Block({ block }: { block: IrBlock }) {
         </aside>
       );
     case "code":
-      return (
-        <CodeBlock
-          code={block.text ?? ""}
-          lang={block.lang}
-          title={block.title}
-          titleHref={block.title_link?.href}
-        />
-      );
+      return <HighlightedCode block={block} />;
     case "table":
       return <Table block={block} />;
     case "tabs":
@@ -171,5 +166,33 @@ function Image({ block }: { block: IrBlock }) {
         </figcaption>
       )}
     </figure>
+  );
+}
+
+/** A code block, highlighted once it nears the viewport. */
+function HighlightedCode({ block }: { block: IrBlock }) {
+  const code = block.text ?? "";
+  const { ref, lines } = useHighlight(code, block.lang);
+  return (
+    <CodeBlock
+      ref={ref}
+      code={code}
+      lang={block.lang}
+      title={block.title}
+      titleHref={block.title_link?.href}
+    >
+      {lines?.map((line, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: lines are positional.
+        <Fragment key={i}>
+          {i > 0 && "\n"}
+          {line.map((token, j) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: tokens are positional.
+            <span key={j} style={{ color: token.color }}>
+              {token.content}
+            </span>
+          ))}
+        </Fragment>
+      ))}
+    </CodeBlock>
   );
 }

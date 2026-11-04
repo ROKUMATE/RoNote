@@ -1,5 +1,6 @@
 import { cleanup } from "@testing-library/react";
 import { afterEach, vi } from "vitest";
+import { FakeIntersectionObserver } from "./test/intersection";
 
 afterEach(() => {
   cleanup();
@@ -21,3 +22,7 @@ if (!HTMLDialogElement.prototype.showModal) {
 
 // The router restores scroll positions, which jsdom does not implement.
 window.scrollTo = () => {};
+
+// jsdom has no IntersectionObserver; nothing intersects unless a test says so.
+globalThis.IntersectionObserver =
+  FakeIntersectionObserver as unknown as typeof IntersectionObserver;

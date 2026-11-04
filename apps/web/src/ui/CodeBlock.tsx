@@ -1,5 +1,5 @@
 import { CopyIcon } from "@phosphor-icons/react/Copy";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, type Ref, useState } from "react";
 
 type CodeBlockProps = {
   code: string;
@@ -9,20 +9,21 @@ type CodeBlockProps = {
   titleHref?: string | undefined;
   /** The code drawn another way, such as highlighted; code is still what Copy copies. */
   children?: ReactNode;
+  ref?: Ref<HTMLDivElement>;
 };
 
 /**
  * A code block that keeps its line breaks and scrolls sideways when too
  * wide, with its title, language and a Copy button when it has a header.
  */
-export function CodeBlock({ code, lang, title, titleHref, children }: CodeBlockProps) {
+export function CodeBlock({ code, lang, title, titleHref, children, ref }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     await navigator.clipboard.writeText(code);
     setCopied(true);
   };
   return (
-    <div className="code-block">
+    <div ref={ref} className="code-block">
       <div className="code-header">
         {title &&
           (titleHref ? (

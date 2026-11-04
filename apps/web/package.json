@@ -24,7 +24,6 @@
     "@tiptap/extension-document": "3.32.2",
     "@tiptap/extension-heading": "3.32.2",
     "@tiptap/extension-italic": "3.32.2",
-    "@tiptap/extension-link": "3.32.2",
     "@tiptap/extension-list": "3.32.2",
     "@tiptap/extension-paragraph": "3.32.2",
     "@tiptap/extension-strike": "3.32.2",
@@ -36,7 +35,8 @@
     "@tiptap/react": "3.32.2",
     "openapi-fetch": "0.17.0",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "shiki": "4.6.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",

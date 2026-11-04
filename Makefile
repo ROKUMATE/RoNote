@@ -43,12 +43,15 @@ tools: ## Install the pinned golangci-lint into ./bin
 		$(golangci_lint_current) || { echo "make tools: failed to install golangci-lint $(GOLANGCI_LINT_VERSION)" >&2; exit 1; }; \
 	}
 
-check: lint test hooks-test ## Run what CI's fast jobs run; do this before pushing
+check: lint test test-perf hooks-test ## Run what CI's fast jobs run; do this before pushing
 
 test: test-go test-web ## Run Go and web unit tests
 
 test-go: ## Run Go unit tests with the race detector
 	go test -race -count=1 ./...
+
+test-perf: ## Run timing tests (perf build tag) alone: one package at a time, without the race detector
+	go test -tags perf -p 1 -count=1 -run '^TestPerf' ./...
 
 test-web: ## Run web unit tests (Vitest)
 	@$(node_required)
@@ -69,7 +72,7 @@ lint: lint-go lint-web ## Lint Go and web code
 lint-go: ## Lint Go code and CI workflows (golangci-lint, deadcode, go mod tidy, actionlint)
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) run
-	@dead=$$(go tool deadcode -test -tags integration,live ./...) || { echo "make lint-go: deadcode failed" >&2; exit 1; }; \
+	@dead=$$(go tool deadcode -test -tags integration,live,perf ./...) || { echo "make lint-go: deadcode failed" >&2; exit 1; }; \
 		dead=$$(printf '%s\n' "$$dead" | grep -v '^internal/httpapi/gen/' || true); \
 		[ -z "$$dead" ] || { printf '%s\n' "$$dead" >&2; echo "make lint-go: deadcode found unreachable functions" >&2; exit 1; }
 	go mod tidy -diff
@@ -180,7 +183,7 @@ web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromiu
 	go build -o bin/e2e/ ./cmd/api ./cmd/worker
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" $(WEB) e2e
 
-.PHONY: help setup hooks-test check-commits tools check test test-go test-web run-api run-worker extract lint lint-go lint-web fmt
+.PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker extract lint lint-go lint-web fmt
 .PHONY: dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration test-live test-clean web-install web-deps web-browsers check-node-version

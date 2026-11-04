@@ -58,13 +58,14 @@ Create a directory when its first file needs it, not before.
 | `make hooks-test` | test the commit message hook (normal and strict mode) and `scripts/check-commits.sh` |
 | `make check-commits RANGE=main..HEAD` | check every commit message in `RANGE` in strict mode; in CI the event sets the range (`scripts/commit-range.sh`). `scripts/check-commits.sh` exits 0 when all pass, 1 when any is bad (report on stderr), 2 on a usage or internal error |
 | `make tools` | install the pinned golangci-lint into `./bin` |
-| `make check` | `lint`, `test` and `hooks-test`: what CI's fast jobs run. Run it before pushing |
+| `make check` | `lint`, `test`, `test-perf` and `hooks-test`: what CI's fast jobs run. Run it before pushing |
 | `make lint` | `lint-go` and `lint-web` |
-| `make lint-go` | golangci-lint (`.golangci.yml`, includes `integration` and `live` files), then `go tool deadcode -test -tags integration,live ./...`, which must print nothing outside `internal/httpapi/gen/` (generated helpers may go unused), then `go mod tidy -diff`, then `go tool actionlint` on `.github/workflows` |
+| `make lint-go` | golangci-lint (`.golangci.yml`, includes `integration`, `live` and `perf` files), then `go tool deadcode -test -tags integration,live,perf ./...`, which must print nothing outside `internal/httpapi/gen/` (generated helpers may go unused), then `go mod tidy -diff`, then `go tool actionlint` on `.github/workflows` |
 | `make lint-web` | `biome check --error-on-warnings`, `tsc -b`, `knip`, all with zero findings |
 | `make fmt` | format Go code with gofumpt and goimports |
 | `make test` | `test-go` and `test-web` |
 | `make test-go` | Go unit tests with `-race` |
+| `make test-perf` | timing tests alone: files tagged `perf`, tests named `TestPerf...`, run with `go test -tags perf -p 1` (one package at a time) and without the race detector. A timing test checks growth (time for 2n against n), never an absolute duration, and lives only here: `make test` and `make test-integration` never build it |
 | `make test-web` | web unit tests (Vitest, jsdom) |
 | `make test-integration` | unit and integration tests (`integration` build tag, testcontainers); fails if a test container is left behind |
 | `make test-live` | extract the real pages listed in `internal/extract/live_test.go` over the network and print a table: adapter, blocks, code found vs an independent count, verbatim check, warnings, junk. Needs the network, so it never runs in CI |
@@ -196,7 +197,7 @@ In users' documents, source code, tables, tabs and images are locked: the server
 | Job | Runs | Reproduce locally |
 |---|---|---|
 | commits | `make check-commits` (the strict hook over a PR's base..head, or a push's before..sha; `sha~1..sha` after a force push or a new branch), then `make hooks-test` with dash and GNU tools | `make check-commits RANGE=main..HEAD`, `make hooks-test` |
-| go | `make check-go-version`, `make tools`, `make lint-go`, `make test-go`, then Node and `make web-deps` for `make check-generated` | the same targets |
+| go | `make check-go-version`, `make tools`, `make lint-go`, `make test-go`, `make test-perf`, then Node and `make web-deps` for `make check-generated` | the same targets |
 | integration | `make check-go-version`, `make test-integration` on the runner's Docker with Ryuk on | `make test-integration` |
 | web | `make check-node-version`, `make web-deps`, `make lint-web`, `make test-web`, `make web-build` (styleguide guard and bundle budget) | the same targets |
 | e2e, after web | a Postgres service with an empty `ronote_e2e`, `make check-go-version`, `make check-node-version`, `make web-browsers WITH_DEPS=1`, `make web-e2e` (migrations, API, worker, fixture site, Vite); uploads `apps/web/playwright-report` for 7 days when it fails | `make dev-up`, `make web-install`, `make web-e2e` |

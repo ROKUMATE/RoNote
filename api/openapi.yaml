@@ -160,6 +160,92 @@ paths:
           $ref: "#/components/responses/InternalError"
         "404":
           $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: saveDocument
+      summary: Save a document's content
+      description: |
+        Replaces the document's content if version is still its current
+        version, and answers with the new one. The content must keep the
+        rules of docs/adr/0006-editor-and-doc-content.md: source blocks name
+        blocks of the document's extraction, their code, tables, tabs and
+        images are unchanged, an unedited source block is exactly its
+        extraction block, and user blocks use only paragraph, heading, list,
+        quote, callout and divider.
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveDocumentRequest"
+      responses:
+        "200":
+          description: Saved.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavedDocument"
+        "400":
+          description: "The body is not a save request. Codes: invalid_request, invalid_parameter."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "The document changed since version. Code: version_conflict."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VersionConflict"
+        "422":
+          description: >-
+            The content breaks a rule. Codes: invalid_content,
+            unknown_source_block, source_block_modified,
+            block_kind_not_allowed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /documents/{id}/blocks/{blockId}/revert:
+    post:
+      operationId: revertBlock
+      summary: Put a source block back as it was extracted
+      description: |
+        Replaces the document's source block blockId with its extraction
+        block, byte for byte, marks it unedited and bumps the version.
+      parameters:
+        - $ref: "#/components/parameters/ID"
+        - name: blockId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The document after the revert.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentResponse"
+        "400":
+          $ref: "#/components/responses/InvalidParameter"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          description: "No such document, or no source block blockId in it. Code: not_found."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
 components:
   parameters:
     ID:
@@ -225,6 +311,11 @@ components:
         - invalid_cursor
         - not_found
         - method_not_allowed
+        - version_conflict
+        - invalid_content
+        - unknown_source_block
+        - source_block_modified
+        - block_kind_not_allowed
         - unauthenticated
         - internal_error
     CreateImportRequest:
@@ -341,6 +432,37 @@ components:
               description: What the extractor was unsure of when it made the document's source blocks.
               items:
                 $ref: "#/components/schemas/IRWarning"
+    DocumentResponse:
+      type: object
+      required: [document]
+      properties:
+        document:
+          $ref: "#/components/schemas/Document"
+    SaveDocumentRequest:
+      type: object
+      required: [content, version]
+      properties:
+        content:
+          $ref: "#/components/schemas/DocContent"
+        version:
+          type: integer
+          minimum: 1
+          description: The version the content was edited from.
+    SavedDocument:
+      type: object
+      required: [version]
+      properties:
+        version:
+          type: integer
+    VersionConflict:
+      type: object
+      required: [error, current_version]
+      properties:
+        error:
+          $ref: "#/components/schemas/ErrorBody"
+        current_version:
+          type: integer
+          description: The document's version now.
     DocumentList:
       type: object
       required: [documents]

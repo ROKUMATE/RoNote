@@ -22,25 +22,34 @@ import (
 
 // Defines values for ErrorCode.
 const (
-	ErrorCodeIPLiteralHost     ErrorCode = "ip_literal_host"
-	ErrorCodeInternalError     ErrorCode = "internal_error"
-	ErrorCodeInvalidCursor     ErrorCode = "invalid_cursor"
-	ErrorCodeInvalidParameter  ErrorCode = "invalid_parameter"
-	ErrorCodeInvalidRequest    ErrorCode = "invalid_request"
-	ErrorCodeInvalidURL        ErrorCode = "invalid_url"
-	ErrorCodeMethodNotAllowed  ErrorCode = "method_not_allowed"
-	ErrorCodeNotFound          ErrorCode = "not_found"
-	ErrorCodeURLTooLong        ErrorCode = "url_too_long"
-	ErrorCodeUnauthenticated   ErrorCode = "unauthenticated"
-	ErrorCodeUnsupportedScheme ErrorCode = "unsupported_scheme"
+	ErrorCodeBlockKindNotAllowed ErrorCode = "block_kind_not_allowed"
+	ErrorCodeIPLiteralHost       ErrorCode = "ip_literal_host"
+	ErrorCodeInternalError       ErrorCode = "internal_error"
+	ErrorCodeInvalidContent      ErrorCode = "invalid_content"
+	ErrorCodeInvalidCursor       ErrorCode = "invalid_cursor"
+	ErrorCodeInvalidParameter    ErrorCode = "invalid_parameter"
+	ErrorCodeInvalidRequest      ErrorCode = "invalid_request"
+	ErrorCodeInvalidURL          ErrorCode = "invalid_url"
+	ErrorCodeMethodNotAllowed    ErrorCode = "method_not_allowed"
+	ErrorCodeNotFound            ErrorCode = "not_found"
+	ErrorCodeSourceBlockModified ErrorCode = "source_block_modified"
+	ErrorCodeURLTooLong          ErrorCode = "url_too_long"
+	ErrorCodeUnauthenticated     ErrorCode = "unauthenticated"
+	ErrorCodeUnknownSourceBlock  ErrorCode = "unknown_source_block"
+	ErrorCodeUnsupportedScheme   ErrorCode = "unsupported_scheme"
+	ErrorCodeVersionConflict     ErrorCode = "version_conflict"
 )
 
 // Valid indicates whether the value is a known member of the ErrorCode enum.
 func (e ErrorCode) Valid() bool {
 	switch e {
+	case ErrorCodeBlockKindNotAllowed:
+		return true
 	case ErrorCodeIPLiteralHost:
 		return true
 	case ErrorCodeInternalError:
+		return true
+	case ErrorCodeInvalidContent:
 		return true
 	case ErrorCodeInvalidCursor:
 		return true
@@ -54,11 +63,17 @@ func (e ErrorCode) Valid() bool {
 		return true
 	case ErrorCodeNotFound:
 		return true
+	case ErrorCodeSourceBlockModified:
+		return true
 	case ErrorCodeURLTooLong:
 		return true
 	case ErrorCodeUnauthenticated:
 		return true
+	case ErrorCodeUnknownSourceBlock:
+		return true
 	case ErrorCodeUnsupportedScheme:
+		return true
+	case ErrorCodeVersionConflict:
 		return true
 	default:
 		return false
@@ -186,6 +201,11 @@ type DocumentList struct {
 	NextCursor *string `json:"next_cursor,omitempty"`
 }
 
+// DocumentResponse defines model for DocumentResponse.
+type DocumentResponse struct {
+	Document Document `json:"document"`
+}
+
 // DocumentSummary defines model for DocumentSummary.
 type DocumentSummary struct {
 	CreatedAt time.Time          `json:"created_at"`
@@ -285,6 +305,26 @@ type ImportResponse struct {
 // ImportStatus defines model for ImportStatus.
 type ImportStatus string
 
+// SaveDocumentRequest defines model for SaveDocumentRequest.
+type SaveDocumentRequest struct {
+	Content DocContent `json:"content"`
+
+	// Version The version the content was edited from.
+	Version int `json:"version"`
+}
+
+// SavedDocument defines model for SavedDocument.
+type SavedDocument struct {
+	Version int `json:"version"`
+}
+
+// VersionConflict defines model for VersionConflict.
+type VersionConflict struct {
+	// CurrentVersion The document's version now.
+	CurrentVersion int       `json:"current_version"`
+	Error          ErrorBody `json:"error"`
+}
+
 // ID defines model for ID.
 type ID = openapi_types.UUID
 
@@ -307,6 +347,9 @@ type ListDocumentsParams struct {
 	Limit  *int    `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
+// SaveDocumentJSONRequestBody defines body for SaveDocument for application/json ContentType.
+type SaveDocumentJSONRequestBody = SaveDocumentRequest
+
 // CreateImportJSONRequestBody defines body for CreateImport for application/json ContentType.
 type CreateImportJSONRequestBody = CreateImportRequest
 
@@ -318,6 +361,12 @@ type ServerInterface interface {
 	// GetDocument Get a document with its content
 	// (GET /documents/{id})
 	GetDocument(w http.ResponseWriter, r *http.Request, id ID)
+	// SaveDocument Save a document's content
+	// (PATCH /documents/{id})
+	SaveDocument(w http.ResponseWriter, r *http.Request, id ID)
+	// RevertBlock Put a source block back as it was extracted
+	// (POST /documents/{id}/blocks/{blockId}/revert)
+	RevertBlock(w http.ResponseWriter, r *http.Request, id ID, blockID string)
 	// CreateImport Import a page
 	// (POST /imports)
 	CreateImport(w http.ResponseWriter, r *http.Request)
@@ -398,6 +447,67 @@ func (siw *ServerInterfaceWrapper) GetDocument(w http.ResponseWriter, r *http.Re
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetDocument(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SaveDocument operation middleware
+func (siw *ServerInterfaceWrapper) SaveDocument(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id ID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SaveDocument(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RevertBlock operation middleware
+func (siw *ServerInterfaceWrapper) RevertBlock(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id ID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "blockId" -------------
+	var blockID string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "blockId", r.PathValue("blockId"), &blockID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "blockId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RevertBlock(w, r, id, blockID)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -571,6 +681,8 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/imports/{id}", wrapper.GetImport)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/documents", wrapper.ListDocuments)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/documents/{id}", wrapper.GetDocument)
+	m.HandleFunc(http.MethodPatch+" "+options.BaseURL+"/documents/{id}", wrapper.SaveDocument)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/documents/{id}/blocks/{blockId}/revert", wrapper.RevertBlock)
 
 	return m
 }
@@ -714,6 +826,192 @@ func (response GetDocument404JSONResponse) VisitGetDocumentResponse(w http.Respo
 type GetDocument500JSONResponse struct{ InternalErrorJSONResponse }
 
 func (response GetDocument500JSONResponse) VisitGetDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveDocumentRequestObject struct {
+	ID   ID `json:"id"`
+	Body *SaveDocumentJSONRequestBody
+}
+
+type SaveDocumentResponseObject interface {
+	VisitSaveDocumentResponse(w http.ResponseWriter) error
+}
+
+type SaveDocument200JSONResponse SavedDocument
+
+func (response SaveDocument200JSONResponse) VisitSaveDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveDocument400JSONResponse Error
+
+func (response SaveDocument400JSONResponse) VisitSaveDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveDocument401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response SaveDocument401JSONResponse) VisitSaveDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveDocument404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response SaveDocument404JSONResponse) VisitSaveDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveDocument409JSONResponse VersionConflict
+
+func (response SaveDocument409JSONResponse) VisitSaveDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveDocument422JSONResponse Error
+
+func (response SaveDocument422JSONResponse) VisitSaveDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveDocument500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response SaveDocument500JSONResponse) VisitSaveDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RevertBlockRequestObject struct {
+	ID      ID     `json:"id"`
+	BlockID string `json:"blockId"`
+}
+
+type RevertBlockResponseObject interface {
+	VisitRevertBlockResponse(w http.ResponseWriter) error
+}
+
+type RevertBlock200JSONResponse DocumentResponse
+
+func (response RevertBlock200JSONResponse) VisitRevertBlockResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RevertBlock400JSONResponse struct{ InvalidParameterJSONResponse }
+
+func (response RevertBlock400JSONResponse) VisitRevertBlockResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RevertBlock401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response RevertBlock401JSONResponse) VisitRevertBlockResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RevertBlock404JSONResponse Error
+
+func (response RevertBlock404JSONResponse) VisitRevertBlockResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RevertBlock500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response RevertBlock500JSONResponse) VisitRevertBlockResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -889,6 +1187,12 @@ type StrictServerInterface interface {
 	// GetDocument Get a document with its content
 	// (GET /documents/{id})
 	GetDocument(ctx context.Context, request GetDocumentRequestObject) (GetDocumentResponseObject, error)
+	// SaveDocument Save a document's content
+	// (PATCH /documents/{id})
+	SaveDocument(ctx context.Context, request SaveDocumentRequestObject) (SaveDocumentResponseObject, error)
+	// RevertBlock Put a source block back as it was extracted
+	// (POST /documents/{id}/blocks/{blockId}/revert)
+	RevertBlock(ctx context.Context, request RevertBlockRequestObject) (RevertBlockResponseObject, error)
 	// CreateImport Import a page
 	// (POST /imports)
 	CreateImport(ctx context.Context, request CreateImportRequestObject) (CreateImportResponseObject, error)
@@ -981,6 +1285,66 @@ func (sh *strictHandler) GetDocument(w http.ResponseWriter, r *http.Request, id 
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetDocumentResponseObject); ok {
 		if err := validResponse.VisitGetDocumentResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SaveDocument operation middleware
+func (sh *strictHandler) SaveDocument(w http.ResponseWriter, r *http.Request, id ID) {
+	var request SaveDocumentRequestObject
+
+	request.ID = id
+
+	var body SaveDocumentJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.SaveDocument(ctx, request.(SaveDocumentRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SaveDocument")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SaveDocumentResponseObject); ok {
+		if err := validResponse.VisitSaveDocumentResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RevertBlock operation middleware
+func (sh *strictHandler) RevertBlock(w http.ResponseWriter, r *http.Request, id ID, blockID string) {
+	var request RevertBlockRequestObject
+
+	request.ID = id
+	request.BlockID = blockID
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RevertBlock(ctx, request.(RevertBlockRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RevertBlock")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RevertBlockResponseObject); ok {
+		if err := validResponse.VisitRevertBlockResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

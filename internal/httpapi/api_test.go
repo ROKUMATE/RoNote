@@ -33,6 +33,9 @@ type fakeBackend struct {
 	owners  []uuid.UUID
 	after   *store.DocumentCursor
 	fail    error
+	// extraction is every document's extraction; saves records each save.
+	extraction *ir.Doc
+	saves      []*doccontent.Doc
 }
 
 func (f *fakeBackend) Request(_ context.Context, owner uuid.UUID, url string) (importer.Requested, error) {
@@ -59,6 +62,32 @@ func (f *fakeBackend) GetDocument(_ context.Context, owner, id uuid.UUID) (store
 		}
 	}
 	return store.Document{}, store.ErrNotFound
+}
+
+func (f *fakeBackend) DocumentExtraction(_ context.Context, owner, id uuid.UUID) (*ir.Doc, error) {
+	f.owners = append(f.owners, owner)
+	for _, d := range f.docs {
+		if d.ID == id {
+			return f.extraction, nil
+		}
+	}
+	return nil, store.ErrNotFound
+}
+
+func (f *fakeBackend) SaveDocument(_ context.Context, owner, id uuid.UUID, content *doccontent.Doc, version int) (int, error) {
+	f.owners = append(f.owners, owner)
+	for i, d := range f.docs {
+		if d.ID != id {
+			continue
+		}
+		if d.Version != version {
+			return 0, &store.VersionConflictError{Current: d.Version}
+		}
+		f.docs[i].Content, f.docs[i].Version = content, version+1
+		f.saves = append(f.saves, content)
+		return version + 1, nil
+	}
+	return 0, store.ErrNotFound
 }
 
 func (f *fakeBackend) ListDocuments(_ context.Context, owner uuid.UUID, after *store.DocumentCursor, limit int) ([]store.DocumentSummary, error) {

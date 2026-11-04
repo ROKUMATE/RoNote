@@ -3,11 +3,13 @@ package httpapi
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 
 	"github.com/google/uuid"
 
+	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/httpapi/gen"
 	"github.com/rokumate/ronote/internal/importer"
 	"github.com/rokumate/ronote/internal/ir"
@@ -26,6 +28,8 @@ type Backend interface {
 	Request(ctx context.Context, owner uuid.UUID, rawURL string) (importer.Requested, error)
 	GetImport(ctx context.Context, owner, id uuid.UUID) (store.Import, error)
 	GetDocument(ctx context.Context, owner, id uuid.UUID) (store.Document, error)
+	DocumentExtraction(ctx context.Context, owner, id uuid.UUID) (*ir.Doc, error)
+	SaveDocument(ctx context.Context, owner, id uuid.UUID, content *doccontent.Doc, version int) (int, error)
 	ListDocuments(ctx context.Context, owner uuid.UUID, after *store.DocumentCursor, limit int) ([]store.DocumentSummary, error)
 }
 
@@ -119,12 +123,102 @@ func (s apiServer) GetDocument(ctx context.Context, req gen.GetDocumentRequestOb
 	if err != nil {
 		return nil, err
 	}
+	return gen.GetDocument200JSONResponse(documentJSON(doc)), nil
+}
+
+// revertAttempts bounds how often a revert retries when a save lands
+// between its read and its write.
+const revertAttempts = 3
+
+func (s apiServer) SaveDocument(ctx context.Context, req gen.SaveDocumentRequestObject) (gen.SaveDocumentResponseObject, error) {
+	if req.Body == nil || req.Body.Version < 1 {
+		return gen.SaveDocument400JSONResponse(apiError(ctx, gen.ErrorCodeInvalidRequest, "a JSON body with content and the version it was edited from is required")), nil
+	}
+	owner := userFrom(ctx)
+	extraction, err := s.backend.DocumentExtraction(ctx, owner, req.ID)
+	if errors.Is(err, store.ErrNotFound) {
+		return gen.SaveDocument404JSONResponse{NotFoundJSONResponse: gen.NotFoundJSONResponse(apiError(ctx, gen.ErrorCodeNotFound, "no such document"))}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	content := req.Body.Content
+	if err := doccontent.Validate(&content); err != nil {
+		return saveRefused(ctx, err)
+	}
+	if err := doccontent.CheckSource(&content, extraction); err != nil {
+		return saveRefused(ctx, err)
+	}
+	version, err := s.backend.SaveDocument(ctx, owner, req.ID, &content, req.Body.Version)
+	var conflict *store.VersionConflictError
+	switch {
+	case errors.As(err, &conflict):
+		return gen.SaveDocument409JSONResponse{
+			Error:          apiError(ctx, gen.ErrorCodeVersionConflict, "the document changed since this version").Error,
+			CurrentVersion: conflict.Current,
+		}, nil
+	case errors.Is(err, store.ErrNotFound):
+		return gen.SaveDocument404JSONResponse{NotFoundJSONResponse: gen.NotFoundJSONResponse(apiError(ctx, gen.ErrorCodeNotFound, "no such document"))}, nil
+	case err != nil:
+		return nil, err
+	}
+	return gen.SaveDocument200JSONResponse{Version: version}, nil
+}
+
+// saveRefused answers 422 with the code of the rule err broke.
+func saveRefused(ctx context.Context, err error) (gen.SaveDocumentResponseObject, error) {
+	var p *doccontent.Problem
+	if !errors.As(err, &p) {
+		return nil, err
+	}
+	return gen.SaveDocument422JSONResponse(apiError(ctx, gen.ErrorCode(p.Code), p.Err.Error())), nil
+}
+
+func (s apiServer) RevertBlock(ctx context.Context, req gen.RevertBlockRequestObject) (gen.RevertBlockResponseObject, error) {
+	owner := userFrom(ctx)
+	notFound := gen.RevertBlock404JSONResponse(apiError(ctx, gen.ErrorCodeNotFound, "no such document or source block"))
+	for range revertAttempts {
+		doc, err := s.backend.GetDocument(ctx, owner, req.ID)
+		if errors.Is(err, store.ErrNotFound) {
+			return notFound, nil
+		}
+		if err != nil {
+			return nil, err
+		}
+		extraction, err := s.backend.DocumentExtraction(ctx, owner, req.ID)
+		if err != nil {
+			return nil, err
+		}
+		reverted, err := doccontent.Revert(doc.Content, extraction, req.BlockID)
+		if errors.Is(err, doccontent.ErrNoSourceBlock) {
+			return notFound, nil
+		}
+		if err != nil {
+			return nil, err
+		}
+		_, err = s.backend.SaveDocument(ctx, owner, req.ID, reverted, doc.Version)
+		if errors.As(err, new(*store.VersionConflictError)) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		saved, err := s.backend.GetDocument(ctx, owner, req.ID)
+		if err != nil {
+			return nil, err
+		}
+		return gen.RevertBlock200JSONResponse{Document: documentJSON(saved)}, nil
+	}
+	return nil, fmt.Errorf("revert block %s: the document kept changing", req.BlockID)
+}
+
+func documentJSON(doc store.Document) gen.Document {
 	sum := summaryJSON(doc.DocumentSummary)
-	return gen.GetDocument200JSONResponse{
+	return gen.Document{
 		ID: sum.ID, Title: sum.Title, SourceURL: sum.SourceURL, Version: sum.Version,
 		CreatedAt: sum.CreatedAt, UpdatedAt: sum.UpdatedAt, Content: *doc.Content,
 		Warnings: append([]ir.Warning{}, doc.Warnings...),
-	}, nil
+	}
 }
 
 func (s apiServer) ListDocuments(ctx context.Context, req gen.ListDocumentsRequestObject) (gen.ListDocumentsResponseObject, error) {

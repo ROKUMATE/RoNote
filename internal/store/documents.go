@@ -3,7 +3,9 @@ package store
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/google/uuid"
@@ -145,4 +147,39 @@ func (s *Store) DocumentExtraction(ctx context.Context, owner, id uuid.UUID) (*i
 		return nil, fmt.Errorf("extraction of document %s: %w", id, err)
 	}
 	return &doc, nil
+}
+
+// VersionConflictError means a save was made from an old version of the
+// document. Current is the version now.
+type VersionConflictError struct {
+	Current int
+}
+
+func (e *VersionConflictError) Error() string {
+	return fmt.Sprintf("document is at version %d", e.Current)
+}
+
+// SaveDocument replaces the content of owner's document id if it is still at
+// version, and returns the new version. It returns a *VersionConflictError
+// when the document has moved on, and ErrNotFound when owner has no such
+// document.
+func (s *Store) SaveDocument(ctx context.Context, owner, id uuid.UUID, content *doccontent.Doc, version int) (int, error) {
+	data, err := json.Marshal(content)
+	if err != nil {
+		return 0, fmt.Errorf("save document: %w", err)
+	}
+	saved, err := s.q.SaveDocument(ctx, sqlcdb.SaveDocumentParams{
+		Content: data, OwnerID: owner, ID: id, Version: int32(min(max(version, 0), math.MaxInt32)), //nolint:gosec // clamped
+	})
+	if err == nil {
+		return int(saved), nil
+	}
+	if !errors.Is(mapErr("save document", err), ErrNotFound) {
+		return 0, mapErr("save document", err)
+	}
+	current, err := s.q.DocumentVersion(ctx, sqlcdb.DocumentVersionParams{OwnerID: owner, ID: id})
+	if err != nil {
+		return 0, mapErr("document version", err)
+	}
+	return 0, &VersionConflictError{Current: int(current)}
 }

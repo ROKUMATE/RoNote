@@ -49,3 +49,13 @@ SELECT e.ir
 FROM documents d
 JOIN extractions e ON e.id = d.extraction_id
 WHERE d.owner_id = $1 AND d.id = $2;
+
+-- name: SaveDocument :one
+-- Replaces the content if the document is still at version, and bumps it.
+UPDATE documents
+SET content = sqlc.arg(content), version = version + 1, updated_at = now()
+WHERE owner_id = sqlc.arg(owner_id) AND id = sqlc.arg(id) AND version = sqlc.arg(version)
+RETURNING version;
+
+-- name: DocumentVersion :one
+SELECT version FROM documents WHERE owner_id = $1 AND id = $2;

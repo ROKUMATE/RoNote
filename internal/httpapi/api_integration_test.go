@@ -4,6 +4,7 @@ package httpapi
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -136,6 +137,56 @@ func TestAPIImportsEndToEnd(t *testing.T) {
 	rec = apiRequest(t, graceAPI, http.MethodGet, "/api/v1/documents", "")
 	if body := rec.Body.String(); rec.Code != http.StatusOK || body != "{\"documents\":[]}\n" {
 		t.Errorf("another user's list = %d %s, want no documents", rec.Code, body)
+	}
+
+	checkEditing(t, adaAPI, graceAPI, st, ada.ID, imp.DocumentID)
+}
+
+// checkEditing edits the user's document through the API: a save, a stale
+// save, another user's save, and a revert that restores the extraction's
+// block byte for byte.
+func checkEditing(t *testing.T, owner, stranger http.Handler, st *store.Store, ownerID uuid.UUID, docID string) {
+	t.Helper()
+	target := "/api/v1/documents/" + docID
+	var doc struct {
+		Version int            `json:"version"`
+		Content doccontent.Doc `json:"content"`
+	}
+	if err := json.Unmarshal(apiRequest(t, owner, http.MethodGet, target, "").Body.Bytes(), &doc); err != nil {
+		t.Fatal(err)
+	}
+	heading := &doc.Content.Blocks[0]
+	heading.Content = []ir.Inline{{Text: "My guide"}}
+	edited := true
+	heading.Edited = &edited
+
+	if rec := apiRequest(t, stranger, http.MethodPatch, target, saveBody(t, &doc.Content, doc.Version)); rec.Code != http.StatusNotFound {
+		t.Errorf("another user's PATCH = %d, want 404", rec.Code)
+	}
+	rec := apiRequest(t, owner, http.MethodPatch, target, saveBody(t, &doc.Content, doc.Version))
+	if rec.Code != http.StatusOK || decodeJSON[struct{ Version int }](t, rec).Version != doc.Version+1 {
+		t.Fatalf("PATCH = %d %s, want 200 with the next version", rec.Code, rec.Body)
+	}
+	if rec := apiRequest(t, owner, http.MethodPatch, target, saveBody(t, &doc.Content, doc.Version)); rec.Code != http.StatusConflict {
+		t.Errorf("stale PATCH = %d %s, want 409", rec.Code, rec.Body)
+	}
+
+	rec = apiRequest(t, owner, http.MethodPost, target+"/blocks/"+heading.ID+"/revert", "")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("revert = %d %s", rec.Code, rec.Body)
+	}
+	extraction, err := st.DocumentExtraction(t.Context(), ownerID, uuid.MustParse(docID))
+	if err != nil {
+		t.Fatal(err)
+	}
+	stored, err := st.GetDocument(t.Context(), ownerID, uuid.MustParse(docID))
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, _ := json.Marshal(stored.Content.Blocks[0].Block)
+	want, _ := json.Marshal(extraction.Blocks[0])
+	if string(got) != string(want) || *stored.Content.Blocks[0].Edited || stored.Version != doc.Version+2 {
+		t.Errorf("after revert the block is %s (edited %v, version %d), want the extraction's %s", got, *stored.Content.Blocks[0].Edited, stored.Version, want)
 	}
 }
 

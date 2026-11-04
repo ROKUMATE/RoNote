@@ -98,6 +98,37 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Save a document's content
+         * @description Replaces the document's content if version is still its current
+         *     version, and answers with the new one. The content must keep the
+         *     rules of docs/adr/0006-editor-and-doc-content.md: source blocks name
+         *     blocks of the document's extraction, their code, tables, tabs and
+         *     images are unchanged, an unedited source block is exactly its
+         *     extraction block, and user blocks use only paragraph, heading, list,
+         *     quote, callout and divider.
+         */
+        patch: operations["saveDocument"];
+        trace?: never;
+    };
+    "/documents/{id}/blocks/{blockId}/revert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Put a source block back as it was extracted
+         * @description Replaces the document's source block blockId with its extraction
+         *     block, byte for byte, marks it unedited and bumps the version.
+         */
+        post: operations["revertBlock"];
+        delete?: never;
+        options?: never;
+        head?: never;
         patch?: never;
         trace?: never;
     };
@@ -117,7 +148,7 @@ export interface components {
          * @description Why a request failed. Each response lists the codes it can carry.
          * @enum {string}
          */
-        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "unauthenticated" | "internal_error";
+        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unauthenticated" | "internal_error";
         CreateImportRequest: {
             url: string;
         };
@@ -175,6 +206,22 @@ export interface components {
             content: components["schemas"]["DocContent"];
             /** @description What the extractor was unsure of when it made the document's source blocks. */
             warnings: components["schemas"]["IRWarning"][];
+        };
+        DocumentResponse: {
+            document: components["schemas"]["Document"];
+        };
+        SaveDocumentRequest: {
+            content: components["schemas"]["DocContent"];
+            /** @description The version the content was edited from. */
+            version: number;
+        };
+        SavedDocument: {
+            version: number;
+        };
+        VersionConflict: {
+            error: components["schemas"]["ErrorBody"];
+            /** @description The document's version now. */
+            current_version: number;
         };
         DocumentList: {
             documents: components["schemas"]["DocumentSummary"][];
@@ -341,6 +388,10 @@ export type ExistingImportResponse = components['schemas']['ExistingImportRespon
 export type ImportEvent = components['schemas']['ImportEvent'];
 export type DocumentSummary = components['schemas']['DocumentSummary'];
 export type Document = components['schemas']['Document'];
+export type DocumentResponse = components['schemas']['DocumentResponse'];
+export type SaveDocumentRequest = components['schemas']['SaveDocumentRequest'];
+export type SavedDocument = components['schemas']['SavedDocument'];
+export type VersionConflict = components['schemas']['VersionConflict'];
 export type DocumentList = components['schemas']['DocumentList'];
 export type DocContent = components['schemas']['DocContent'];
 export type DocBlock = components['schemas']['DocBlock'];
@@ -521,6 +572,97 @@ export interface operations {
             400: components["responses"]["InvalidParameter"];
             401: components["responses"]["Unauthenticated"];
             404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    saveDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveDocumentRequest"];
+            };
+        };
+        responses: {
+            /** @description Saved. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedDocument"];
+                };
+            };
+            /** @description The body is not a save request. Codes: invalid_request, invalid_parameter. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["NotFound"];
+            /** @description The document changed since version. Code: version_conflict. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionConflict"];
+                };
+            };
+            /** @description The content breaks a rule. Codes: invalid_content, unknown_source_block, source_block_modified, block_kind_not_allowed. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    revertBlock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ID"];
+                blockId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The document after the revert. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentResponse"];
+                };
+            };
+            400: components["responses"]["InvalidParameter"];
+            401: components["responses"]["Unauthenticated"];
+            /** @description No such document, or no source block blockId in it. Code: not_found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             500: components["responses"]["InternalError"];
         };
     };

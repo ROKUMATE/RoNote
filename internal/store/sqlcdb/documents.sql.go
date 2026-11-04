@@ -67,6 +67,22 @@ func (q *Queries) DocumentExtraction(ctx context.Context, arg DocumentExtraction
 	return ir, err
 }
 
+const documentVersion = `-- name: DocumentVersion :one
+SELECT version FROM documents WHERE owner_id = $1 AND id = $2
+`
+
+type DocumentVersionParams struct {
+	OwnerID uuid.UUID
+	ID      uuid.UUID
+}
+
+func (q *Queries) DocumentVersion(ctx context.Context, arg DocumentVersionParams) (int32, error) {
+	row := q.db.QueryRow(ctx, documentVersion, arg.OwnerID, arg.ID)
+	var version int32
+	err := row.Scan(&version)
+	return version, err
+}
+
 const findOwnerDocumentForURL = `-- name: FindOwnerDocumentForURL :one
 
 SELECT d.id
@@ -197,4 +213,31 @@ func (q *Queries) ListDocuments(ctx context.Context, arg ListDocumentsParams) ([
 		return nil, err
 	}
 	return items, nil
+}
+
+const saveDocument = `-- name: SaveDocument :one
+UPDATE documents
+SET content = $1, version = version + 1, updated_at = now()
+WHERE owner_id = $2 AND id = $3 AND version = $4
+RETURNING version
+`
+
+type SaveDocumentParams struct {
+	Content []byte
+	OwnerID uuid.UUID
+	ID      uuid.UUID
+	Version int32
+}
+
+// Replaces the content if the document is still at version, and bumps it.
+func (q *Queries) SaveDocument(ctx context.Context, arg SaveDocumentParams) (int32, error) {
+	row := q.db.QueryRow(ctx, saveDocument,
+		arg.Content,
+		arg.OwnerID,
+		arg.ID,
+		arg.Version,
+	)
+	var version int32
+	err := row.Scan(&version)
+	return version, err
 }

@@ -30,6 +30,12 @@ export const requestErrorMessages: Record<ErrorCode, string> = {
   invalid_cursor: "That page of your library has expired. Reload to start again.",
   not_found: "That isn't in your library.",
   method_not_allowed: "RoNote couldn't read that request. Try again.",
+  version_conflict: "This document changed in another tab.",
+  invalid_content: "RoNote couldn't save that change. Reload to continue.",
+  unknown_source_block: "Part of this document no longer matches its source. Reload to continue.",
+  source_block_modified: "Code, tables and tabs from the page can't be edited.",
+  block_kind_not_allowed:
+    "Notes can only hold text, headings, lists, quotes, callouts and dividers.",
   unauthenticated: "You're signed out. Sign in and try again.",
   internal_error: "Something went wrong on RoNote's side. Try again.",
 };

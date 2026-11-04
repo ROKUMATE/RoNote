@@ -46,24 +46,32 @@ export function Outline({ editor }: { editor: Editor }) {
     };
   }, [editor]);
 
-  // Scroll spy: the current heading is the last one to have crossed into
-  // the top third of the viewport.
+  // Scroll spy: the current heading is the last one above the line a third
+  // of the way down the viewport. Measured on every scrolled frame, so a jump
+  // past several headings still lands on the right one.
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (records) => {
-        const crossing = records
-          .filter((r) => r.isIntersecting)
-          .map((r) => r.target.getAttribute("data-block-id"));
-        const last = crossing.at(-1);
-        if (last) setCurrent(last);
-      },
-      { rootMargin: "0px 0px -66% 0px" },
-    );
-    for (const entry of entries) {
-      const heading = headingElement(entry.id);
-      if (heading) observer.observe(heading);
-    }
-    return () => observer.disconnect();
+    let frame = 0;
+    const measure = () => {
+      frame = 0;
+      const line = window.innerHeight / 3;
+      let above: string | undefined;
+      for (const entry of entries) {
+        const top = headingElement(entry.id)?.getBoundingClientRect().top;
+        if (top !== undefined && top <= line) above = entry.id;
+      }
+      setCurrent(above ?? entries[0]?.id);
+    };
+    const onScroll = () => {
+      frame ||= requestAnimationFrame(measure);
+    };
+    measure();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(frame);
+    };
   }, [entries]);
 
   if (!slot || entries.length === 0) return null;

@@ -3,7 +3,6 @@ import type { Editor } from "@tiptap/core";
 import { expect, test, vi } from "vitest";
 import type { DocBlock, IrBlock } from "../api/schema";
 import { outlineSlotId } from "../shell/AppShell";
-import { bringIntoView } from "../test/intersection";
 import { Outline } from "./Outline";
 import { Reader } from "./Reader";
 
@@ -72,17 +71,6 @@ test("clicking a heading scrolls to it and puts the caret there", async () => {
   expect(outline.getByRole("link", { name: "Use" }).getAttribute("aria-current")).toBe("location");
 });
 
-test("marks the heading being read as the current location", async () => {
-  const { outline } = await openOutline();
-
-  act(() => bringIntoView(screen.getByRole("heading", { name: "On macOS" })));
-
-  expect(outline.getByRole("link", { name: "On macOS" }).getAttribute("aria-current")).toBe(
-    "location",
-  );
-  expect(outline.getByRole("link", { name: "Install" }).getAttribute("aria-current")).toBeNull();
-});
-
 test("follows headings as they are edited", async () => {
   const { editor, outline } = await openOutline();
 
@@ -92,4 +80,23 @@ test("follows headings as they are edited", async () => {
   });
 
   expect(outline.getAllByRole("link")[0]?.textContent).toBe("Install it");
+});
+
+test("knows the current heading after a jump that skipped past others", async () => {
+  const { outline } = await openOutline();
+  const tops: Record<string, number> = { Install: -1200, "On macOS": 120, Use: 900 };
+  for (const [name, top] of Object.entries(tops)) {
+    const heading = screen.getByRole("heading", { name });
+    heading.getBoundingClientRect = () => ({ top, bottom: top + 30 }) as DOMRect;
+  }
+
+  // No heading entered the reading zone on the way: the page jumped.
+  act(() => {
+    window.dispatchEvent(new Event("scroll"));
+  });
+  await act(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+
+  expect(outline.getByRole("link", { name: "On macOS" }).getAttribute("aria-current")).toBe(
+    "location",
+  );
 });

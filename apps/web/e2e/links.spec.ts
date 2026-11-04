@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 import {
+  caretHeading,
   chooseTheme,
   expectNoAxeViolations,
   expectNoHorizontalScroll,
@@ -76,6 +77,19 @@ test("going back returns to the same place, and the link then opens without impo
 
   await expect(page).toHaveURL(new RegExp(`${pathB}$`));
   expect(imports).toEqual([]);
+});
+
+test("a link to a section opens its page at that section, with the caret there", async ({
+  page,
+}) => {
+  await openLinkedPage(page);
+
+  await page.getByRole("link", { name: "its usage section" }).click();
+
+  await expect(page).toHaveURL(/\/doc\/[0-9a-f-]{36}#usage$/, { timeout: importTimeout });
+  const usage = page.getByRole("heading", { level: 2, name: "Usage" });
+  await expect(usage).toBeInViewport();
+  await expect.poll(() => caretHeading(page)).toBe("Usage");
 });
 
 test("Cmd-click opens the original page instead", async ({ page, context }) => {

@@ -73,6 +73,11 @@ export async function importPage(page: Page, url: string): Promise<string> {
   return new URL(page.url()).pathname;
 }
 
+/** The text of the h2 the caret is in, if any. */
+export function caretHeading(page: Page) {
+  return page.evaluate(() => getSelection()?.anchorNode?.parentElement?.closest("h2")?.textContent);
+}
+
 /** Goes back to the library through the sidebar, as a reader would. */
 export async function openLibrary(page: Page) {
   await page

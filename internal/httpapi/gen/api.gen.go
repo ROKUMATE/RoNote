@@ -335,6 +335,28 @@ type ImportResponse struct {
 // ImportStatus defines model for ImportStatus.
 type ImportStatus string
 
+// ResolveDocumentsRequest defines model for ResolveDocumentsRequest.
+type ResolveDocumentsRequest struct {
+	Urls []string `json:"urls"`
+}
+
+// ResolvedLink defines model for ResolvedLink.
+type ResolvedLink struct {
+	// CanonicalURL The URL canonicalized as imports do; absent when an import would refuse it.
+	CanonicalURL *string `json:"canonical_url,omitempty"`
+
+	// DocumentID The user's document for it; absent when they have none.
+	DocumentID *openapi_types.UUID `json:"document_id,omitempty"`
+
+	// URL The URL as asked.
+	URL string `json:"url"`
+}
+
+// ResolvedLinks defines model for ResolvedLinks.
+type ResolvedLinks struct {
+	Links []ResolvedLink `json:"links"`
+}
+
 // SaveDocumentRequest defines model for SaveDocumentRequest.
 type SaveDocumentRequest struct {
 	Content DocContent `json:"content"`
@@ -380,6 +402,9 @@ type ListDocumentsParams struct {
 	Limit  *int    `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
+// ResolveDocumentsJSONRequestBody defines body for ResolveDocuments for application/json ContentType.
+type ResolveDocumentsJSONRequestBody = ResolveDocumentsRequest
+
 // SaveDocumentJSONRequestBody defines body for SaveDocument for application/json ContentType.
 type SaveDocumentJSONRequestBody = SaveDocumentRequest
 
@@ -391,6 +416,9 @@ type ServerInterface interface {
 	// ListDocuments List the user's documents, newest first
 	// (GET /documents)
 	ListDocuments(w http.ResponseWriter, r *http.Request, params ListDocumentsParams)
+	// ResolveDocuments Find which links the user already has as documents
+	// (POST /documents/resolve)
+	ResolveDocuments(w http.ResponseWriter, r *http.Request)
 	// GetDocument Get a document with its content
 	// (GET /documents/{id})
 	GetDocument(w http.ResponseWriter, r *http.Request, id ID)
@@ -454,6 +482,20 @@ func (siw *ServerInterfaceWrapper) ListDocuments(w http.ResponseWriter, r *http.
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ListDocuments(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ResolveDocuments operation middleware
+func (siw *ServerInterfaceWrapper) ResolveDocuments(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ResolveDocuments(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -715,6 +757,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/documents", wrapper.ListDocuments)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/documents/{id}", wrapper.GetDocument)
 	m.HandleFunc(http.MethodPatch+" "+options.BaseURL+"/documents/{id}", wrapper.SaveDocument)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/documents/resolve", wrapper.ResolveDocuments)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/documents/{id}/blocks/{blockId}/revert", wrapper.RevertBlock)
 
 	return m
@@ -781,6 +824,70 @@ func (response ListDocuments401JSONResponse) VisitListDocumentsResponse(w http.R
 type ListDocuments500JSONResponse struct{ InternalErrorJSONResponse }
 
 func (response ListDocuments500JSONResponse) VisitListDocumentsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ResolveDocumentsRequestObject struct {
+	Body *ResolveDocumentsJSONRequestBody
+}
+
+type ResolveDocumentsResponseObject interface {
+	VisitResolveDocumentsResponse(w http.ResponseWriter) error
+}
+
+type ResolveDocuments200JSONResponse ResolvedLinks
+
+func (response ResolveDocuments200JSONResponse) VisitResolveDocumentsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ResolveDocuments400JSONResponse Error
+
+func (response ResolveDocuments400JSONResponse) VisitResolveDocumentsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ResolveDocuments401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response ResolveDocuments401JSONResponse) VisitResolveDocumentsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ResolveDocuments500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response ResolveDocuments500JSONResponse) VisitResolveDocumentsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -1217,6 +1324,9 @@ type StrictServerInterface interface {
 	// ListDocuments List the user's documents, newest first
 	// (GET /documents)
 	ListDocuments(ctx context.Context, request ListDocumentsRequestObject) (ListDocumentsResponseObject, error)
+	// ResolveDocuments Find which links the user already has as documents
+	// (POST /documents/resolve)
+	ResolveDocuments(ctx context.Context, request ResolveDocumentsRequestObject) (ResolveDocumentsResponseObject, error)
 	// GetDocument Get a document with its content
 	// (GET /documents/{id})
 	GetDocument(ctx context.Context, request GetDocumentRequestObject) (GetDocumentResponseObject, error)
@@ -1292,6 +1402,37 @@ func (sh *strictHandler) ListDocuments(w http.ResponseWriter, r *http.Request, p
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ListDocumentsResponseObject); ok {
 		if err := validResponse.VisitListDocumentsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ResolveDocuments operation middleware
+func (sh *strictHandler) ResolveDocuments(w http.ResponseWriter, r *http.Request) {
+	var request ResolveDocumentsRequestObject
+
+	var body ResolveDocumentsJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ResolveDocuments(ctx, request.(ResolveDocumentsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ResolveDocuments")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ResolveDocumentsResponseObject); ok {
+		if err := validResponse.VisitResolveDocumentsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

@@ -31,6 +31,7 @@ type Backend interface {
 	DocumentExtraction(ctx context.Context, owner, id uuid.UUID) (*ir.Doc, error)
 	SaveDocument(ctx context.Context, owner, id uuid.UUID, content *doccontent.Doc, version int) (int, error)
 	ListDocuments(ctx context.Context, owner uuid.UUID, after *store.DocumentCursor, limit int) ([]store.DocumentSummary, error)
+	ResolveDocuments(ctx context.Context, owner uuid.UUID, urls []string) (map[string]uuid.UUID, error)
 }
 
 // apiRoutes returns a mux with the routes of api/openapi.yaml: the
@@ -210,6 +211,45 @@ func (s apiServer) RevertBlock(ctx context.Context, req gen.RevertBlockRequestOb
 		return gen.RevertBlock200JSONResponse{Document: documentJSON(saved)}, nil
 	}
 	return nil, fmt.Errorf("revert block %s: the document kept changing", req.BlockID)
+}
+
+// maxResolve is how many URLs one resolve request may ask about, as the
+// spec's maxItems says.
+const maxResolve = 200
+
+func (s apiServer) ResolveDocuments(ctx context.Context, req gen.ResolveDocumentsRequestObject) (gen.ResolveDocumentsResponseObject, error) {
+	if req.Body == nil || len(req.Body.Urls) == 0 || len(req.Body.Urls) > maxResolve {
+		return gen.ResolveDocuments400JSONResponse(apiError(ctx, gen.ErrorCodeInvalidRequest,
+			fmt.Sprintf("a JSON body with 1 to %d urls is required", maxResolve))), nil
+	}
+	canonical := make([]string, len(req.Body.Urls))
+	var known []string
+	for i, raw := range req.Body.Urls {
+		// A URL an import would refuse has no canonical form and no document.
+		if c, err := importer.Validate(raw); err == nil {
+			canonical[i] = c
+			known = append(known, c)
+		}
+	}
+	found := map[string]uuid.UUID{}
+	if len(known) > 0 {
+		var err error
+		if found, err = s.backend.ResolveDocuments(ctx, userFrom(ctx), known); err != nil {
+			return nil, err
+		}
+	}
+	links := make([]gen.ResolvedLink, len(req.Body.Urls))
+	for i, raw := range req.Body.Urls {
+		links[i] = gen.ResolvedLink{URL: raw}
+		if canonical[i] == "" {
+			continue
+		}
+		links[i].CanonicalURL = &canonical[i]
+		if id, ok := found[canonical[i]]; ok {
+			links[i].DocumentID = &id
+		}
+	}
+	return gen.ResolveDocuments200JSONResponse{Links: links}, nil
 }
 
 func documentJSON(doc store.Document) gen.Document {

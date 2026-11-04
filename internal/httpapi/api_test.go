@@ -36,6 +36,22 @@ type fakeBackend struct {
 	// extraction is every document's extraction; saves records each save.
 	extraction *ir.Doc
 	saves      []*doccontent.Doc
+	// resolved is the owner's documents by canonical URL; asked records
+	// what ResolveDocuments was asked for.
+	resolved map[string]uuid.UUID
+	asked    []string
+}
+
+func (f *fakeBackend) ResolveDocuments(_ context.Context, owner uuid.UUID, urls []string) (map[string]uuid.UUID, error) {
+	f.owners = append(f.owners, owner)
+	f.asked = append(f.asked, urls...)
+	found := map[string]uuid.UUID{}
+	for _, u := range urls {
+		if id, ok := f.resolved[u]; ok {
+			found[u] = id
+		}
+	}
+	return found, nil
 }
 
 func (f *fakeBackend) Request(_ context.Context, owner uuid.UUID, url string) (importer.Requested, error) {

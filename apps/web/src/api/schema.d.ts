@@ -111,6 +111,28 @@ export interface paths {
         patch: operations["saveDocument"];
         trace?: never;
     };
+    "/documents/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Find which links the user already has as documents
+         * @description For each URL, canonicalized the way imports are, the user's document
+         *     for it, if any. Answers come in request order. A URL an import would
+         *     refuse gets neither a canonical URL nor a document.
+         */
+        post: operations["resolveDocuments"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/documents/{id}/blocks/{blockId}/revert": {
         parameters: {
             query?: never;
@@ -206,6 +228,23 @@ export interface components {
             content: components["schemas"]["DocContent"];
             /** @description What the extractor was unsure of when it made the document's source blocks. */
             warnings: components["schemas"]["IRWarning"][];
+        };
+        ResolveDocumentsRequest: {
+            urls: string[];
+        };
+        ResolvedLinks: {
+            links: components["schemas"]["ResolvedLink"][];
+        };
+        ResolvedLink: {
+            /** @description The URL as asked. */
+            url: string;
+            /** @description The URL canonicalized as imports do; absent when an import would refuse it. */
+            canonical_url?: string;
+            /**
+             * Format: uuid
+             * @description The user's document for it; absent when they have none.
+             */
+            document_id?: string;
         };
         DocumentResponse: {
             document: components["schemas"]["Document"];
@@ -393,6 +432,9 @@ export type ExistingImportResponse = components['schemas']['ExistingImportRespon
 export type ImportEvent = components['schemas']['ImportEvent'];
 export type DocumentSummary = components['schemas']['DocumentSummary'];
 export type Document = components['schemas']['Document'];
+export type ResolveDocumentsRequest = components['schemas']['ResolveDocumentsRequest'];
+export type ResolvedLinks = components['schemas']['ResolvedLinks'];
+export type ResolvedLink = components['schemas']['ResolvedLink'];
 export type DocumentResponse = components['schemas']['DocumentResponse'];
 export type SaveDocumentRequest = components['schemas']['SaveDocumentRequest'];
 export type SavedDocument = components['schemas']['SavedDocument'];
@@ -634,6 +676,41 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    resolveDocuments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolveDocumentsRequest"];
+            };
+        };
+        responses: {
+            /** @description One answer per URL, in request order. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResolvedLinks"];
+                };
+            };
+            /** @description No URLs, or more than 200. Code: invalid_request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: components["responses"]["Unauthenticated"];
             500: components["responses"]["InternalError"];
         };
     };

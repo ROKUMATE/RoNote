@@ -1,6 +1,6 @@
 import { infiniteQueryOptions, QueryClient, queryOptions } from "@tanstack/react-query";
 import { ApiError, api, dataOrThrow } from "./client";
-import type { DocumentSummary, Import } from "./schema";
+import type { Document, DocumentSummary, Import } from "./schema";
 
 /** Every documents query sits under this key, so one invalidation refreshes them all. */
 export const documentsKey = ["documents"] as const;
@@ -36,6 +36,16 @@ export function documentQuery(id: string) {
     queryFn: async () =>
       dataOrThrow(await api.GET("/documents/{id}", { params: { path: { id } } })),
   });
+}
+
+/** Puts one source block of a document back as extracted; returns the document. */
+export async function revertBlock(id: string, blockId: string): Promise<Document> {
+  const { document } = dataOrThrow(
+    await api.POST("/documents/{id}/blocks/{blockId}/revert", {
+      params: { path: { id, blockId } },
+    }),
+  );
+  return document;
 }
 
 /**

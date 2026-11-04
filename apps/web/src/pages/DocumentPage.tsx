@@ -1,9 +1,9 @@
 import { ArrowSquareOutIcon } from "@phosphor-icons/react/ArrowSquareOut";
 import { InfoIcon } from "@phosphor-icons/react/Info";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams, useRouterState } from "@tanstack/react-router";
 import { ApiError } from "../api/client";
-import { documentQuery } from "../api/queries";
+import { documentQuery, revertBlock } from "../api/queries";
 import type { Document, IrWarning } from "../api/schema";
 import { blockCounts } from "../document/counts";
 import { Reader } from "../document/Reader";
@@ -69,6 +69,14 @@ function opensWithTitle(doc: Document): boolean {
 
 function Header({ doc, existing }: { doc: Document; existing: boolean }) {
   const fallback = doc.warnings.some((w) => genericWarnings.has(w.code));
+  const queryClient = useQueryClient();
+  const revert = async (blockId: string) => {
+    const reverted = await revertBlock(doc.id, blockId);
+    queryClient.setQueryData(documentQuery(doc.id).queryKey, reverted);
+    const block = reverted.content.blocks.find((b) => b.id === blockId);
+    if (!block) throw new Error(`block ${blockId} is not in the reverted document`);
+    return block;
+  };
   return (
     <article className="max-w-[68ch]">
       {existing && (
@@ -109,7 +117,7 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
         </p>
       )}
       <div className="mt-8">
-        <Reader key={doc.id} content={doc.content} />
+        <Reader key={doc.id} content={doc.content} onRevert={revert} />
       </div>
     </article>
   );

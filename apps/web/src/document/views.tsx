@@ -22,7 +22,12 @@ function AtomView({ node }: NodeViewProps) {
 /** A callout: its title is the page's and stays fixed; its body is editable. */
 function CalloutView({ node }: NodeViewProps) {
   return (
-    <NodeViewWrapper as="aside" className="callout" data-variant={node.attrs.variant}>
+    <NodeViewWrapper
+      as="aside"
+      className="callout"
+      data-variant={node.attrs.variant}
+      data-edited={node.attrs.origin === "source" && node.attrs.edited ? "true" : undefined}
+    >
       {node.attrs.title && (
         <p className="callout-title" contentEditable={false}>
           {node.attrs.title}

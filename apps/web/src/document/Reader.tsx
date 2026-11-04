@@ -3,10 +3,12 @@ import type { Editor } from "@tiptap/core";
 import type { EditorView } from "@tiptap/pm/view";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { type MouseEvent, useEffect, useRef, useState } from "react";
-import type { DocContent } from "../api/schema";
+import type { DocBlock, DocContent } from "../api/schema";
 import { BlockMenu } from "./BlockMenu";
+import { ConfirmRevert } from "./ConfirmRevert";
+import { BlockIdentityPlugin, revertMeta } from "./identity";
 import { type InsertAt, insertUserBlock, SlashMenu, topLevelBlockAt } from "./insert";
-import { toEditor } from "./mapping";
+import { toEditor, topLevelNode } from "./mapping";
 import { readerExtensions } from "./views";
 
 /**
@@ -40,17 +42,25 @@ function followLink(_view: EditorView, event: globalThis.MouseEvent): boolean {
 export function Reader({
   content,
   onEditor,
+  onRevert,
 }: {
   content: DocContent;
   onEditor?: (editor: Editor) => void;
+  /** Puts a source block back on the server, and returns it as stored. */
+  onRevert?: (blockId: string) => Promise<DocBlock>;
 }) {
   const wrapper = useRef<HTMLDivElement>(null);
   const [menu, setMenu] = useState<{ at: InsertAt; top: number }>();
   const [target, setTarget] = useState<{ pos: number; top: number }>();
   const open = useRef<(at: InsertAt) => void>(() => {});
+  const [reverting, setReverting] = useState<string>();
 
   const editor = useEditor({
-    extensions: [...readerExtensions, SlashMenu.configure({ open: (at) => open.current(at) })],
+    extensions: [
+      ...readerExtensions,
+      SlashMenu.configure({ open: (at) => open.current(at) }),
+      BlockIdentityPlugin.configure({ onRevert: setReverting }),
+    ],
     content: toEditor(content),
     immediatelyRender: true,
     shouldRerenderOnTransaction: false,
@@ -89,6 +99,12 @@ export function Reader({
     if (pos !== undefined && pos !== target?.pos) setTarget({ pos, top: bottomOf(pos) });
   };
 
+  const revert = async (blockId: string) => {
+    setReverting(undefined);
+    if (!onRevert) return;
+    replaceBlock(editor, await onRevert(blockId));
+  };
+
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: hovering only places the "+" button; the cursor and "/" do the same from the keyboard.
     <div ref={wrapper} className="relative" onMouseMove={hover}>
@@ -103,6 +119,12 @@ export function Reader({
         >
           <PlusIcon size={16} aria-hidden />
         </button>
+      )}
+      {reverting && (
+        <ConfirmRevert
+          onConfirm={() => void revert(reverting)}
+          onCancel={() => setReverting(undefined)}
+        />
       )}
       {menu && (
         <BlockMenu
@@ -119,4 +141,21 @@ export function Reader({
       )}
     </div>
   );
+}
+
+/** Swaps the top-level block with block's id for block, as a revert, not an edit. */
+function replaceBlock(editor: Editor, block: DocBlock) {
+  const { state } = editor;
+  let at: number | undefined;
+  state.doc.forEach((node, pos) => {
+    if (node.attrs.blockId === block.id) at = pos;
+  });
+  const old = at === undefined ? undefined : state.doc.nodeAt(at);
+  if (at === undefined || !old) return;
+  const tr = state.tr.replaceWith(
+    at,
+    at + old.nodeSize,
+    state.schema.nodeFromJSON(topLevelNode(block)),
+  );
+  editor.view.dispatch(tr.setMeta(revertMeta, true));
 }

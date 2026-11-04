@@ -22,18 +22,21 @@ const irMarks = Object.keys(markOfIR) as IRMark[];
 export function toEditor(content: DocContent): JSONContent {
   return {
     type: "doc",
-    content: content.blocks.map((b) => {
-      const node = blockNode(b);
-      return {
-        ...node,
-        attrs: {
-          ...node.attrs,
-          origin: b.origin,
-          edited: b.origin === "source" ? (b.edited ?? false) : null,
-          sourceBlockId: b.source_block_id ?? null,
-        },
-      };
-    }),
+    content: content.blocks.map(topLevelNode),
+  };
+}
+
+/** One top-level block as an editor node, with where it came from. */
+export function topLevelNode(b: DocBlock): JSONContent {
+  const node = blockNode(b);
+  return {
+    ...node,
+    attrs: {
+      ...node.attrs,
+      origin: b.origin,
+      edited: b.origin === "source" ? (b.edited ?? false) : null,
+      sourceBlockId: b.source_block_id ?? null,
+    },
   };
 }
 

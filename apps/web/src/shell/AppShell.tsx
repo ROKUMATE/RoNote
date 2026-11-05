@@ -7,6 +7,8 @@ import { Settings } from "./Settings";
 
 /** Where a page can put an outline of itself, below the main navigation. */
 export const outlineSlotId = "outline-slot";
+/** Where a document's notes go in the notes margin (ADR 0007). */
+export const notesSlotId = "notes-slot";
 
 const navLink =
   "flex items-center gap-2 rounded-sm px-2 py-1 text-ui-lg text-ink-2 hover:bg-paper-2 hover:text-ink aria-[current=page]:bg-paper-2 aria-[current=page]:text-ink";
@@ -52,7 +54,8 @@ export function AppShell() {
           aria-label="Notes"
           className="hidden border-rule border-l px-6 py-12 text-ink-2 text-ui notes:block"
         >
-          Notes appear here when you annotate a page.
+          <div id={notesSlotId} className="peer" />
+          <p className="peer-[:not(:empty)]:hidden">Notes appear here when you annotate a page.</p>
         </aside>
       </div>
     </div>

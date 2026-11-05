@@ -82,6 +82,23 @@ async function highlightSelection(page: Page, button = "Highlight") {
   await saved;
 }
 
+/** Highlights the selection with a note, and waits for the note to be saved. */
+async function highlightWithNote(page: Page, note: string) {
+  await highlightSelection(page, "Highlight + note");
+  const field = page
+    .getByRole("dialog", { name: "Highlight" })
+    .getByRole("textbox", { name: "Note" });
+  await expect(field).toBeFocused();
+  await field.fill(note);
+  const saved = page.waitForResponse(
+    (r) => r.request().method() === "PATCH" && r.url().includes("/annotations/") && r.ok(),
+  );
+  await field.press("Enter");
+  await saved;
+}
+
+const notesMargin = (page: Page) => page.getByRole("complementary", { name: "Notes" });
+
 test("a highlight is saved, and is still there after a reload", async ({ page }) => {
   await openLinkedPage(page);
   await select(page, intro, "synthetic page");
@@ -227,6 +244,74 @@ test("keyboard only: select, highlight, and add a note", async ({ page }) => {
   await expect(marks(page)).toHaveText(["Setup", " paragraph"]);
 });
 
+test.describe("notes", () => {
+  test.use({ viewport: { width: 1280, height: 900 } });
+
+  test("a note shows in the margin, level with its highlight, after a reload too", async ({
+    page,
+  }) => {
+    await openLinkedPage(page);
+    await select(page, intro, "synthetic page");
+
+    await highlightWithNote(page, "Ask about the fixtures");
+
+    const card = notesMargin(page).getByRole("button", { name: /Ask about the fixtures/ });
+    await expect(card).toBeVisible();
+    const level = async () =>
+      Math.abs(
+        ((await card.boundingBox())?.y ?? 0) - ((await marks(page).first().boundingBox())?.y ?? 0),
+      );
+    await expect.poll(level).toBeLessThan(12);
+    await page.reload();
+    await expect(card).toBeVisible();
+    await expect.poll(level).toBeLessThan(12);
+  });
+
+  test("notes that would overlap stack, one below the other", async ({ page }) => {
+    await openLinkedPage(page);
+    await select(page, setup1, "Setup");
+    await highlightWithNote(
+      page,
+      "First note, long enough to take more than one line in the margin",
+    );
+    await select(page, setup1, "invented");
+    await highlightWithNote(page, "Second note");
+
+    const first = notesMargin(page).getByRole("button", { name: /First note/ });
+    const second = notesMargin(page).getByRole("button", { name: /Second note/ });
+    await expect(second).toBeVisible();
+    const a = await first.boundingBox();
+    const b = await second.boundingBox();
+    expect((b?.y ?? 0) >= (a?.y ?? 0) + (a?.height ?? 0)).toBe(true);
+  });
+
+  test("below 1100px the margin folds away, and the note opens under its highlight", async ({
+    page,
+  }) => {
+    await openLinkedPage(page);
+    await select(page, intro, "synthetic page");
+    await highlightWithNote(page, "Folded note");
+    await expect(notesMargin(page).getByRole("button", { name: /Folded note/ })).toBeVisible();
+
+    await page.setViewportSize({ width: 1099, height: 900 });
+
+    await expect(notesMargin(page)).toBeHidden();
+    const icon = page.getByRole("button", { name: "Note on “synthetic page”" });
+    await expect(icon).toBeVisible();
+    await icon.click();
+    const field = page
+      .getByRole("dialog", { name: "Highlight" })
+      .getByRole("textbox", { name: "Note" });
+    await expect(field).toHaveValue("Folded note");
+    const below =
+      ((await field.boundingBox())?.y ?? 0) - ((await marks(page).first().boundingBox())?.y ?? 0);
+    expect(below).toBeGreaterThan(0);
+
+    await page.setViewportSize({ width: 1100, height: 900 });
+    await expect(notesMargin(page).getByRole("button", { name: /Folded note/ })).toBeVisible();
+  });
+});
+
 test.describe("accessibility", () => {
   test.use({ reducedMotion: "reduce" });
 
@@ -240,7 +325,8 @@ test.describe("accessibility", () => {
       await expect(page.getByRole("toolbar", { name: "Highlight" })).toBeVisible();
       await expectNoAxeViolations(page);
 
-      await highlightSelection(page);
+      await highlightWithNote(page, "A note for axe");
+      await expect(notesMargin(page).getByRole("button", { name: /A note for axe/ })).toBeVisible();
       await marks(page).click();
       await expect(page.getByRole("dialog", { name: "Highlight" })).toBeVisible();
       await expectNoAxeViolations(page);

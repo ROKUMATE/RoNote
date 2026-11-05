@@ -7,6 +7,7 @@ import type { Annotation } from "../../api/schema";
 import { selectorOf } from "../anchoring";
 import { type Segment, selectionSegments } from "../highlights";
 import type { Annotations } from "../useAnnotations";
+import { Notes } from "./notes";
 
 /*
  * The controls for highlights and notes (docs/adr/0007-annotations-and-anchoring.md),
@@ -62,9 +63,16 @@ export function AnnotationsUI({ editor, annotations, frame }: Props) {
   }, [editor]);
 
   const current = open && annotations.list?.find((a) => a.id === open.id);
+  const noted = annotations.list?.filter((a) => a.note) ?? [];
   return (
     <>
       <SelectionToolbar editor={editor} frame={frame} onHighlight={highlight} />
+      <Notes
+        editor={editor}
+        notes={noted}
+        frame={frame}
+        onOpen={(id) => setOpen({ id, noteFirst: true })}
+      />
       {current && (
         <HighlightPopover
           key={current.id}

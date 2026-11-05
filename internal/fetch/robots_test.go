@@ -3,6 +3,7 @@ package fetch
 import (
 	"context"
 	"errors"
+	"net"
 	"net/http"
 	"slices"
 	"sync"
@@ -177,28 +178,89 @@ func TestHostLimiterStopsWithContext(t *testing.T) {
 
 func TestFetchRateLimitsEachHost(t *testing.T) {
 	t.Parallel()
-	var mu sync.Mutex
-	var starts []time.Time
-	srv := serve(t, nil, http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		mu.Lock()
-		starts = append(starts, time.Now())
-		mu.Unlock()
-		w.Header().Set("Content-Type", "text/html")
-		_, _ = w.Write([]byte("<p>ok</p>"))
-	}))
-	f := New(Options{AllowPrivateNetworks: true})
-	f.limiter = newHostLimiter(100 * time.Millisecond)
+	// In a synctest bubble time is fake and moves only when every goroutine
+	// waits, so the server's clock reads exactly what the limiter decided,
+	// however busy the machine is.
+	synctest.Test(t, func(t *testing.T) {
+		var mu sync.Mutex
+		var starts []time.Time
+		mux := http.NewServeMux()
+		mux.Handle("/robots.txt", http.NotFoundHandler())
+		mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
+			mu.Lock()
+			starts = append(starts, time.Now())
+			mu.Unlock()
+			w.Header().Set("Content-Type", "text/html")
+			_, _ = w.Write([]byte("<p>ok</p>"))
+		})
+		ln := newPipeListener()
+		srv := &http.Server{Handler: mux, ReadHeaderTimeout: time.Second}
+		go func() { _ = srv.Serve(ln) }()
+		f := New(Options{AllowPrivateNetworks: true})
+		f.limiter = newHostLimiter(100 * time.Millisecond)
+		transport := &http.Transport{DialContext: ln.dial}
+		f.client.Transport, f.robotsClient.Transport = transport, transport
 
-	for range 2 {
-		if _, err := f.Fetch(t.Context(), Request{URL: srv.URL}); err != nil {
-			t.Fatal(err)
+		for range 2 {
+			if _, err := f.Fetch(t.Context(), Request{URL: "http://docs.example/page"}); err != nil {
+				t.Fatal(err)
+			}
 		}
-	}
+		transport.CloseIdleConnections()
+		_ = srv.Close()
 
-	if gap := starts[1].Sub(starts[0]); gap < 90*time.Millisecond {
-		t.Errorf("second page request started %v after the first, want at least the 100ms interval", gap)
+		if gap := starts[1].Sub(starts[0]); gap != 100*time.Millisecond {
+			t.Errorf("second page request started %v after the first, want the 100ms interval", gap)
+		}
+	})
+}
+
+// pipeListener is a net.Listener of in-memory pipes, so a server and the
+// clients dialling it run inside a synctest bubble, with no real network.
+type pipeListener struct {
+	conns  chan net.Conn
+	closed chan struct{}
+	once   sync.Once
+}
+
+func newPipeListener() *pipeListener {
+	return &pipeListener{conns: make(chan net.Conn), closed: make(chan struct{})}
+}
+
+func (l *pipeListener) Accept() (net.Conn, error) {
+	select {
+	case c := <-l.conns:
+		return c, nil
+	case <-l.closed:
+		return nil, net.ErrClosed
 	}
 }
+
+func (l *pipeListener) Close() error {
+	l.once.Do(func() { close(l.closed) })
+	return nil
+}
+
+func (l *pipeListener) Addr() net.Addr { return pipeAddr{} }
+
+// dial is a DialContext that connects to the listener, whatever the address.
+func (l *pipeListener) dial(ctx context.Context, _, _ string) (net.Conn, error) {
+	server, client := net.Pipe()
+	select {
+	case l.conns <- server:
+		return client, nil
+	case <-l.closed:
+		return nil, net.ErrClosed
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
+
+type pipeAddr struct{}
+
+func (pipeAddr) Network() string { return "pipe" }
+
+func (pipeAddr) String() string { return "pipe" }
 
 func text(body string) http.HandlerFunc {
 	return func(w http.ResponseWriter, _ *http.Request) {

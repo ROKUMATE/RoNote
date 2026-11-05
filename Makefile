@@ -28,10 +28,11 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook, scripts/check-commits.sh and the clock check
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the clock check and run/stop
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
 	sh scripts/test-container-clock.sh
+	sh scripts/test-run-stop.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
@@ -58,11 +59,11 @@ test-web: ## Run web unit tests (Vitest)
 	@$(node_required)
 	$(WEB) test
 
-run-api: ## Run the API locally (RONOTE_ENV defaults to dev)
-	RONOTE_ENV=$${RONOTE_ENV:-dev} go run ./cmd/api
+run-api: ## Run the API locally (RONOTE_ENV defaults to dev); make stop ends it
+	RONOTE_ENV=$${RONOTE_ENV:-dev} sh scripts/run.sh api go run ./cmd/api
 
-run-worker: ## Run the import worker locally (RONOTE_ENV defaults to dev)
-	RONOTE_ENV=$${RONOTE_ENV:-dev} go run ./cmd/worker
+run-worker: ## Run the import worker locally (RONOTE_ENV defaults to dev); make stop ends it
+	RONOTE_ENV=$${RONOTE_ENV:-dev} sh scripts/run.sh worker go run ./cmd/worker
 
 extract: ## Print a page's IR: make extract url=https://... [format=text]
 	@test -n "$(url)" || { echo "usage: make extract url=https://... [format=text]" >&2; exit 1; }
@@ -94,8 +95,11 @@ dev-up: ## Start the dev stack (Postgres) and wait until it is healthy
 	@[ -f .env.dev ] || { cp .env.example .env.dev; echo "make dev-up: created .env.dev from .env.example"; }
 	$(COMPOSE) up -d --wait
 
-dev-down: ## Stop the dev stack; the data volume is kept
+dev-down: stop ## Stop the dev processes and the dev stack; the data volume is kept
 	$(COMPOSE) down
+
+stop: ## Stop what run-api, run-worker and web-dev started, with everything they started
+	@sh scripts/stop.sh
 
 dev-logs: ## Follow the dev stack logs
 	$(COMPOSE) logs -f
@@ -170,9 +174,9 @@ web-browsers: ## Install Playwright's Chromium (WITH_DEPS=1 adds its system pack
 check-node-version: ## Print the Node version; fail unless it is the one .nvmrc pins
 	@$(node_required); echo "Node $$(node --version), as pinned in .nvmrc"
 
-web-dev: ## Run the web dev server (styleguide at /_styleguide)
+web-dev: ## Run the web dev server (styleguide at /_styleguide); make stop ends it
 	@$(node_required)
-	$(WEB) dev
+	sh scripts/run.sh web $(WEB) dev
 
 web-build: ## Build the web app; fails if dev-only code ships or it is over budget
 	@$(node_required)
@@ -188,7 +192,7 @@ web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromiu
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" $(WEB) e2e
 
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker extract lint lint-go lint-web fmt
-.PHONY: doctor dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
+.PHONY: doctor stop dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration test-live test-clean web-install web-deps web-browsers check-node-version
 .PHONY: web-dev web-build web-e2e

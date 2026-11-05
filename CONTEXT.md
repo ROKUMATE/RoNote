@@ -4,39 +4,30 @@ Current state of the project. Rewrite this file at the end of each phase; never 
 
 ## Current milestone
 
-P12, highlights and notes: done.
-- **The P11 clock question, answered and fixed.** River writes a job's times from the app's clock but claims jobs by the database's `now()`:
-  - its pgx driver fills `scheduled_at` with `time.Now()`;
-  - retries are `time.Now()` plus a backoff.
-
-  With the podman VM 19 minutes behind the Mac, every new job sat 19 minutes in the database's future. Migration 00006's trigger moves those times onto the database's clock and puts the job in `available`, so the claim is the only comparison that decides when a job runs (ADR 0005). `TestJobsRunWhateverTheAppClock` fakes a half-hour offset either way; it failed both ways before the fix.
-- **`make doctor`** checks the container VM's clock is within 2s of the host's, and prints the fix (`podman machine ssh sudo chronyc makestep`) when it is not.
-- **Highlights and notes** (ADR 0007):
-  - stored outside DocContent, owner-scoped, through an annotations API;
-  - anchored by position, then quote, then a fuzzy match, else unplaced;
-  - drawn in prose and in code;
-  - notes in the right margin, or under the highlight below 1100px;
-  - a list of every highlight, with recovery for unplaced ones.
-- **Time to interactive** on Effective Go, production build, median of 5 cold loads at 1280×900 on this Mac:
-  - 0 highlights: interactive 97 ms, LCP 128 ms;
-  - 300 highlights, 30 with notes: interactive 110 ms, LCP 128 ms.
-
-  That is +13 ms, against a limit of +50; it is also 11 ms under P10's 121 ms. All 300 were placed, none unplaced.
-- **In the browser, on Effective Go:**
-  - a selection across two adjacent paragraphs made one highlight in each;
-  - a note on a third highlight showed in the margin;
-  - typing at the start of a highlighted paragraph re-anchored its highlight (saved as version 2);
-  - after a reload, the same words were highlighted and the note was in its place, and every stored selector quotes its block's stored text exactly.
+P13a, the isolated runner and Python in the browser: done.
+- **Leftovers:**
+  - quieter make targets: Vitest's dot reporter, and Playwright's line reporter locally (CI keeps the HTML report);
+  - `TestFetchRateLimitsEachHost` runs in a `testing/synctest` bubble on an in-memory listener, so the gap it measures is exactly the 100 ms interval, whatever the machine's load;
+  - `make stop` ends what `make run-api`, `make run-worker` and `make web-dev` started, child processes included; `make dev-down` calls it.
+- **Running code** (ADR 0008): Python blocks run in the reader's browser, on a runner origin of their own, with Run, Stop, Restart and an output panel under the block.
+- **In the browser, on the e2e stack:**
+  - `greet.py` from the expressive-code fixture page ran: "Hello, Ada!", 24 ms;
+  - every code block of the real RAG tutorial shows its reason, and none offers Run: 1 can't run (plain text), 2 shell, 3 need packages (with Run anyway), 4 need a key, 1 fragment (with Run anyway).
+- **Measured** on this Mac in Chromium, against production builds served by `vite preview`, median of 5 cold loads, with the load average about 3.7:
+  - Pyodide as served: 12.4 MB uncompressed (wasm 9.6 MB, standard library zip 2.5 MB, loader 1.25 MB, worker 22 kB), 6.3 MB with gzip;
+  - cold start, from the first Run to Python ready: 4.2 s. Pyodide's own load is most of it, and takes as long in Node here;
+  - warm runs: `print(1)` 2 ms there and back; summing a million squares 0.4 s.
 - **Bundle, gzip:**
-  - initial JS 119.8 kB of 150;
-  - document route 131.9 kB of 135 (129.6 in P11);
+  - initial JS 120.4 kB of 150;
+  - document route 132.3 kB of 135 (131.9 in P12);
   - highlighter core 54.5 kB of 60;
-  - the new highlight controls chunk 6.6 kB of 15;
-  - CSS 9.7 kB of 20.
+  - highlight controls 6.7 kB of 15;
+  - the new run chunk 8.8 kB of 20;
+  - CSS 10.0 kB of 20.
 - **Checks:**
-  - `make web-e2e` passes 63 tests;
-  - `make test-live` passes all 11 pages;
-  - `make test-integration`, `make test-perf` and `make doctor` pass.
+  - `make web-e2e`: 79 passed, 1 skipped (quarantined);
+  - `make test-live`: all 11 pages and the RAG check pass. vite.dev's robots.txt timed out once, and the rerun passed.
+- **Quarantined:** #13, "going back returns to the same place" in `apps/web/e2e/links.spec.ts`.
 
 ## Decisions so far
 
@@ -194,11 +185,54 @@ Web app (`apps/web`, since P09):
   - **Arrival:** a `#fragment` scrolls to its heading and puts the caret there (`useScrollAnchor`); an unknown fragment does nothing.
   - **Back:** returns to the same place, recorded per history entry as the top-level block at the top of the viewport and its offset, since unrendered blocks keep placeholder heights.
 - **Dev:** Vite proxies `/api` to `RONOTE_API_ORIGIN` (default the API's `127.0.0.1:8080`) and streams, so the event stream works through it.
-- **End-to-end:** `make web-e2e` recreates `ronote_e2e` in the dev stack's Postgres (CI: a service container), builds the API and worker, and Playwright starts them with the test-only environment (`RONOTE_FETCH_ALLOW_PRIVATE=true`, user `e2e@ronote.local`), plus `e2e/fixture-site.ts`, which serves golden fixtures on `localhost:18090` (`/pages/`, `/slow/` 3s later, `/private/` behind robots.txt; since P11 `/linked/` for the two linked pages in `e2e/fixtures`, which carry the test's `?run=` into their links, and `/files/sample.pdf`; 404 otherwise). Every test imports a URL of its own, so tests do not depend on each other. axe runs on the library, the dialog (form and progress) and a document in light and dark, with reduced motion so the dialog is never measured mid-fade.
+- **End-to-end:** `make web-e2e` recreates `ronote_e2e` in the dev stack's Postgres (CI: a service container), builds the API and worker, and Playwright starts them with the test-only environment (`RONOTE_FETCH_ALLOW_PRIVATE=true`, user `e2e@ronote.local`), plus `e2e/fixture-site.ts`, which serves golden fixtures on `localhost:18090` (`/pages/`, `/slow/` 3s later, `/private/` behind robots.txt; since P11 `/linked/` for the pages in `e2e/fixtures`, the two linked pages, which carry the test's `?run=` into their links, and since P13a the Python page; and `/files/sample.pdf`; 404 otherwise), and since P13a the runner on `localhost:5181`. Every test imports a URL of its own, so tests do not depend on each other. axe runs on the library, the dialog (form and progress) and a document in light and dark, with reduced motion so the dialog is never measured mid-fade.
 - **Tests that catch regressions:** three deliberate breaks were each caught.
   - Dropping one error-code message: `tsc` and the messages test.
   - Leaving the event stream open after done: the subscribeImport test sees the reconnect's second done.
   - Skipping the invalidation after done: the dialog tests, and the e2e test whose sidebar never lists the new document.
+
+Running code (ADR 0008, since P13a):
+- **Isolation:**
+  - code from documents never runs on the app's origin;
+  - the runner page (`apps/web/runner/`, `vite.runner.config.ts`) is its own origin: dev `localhost:5174` and e2e `localhost:5181`, while the app is on `127.0.0.1`, because cookies ignore ports;
+  - the app frames it hidden, with `sandbox="allow-scripts allow-same-origin"` and `allow="cross-origin-isolated"`;
+  - runner headers: CSP `default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; frame-ancestors <app origins>`, plus COOP, COEP `require-corp` and CORP;
+  - the app sends COOP `same-origin` and COEP `credentialless`, so both are cross-origin isolated in Chrome and Firefox.
+- **Messages** (`src/runner/protocol.ts`, version 1):
+  - every message is parsed for exact shape, version and field limits, and dropped otherwise;
+  - the app names its origin in the runner's URL (`?app=`); the runner talks only when that origin is in `RONOTE_APP_ORIGINS`, and only to it;
+  - each side also checks `event.source`.
+- **Sessions:**
+  - one Pyodide session per open document, in a module worker, started by the first Run and ended when the page closes;
+  - blocks share `__main__`, as notebook cells do; a block gives back the repr of its last value; a `>>>` transcript runs a statement at a time, like the REPL;
+  - tracebacks start at the reader's code (`<cell n>`, with source lines);
+  - the runner page keeps the limits on its own clock and treats what the worker says as untrusted, since the code in the worker shares its realm:
+    - Stop and the 30 s limit set Pyodide's interrupt buffer, and end the session if the run hasn't stopped a second later;
+    - output past 1 MB stops the run;
+    - a crash or a failed start ends the session and says so;
+    - without isolation (Safari), Stop ends the session instead.
+  - Pyodide 314.0.7 is served from the runner origin, standard library only: its lock file lists no packages.
+- **Classifier** (`src/document/run/classify.ts`):
+  - derived, never stored, from each block's language (the reader's choice first) and text;
+  - classes: browser_python, python_doctest, needs_packages, needs_network, needs_secret, needs_input, needs_dom, shell, fragment and unsupported, each with one sentence;
+  - read across the document: a block that uses a name only blocks that can't run define takes the stricter of their classes, and a name no block defines makes it a fragment. The RAG tutorial needed this, as four of its blocks first classified as runnable;
+  - `testdata/runnability/classes.json` keeps every golden fixture's classes, and `make test-live` checks the real RAG tutorial offers no Run.
+- **UI:**
+  - Run (or Run anyway, for fragments and missing packages) and a chip in the code header; the chip's reason shows on hover and focus, and Escape hides it;
+  - the output under the block: stdout plain, stderr and errors labelled, the last value, the duration, Clear and Restart;
+  - outputs are never saved;
+  - a lazy chunk (`src/document/run/ui.tsx`, budget 20 kB); the document chunk only carries `RunArea.tsx`.
+- **Tests that catch regressions:** two deliberate breaks were each caught.
+  - The runner answering any origin: the e2e test that forges messages from other origins.
+    - The first design, which replied to the sender's origin, let this break pass: the browser dropped the replies anyway.
+    - Pinning the app's origin made a forged message that got through visible to the test.
+  - `connect-src` opened to the API: both reachability tests, from the frame and from Python.
+    - At first they only checked that the fetch failed, and COEP refused the API's answer anyway. But the request had still gone out.
+    - They now look for CSP's `connect-src` refusal.
+- **Found while building:**
+  - output written faster than 1 MB in 50 ms came as one message over the protocol's limit, which was dropped, so the 1 MB cap never fired; the worker now sends 64 kB chunks;
+  - importing `doctest` cost a second of every cold start; it loads with the first transcript now;
+  - the chip's reason was keyed to `:focus-visible`, which Chrome doesn't apply to focus after mouse use.
 
 Reader and editor (`apps/web/src/document`, since P10; `/doc/$id` is a lazy chunk):
 - **Mapping:** `mapping.ts` converts IR ⇄ Tiptap JSON, and every golden fixture round-trips through a real editor unchanged. Unedited source blocks are saved exactly as loaded, never re-serialized.
@@ -271,7 +305,11 @@ Unchanged: `/healthz`, `/readyz`, the P04 tokens and styleguide, the extractor a
 - Link status is resolved when a document opens and again after an import finishes. A page imported from another tab shows as not imported until then, and following it opens the existing document.
 - Following a link that fails leaves its message under the link until the next link is followed.
 - After macOS sleeps, the podman VM's clock can lag for a few minutes. Jobs no longer wait on it (P12), but tests that compare a database time with the app's, such as a user's `created_at` "about now", still fail meanwhile. `make doctor` says so and prints the fix.
-- `TestFetchRateLimitsEachHost` failed twice inside a full `make check` while the machine was at load average 20 or more. It times requests where the test server receives them, not where the limiter lets them go, and passed 6 of 6 alone. Measuring at the limiter would make it robust.
+- Code in the runner's worker can post a false "done", which stops its run's clock while it keeps running. The next run then waits behind it and is interrupted at its own limit, so the waste lasts until the reader runs something or leaves.
+- Safari isn't cross-origin isolated (no COEP `credentialless`), so Stop there ends the session; the e2e tests run Chromium only, so that path is covered by unit tests alone.
+- A cold start takes about 4 s on this Mac, and Pyodide is 6.3 MB with gzip. The production runner (P18) should serve it compressed and cacheable.
+- In dev, open the app at `127.0.0.1:5173`: the runner answers only the origins in `RONOTE_APP_ORIGINS`.
+- The runner's Vite build warns that Pyodide's Node-only imports are left out; that is expected.
 - Highlights go in prose the editor edits, and in code; not in table cells, captions, or prose inside tabs, which are drawn read-only.
 - Jump to puts the caret at a highlight's start rather than selecting it, so the toolbar does not offer to highlight it again.
 - A highlight's note is plain text; links and formatting in notes are for later.
@@ -286,4 +324,4 @@ Unchanged: `/healthz`, `/readyz`, the P04 tokens and styleguide, the extractor a
 
 ## Next step
 
-P13, per its brief. v1 still lacks running code blocks, and printed-PDF import, which the PDF link's message already promises.
+The rest of P13, per its brief. v1 still lacks printed-PDF import, which the PDF link's message already promises; the runner origin's deployment is P18.

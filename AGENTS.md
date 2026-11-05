@@ -29,6 +29,7 @@ Site crawling, AI summaries, chat, handwritten OCR, pseudocode conversion. Do no
 | `internal/<pkg>/` | Go packages, one concern each |
 | `migrations/` | Postgres schema migrations |
 | `apps/web/` | React + TypeScript + Tailwind v4 frontend |
+| `apps/web/runner/` | the runner origin's page, Python worker and cell runner, where code from documents runs (docs/adr/0008-in-browser-code-execution.md); `apps/web/src/runner/protocol.ts` is the message protocol both sides parse with |
 | `deploy/` | deployment config |
 | `scripts/` | repo scripts |
 | `internal/ir/` | the document model every importer produces (docs/adr/0004-ir-and-links.md) |

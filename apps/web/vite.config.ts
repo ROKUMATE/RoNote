@@ -22,5 +22,11 @@ export default defineConfig({
     environment: "jsdom",
     include: ["src/**/*.test.{ts,tsx}"],
     setupFiles: ["src/test-setup.ts"],
+    // Vitest's on-disk module cache keys a test's build by the test file's
+    // own text, but an import.meta.glob in it also depends on which files
+    // exist: a file added later went unread until the test changed (P11's
+    // link test broke the spec-type guard unseen). Building takes ~2% of
+    // the run.
+    fsModuleCache: false,
   },
 });

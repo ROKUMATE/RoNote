@@ -34,8 +34,9 @@ export default defineConfig({
   testDir: "e2e",
   forbidOnly: Boolean(process.env.CI),
   timeout: 60_000,
-  // CI also writes the HTML report, which the workflow uploads when a test fails.
-  reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
+  // Locally one line that updates in place, and failures in full; CI also
+  // writes the HTML report, which the workflow uploads when a test fails.
+  reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "line",
   use: { baseURL: stack.web, trace: "retain-on-failure" },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: [

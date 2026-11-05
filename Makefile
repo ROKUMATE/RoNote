@@ -155,8 +155,10 @@ ci-cache-keys: ## (CI) Write tool versions used in cache keys to GITHUB_OUTPUT
 test-integration: ## Run unit and integration tests against throwaway Postgres containers
 	sh scripts/container.sh test go test -race -count=1 -tags integration ./...
 
-test-live: ## Extract real documentation pages over the network and print a report (never in CI)
+test-live: ## Extract real pages over the network, print a report, and check the RAG tutorial runs nothing (never in CI)
+	@$(node_required)
 	go test -tags live -run TestLive -count=1 -v ./internal/extract
+	$(WEB) live
 
 test-clean: ## Remove leftover testcontainers containers
 	sh scripts/container.sh clean

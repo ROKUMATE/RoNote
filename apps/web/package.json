@@ -7,6 +7,7 @@
     "build": "vite build",
     "test": "vitest run --reporter=dot",
     "e2e": "playwright test",
+    "live": "vitest run --config vitest.live.config.ts --reporter=dot",
     "lint": "biome check --error-on-warnings && tsc -b && knip"
   },
   "dependencies": {

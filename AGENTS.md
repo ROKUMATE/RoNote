@@ -69,7 +69,7 @@ Create a directory when its first file needs it, not before.
 | `make test-perf` | timing tests alone: files tagged `perf`, tests named `TestPerf...`, run with `go test -tags perf -p 1` (one package at a time) and without the race detector. A timing test checks growth (time for 2n against n), never an absolute duration, and lives only here: `make test` and `make test-integration` never build it |
 | `make test-web` | web unit tests (Vitest, jsdom) |
 | `make test-integration` | unit and integration tests (`integration` build tag, testcontainers); fails if a test container is left behind |
-| `make test-live` | extract the real pages listed in `internal/extract/live_test.go` over the network and print a table: adapter, blocks, code found vs an independent count, verbatim check, warnings, junk. Needs the network, so it never runs in CI |
+| `make test-live` | extract the real pages listed in `internal/extract/live_test.go` over the network and print a table: adapter, blocks, code found vs an independent count, verbatim check, warnings, junk; then `apps/web/live/rag.test.ts` extracts the RAG tutorial and fails if any of its code blocks would offer Run. Needs the network, so it never runs in CI |
 | `make test-clean` | remove leftover testcontainers containers |
 | `make web-install` | `web-deps` and `web-browsers` |
 | `make web-deps` | `pnpm install --frozen-lockfile` |

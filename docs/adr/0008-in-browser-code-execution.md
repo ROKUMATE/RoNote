@@ -35,6 +35,8 @@ From P13 on, readers run code blocks from their documents. That code comes from 
   - it starts on the first Run, and Restart starts it again;
   - Stop interrupts within a second; a run stops after 30 seconds, and output stops at 1 MB;
   - a crash or running out of memory restarts the session, and says so.
+  - The worker shares its realm with the code it runs, which can post messages as the worker would. So the runner page treats what its worker sends like a message from another origin (parsed, and about the run in progress, or dropped), and keeps the limits on its own clock.
+  - `connect-src 'self'` is what keeps a request from being sent at all. COEP also refuses answers without a CORP header, but only after the request has gone.
 - **What can run is derived, never stored.** A pure classifier reads each code block's language (the reader's choice over the page's) and text, and the names it shares with the document's other blocks, and names a class: `browser_python`, `python_doctest`, `needs_packages`, `needs_network`, `needs_secret`, `needs_input`, `needs_dom`, `shell`, `fragment` or `unsupported`.
   - Each class has one plain sentence saying why.
   - Only `browser_python` and `python_doctest` show Run. `fragment` and `needs_packages` offer "Run anyway", since they may well run; the rest only explain.

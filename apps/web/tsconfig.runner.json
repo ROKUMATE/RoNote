@@ -15,5 +15,6 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["runner"]
+  "include": ["runner"],
+  "exclude": ["runner/*.worker.ts"]
 }

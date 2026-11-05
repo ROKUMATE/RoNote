@@ -41,3 +41,25 @@ test("a request with an event's fields, or of another version, is dropped", () =
   expect(parseRequest({ v: 1, type: "hello", isolated: true })).toBeUndefined();
   expect(parseRequest({ v: 0, type: "hello" })).toBeUndefined();
 });
+
+test("a run, and the events it brings, parse only with their fields in range", () => {
+  const run = { v: 1, type: "run", id: "b1", code: "print(1)", mode: "exec" };
+  expect(parseRequest(run)).toEqual(run);
+  expect(parseRequest({ ...run, mode: "shell" })).toBeUndefined();
+  expect(parseRequest({ ...run, code: "x".repeat(5_000_001) })).toBeUndefined();
+  expect(parseRequest({ ...run, id: "x".repeat(201) })).toBeUndefined();
+
+  const done = { v: 1, type: "done", id: "b1", ms: 12, end: "timeout" };
+  expect(parseEvent(done)).toEqual(done);
+  expect(parseEvent({ ...done, ms: -1 })).toBeUndefined();
+  expect(parseEvent({ ...done, ms: Number.NaN })).toBeUndefined();
+  expect(parseEvent({ ...done, end: "crashed" })).toBeUndefined();
+  expect(
+    parseEvent({ v: 1, type: "stdout", id: "b1", text: "x".repeat(1_000_001) }),
+  ).toBeUndefined();
+  expect(parseEvent({ v: 1, type: "ended", reason: "crash" })).toEqual({
+    v: 1,
+    type: "ended",
+    reason: "crash",
+  });
+});

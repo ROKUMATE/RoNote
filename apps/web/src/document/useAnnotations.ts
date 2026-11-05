@@ -94,6 +94,18 @@ export function useAnnotations(
     update((old) => old.filter((a) => a.id !== annotation.id));
   };
 
+  /** Puts an unplaced highlight on new text, as the user selected it. */
+  const place = async (annotation: Annotation, segment: Segment) => {
+    await saving.flush();
+    replace([
+      await updateAnnotation(annotation.id, {
+        version: annotation.version,
+        block_id: segment.blockId,
+        selector: segment.selector,
+      }),
+    ]);
+  };
+
   /** Puts a removed highlight back, as a new annotation with its range and note. */
   const restore = async (annotation: Annotation) => {
     await saving.flush();
@@ -106,7 +118,7 @@ export function useAnnotations(
     update((old) => [...old, restored]);
   };
 
-  return { list, create, setNote, remove, restore };
+  return { list, create, setNote, remove, restore, place };
 }
 
 export type Annotations = ReturnType<typeof useAnnotations>;

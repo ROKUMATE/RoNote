@@ -75,8 +75,20 @@ async function openDoc(existing: Annotation[] = []) {
       patched.push(body);
       return json({ ...annotation("new-1", theTool, body.note || null), version: 2 });
     },
+    "PATCH /annotations/gone": async (request) => {
+      const body = await request.clone().json();
+      patched.push(body);
+      return json({
+        ...annotation("gone", body.selector, "an old note", body.block_id),
+        version: 2,
+      });
+    },
     "DELETE /annotations/a1": () => {
       deleted.push("a1");
+      return new Response(null, { status: 204 });
+    },
+    "DELETE /annotations/gone": () => {
+      deleted.push("gone");
       return new Response(null, { status: 204 });
     },
     "PATCH /documents/doc-1": () => json({ version: 4 }),
@@ -253,4 +265,81 @@ test("Ctrl+Shift+H inside code highlights the code selection", async () => {
       { block_id: "c1", kind: "highlight", selector: selectorOf(code, 0, 2) },
     ]),
   );
+});
+
+/** A highlight whose words are no longer in the text. */
+const gone = annotation(
+  "gone",
+  {
+    position: { start: 0, end: 12 },
+    quote: { exact: "Deleted text", prefix: "", suffix: " here" },
+  },
+  "an old note",
+);
+
+test("the list holds every highlight in the order of the text, then the unplaced ones", async () => {
+  const later = annotation("later", selectorOf(text, 28, 33));
+  const { main, deleted } = await openDoc([later, annotation("a1", theTool, "a note"), gone]);
+
+  fireEvent.click(await main.findByText("Highlights (3)"));
+
+  const lists = await waitFor(() => {
+    const found = main.getAllByRole("list").filter((l) => l.closest("details"));
+    if (found.length < 2) throw new Error("no unplaced list yet");
+    return found;
+  });
+  const [placed, unplaced] = lists;
+  expect(
+    within(placed as HTMLElement)
+      .getAllByRole("listitem")
+      .map((li) => li.querySelector("q")?.textContent),
+  ).toEqual(["the tool", "start"]);
+  const section = main.getByRole("region", { name: "Unplaced highlights" });
+  expect(within(section).getByText("Deleted text")).toBeDefined();
+  expect(within(section).getByText("an old note")).toBeDefined();
+  expect(within(unplaced as HTMLElement).getAllByRole("listitem")).toHaveLength(1);
+  // Unplaced is never gone: nothing removes it but the user.
+  await act(async () => {});
+  expect(deleted).toEqual([]);
+});
+
+test("Re-apply puts an unplaced highlight on newly selected text", async () => {
+  const { main, editor, patched } = await openDoc([gone]);
+  fireEvent.click(await main.findByText("Highlights (1)"));
+  fireEvent.click(
+    within(await main.findByRole("region", { name: "Unplaced highlights" })).getByRole("button", {
+      name: "Re-apply",
+    }),
+  );
+  expect(screen.getByText(/Select the text for “Deleted text”/).getAttribute("role")).toBe(
+    "status",
+  );
+
+  select(editor, 17, 33);
+  fireEvent.click(
+    within(await main.findByRole("toolbar", { name: "Highlight" })).getByRole("button", {
+      name: "Place here",
+    }),
+  );
+
+  await waitFor(() =>
+    expect(patched).toEqual([{ version: 1, block_id: "p1", selector: selectorOf(text, 17, 33) }]),
+  );
+  await waitFor(() =>
+    expect(document.querySelector("mark.hl")?.textContent).toBe("before you start"),
+  );
+  expect(main.queryByRole("region", { name: "Unplaced highlights" })).toBeNull();
+});
+
+test("Jump to scrolls to a highlight and puts the caret at its start", async () => {
+  const scrolled = vi.fn();
+  Element.prototype.scrollIntoView = scrolled;
+  const { main, editor } = await openDoc([annotation("a1", theTool)]);
+  fireEvent.click(await main.findByText("Highlights (1)"));
+
+  fireEvent.click(await main.findByRole("button", { name: "Jump to" }));
+
+  expect(scrolled.mock.contexts).toEqual([document.querySelector("mark.hl")]);
+  expect(editor.state.selection.from).toBe(9);
+  expect(editor.state.selection.empty).toBe(true);
 });

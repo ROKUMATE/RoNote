@@ -46,6 +46,8 @@ async function select(page: Page, para: string, quote: string, endPara = para, e
     },
     { para, quote, endPara, endQuote },
   );
+  // The editor takes focus on the next frame; keys before it go nowhere.
+  await expect(page.getByLabel("Document text")).toBeFocused();
 }
 
 const marks = (page: Page) => page.locator(".reader mark.hl");
@@ -169,6 +171,49 @@ test("a selection across two paragraphs makes one highlight in each", async ({ p
   await expect(marks(page).last()).toHaveText("Setup paragraph 2: invented text");
 });
 
+test("deleting the highlighted words leaves the highlight unplaced, never lost; Re-apply puts it back", async ({
+  page,
+}) => {
+  await openLinkedPage(page);
+  await select(page, setup1, "invented text");
+  await highlightWithNote(page, "Keep me");
+  const saved = page.waitForResponse(
+    (r) => r.request().method() === "PATCH" && r.url().includes("/documents/") && r.ok(),
+    { timeout: 10_000 },
+  );
+
+  await select(page, setup1, "invented text");
+  await page.keyboard.press("Backspace");
+  await saved;
+
+  await expect(marks(page)).toHaveCount(0);
+  const list = page.locator("details").filter({ hasText: /^Highlights \(1\)/ });
+  await list.getByText("Highlights (1)").click();
+  const unplaced = list.getByRole("region", { name: "Unplaced highlights" });
+  await expect(unplaced.getByText("invented text")).toBeVisible();
+  await expect(unplaced.getByText("Keep me")).toBeVisible();
+  await page.reload();
+  await page.getByText("Highlights (1)").click();
+  await expect(unplaced.getByText("invented text")).toBeVisible();
+
+  await unplaced.getByRole("button", { name: "Re-apply" }).click();
+  // Its words are gone from the paragraph, so it no longer starts with them.
+  await select(page, "Setup paragraph 1:", "only makes the page");
+  const placed = page.waitForResponse(
+    (r) => r.request().method() === "PATCH" && r.url().includes("/annotations/") && r.ok(),
+  );
+  await page
+    .getByRole("toolbar", { name: "Highlight" })
+    .getByRole("button", { name: "Place here" })
+    .click();
+  await placed;
+
+  await expect(marks(page)).toHaveText(["only makes the page"]);
+  await expect(unplaced).toHaveCount(0);
+  await page.reload();
+  await expect(marks(page)).toHaveText(["only makes the page"]);
+});
+
 test("a highlight in code persists, and Copy still copies the exact code", async ({
   page,
   context,
@@ -209,8 +254,6 @@ test("a highlight in code persists, and Copy still copies the exact code", async
 test("keyboard only: select, highlight, and add a note", async ({ page }) => {
   await openLinkedPage(page);
   await select(page, setup1, "Setup", setup1, "");
-  // The editor takes focus on the next frame; keys before it go nowhere.
-  await expect(page.getByLabel("Document text")).toBeFocused();
   for (const _ of "Setup") await page.keyboard.press("Shift+ArrowRight");
   await expect.poll(() => selected(page)).toBe("Setup");
   // The highlight controls load just after the page; they show over the
@@ -242,6 +285,21 @@ test("keyboard only: select, highlight, and add a note", async ({ page }) => {
   await saved;
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(marks(page)).toHaveText(["Setup", " paragraph"]);
+
+  // Closing the note gives the text its focus back; then to the list, open
+  // it, and jump to the first highlight, by keyboard.
+  await expect(page.getByLabel("Document text")).toBeFocused();
+  await page.getByText("Highlights (2)").focus();
+  await page.keyboard.press("Enter");
+  const jump = page.locator("details").getByRole("button", { name: "Jump to" }).first();
+  await expect(jump).toBeVisible();
+  while (!(await jump.evaluate((el) => el === document.activeElement))) {
+    await page.keyboard.press("Tab");
+  }
+  await page.keyboard.press("Enter");
+  await expect(page.getByLabel("Document text")).toBeFocused();
+  await expect.poll(() => selected(page)).toBe("");
+  await expect(marks(page).first()).toBeInViewport();
 });
 
 test.describe("notes", () => {
@@ -329,6 +387,11 @@ test.describe("accessibility", () => {
       await expect(notesMargin(page).getByRole("button", { name: /A note for axe/ })).toBeVisible();
       await marks(page).click();
       await expect(page.getByRole("dialog", { name: "Highlight" })).toBeVisible();
+      await expectNoAxeViolations(page);
+
+      await page.keyboard.press("Escape");
+      await page.getByText("Highlights (1)").click();
+      await expect(page.getByRole("button", { name: "Jump to" })).toBeVisible();
       await expectNoAxeViolations(page);
     });
   }

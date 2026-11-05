@@ -20,6 +20,8 @@ export type Highlight = Pick<Annotation, "id" | "block_id" | "selector">;
 export type Placements = {
   highlights: readonly Highlight[];
   placed: ReadonlyMap<string, Range>;
+  /** The placed highlights' ids, in the order of the document. */
+  order: readonly string[];
   decorations: DecorationSet;
 };
 
@@ -55,6 +57,7 @@ function targets(doc: PMNode): Map<string, Target> {
 
 function place(doc: PMNode, highlights: readonly Highlight[]): Placements {
   const blocks = targets(doc);
+  const blockOrder = new Map([...blocks.keys()].map((id, i) => [id, i]));
   const placed = new Map<string, Range>();
   const marks: Decoration[] = [];
   for (const h of highlights) {
@@ -66,15 +69,24 @@ function place(doc: PMNode, highlights: readonly Highlight[]): Placements {
     if ("node" in target) {
       const start = target.pos + 1;
       marks.push(
-        Decoration.inline(start + range.start, start + range.end, {
-          nodeName: "mark",
-          class: "hl",
-          "data-annotation": h.id,
-        }),
+        Decoration.inline(
+          start + range.start,
+          start + range.end,
+          { nodeName: "mark", class: "hl", "data-annotation": h.id },
+          { id: h.id },
+        ),
       );
     }
   }
-  return { highlights, placed, decorations: DecorationSet.create(doc, marks) };
+  const key = (h: Highlight) => ({
+    block: blockOrder.get(h.block_id) ?? 0,
+    start: placed.get(h.id)?.start ?? 0,
+  });
+  const order = highlights
+    .filter((h) => placed.has(h.id))
+    .sort((a, b) => key(a).block - key(b).block || key(a).start - key(b).start)
+    .map((h) => h.id);
+  return { highlights, placed, order, decorations: DecorationSet.create(doc, marks) };
 }
 
 /** What a keyboard shortcut asks of the page; true when it was handled. */
@@ -130,6 +142,16 @@ export function placements(state: EditorState): Placements {
   const current = highlightsKey.getState(state);
   if (!current) throw new Error("the editor has no Highlights extension");
   return current;
+}
+
+/** Where a highlight in prose is in the editor's document, if it is placed there. */
+export function rangeOf(state: EditorState, id: string): { from: number; to: number } | undefined {
+  const [found] = placements(state).decorations.find(
+    undefined,
+    undefined,
+    (spec) => spec.id === id,
+  );
+  return found && { from: found.from, to: found.to };
 }
 
 /** Part of a selection inside one block: its range of the block's text. */

@@ -107,13 +107,25 @@ const strictness = { run: 0, anyway: 1, none: 2 } as const;
 
 export type CodeBlock = { id: string; code: string; lang: string | undefined };
 
-/** The code blocks in blocks, nested ones included, in document order. */
-export function codeBlocks(blocks: readonly IrBlock[]): CodeBlock[] {
+/**
+ * The code blocks in blocks, nested ones included, in document order, each in
+ * the language the reader chose for it or else the page's.
+ */
+export function codeBlocks(
+  blocks: readonly IrBlock[],
+  chosen: Readonly<Record<string, string>> = {},
+): CodeBlock[] {
   const found: CodeBlock[] = [];
   eachBlock(blocks, (b) => {
-    if (b.kind === "code") found.push({ id: b.id, code: b.text ?? "", lang: b.lang });
+    if (b.kind === "code")
+      found.push({ id: b.id, code: b.text ?? "", lang: chosen[b.id] ?? b.lang });
   });
   return found;
+}
+
+/** Whether code is a >>> transcript, which runs a statement at a time. */
+export function isDoctest(code: string): boolean {
+  return /^\s*>>> /m.test(code);
 }
 
 /**
@@ -129,7 +141,7 @@ export function classifyAll(blocks: readonly CodeBlock[]): Map<string, Runnabili
     const r = classify(b.code, b.lang);
     classes.set(b.id, r);
     if (r.class !== "shell" && r.class !== "unsupported") {
-      read.set(b.id, names(/^\s*>>> /m.test(b.code) ? doctestSource(b.code) : b.code));
+      read.set(b.id, names(isDoctest(b.code) ? doctestSource(b.code) : b.code));
     }
   }
   const binders = new Map<string, string[]>();
@@ -174,7 +186,7 @@ export function classify(code: string, lang: string | undefined): Runnability {
   if (language && shells.has(language)) return result("shell");
   if (!language || !python.has(language)) return result("unsupported");
 
-  const doctest = /^\s*>>> /m.test(code);
+  const doctest = isDoctest(code);
   const source = doctest ? doctestSource(code) : code;
   const lines = codeLines(source);
   if (lines.some((l) => /^\s*(\$ |pip3? install |python3? -m |[!%]pip )/.test(l))) {

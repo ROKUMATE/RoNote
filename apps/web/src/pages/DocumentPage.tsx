@@ -13,6 +13,7 @@ import { blockCounts } from "../document/counts";
 import { sameDomainHrefs } from "../document/links";
 import { Outline } from "../document/Outline";
 import { Reader } from "../document/Reader";
+import { RunScopeProvider } from "../document/run/RunArea";
 import type { SaveStatus } from "../document/save";
 import { useAnnotations } from "../document/useAnnotations";
 import { useEditing } from "../document/useEditing";
@@ -137,17 +138,19 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
       )}
       <div ref={setFrame} className="relative mt-8">
         <CodeLangsContext value={codeLangs}>
-          <Reader
-            content={doc.content}
-            onEditor={(e) => {
-              onEditor(e);
-              setEditor(e);
-            }}
-            onRevert={revert}
-            linkTargets={targets}
-            onFollow={(href, link) => void follow(href, link)}
-            following={following}
-          />
+          <RunScopeProvider documentId={doc.id} blocks={doc.content.blocks}>
+            <Reader
+              content={doc.content}
+              onEditor={(e) => {
+                onEditor(e);
+                setEditor(e);
+              }}
+              onRevert={revert}
+              linkTargets={targets}
+              onFollow={(href, link) => void follow(href, link)}
+              following={following}
+            />
+          </RunScopeProvider>
         </CodeLangsContext>
         {editor && <Outline editor={editor} />}
         {editor && frame && listSlot && (

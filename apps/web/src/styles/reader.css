@@ -302,6 +302,114 @@
     color: var(--color-ink);
   }
 
+  /* Running code (ADR 0008): a chip saying whether and why, Run beside Copy,
+     and the output under the code. */
+  .reader .code-header {
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
+  }
+
+  .reader .run-chip-wrap {
+    position: relative;
+  }
+
+  .reader .run-chip {
+    padding: 0 0.375rem;
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-sm);
+    color: var(--color-ink-2);
+  }
+
+  .reader .run-tip {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    width: max-content;
+    max-width: min(18rem, 80vw);
+    margin-top: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--color-paper);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-md);
+    color: var(--color-ink);
+  }
+
+  .reader .run-chip-wrap:is(:hover, :focus-within):not([data-dismissed]) .run-tip {
+    display: block;
+  }
+
+  .reader .run-button,
+  .reader .run-output-bar button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-sm);
+    color: var(--color-ink-2);
+  }
+
+  .reader .run-button {
+    margin-left: auto;
+  }
+
+  .reader .run-button + .code-copy {
+    margin-left: 0;
+  }
+
+  .reader :is(.run-button, .run-output-bar button):hover:not(:disabled) {
+    background-color: var(--color-paper-2);
+    color: var(--color-ink);
+  }
+
+  .reader .run-output-bar button:disabled {
+    opacity: 0.5;
+  }
+
+  .reader .run-output {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-rule);
+    font-family: var(--font-sans);
+    font-size: var(--text-ui);
+    color: var(--color-ink-2);
+  }
+
+  .reader .run-output-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.75rem;
+  }
+
+  .reader .run-output-bar p {
+    margin: 0 auto 0 0;
+  }
+
+  .reader .run-note {
+    margin: 0.25rem 0 0;
+    color: var(--color-ink);
+  }
+
+  .reader .run-output .run-text {
+    max-height: 20rem;
+    overflow: auto;
+    margin-top: 0.5rem;
+    color: var(--color-ink);
+  }
+
+  .reader .run-stderr {
+    color: var(--color-ink-2);
+  }
+
+  .reader .run-label {
+    margin-right: 0.5rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-ui);
+    color: var(--color-ink-2);
+  }
+
   .reader .table-scroll {
     margin: 1rem 0;
     overflow-x: auto;

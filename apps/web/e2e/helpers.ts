@@ -1,26 +1,7 @@
 import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
-import { test as base, expect, type Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { stack } from "./stack";
-
-/**
- * Playwright's test, slowed down when E2E_CPU_THROTTLE is set: the
- * browser's CPU runs that many times slower (Chrome's own throttling), as
- * on a slow CI runner.
- */
-export const test = base.extend<{ throttle: undefined }>({
-  throttle: [
-    async ({ page }, use) => {
-      const rate = Number(process.env.E2E_CPU_THROTTLE ?? 1);
-      if (rate > 1) {
-        const cdp = await page.context().newCDPSession(page);
-        await cdp.send("Emulation.setCPUThrottlingRate", { rate });
-      }
-      await use(undefined);
-    },
-    { auto: true },
-  ],
-});
 
 /** Fails if the page is wider than the viewport. */
 export async function expectNoHorizontalScroll(page: Page) {

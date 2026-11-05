@@ -126,9 +126,7 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
             <li key={count}>{count}</li>
           ))}
         </ul>
-        {/* The highlights list arrives with a lazy chunk: its line is kept
-            from the start, so nothing below moves when it comes. */}
-        <div ref={setListSlot} className="mt-3 min-h-5" />
+        <div ref={setListSlot} />
         <SaveState status={status} />
       </header>
       {fallback && (

@@ -1,5 +1,5 @@
 import { CopyIcon } from "@phosphor-icons/react/Copy";
-import { type CSSProperties, type ReactNode, type Ref, useState } from "react";
+import { type ReactNode, type Ref, useState } from "react";
 
 type CodeBlockProps = {
   code: string;
@@ -14,11 +14,6 @@ type CodeBlockProps = {
   children?: ReactNode;
   ref?: Ref<HTMLDivElement>;
 };
-
-/** How many lines code shows: a final line break starts no new line. */
-export function lineCount(code: string): number {
-  return Math.max(1, code.split("\n").length - (code.endsWith("\n") ? 1 : 0));
-}
 
 /**
  * A code block that keeps its line breaks and scrolls sideways when too
@@ -39,12 +34,7 @@ export function CodeBlock({
     setCopied(true);
   };
   return (
-    <div
-      ref={ref}
-      className="code-block"
-      data-block-id={blockId}
-      style={{ "--lines": lineCount(code) } as CSSProperties}
-    >
+    <div ref={ref} className="code-block" data-block-id={blockId}>
       <div className="code-header">
         {title &&
           (titleHref ? (

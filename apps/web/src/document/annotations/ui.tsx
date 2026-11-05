@@ -4,6 +4,7 @@ import type { Editor } from "@tiptap/core";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { requestErrorMessage } from "../../api/messages";
 import type { Annotation } from "../../api/schema";
+import { selectorOf } from "../anchoring";
 import { type Segment, selectionSegments } from "../highlights";
 import type { Annotations } from "../useAnnotations";
 
@@ -34,13 +35,18 @@ export function AnnotationsUI({ editor, annotations, frame }: Props) {
     }
   };
 
-  const highlight = (segments: readonly Segment[], withNote: boolean) =>
+  const highlight = (segments: readonly Segment[], withNote: boolean, inCode: boolean) =>
     run(async () => {
       const created = await annotations.create(segments);
-      editor.commands.setTextSelection(editor.state.selection.to);
       const first = created[0];
+      if (inCode) {
+        // The selection was the browser's, inside the code; focus stays there.
+        getSelection()?.collapseToEnd();
+      } else {
+        editor.commands.setTextSelection(editor.state.selection.to);
+      }
       if (withNote && first) setOpen({ id: first.id, noteFirst: true });
-      else editor.commands.focus();
+      else if (!inCode) editor.commands.focus();
     });
 
   // A click on a highlight opens its popover.
@@ -105,6 +111,41 @@ export function AnnotationsUI({ editor, annotations, frame }: Props) {
   );
 }
 
+/** Mod+Shift+H and Alt+F10, as the editor's keymap reads them. */
+function shortcutOf(event: globalThis.KeyboardEvent): "highlight" | "toolbar" | undefined {
+  const mod = /Mac|iP(hone|[oa]d)/.test(navigator.platform) ? event.metaKey : event.ctrlKey;
+  if (mod && event.shiftKey && event.key.toLowerCase() === "h") return "highlight";
+  if (event.altKey && event.key === "F10") return "toolbar";
+  return undefined;
+}
+
+/**
+ * The browser's selection when it lies inside the text of one code block
+ * under root: the block's segment, and where the selection is on screen.
+ */
+function codeSelection(root: HTMLElement): { segment: Segment; rect: DOMRect } | undefined {
+  const selection = getSelection();
+  if (!selection || selection.isCollapsed || selection.rangeCount === 0) return undefined;
+  const range = selection.getRangeAt(0);
+  const element = (node: Node) => (node instanceof Element ? node : node.parentElement);
+  const code = element(range.startContainer)?.closest("pre > code");
+  const block = code?.closest<HTMLElement>("[data-block-id]");
+  const blockId = block?.dataset.blockId;
+  if (!code || !blockId || !root.contains(code) || !code.contains(range.endContainer)) {
+    return undefined;
+  }
+  // The code element's text is the block's: count up to the selection.
+  const before = document.createRange();
+  before.setStart(code, 0);
+  before.setEnd(range.startContainer, range.startOffset);
+  const start = before.toString().length;
+  const end = start + range.toString().length;
+  return {
+    segment: { blockId, selector: selectorOf(code.textContent ?? "", start, end) },
+    rect: range.getBoundingClientRect(),
+  };
+}
+
 /** Where to put a box at the viewport coordinates x and y, inside frame. */
 function inFrame(frame: HTMLElement, x: number, y: number, width: number) {
   const box = frame.getBoundingClientRect();
@@ -128,15 +169,16 @@ function SelectionToolbar({
 }: {
   editor: Editor;
   frame: HTMLElement;
-  onHighlight: (segments: readonly Segment[], withNote: boolean) => void;
+  onHighlight: (segments: readonly Segment[], withNote: boolean, inCode: boolean) => void;
 }) {
-  // From the editor as it is: the selection may predate this chunk loading.
+  // From the page as it is: the selection may predate this chunk loading.
   const [segments, setSegments] = useState(() => selectionSegments(editor.state));
+  const [code, setCode] = useState(() => codeSelection(editor.view.dom));
   // Hidden once focus goes somewhere else on the page. Focus events alone
   // can't show it: a browser window without focus sends none.
   const [away, setAway] = useState(false);
   const toolbar = useRef<HTMLDivElement>(null);
-  // Read by the shortcut handler, which is set up once.
+  // Read by the key handlers, which are set up once.
   const latest = useRef(onHighlight);
   latest.current = onHighlight;
 
@@ -149,28 +191,52 @@ function SelectionToolbar({
       const to = event.relatedTarget as Node | null;
       if (to && !toolbar.current?.contains(to)) setAway(true);
     };
-    editor.on("selectionUpdate", update);
-    editor.on("blur", blur);
+    const selectionChange = () => setCode(codeSelection(editor.view.dom));
     // The editor's own selection: a key can come before React has drawn
     // the last change.
-    editor.storage.highlights.onShortcut = (shortcut) => {
-      const segments = selectionSegments(editor.state);
+    const shortcut = (which: "highlight" | "toolbar", segments: Segment[], inCode: boolean) => {
       if (segments.length === 0) return false;
-      if (shortcut === "highlight") latest.current(segments, false);
+      if (which === "highlight") latest.current(segments, false, inCode);
       else toolbar.current?.querySelector("button")?.focus();
       return true;
     };
+    // Keys inside code never reach the editor's keymap, so they are read here.
+    const codeKeys = (event: globalThis.KeyboardEvent) => {
+      const found = codeSelection(editor.view.dom);
+      const which = shortcutOf(event);
+      if (found && which && shortcut(which, [found.segment], true)) event.preventDefault();
+    };
+    editor.on("selectionUpdate", update);
+    editor.on("blur", blur);
+    document.addEventListener("selectionchange", selectionChange);
+    editor.view.dom.addEventListener("keydown", codeKeys);
+    editor.storage.highlights.onShortcut = (which) =>
+      shortcut(which, selectionSegments(editor.state), false);
+    // A selection made between the first render and now sent its events
+    // before anyone listened.
+    setSegments(selectionSegments(editor.state));
+    selectionChange();
     return () => {
       editor.off("selectionUpdate", update);
       editor.off("blur", blur);
+      document.removeEventListener("selectionchange", selectionChange);
+      editor.view.dom.removeEventListener("keydown", codeKeys);
       editor.storage.highlights.onShortcut = undefined;
     };
   }, [editor]);
 
-  if (segments.length === 0 || away) return null;
-  const coords = editor.view.coordsAtPos(editor.state.selection.from);
-  const above = coords.top - 40;
-  const at = inFrame(frame, coords.left, above < 0 ? coords.bottom + 4 : above, toolbarWidth);
+  let shown: { segments: Segment[]; x: number; top: number; bottom: number; inCode: boolean };
+  if (code) {
+    const { left, top, bottom } = code.rect;
+    shown = { segments: [code.segment], x: left, top, bottom, inCode: true };
+  } else if (segments.length > 0 && !away) {
+    const { left, top, bottom } = editor.view.coordsAtPos(editor.state.selection.from);
+    shown = { segments, x: left, top, bottom, inCode: false };
+  } else {
+    return null;
+  }
+  const above = shown.top - 40;
+  const at = inFrame(frame, shown.x, above < 0 ? shown.bottom + 4 : above, toolbarWidth);
 
   const move = (event: KeyboardEvent) => {
     const buttons = [...(toolbar.current?.querySelectorAll("button") ?? [])];
@@ -185,7 +251,7 @@ function SelectionToolbar({
     }
   };
 
-  const one = segments.length === 1;
+  const one = shown.segments.length === 1;
   return (
     <div
       ref={toolbar}
@@ -205,7 +271,7 @@ function SelectionToolbar({
     >
       <button
         type="button"
-        onClick={() => onHighlight(segments, false)}
+        onClick={() => onHighlight(shown.segments, false, shown.inCode)}
         className="flex items-center gap-1.5 rounded-sm px-2 py-1 hover:bg-paper-2 focus-visible:bg-paper-2"
       >
         <HighlighterIcon size={16} aria-hidden />
@@ -215,7 +281,7 @@ function SelectionToolbar({
         <button
           type="button"
           tabIndex={-1}
-          onClick={() => onHighlight(segments, true)}
+          onClick={() => onHighlight(shown.segments, true, shown.inCode)}
           className="flex items-center gap-1.5 rounded-sm px-2 py-1 hover:bg-paper-2 focus-visible:bg-paper-2"
         >
           <NotePencilIcon size={16} aria-hidden />

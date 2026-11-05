@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import type { Editor } from "@tiptap/core";
 import { expect, test } from "vitest";
 import type { DocBlock, IrBlock } from "../api/schema";
@@ -55,12 +55,16 @@ test("highlights are drawn as marks over their words, nested blocks included", a
     highlight("a3", "c1", code, "install"),
   ]);
 
-  expect(marks()).toEqual([
-    ["a1", "the tool"],
-    ["a2", "run the tool"],
-  ]);
-  // Code is drawn by its own view; the placement is known all the same.
+  // Code is drawn by its own view, from the same placements.
+  await waitFor(() =>
+    expect(marks()).toEqual([
+      ["a1", "the tool"],
+      ["a2", "run the tool"],
+      ["a3", "install"],
+    ]),
+  );
   expect(placements(editor.state).placed.get("a3")).toEqual({ start: 3, end: 10 });
+  expect(document.querySelector("pre")?.textContent).toBe(code);
 });
 
 test("a highlight follows its words as text is typed before it, and nothing is an edit", async () => {

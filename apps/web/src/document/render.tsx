@@ -1,9 +1,10 @@
 import * as Tabs from "@radix-ui/react-tabs";
-import { createContext, Fragment, useContext } from "react";
+import { createContext, type ReactNode, useContext } from "react";
 import type { IrBlock, IrCell, IrInline, IrLink } from "../api/schema";
 import { CodeBlock } from "../ui/CodeBlock";
 import { CodeLangPicker } from "./CodeLangPicker";
 import { CodeLangsContext } from "./codeLangs";
+import { type CodeMark, cutRuns, type Run } from "./codeMarks";
 import { type LinkTargets, linkAttributes, linkStatus } from "./links";
 import { useHighlight } from "./useHighlight";
 
@@ -23,6 +24,9 @@ function Inlines({ runs }: { runs: readonly IrInline[] | null | undefined }) {
     return <span key={i}>{node}</span>;
   });
 }
+
+/** The highlights in code blocks, by block id, from the editor (ADR 0007). */
+export const CodeMarksContext = createContext<ReadonlyMap<string, readonly CodeMark[]>>(new Map());
 
 /** Where locked blocks' same-domain links lead, from the document page. */
 export const LinkTargetsContext = createContext<LinkTargets | undefined>(undefined);
@@ -188,27 +192,43 @@ function Image({ block }: { block: IrBlock }) {
 function HighlightedCode({ block }: { block: IrBlock }) {
   const code = block.text ?? "";
   const choices = useContext(CodeLangsContext);
+  const marks = useContext(CodeMarksContext).get(block.id);
   const { ref, lines } = useHighlight(code, choices.chosen[block.id] ?? block.lang);
+  let children: ReactNode;
+  if (lines || marks) {
+    const runs: Run[] = lines
+      ? lines.flatMap((line, i) => [
+          ...(i > 0 ? [{ text: "\n" }] : []),
+          ...line.map((token) => ({ text: token.content, color: token.color })),
+        ])
+      : [{ text: code }];
+    children = cutRuns(runs, marks ?? []).map((run, i) => (
+      // biome-ignore lint/suspicious/noArrayIndexKey: runs are positional.
+      <CodeRun key={i} run={run} />
+    ));
+  }
   return (
     <CodeBlock
       ref={ref}
       code={code}
+      blockId={block.id}
       language={<CodeLangPicker block={block} choices={choices} />}
       title={block.title}
       titleHref={block.title_link?.href}
     >
-      {lines?.map((line, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: lines are positional.
-        <Fragment key={i}>
-          {i > 0 && "\n"}
-          {line.map((token, j) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: tokens are positional.
-            <span key={j} style={{ color: token.color }}>
-              {token.content}
-            </span>
-          ))}
-        </Fragment>
-      ))}
+      {children}
     </CodeBlock>
+  );
+}
+
+/** A run of code text: coloured when highlighted, marked when in a user's highlight. */
+function CodeRun({ run }: { run: Run }) {
+  const text = run.color ? <span style={{ color: run.color }}>{run.text}</span> : run.text;
+  return run.mark ? (
+    <mark className="hl" data-annotation={run.mark}>
+      {text}
+    </mark>
+  ) : (
+    text
   );
 }

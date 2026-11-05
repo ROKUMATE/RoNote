@@ -1,12 +1,13 @@
 import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import type { Editor } from "@tiptap/core";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import type { Annotation, TextSelector } from "../api/schema";
 import { selectorOf } from "../document/anchoring";
 import { json, stubApi } from "../test/api";
 import { renderApp } from "../test/render";
 
 const text = "Install the tool before you start.";
+const code = "go install ./...\nrun it\n";
 const source = { origin: "source", edited: false } as const;
 
 const doc = {
@@ -21,15 +22,21 @@ const doc = {
     doc_version: 1,
     blocks: [
       { id: "p1", kind: "paragraph", content: [{ text }], ...source, source_block_id: "p1" },
+      { id: "c1", kind: "code", text: code, ...source, source_block_id: "c1" },
     ],
   },
 };
 
-function annotation(id: string, selector: TextSelector, note: string | null = null): Annotation {
+function annotation(
+  id: string,
+  selector: TextSelector,
+  note: string | null = null,
+  blockId = "p1",
+): Annotation {
   return {
     id,
     document_id: "doc-1",
-    block_id: "p1",
+    block_id: blockId,
     kind: "highlight",
     selector,
     note,
@@ -53,7 +60,10 @@ async function openDoc(existing: Annotation[] = []) {
     "POST /documents/doc-1/annotations": async (request) => {
       const body = await request.clone().json();
       posted.push(body);
-      return json(annotation(`new-${posted.length}`, body.selector, body.note ?? null), 201);
+      return json(
+        annotation(`new-${posted.length}`, body.selector, body.note ?? null, body.block_id),
+        201,
+      );
     },
     "PATCH /annotations/a1": async (request) => {
       const body = await request.clone().json();
@@ -182,4 +192,65 @@ test("after an edit is saved, moved highlights are saved where their words are n
     annotations: [{ id: "a1", version: 1, selector: selectorOf(`First, ${text}`, 15, 23) }],
   });
   expect(document.querySelector("mark.hl")?.textContent).toBe("the tool");
+});
+
+/** Selects characters start to end of the first code block's text, as the browser would. */
+function selectInCode(start: number, end: number) {
+  const codeText = document.querySelector("pre code")?.firstChild;
+  if (!codeText) throw new Error("no code text");
+  act(() => {
+    const range = document.createRange();
+    range.setStart(codeText, start);
+    range.setEnd(codeText, end);
+    getSelection()?.removeAllRanges();
+    getSelection()?.addRange(range);
+    document.dispatchEvent(new Event("selectionchange"));
+  });
+}
+
+test("a selection inside code is highlighted in the code block, and Copy stays exact", async () => {
+  const writeText = vi.fn(async () => {});
+  Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+  const { main, posted } = await openDoc();
+  selectInCode(3, 10);
+
+  fireEvent.click(
+    within(await main.findByRole("toolbar", { name: "Highlight" })).getByRole("button", {
+      name: "Highlight",
+    }),
+  );
+
+  await waitFor(() =>
+    expect(posted).toEqual([
+      { block_id: "c1", kind: "highlight", selector: selectorOf(code, 3, 10) },
+    ]),
+  );
+  const mark = await waitFor(() => {
+    const found = document.querySelector("pre mark.hl");
+    if (!found) throw new Error("no code highlight yet");
+    return found;
+  });
+  expect(mark.textContent).toBe("install");
+  expect(document.querySelector("pre")?.textContent).toBe(code);
+  fireEvent.click(main.getByRole("button", { name: "Copy code" }));
+  expect(writeText).toHaveBeenCalledWith(code);
+});
+
+test("Ctrl+Shift+H inside code highlights the code selection", async () => {
+  const { main, posted } = await openDoc();
+  selectInCode(0, 2);
+  await main.findByRole("toolbar", { name: "Highlight" });
+
+  fireEvent.keyDown(document.querySelector("pre") as HTMLElement, {
+    key: "H",
+    keyCode: 72,
+    ctrlKey: true,
+    shiftKey: true,
+  });
+
+  await waitFor(() =>
+    expect(posted).toEqual([
+      { block_id: "c1", kind: "highlight", selector: selectorOf(code, 0, 2) },
+    ]),
+  );
 });

@@ -41,6 +41,23 @@ From P08 on, a user's import is stored: the API takes a URL, a worker fetches an
   - Another user's rows answer 404.
 - **Rate limit.** The fetcher's 1 request per second per host holds per worker process. Several worker processes multiply it.
 - **Schema.** Goose owns all schema, River's tables included (`make river-migration`). A test fails when the pinned River knows a migration we have not added.
+- **One clock for jobs (P12).** River writes a job's times from the app's clock but claims jobs by the database's `now()`:
+  - its pgx driver fills a new job's `created_at` and `scheduled_at` with `time.Now()`;
+  - a retry's time is `time.Now()` plus a backoff, from River's policy or the worker's `NextRetry`;
+  - the claim takes `available` jobs whose `scheduled_at` is at or before `now()`.
+
+  When the podman VM's clock lagged the Mac's by 19 minutes after sleep, every new job was 19 minutes in the database's future, and imports stayed `queued`. A database clock running ahead let River's scheduler hand retries to the claim early.
+
+  Migration 00006's trigger on `river_job` moves those times onto the database's clock:
+  - **New jobs:** shifted by the database's `now()` minus the app's `created_at`.
+  - **Retries:** shifted by `attempted_at` minus the failed attempt's error time. Both are the attempt's start, one on each clock.
+  - **State:** both go straight to `available`, which River's completer already treats as a retry.
+
+  So the claim is the only comparison that decides when a job runs, and it uses the database's clock. `TestJobsRunWhateverTheAppClock` fakes a half-hour offset either way.
+
+  Left on the app's clock:
+  - River's stuck-job rescue. A skew over an hour can rescue a running job early; imports are idempotent.
+  - Snoozed jobs; RoNote never snoozes.
 
 ## Consequences
 

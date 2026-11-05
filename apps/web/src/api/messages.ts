@@ -37,6 +37,9 @@ export const requestErrorMessages: Record<ErrorCode, string> = {
   source_block_modified: "Code, tables and tabs from the page can't be edited.",
   block_kind_not_allowed:
     "Notes can only hold text, headings, lists, quotes, callouts and dividers.",
+  unknown_block: "That text can't be highlighted.",
+  quote_mismatch: "The text changed before the highlight was saved. Try again.",
+  annotation_limit: "This document already has 2000 highlights, the most it can hold.",
   unauthenticated: "You're signed out. Sign in and try again.",
   internal_error: "Something went wrong on RoNote's side. Try again.",
 };

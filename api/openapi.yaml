@@ -277,6 +277,184 @@ paths:
                 $ref: "#/components/schemas/Error"
         "500":
           $ref: "#/components/responses/InternalError"
+  /documents/{id}/annotations:
+    get:
+      operationId: listAnnotations
+      summary: List a document's highlights and notes
+      description: |
+        Every annotation of the document, oldest first. Each points into one
+        block's plain text (docs/adr/0007-annotations-and-anchoring.md); the
+        client anchors it in the current content, and lists the ones it
+        cannot place as unplaced.
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: The document's annotations.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnnotationList"
+        "400":
+          $ref: "#/components/responses/InvalidParameter"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    post:
+      operationId: createAnnotation
+      summary: Highlight a range of one block, with an optional note
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewAnnotation"
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Annotation"
+        "400":
+          description: "The body is not an annotation. Codes: invalid_request, invalid_parameter."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          description: >-
+            The selector does not fit the document, or the document is
+            full. Codes: unknown_block, quote_mismatch, annotation_limit.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /documents/{id}/annotations/reanchor:
+    post:
+      operationId: reanchorAnnotations
+      summary: Move annotations to where their text is now
+      description: |
+        Saves new selectors for annotations of the document after its text
+        changed, all or none. Each names the version it was re-anchored
+        from; one stale version refuses the whole batch.
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReanchorRequest"
+      responses:
+        "200":
+          description: The annotations as saved.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnnotationList"
+        "400":
+          description: "The body is not a batch of selectors. Codes: invalid_request, invalid_parameter."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          description: "No such document, or an annotation that is not one of it. Code: not_found."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: "An annotation changed since its version. Code: version_conflict."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: "A selector does not fit the document. Codes: unknown_block, quote_mismatch."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /annotations/{id}:
+    patch:
+      operationId: updateAnnotation
+      summary: Change an annotation's note, or place it on new text
+      description: |
+        Sets the note (an empty note removes it), or moves the annotation to
+        a new range with block_id and selector together, if version is
+        still the annotation's current version.
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnotationPatch"
+      responses:
+        "200":
+          description: The annotation as saved.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Annotation"
+        "400":
+          description: "The body is not a change. Codes: invalid_request, invalid_parameter."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "The annotation changed since version. Code: version_conflict."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VersionConflict"
+        "422":
+          description: "The selector does not fit the document. Codes: unknown_block, quote_mismatch."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    delete:
+      operationId: deleteAnnotation
+      summary: Remove an annotation
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "204":
+          description: Removed.
+        "400":
+          $ref: "#/components/responses/InvalidParameter"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
 components:
   parameters:
     ID:
@@ -347,6 +525,9 @@ components:
         - unknown_source_block
         - source_block_modified
         - block_kind_not_allowed
+        - unknown_block
+        - quote_mismatch
+        - annotation_limit
         - unauthenticated
         - internal_error
     CreateImportRequest:
@@ -572,6 +753,138 @@ components:
         A language a user may choose for a code block. plaintext means no
         highlighting.
       enum: [go, python, javascript, typescript, tsx, jsx, bash, console, c, cpp, csharp, java, kotlin, rust, swift, ruby, php, sql, json, yaml, toml, ini, xml, html, css, dockerfile, makefile, markdown, diff, plaintext]
+    AnnotationKind:
+      type: string
+      description: What an annotation is. Highlights are the one kind so far.
+      enum: [highlight]
+    TextSelector:
+      x-go-type: annotation.Selector
+      x-go-type-import:
+        path: github.com/rokumate/ronote/internal/annotation
+      type: object
+      additionalProperties: false
+      required: [position, quote]
+      description: >-
+        A range of one block's plain text: a heading's or paragraph's runs
+        joined, or a code block's text. Offsets count UTF-16 code units, end
+        exclusive. exact is the text in the range when it was saved; prefix
+        and suffix, the text just around it, tell repeats apart when the
+        text changes.
+      properties:
+        position:
+          type: object
+          additionalProperties: false
+          required: [start, end]
+          properties:
+            start:
+              type: integer
+              minimum: 0
+            end:
+              type: integer
+              minimum: 1
+        quote:
+          type: object
+          additionalProperties: false
+          required: [exact, prefix, suffix]
+          properties:
+            exact:
+              type: string
+              minLength: 1
+            prefix:
+              type: string
+              maxLength: 32
+            suffix:
+              type: string
+              maxLength: 32
+    Annotation:
+      type: object
+      additionalProperties: false
+      required: [id, document_id, block_id, kind, selector, note, version, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        block_id:
+          type: string
+          description: The block, at any depth of the content, the selector points into.
+        kind:
+          $ref: "#/components/schemas/AnnotationKind"
+        selector:
+          $ref: "#/components/schemas/TextSelector"
+        note:
+          type: [string, "null"]
+          maxLength: 5000
+        version:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    AnnotationList:
+      type: object
+      required: [annotations]
+      properties:
+        annotations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Annotation"
+    NewAnnotation:
+      type: object
+      additionalProperties: false
+      required: [block_id, kind, selector]
+      properties:
+        block_id:
+          type: string
+        kind:
+          $ref: "#/components/schemas/AnnotationKind"
+        selector:
+          $ref: "#/components/schemas/TextSelector"
+        note:
+          type: string
+          maxLength: 5000
+    AnnotationPatch:
+      type: object
+      additionalProperties: false
+      required: [version]
+      description: >-
+        What to change: the note (empty removes it), and the range, as
+        block_id and selector together. Anything left out stays.
+      properties:
+        version:
+          type: integer
+        note:
+          type: string
+          maxLength: 5000
+        block_id:
+          type: string
+        selector:
+          $ref: "#/components/schemas/TextSelector"
+    ReanchorRequest:
+      type: object
+      additionalProperties: false
+      required: [annotations]
+      properties:
+        annotations:
+          type: array
+          minItems: 1
+          maxItems: 2000
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, selector, version]
+            properties:
+              id:
+                type: string
+                format: uuid
+              selector:
+                $ref: "#/components/schemas/TextSelector"
+              version:
+                type: integer
     UserBlockKind:
       type: string
       description: >-

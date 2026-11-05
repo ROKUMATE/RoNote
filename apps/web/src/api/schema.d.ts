@@ -154,6 +154,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/documents/{id}/annotations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List a document's highlights and notes
+         * @description Every annotation of the document, oldest first. Each points into one
+         *     block's plain text (docs/adr/0007-annotations-and-anchoring.md); the
+         *     client anchors it in the current content, and lists the ones it
+         *     cannot place as unplaced.
+         */
+        get: operations["listAnnotations"];
+        put?: never;
+        /** Highlight a range of one block, with an optional note */
+        post: operations["createAnnotation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}/annotations/reanchor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Move annotations to where their text is now
+         * @description Saves new selectors for annotations of the document after its text
+         *     changed, all or none. Each names the version it was re-anchored
+         *     from; one stale version refuses the whole batch.
+         */
+        post: operations["reanchorAnnotations"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/annotations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove an annotation */
+        delete: operations["deleteAnnotation"];
+        options?: never;
+        head?: never;
+        /**
+         * Change an annotation's note, or place it on new text
+         * @description Sets the note (an empty note removes it), or moves the annotation to
+         *     a new range with block_id and selector together, if version is
+         *     still the annotation's current version.
+         */
+        patch: operations["updateAnnotation"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -170,7 +239,7 @@ export interface components {
          * @description Why a request failed. Each response lists the codes it can carry.
          * @enum {string}
          */
-        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unauthenticated" | "internal_error";
+        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unknown_block" | "quote_mismatch" | "annotation_limit" | "unauthenticated" | "internal_error";
         CreateImportRequest: {
             url: string;
         };
@@ -281,6 +350,63 @@ export interface components {
          * @enum {string}
          */
         CodeLang: "go" | "python" | "javascript" | "typescript" | "tsx" | "jsx" | "bash" | "console" | "c" | "cpp" | "csharp" | "java" | "kotlin" | "rust" | "swift" | "ruby" | "php" | "sql" | "json" | "yaml" | "toml" | "ini" | "xml" | "html" | "css" | "dockerfile" | "makefile" | "markdown" | "diff" | "plaintext";
+        /**
+         * @description What an annotation is. Highlights are the one kind so far.
+         * @enum {string}
+         */
+        AnnotationKind: "highlight";
+        /** @description A range of one block's plain text: a heading's or paragraph's runs joined, or a code block's text. Offsets count UTF-16 code units, end exclusive. exact is the text in the range when it was saved; prefix and suffix, the text just around it, tell repeats apart when the text changes. */
+        TextSelector: {
+            position: {
+                start: number;
+                end: number;
+            };
+            quote: {
+                exact: string;
+                prefix: string;
+                suffix: string;
+            };
+        };
+        Annotation: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            document_id: string;
+            /** @description The block, at any depth of the content, the selector points into. */
+            block_id: string;
+            kind: components["schemas"]["AnnotationKind"];
+            selector: components["schemas"]["TextSelector"];
+            note: string | null;
+            version: number;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        AnnotationList: {
+            annotations: components["schemas"]["Annotation"][];
+        };
+        NewAnnotation: {
+            block_id: string;
+            kind: components["schemas"]["AnnotationKind"];
+            selector: components["schemas"]["TextSelector"];
+            note?: string;
+        };
+        /** @description What to change: the note (empty removes it), and the range, as block_id and selector together. Anything left out stays. */
+        AnnotationPatch: {
+            version: number;
+            note?: string;
+            block_id?: string;
+            selector?: components["schemas"]["TextSelector"];
+        };
+        ReanchorRequest: {
+            annotations: {
+                /** Format: uuid */
+                id: string;
+                selector: components["schemas"]["TextSelector"];
+                version: number;
+            }[];
+        };
         /**
          * @description The kinds a user block may use, nested blocks included. Source code, tables, tabs and images come only from the page.
          * @enum {string}
@@ -451,6 +577,13 @@ export type VersionConflict = components['schemas']['VersionConflict'];
 export type DocumentList = components['schemas']['DocumentList'];
 export type DocContent = components['schemas']['DocContent'];
 export type CodeLang = components['schemas']['CodeLang'];
+export type AnnotationKind = components['schemas']['AnnotationKind'];
+export type TextSelector = components['schemas']['TextSelector'];
+export type Annotation = components['schemas']['Annotation'];
+export type AnnotationList = components['schemas']['AnnotationList'];
+export type NewAnnotation = components['schemas']['NewAnnotation'];
+export type AnnotationPatch = components['schemas']['AnnotationPatch'];
+export type ReanchorRequest = components['schemas']['ReanchorRequest'];
 export type UserBlockKind = components['schemas']['UserBlockKind'];
 export type DocBlock = components['schemas']['DocBlock'];
 export type IrDocument = components['schemas']['IRDocument'];
@@ -749,6 +882,223 @@ export interface operations {
             401: components["responses"]["Unauthenticated"];
             /** @description No such document, or no source block blockId in it. Code: not_found. */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    listAnnotations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The document's annotations. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnotationList"];
+                };
+            };
+            400: components["responses"]["InvalidParameter"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    createAnnotation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NewAnnotation"];
+            };
+        };
+        responses: {
+            /** @description Created. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Annotation"];
+                };
+            };
+            /** @description The body is not an annotation. Codes: invalid_request, invalid_parameter. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["NotFound"];
+            /** @description The selector does not fit the document, or the document is full. Codes: unknown_block, quote_mismatch, annotation_limit. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    reanchorAnnotations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReanchorRequest"];
+            };
+        };
+        responses: {
+            /** @description The annotations as saved. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnotationList"];
+                };
+            };
+            /** @description The body is not a batch of selectors. Codes: invalid_request, invalid_parameter. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: components["responses"]["Unauthenticated"];
+            /** @description No such document, or an annotation that is not one of it. Code: not_found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description An annotation changed since its version. Code: version_conflict. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description A selector does not fit the document. Codes: unknown_block, quote_mismatch. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
+    deleteAnnotation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["InvalidParameter"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    updateAnnotation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnnotationPatch"];
+            };
+        };
+        responses: {
+            /** @description The annotation as saved. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Annotation"];
+                };
+            };
+            /** @description The body is not a change. Codes: invalid_request, invalid_parameter. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["NotFound"];
+            /** @description The annotation changed since version. Code: version_conflict. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionConflict"];
+                };
+            };
+            /** @description The selector does not fit the document. Codes: unknown_block, quote_mismatch. */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

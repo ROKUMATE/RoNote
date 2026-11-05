@@ -28,5 +28,7 @@ export default defineConfig({
     // link test broke the spec-type guard unseen). Building takes ~2% of
     // the run.
     fsModuleCache: false,
+    // Tuning hints after every run are noise when nothing failed.
+    experimental: { diagnostics: false },
   },
 });

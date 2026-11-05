@@ -6,7 +6,6 @@ expression; a doctest transcript runs one statement at a time and prints each
 value, like the REPL.
 """
 
-import doctest
 import linecache
 import traceback
 
@@ -43,6 +42,9 @@ def _repr(value):
 async def run(source, transcript):
     """Runs source; returns (repr of the last value or None, traceback or None)."""
     if transcript:
+        # Imported here, as it takes about a second, which plain runs never pay.
+        import doctest
+
         parts = [example.source for example in doctest.DocTestParser().get_examples(source)]
     else:
         parts = [source]

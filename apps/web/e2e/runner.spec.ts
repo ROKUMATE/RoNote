@@ -159,13 +159,18 @@ function run(page: Page, code: string, mode: "exec" | "doctest" = "exec"): Promi
   );
 }
 
-/** The parts of events worth comparing: no ids or durations. */
+/**
+ * The parts of events worth comparing: no ids or durations, and output of one
+ * kind in a row joined, however the runner batched it.
+ */
 function shown(events: Event[]) {
-  return events.map(({ type, text, end }) => ({
-    type,
-    ...(text && { text }),
-    ...(end && { end }),
-  }));
+  const parts: Event[] = [];
+  for (const { type, text, end } of events) {
+    const last = parts.at(-1);
+    if (text && last?.type === type && last.text) last.text += text;
+    else parts.push({ type, ...(text && { text }), ...(end && { end }) });
+  }
+  return parts;
 }
 
 test("Python runs blocks in one session, and Restart clears it", async ({ page }) => {

@@ -11,6 +11,30 @@ type Check<T> = (value: unknown) => value is T;
 
 const boolean: Check<boolean> = (value) => typeof value === "boolean";
 
+/** Text of at most max characters. */
+const text =
+  (max: number): Check<string> =>
+  (value): value is string =>
+    typeof value === "string" && value.length <= max;
+
+/** One of values. */
+const oneOf =
+  <T extends string>(...values: T[]): Check<T> =>
+  (value): value is T =>
+    values.includes(value as T);
+
+const duration: Check<number> = (value): value is number =>
+  typeof value === "number" && Number.isFinite(value) && value >= 0;
+
+/** A run's id: the app's choice, such as a block id. */
+const id = text(200);
+
+/** The most code one run takes: the size of the largest page RoNote fetches. */
+const codeLimit = 5_000_000;
+
+/** The most output one run sends; past it the runner stops the run. */
+export const outputLimit = 1_000_000;
+
 /** Each message type's fields besides v and type, and how to check them. */
 type Shapes = Record<string, Record<string, Check<unknown>>>;
 
@@ -23,12 +47,35 @@ type Messages<S extends Shapes> = {
 const requests = {
   // Asks the runner to say it is there, and what it can do.
   hello: {},
+  // Runs code in the session, starting it if need be. Runs wait their turn.
+  // exec runs code whole and gives its last value; doctest runs a >>>
+  // transcript statement by statement.
+  run: { id, code: text(codeLimit), mode: oneOf("exec", "doctest") },
+  // Stops the run in progress and drops those waiting.
+  stop: {},
+  // Ends the session; the next run starts a new one.
+  restart: {},
 } satisfies Shapes;
 
 const events = {
   // The runner is there. isolated: whether Stop can interrupt code, rather
   // than restart its session.
   hello: { isolated: boolean },
+  // Python is loading, for the first run or the first after the session ended.
+  starting: {},
+  ready: {},
+  stdout: { id, text: text(outputLimit) },
+  stderr: { id, text: text(outputLimit) },
+  // The repr of the code's last value, when it has one.
+  result: { id, text: text(outputLimit) },
+  // The traceback the code ended with, from the reader's code on.
+  error: { id, text: text(outputLimit) },
+  // The run is over, after ms: it ended by itself (ok or error), was stopped
+  // (stop, timeout, or output past the limit), or lost with its session.
+  done: { id, ms: duration, end: oneOf("ok", "error", "stop", "timeout", "output", "lost") },
+  // The session ended and its state is gone, because the reader restarted it,
+  // stopping needed it, it crashed or ran out of memory, or it failed to start.
+  ended: { reason: oneOf("restart", "stop", "crash", "failed") },
 } satisfies Shapes;
 
 export type RunnerRequest = Messages<typeof requests>;

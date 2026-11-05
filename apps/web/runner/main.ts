@@ -1,4 +1,5 @@
 import { parseRequest, type RunnerEvent } from "../src/runner/protocol";
+import { createSession } from "./session";
 
 /*
  * The runner page: served from its own origin and framed by the app, it runs
@@ -16,6 +17,14 @@ function post(message: RunnerEvent) {
 }
 
 if (window.parent !== window && import.meta.env.RONOTE_APP_ORIGINS.includes(app)) {
+  const python = createSession({
+    spawn: () =>
+      new Worker(new URL("./python.worker.ts", import.meta.url), {
+        type: "module",
+      }),
+    isolated: crossOriginIsolated,
+    post,
+  });
   window.addEventListener("message", (event) => {
     if (event.source !== window.parent || event.origin !== app) return;
     const request = parseRequest(event.data);
@@ -23,6 +32,15 @@ if (window.parent !== window && import.meta.env.RONOTE_APP_ORIGINS.includes(app)
     switch (request.type) {
       case "hello":
         post({ v: 1, type: "hello", isolated: crossOriginIsolated });
+        break;
+      case "run":
+        python.run(request);
+        break;
+      case "stop":
+        python.stop();
+        break;
+      case "restart":
+        python.restart();
         break;
     }
   });

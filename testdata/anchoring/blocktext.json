@@ -1,0 +1,28 @@
+{
+  "about": "Block plain text as highlights count it (docs/adr/0007-annotations-and-anchoring.md). Read by internal/doccontent and apps/web/src/document/anchoring.test.ts, so both sides agree. length is in UTF-16 code units.",
+  "content": {
+    "doc_version": 1,
+    "blocks": [
+      { "id": "h1", "kind": "heading", "level": 2, "content": [{ "text": "Getting " }, { "text": "started", "marks": ["italic"] }], "origin": "source", "edited": false, "source_block_id": "h1" },
+      { "id": "p1", "kind": "paragraph", "content": [{ "text": "Run " }, { "text": "go build", "marks": ["code"] }, { "text": ", then read " }, { "text": "the guide", "link": { "href": "https://go.dev/doc/", "kind": "same_domain" } }, { "text": "." }], "origin": "source", "edited": false, "source_block_id": "p1" },
+      { "id": "p2", "kind": "paragraph", "content": [{ "text": "Ship it 🚀 now, naïvely." }], "origin": "source", "edited": false, "source_block_id": "p2" },
+      { "id": "c1", "kind": "code", "lang": "go", "text": "func main() {\n\tfmt.Println(\"hi 👋\")\n}\n", "origin": "source", "edited": false, "source_block_id": "c1" },
+      { "id": "l1", "kind": "list", "items": [{ "children": [{ "id": "l1p", "kind": "paragraph", "content": [{ "text": "In a list" }] }, { "id": "l1c", "kind": "code", "text": "make\n" }] }], "origin": "source", "edited": false, "source_block_id": "l1" },
+      { "id": "q1", "kind": "quote", "children": [{ "id": "q1p", "kind": "paragraph", "content": [{ "text": "Quoted" }] }], "origin": "source", "edited": false, "source_block_id": "q1" },
+      { "id": "t1", "kind": "tabs", "items": [{ "label": "npm", "children": [{ "id": "t1c", "kind": "code", "text": "npm install\n" }] }], "origin": "source", "edited": false, "source_block_id": "t1" },
+      { "id": "tb1", "kind": "table", "rows": [[[{ "text": "cell" }]]], "origin": "source", "edited": false, "source_block_id": "tb1" },
+      { "id": "d1", "kind": "divider", "origin": "source", "edited": false, "source_block_id": "d1" }
+    ]
+  },
+  "texts": {
+    "h1": { "text": "Getting started", "length": 15 },
+    "p1": { "text": "Run go build, then read the guide.", "length": 34 },
+    "p2": { "text": "Ship it 🚀 now, naïvely.", "length": 24 },
+    "c1": { "text": "func main() {\n\tfmt.Println(\"hi 👋\")\n}\n", "length": 38 },
+    "l1p": { "text": "In a list", "length": 9 },
+    "l1c": { "text": "make\n", "length": 5 },
+    "q1p": { "text": "Quoted", "length": 6 },
+    "t1c": { "text": "npm install\n", "length": 12 }
+  },
+  "none": ["l1", "q1", "t1", "tb1", "d1", "missing"]
+}

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"maps"
 	"slices"
+	"strings"
 
 	"github.com/google/uuid"
 
@@ -204,4 +205,43 @@ func children(b *ir.Block) []*ir.Block {
 		}
 	}
 	return out
+}
+
+// BlockText returns the plain text of block id, at any depth of doc, for the
+// kinds that take highlights (docs/adr/0007-annotations-and-anchoring.md): a
+// heading's or paragraph's runs joined, or a code block's text. ok is false
+// when doc has no such block, or it takes no highlights.
+func BlockText(doc *Doc, id string) (text string, ok bool) {
+	var found *ir.Block
+	var walk func(b *ir.Block)
+	walk = func(b *ir.Block) {
+		if found != nil {
+			return
+		}
+		if b.ID == id {
+			found = b
+			return
+		}
+		for _, child := range children(b) {
+			walk(child)
+		}
+	}
+	for i := range doc.Blocks {
+		walk(&doc.Blocks[i].Block)
+	}
+	if found == nil {
+		return "", false
+	}
+	switch found.Kind {
+	case ir.KindHeading, ir.KindParagraph:
+		var sb strings.Builder
+		for _, run := range found.Content {
+			sb.WriteString(run.Text)
+		}
+		return sb.String(), true
+	case ir.KindCode:
+		return found.Text, true
+	default:
+		return "", false
+	}
 }

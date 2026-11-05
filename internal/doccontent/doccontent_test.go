@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"unicode/utf16"
 
 	"github.com/google/uuid"
 
@@ -147,6 +148,41 @@ func TestFromIRKeepsEveryGolden(t *testing.T) {
 			if string(got) != string(want) || b.Origin != OriginSource || *b.Edited || b.SourceBlockID != b.ID {
 				t.Errorf("%s: block %d = %s, want the extraction's %s as an unedited source block", file, i, got, want)
 			}
+		}
+	}
+}
+
+// TestBlockText reads the plain text of every block in the shared fixture,
+// which the web app's anchoring test reads too.
+func TestBlockText(t *testing.T) {
+	t.Parallel()
+	data, err := os.ReadFile(filepath.Join("..", "..", "testdata", "anchoring", "blocktext.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var f struct {
+		Content Doc `json:"content"`
+		Texts   map[string]struct {
+			Text   string `json:"text"`
+			Length int    `json:"length"`
+		} `json:"texts"`
+		None []string `json:"none"`
+	}
+	if err := json.Unmarshal(data, &f); err != nil {
+		t.Fatal(err)
+	}
+	for id, want := range f.Texts {
+		got, ok := BlockText(&f.Content, id)
+		if !ok || got != want.Text {
+			t.Errorf("BlockText(%q) = %q, %v, want %q", id, got, ok, want.Text)
+		}
+		if n := len(utf16.Encode([]rune(got))); n != want.Length {
+			t.Errorf("BlockText(%q) is %d UTF-16 code units, want %d", id, n, want.Length)
+		}
+	}
+	for _, id := range f.None {
+		if got, ok := BlockText(&f.Content, id); ok {
+			t.Errorf("BlockText(%q) = %q, want none", id, got)
 		}
 	}
 }

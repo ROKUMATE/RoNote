@@ -16,9 +16,25 @@ import (
 
 	"github.com/oapi-codegen/runtime"
 	openapi_types "github.com/oapi-codegen/runtime/types"
+	"github.com/rokumate/ronote/internal/annotation"
 	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/ir"
 )
+
+// Defines values for AnnotationKind.
+const (
+	Highlight AnnotationKind = "highlight"
+)
+
+// Valid indicates whether the value is a known member of the AnnotationKind enum.
+func (e AnnotationKind) Valid() bool {
+	switch e {
+	case Highlight:
+		return true
+	default:
+		return false
+	}
+}
 
 // Defines values for CodeLang.
 const (
@@ -124,6 +140,7 @@ func (e CodeLang) Valid() bool {
 
 // Defines values for ErrorCode.
 const (
+	ErrorCodeAnnotationLimit     ErrorCode = "annotation_limit"
 	ErrorCodeBlockKindNotAllowed ErrorCode = "block_kind_not_allowed"
 	ErrorCodeIPLiteralHost       ErrorCode = "ip_literal_host"
 	ErrorCodeInternalError       ErrorCode = "internal_error"
@@ -134,9 +151,11 @@ const (
 	ErrorCodeInvalidURL          ErrorCode = "invalid_url"
 	ErrorCodeMethodNotAllowed    ErrorCode = "method_not_allowed"
 	ErrorCodeNotFound            ErrorCode = "not_found"
+	ErrorCodeQuoteMismatch       ErrorCode = "quote_mismatch"
 	ErrorCodeSourceBlockModified ErrorCode = "source_block_modified"
 	ErrorCodeURLTooLong          ErrorCode = "url_too_long"
 	ErrorCodeUnauthenticated     ErrorCode = "unauthenticated"
+	ErrorCodeUnknownBlock        ErrorCode = "unknown_block"
 	ErrorCodeUnknownSourceBlock  ErrorCode = "unknown_source_block"
 	ErrorCodeUnsupportedScheme   ErrorCode = "unsupported_scheme"
 	ErrorCodeVersionConflict     ErrorCode = "version_conflict"
@@ -145,6 +164,8 @@ const (
 // Valid indicates whether the value is a known member of the ErrorCode enum.
 func (e ErrorCode) Valid() bool {
 	switch e {
+	case ErrorCodeAnnotationLimit:
+		return true
 	case ErrorCodeBlockKindNotAllowed:
 		return true
 	case ErrorCodeIPLiteralHost:
@@ -165,11 +186,15 @@ func (e ErrorCode) Valid() bool {
 		return true
 	case ErrorCodeNotFound:
 		return true
+	case ErrorCodeQuoteMismatch:
+		return true
 	case ErrorCodeSourceBlockModified:
 		return true
 	case ErrorCodeURLTooLong:
 		return true
 	case ErrorCodeUnauthenticated:
+		return true
+	case ErrorCodeUnknownBlock:
 		return true
 	case ErrorCodeUnknownSourceBlock:
 		return true
@@ -294,6 +319,42 @@ func (e UserBlockKind) Valid() bool {
 	default:
 		return false
 	}
+}
+
+// Annotation defines model for Annotation.
+type Annotation struct {
+	// BlockID The block, at any depth of the content, the selector points into.
+	BlockID    string             `json:"block_id"`
+	CreatedAt  time.Time          `json:"created_at"`
+	DocumentID openapi_types.UUID `json:"document_id"`
+	ID         openapi_types.UUID `json:"id"`
+
+	// Kind What an annotation is. Highlights are the one kind so far.
+	Kind AnnotationKind `json:"kind"`
+	Note *string        `json:"note"`
+
+	// Selector A range of one block's plain text: a heading's or paragraph's runs joined, or a code block's text. Offsets count UTF-16 code units, end exclusive. exact is the text in the range when it was saved; prefix and suffix, the text just around it, tell repeats apart when the text changes.
+	Selector  TextSelector `json:"selector"`
+	UpdatedAt time.Time    `json:"updated_at"`
+	Version   int          `json:"version"`
+}
+
+// AnnotationKind What an annotation is. Highlights are the one kind so far.
+type AnnotationKind string
+
+// AnnotationList defines model for AnnotationList.
+type AnnotationList struct {
+	Annotations []Annotation `json:"annotations"`
+}
+
+// AnnotationPatch What to change: the note (empty removes it), and the range, as block_id and selector together. Anything left out stays.
+type AnnotationPatch struct {
+	BlockID *string `json:"block_id,omitempty"`
+	Note    *string `json:"note,omitempty"`
+
+	// Selector A range of one block's plain text: a heading's or paragraph's runs joined, or a code block's text. Offsets count UTF-16 code units, end exclusive. exact is the text in the range when it was saved; prefix and suffix, the text just around it, tell repeats apart when the text changes.
+	Selector *TextSelector `json:"selector,omitempty"`
+	Version  int           `json:"version"`
 }
 
 // CodeLang A language a user may choose for a code block. plaintext means no highlighting.
@@ -440,6 +501,29 @@ type ImportResponse struct {
 // ImportStatus defines model for ImportStatus.
 type ImportStatus string
 
+// NewAnnotation defines model for NewAnnotation.
+type NewAnnotation struct {
+	BlockID string `json:"block_id"`
+
+	// Kind What an annotation is. Highlights are the one kind so far.
+	Kind AnnotationKind `json:"kind"`
+	Note *string        `json:"note,omitempty"`
+
+	// Selector A range of one block's plain text: a heading's or paragraph's runs joined, or a code block's text. Offsets count UTF-16 code units, end exclusive. exact is the text in the range when it was saved; prefix and suffix, the text just around it, tell repeats apart when the text changes.
+	Selector TextSelector `json:"selector"`
+}
+
+// ReanchorRequest defines model for ReanchorRequest.
+type ReanchorRequest struct {
+	Annotations []struct {
+		ID openapi_types.UUID `json:"id"`
+
+		// Selector A range of one block's plain text: a heading's or paragraph's runs joined, or a code block's text. Offsets count UTF-16 code units, end exclusive. exact is the text in the range when it was saved; prefix and suffix, the text just around it, tell repeats apart when the text changes.
+		Selector TextSelector `json:"selector"`
+		Version  int          `json:"version"`
+	} `json:"annotations"`
+}
+
 // ResolveDocumentsRequest defines model for ResolveDocumentsRequest.
 type ResolveDocumentsRequest struct {
 	Urls []string `json:"urls"`
@@ -475,6 +559,9 @@ type SavedDocument struct {
 	Version int `json:"version"`
 }
 
+// TextSelector A range of one block's plain text: a heading's or paragraph's runs joined, or a code block's text. Offsets count UTF-16 code units, end exclusive. exact is the text in the range when it was saved; prefix and suffix, the text just around it, tell repeats apart when the text changes.
+type TextSelector = annotation.Selector
+
 // UserBlockKind The kinds a user block may use, nested blocks included. Source code, tables, tabs and images come only from the page.
 type UserBlockKind string
 
@@ -507,17 +594,32 @@ type ListDocumentsParams struct {
 	Limit  *int    `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
+// UpdateAnnotationJSONRequestBody defines body for UpdateAnnotation for application/json ContentType.
+type UpdateAnnotationJSONRequestBody = AnnotationPatch
+
 // ResolveDocumentsJSONRequestBody defines body for ResolveDocuments for application/json ContentType.
 type ResolveDocumentsJSONRequestBody = ResolveDocumentsRequest
 
 // SaveDocumentJSONRequestBody defines body for SaveDocument for application/json ContentType.
 type SaveDocumentJSONRequestBody = SaveDocumentRequest
 
+// CreateAnnotationJSONRequestBody defines body for CreateAnnotation for application/json ContentType.
+type CreateAnnotationJSONRequestBody = NewAnnotation
+
+// ReanchorAnnotationsJSONRequestBody defines body for ReanchorAnnotations for application/json ContentType.
+type ReanchorAnnotationsJSONRequestBody = ReanchorRequest
+
 // CreateImportJSONRequestBody defines body for CreateImport for application/json ContentType.
 type CreateImportJSONRequestBody = CreateImportRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// DeleteAnnotation Remove an annotation
+	// (DELETE /annotations/{id})
+	DeleteAnnotation(w http.ResponseWriter, r *http.Request, id ID)
+	// UpdateAnnotation Change an annotation's note, or place it on new text
+	// (PATCH /annotations/{id})
+	UpdateAnnotation(w http.ResponseWriter, r *http.Request, id ID)
 	// ListDocuments List the user's documents, newest first
 	// (GET /documents)
 	ListDocuments(w http.ResponseWriter, r *http.Request, params ListDocumentsParams)
@@ -530,6 +632,15 @@ type ServerInterface interface {
 	// SaveDocument Save a document's content
 	// (PATCH /documents/{id})
 	SaveDocument(w http.ResponseWriter, r *http.Request, id ID)
+	// ListAnnotations List a document's highlights and notes
+	// (GET /documents/{id}/annotations)
+	ListAnnotations(w http.ResponseWriter, r *http.Request, id ID)
+	// CreateAnnotation Highlight a range of one block, with an optional note
+	// (POST /documents/{id}/annotations)
+	CreateAnnotation(w http.ResponseWriter, r *http.Request, id ID)
+	// ReanchorAnnotations Move annotations to where their text is now
+	// (POST /documents/{id}/annotations/reanchor)
+	ReanchorAnnotations(w http.ResponseWriter, r *http.Request, id ID)
 	// RevertBlock Put a source block back as it was extracted
 	// (POST /documents/{id}/blocks/{blockId}/revert)
 	RevertBlock(w http.ResponseWriter, r *http.Request, id ID, blockID string)
@@ -549,6 +660,58 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// DeleteAnnotation operation middleware
+func (siw *ServerInterfaceWrapper) DeleteAnnotation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id ID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteAnnotation(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateAnnotation operation middleware
+func (siw *ServerInterfaceWrapper) UpdateAnnotation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id ID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateAnnotation(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // ListDocuments operation middleware
 func (siw *ServerInterfaceWrapper) ListDocuments(w http.ResponseWriter, r *http.Request) {
@@ -653,6 +816,84 @@ func (siw *ServerInterfaceWrapper) SaveDocument(w http.ResponseWriter, r *http.R
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.SaveDocument(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListAnnotations operation middleware
+func (siw *ServerInterfaceWrapper) ListAnnotations(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id ID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListAnnotations(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateAnnotation operation middleware
+func (siw *ServerInterfaceWrapper) CreateAnnotation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id ID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateAnnotation(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ReanchorAnnotations operation middleware
+func (siw *ServerInterfaceWrapper) ReanchorAnnotations(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id ID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReanchorAnnotations(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -864,6 +1105,11 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodPatch+" "+options.BaseURL+"/documents/{id}", wrapper.SaveDocument)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/documents/resolve", wrapper.ResolveDocuments)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/documents/{id}/blocks/{blockId}/revert", wrapper.RevertBlock)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/documents/{id}/annotations", wrapper.ListAnnotations)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/documents/{id}/annotations", wrapper.CreateAnnotation)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/documents/{id}/annotations/reanchor", wrapper.ReanchorAnnotations)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/annotations/{id}", wrapper.DeleteAnnotation)
+	m.HandleFunc(http.MethodPatch+" "+options.BaseURL+"/annotations/{id}", wrapper.UpdateAnnotation)
 
 	return m
 }
@@ -875,6 +1121,185 @@ type InvalidParameterJSONResponse Error
 type NotFoundJSONResponse Error
 
 type UnauthenticatedJSONResponse Error
+
+type DeleteAnnotationRequestObject struct {
+	ID ID `json:"id"`
+}
+
+type DeleteAnnotationResponseObject interface {
+	VisitDeleteAnnotationResponse(w http.ResponseWriter) error
+}
+
+type DeleteAnnotation204Response struct {
+}
+
+func (response DeleteAnnotation204Response) VisitDeleteAnnotationResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteAnnotation400JSONResponse struct{ InvalidParameterJSONResponse }
+
+func (response DeleteAnnotation400JSONResponse) VisitDeleteAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteAnnotation401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response DeleteAnnotation401JSONResponse) VisitDeleteAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteAnnotation404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response DeleteAnnotation404JSONResponse) VisitDeleteAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteAnnotation500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response DeleteAnnotation500JSONResponse) VisitDeleteAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateAnnotationRequestObject struct {
+	ID   ID `json:"id"`
+	Body *UpdateAnnotationJSONRequestBody
+}
+
+type UpdateAnnotationResponseObject interface {
+	VisitUpdateAnnotationResponse(w http.ResponseWriter) error
+}
+
+type UpdateAnnotation200JSONResponse Annotation
+
+func (response UpdateAnnotation200JSONResponse) VisitUpdateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateAnnotation400JSONResponse Error
+
+func (response UpdateAnnotation400JSONResponse) VisitUpdateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateAnnotation401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response UpdateAnnotation401JSONResponse) VisitUpdateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateAnnotation404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response UpdateAnnotation404JSONResponse) VisitUpdateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateAnnotation409JSONResponse VersionConflict
+
+func (response UpdateAnnotation409JSONResponse) VisitUpdateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateAnnotation422JSONResponse Error
+
+func (response UpdateAnnotation422JSONResponse) VisitUpdateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateAnnotation500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response UpdateAnnotation500JSONResponse) VisitUpdateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
 
 type ListDocumentsRequestObject struct {
 	Params ListDocumentsParams
@@ -1189,6 +1614,284 @@ func (response SaveDocument500JSONResponse) VisitSaveDocumentResponse(w http.Res
 	return err
 }
 
+type ListAnnotationsRequestObject struct {
+	ID ID `json:"id"`
+}
+
+type ListAnnotationsResponseObject interface {
+	VisitListAnnotationsResponse(w http.ResponseWriter) error
+}
+
+type ListAnnotations200JSONResponse AnnotationList
+
+func (response ListAnnotations200JSONResponse) VisitListAnnotationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAnnotations400JSONResponse struct{ InvalidParameterJSONResponse }
+
+func (response ListAnnotations400JSONResponse) VisitListAnnotationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAnnotations401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response ListAnnotations401JSONResponse) VisitListAnnotationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAnnotations404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response ListAnnotations404JSONResponse) VisitListAnnotationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAnnotations500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response ListAnnotations500JSONResponse) VisitListAnnotationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateAnnotationRequestObject struct {
+	ID   ID `json:"id"`
+	Body *CreateAnnotationJSONRequestBody
+}
+
+type CreateAnnotationResponseObject interface {
+	VisitCreateAnnotationResponse(w http.ResponseWriter) error
+}
+
+type CreateAnnotation201JSONResponse Annotation
+
+func (response CreateAnnotation201JSONResponse) VisitCreateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateAnnotation400JSONResponse Error
+
+func (response CreateAnnotation400JSONResponse) VisitCreateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateAnnotation401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response CreateAnnotation401JSONResponse) VisitCreateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateAnnotation404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response CreateAnnotation404JSONResponse) VisitCreateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateAnnotation422JSONResponse Error
+
+func (response CreateAnnotation422JSONResponse) VisitCreateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateAnnotation500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response CreateAnnotation500JSONResponse) VisitCreateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReanchorAnnotationsRequestObject struct {
+	ID   ID `json:"id"`
+	Body *ReanchorAnnotationsJSONRequestBody
+}
+
+type ReanchorAnnotationsResponseObject interface {
+	VisitReanchorAnnotationsResponse(w http.ResponseWriter) error
+}
+
+type ReanchorAnnotations200JSONResponse AnnotationList
+
+func (response ReanchorAnnotations200JSONResponse) VisitReanchorAnnotationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReanchorAnnotations400JSONResponse Error
+
+func (response ReanchorAnnotations400JSONResponse) VisitReanchorAnnotationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReanchorAnnotations401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response ReanchorAnnotations401JSONResponse) VisitReanchorAnnotationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReanchorAnnotations404JSONResponse Error
+
+func (response ReanchorAnnotations404JSONResponse) VisitReanchorAnnotationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReanchorAnnotations409JSONResponse Error
+
+func (response ReanchorAnnotations409JSONResponse) VisitReanchorAnnotationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReanchorAnnotations422JSONResponse Error
+
+func (response ReanchorAnnotations422JSONResponse) VisitReanchorAnnotationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReanchorAnnotations500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response ReanchorAnnotations500JSONResponse) VisitReanchorAnnotationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type RevertBlockRequestObject struct {
 	ID      ID     `json:"id"`
 	BlockID string `json:"blockId"`
@@ -1426,6 +2129,12 @@ func (response GetImport500JSONResponse) VisitGetImportResponse(w http.ResponseW
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// DeleteAnnotation Remove an annotation
+	// (DELETE /annotations/{id})
+	DeleteAnnotation(ctx context.Context, request DeleteAnnotationRequestObject) (DeleteAnnotationResponseObject, error)
+	// UpdateAnnotation Change an annotation's note, or place it on new text
+	// (PATCH /annotations/{id})
+	UpdateAnnotation(ctx context.Context, request UpdateAnnotationRequestObject) (UpdateAnnotationResponseObject, error)
 	// ListDocuments List the user's documents, newest first
 	// (GET /documents)
 	ListDocuments(ctx context.Context, request ListDocumentsRequestObject) (ListDocumentsResponseObject, error)
@@ -1438,6 +2147,15 @@ type StrictServerInterface interface {
 	// SaveDocument Save a document's content
 	// (PATCH /documents/{id})
 	SaveDocument(ctx context.Context, request SaveDocumentRequestObject) (SaveDocumentResponseObject, error)
+	// ListAnnotations List a document's highlights and notes
+	// (GET /documents/{id}/annotations)
+	ListAnnotations(ctx context.Context, request ListAnnotationsRequestObject) (ListAnnotationsResponseObject, error)
+	// CreateAnnotation Highlight a range of one block, with an optional note
+	// (POST /documents/{id}/annotations)
+	CreateAnnotation(ctx context.Context, request CreateAnnotationRequestObject) (CreateAnnotationResponseObject, error)
+	// ReanchorAnnotations Move annotations to where their text is now
+	// (POST /documents/{id}/annotations/reanchor)
+	ReanchorAnnotations(ctx context.Context, request ReanchorAnnotationsRequestObject) (ReanchorAnnotationsResponseObject, error)
 	// RevertBlock Put a source block back as it was extracted
 	// (POST /documents/{id}/blocks/{blockId}/revert)
 	RevertBlock(ctx context.Context, request RevertBlockRequestObject) (RevertBlockResponseObject, error)
@@ -1486,6 +2204,65 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// DeleteAnnotation operation middleware
+func (sh *strictHandler) DeleteAnnotation(w http.ResponseWriter, r *http.Request, id ID) {
+	var request DeleteAnnotationRequestObject
+
+	request.ID = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteAnnotation(ctx, request.(DeleteAnnotationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteAnnotation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteAnnotationResponseObject); ok {
+		if err := validResponse.VisitDeleteAnnotationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateAnnotation operation middleware
+func (sh *strictHandler) UpdateAnnotation(w http.ResponseWriter, r *http.Request, id ID) {
+	var request UpdateAnnotationRequestObject
+
+	request.ID = id
+
+	var body UpdateAnnotationJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateAnnotation(ctx, request.(UpdateAnnotationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateAnnotation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateAnnotationResponseObject); ok {
+		if err := validResponse.VisitUpdateAnnotationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // ListDocuments operation middleware
@@ -1597,6 +2374,98 @@ func (sh *strictHandler) SaveDocument(w http.ResponseWriter, r *http.Request, id
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(SaveDocumentResponseObject); ok {
 		if err := validResponse.VisitSaveDocumentResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListAnnotations operation middleware
+func (sh *strictHandler) ListAnnotations(w http.ResponseWriter, r *http.Request, id ID) {
+	var request ListAnnotationsRequestObject
+
+	request.ID = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListAnnotations(ctx, request.(ListAnnotationsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListAnnotations")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListAnnotationsResponseObject); ok {
+		if err := validResponse.VisitListAnnotationsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateAnnotation operation middleware
+func (sh *strictHandler) CreateAnnotation(w http.ResponseWriter, r *http.Request, id ID) {
+	var request CreateAnnotationRequestObject
+
+	request.ID = id
+
+	var body CreateAnnotationJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateAnnotation(ctx, request.(CreateAnnotationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateAnnotation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateAnnotationResponseObject); ok {
+		if err := validResponse.VisitCreateAnnotationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ReanchorAnnotations operation middleware
+func (sh *strictHandler) ReanchorAnnotations(w http.ResponseWriter, r *http.Request, id ID) {
+	var request ReanchorAnnotationsRequestObject
+
+	request.ID = id
+
+	var body ReanchorAnnotationsJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ReanchorAnnotations(ctx, request.(ReanchorAnnotationsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ReanchorAnnotations")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ReanchorAnnotationsResponseObject); ok {
+		if err := validResponse.VisitReanchorAnnotationsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

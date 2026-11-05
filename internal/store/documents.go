@@ -149,14 +149,14 @@ func (s *Store) DocumentExtraction(ctx context.Context, owner, id uuid.UUID) (*i
 	return &doc, nil
 }
 
-// VersionConflictError means a save was made from an old version of the
-// document. Current is the version now.
+// VersionConflictError means a save was made from an old version of a
+// document or an annotation. Current is the version now.
 type VersionConflictError struct {
 	Current int
 }
 
 func (e *VersionConflictError) Error() string {
-	return fmt.Sprintf("document is at version %d", e.Current)
+	return fmt.Sprintf("the version is now %d", e.Current)
 }
 
 // SaveDocument replaces the content of owner's document id if it is still at

@@ -40,6 +40,8 @@ type fakeBackend struct {
 	// what ResolveDocuments was asked for.
 	resolved map[string]uuid.UUID
 	asked    []string
+	// annotations are every document's annotations.
+	annotations []store.Annotation
 }
 
 func (f *fakeBackend) ResolveDocuments(_ context.Context, owner uuid.UUID, urls []string) (map[string]uuid.UUID, error) {

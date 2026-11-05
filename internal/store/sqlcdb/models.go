@@ -11,6 +11,19 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Annotation struct {
+	ID         uuid.UUID
+	OwnerID    uuid.UUID
+	DocumentID uuid.UUID
+	BlockID    string
+	Kind       string
+	Selector   []byte
+	Note       pgtype.Text
+	Version    int32
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+}
+
 type Import struct {
 	ID           uuid.UUID
 	OwnerID      uuid.UUID

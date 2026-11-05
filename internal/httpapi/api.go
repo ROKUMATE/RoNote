@@ -32,6 +32,11 @@ type Backend interface {
 	SaveDocument(ctx context.Context, owner, id uuid.UUID, content *doccontent.Doc, version int) (int, error)
 	ListDocuments(ctx context.Context, owner uuid.UUID, after *store.DocumentCursor, limit int) ([]store.DocumentSummary, error)
 	ResolveDocuments(ctx context.Context, owner uuid.UUID, urls []string) (map[string]uuid.UUID, error)
+	ListAnnotations(ctx context.Context, owner, document uuid.UUID) ([]store.Annotation, error)
+	CreateAnnotation(ctx context.Context, owner, document uuid.UUID, a store.NewAnnotation) (store.Annotation, error)
+	UpdateAnnotation(ctx context.Context, owner, id uuid.UUID, change store.AnnotationChange) (store.Annotation, error)
+	ReanchorAnnotations(ctx context.Context, owner, document uuid.UUID, moves []store.Reanchor) ([]store.Annotation, error)
+	DeleteAnnotation(ctx context.Context, owner, id uuid.UUID) error
 }
 
 // apiRoutes returns a mux with the routes of api/openapi.yaml: the

@@ -1,0 +1,171 @@
+import { ArrowCounterClockwiseIcon } from "@phosphor-icons/react/ArrowCounterClockwise";
+import { PlayIcon } from "@phosphor-icons/react/Play";
+import { StopIcon } from "@phosphor-icons/react/Stop";
+import { useContext, useId, useState, useSyncExternalStore } from "react";
+import type { IrBlock } from "../../api/schema";
+import { type ChosenLangs, CodeLangsContext } from "../codeLangs";
+import { classifyAll, codeBlocks, isDoctest, type RunClass, type Runnability } from "./classify";
+import type { RunScope } from "./RunArea";
+import { type BlockRun, type Chunk, type Python, runsOf } from "./runs";
+
+/*
+ * Run controls and output for code blocks, a lazy chunk
+ * (docs/adr/0008-in-browser-code-execution.md).
+ */
+
+/** What a block's chip says; its reason shows on hover and focus. */
+const chips: Record<RunClass, string> = {
+  browser_python: "Python · browser",
+  python_doctest: "Python · browser",
+  needs_packages: "Needs packages",
+  needs_network: "Needs network",
+  needs_secret: "Needs a key",
+  needs_input: "Needs input",
+  needs_dom: "Needs a display",
+  shell: "Shell",
+  fragment: "Fragment",
+  unsupported: "Can't run",
+};
+
+/** The last document's classes: every block of a document classified at once. */
+let classified:
+  | { blocks: readonly IrBlock[]; chosen: ChosenLangs; classes: Map<string, Runnability> }
+  | undefined;
+
+function classesOf(blocks: readonly IrBlock[], chosen: ChosenLangs) {
+  if (classified?.blocks !== blocks || classified.chosen !== chosen) {
+    classified = { blocks, chosen, classes: classifyAll(codeBlocks(blocks, chosen)) };
+  }
+  return classified.classes;
+}
+
+function useRun(scope: RunScope, blockId: string) {
+  const runs = runsOf(scope.documentId);
+  const run = useSyncExternalStore(runs.subscribe, () => runs.get(blockId));
+  const python = useSyncExternalStore(runs.subscribe, runs.python);
+  return { runs, run, python };
+}
+
+/** A block's chip, and Run, Run anyway or Stop. */
+export function Controls({ block, scope }: { block: IrBlock; scope: RunScope }) {
+  const { chosen } = useContext(CodeLangsContext);
+  const runnability = classesOf(scope.blocks, chosen).get(block.id);
+  const { runs, run } = useRun(scope, block.id);
+  if (!runnability) return null;
+  const code = block.text ?? "";
+  const button =
+    run && !run.done ? (
+      <button type="button" className="run-button" onClick={() => runs.stop()}>
+        <StopIcon size={16} aria-hidden />
+        Stop
+      </button>
+    ) : runnability.run === "none" ? null : (
+      <button
+        type="button"
+        className="run-button"
+        onClick={() => runs.run(block.id, code, isDoctest(code) ? "doctest" : "exec")}
+      >
+        <PlayIcon size={16} aria-hidden />
+        {runnability.run === "run" ? "Run" : "Run anyway"}
+      </button>
+    );
+  return (
+    <>
+      <Chip runnability={runnability} />
+      {button}
+    </>
+  );
+}
+
+/** The class as a chip, its reason a tooltip that Escape dismisses. */
+function Chip({ runnability }: { runnability: Runnability }) {
+  const id = useId();
+  const [dismissed, setDismissed] = useState(false);
+  return (
+    <span className="run-chip-wrap" data-dismissed={dismissed || undefined}>
+      <button
+        type="button"
+        className="run-chip"
+        data-run={runnability.run}
+        aria-describedby={id}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") setDismissed(true);
+        }}
+        onBlur={() => setDismissed(false)}
+        onMouseLeave={() => setDismissed(false)}
+      >
+        {chips[runnability.class]}
+      </button>
+      <span role="tooltip" id={id} className="run-tip">
+        {runnability.reason}
+      </span>
+    </span>
+  );
+}
+
+const labels: Record<Exclude<Chunk["kind"], "stdout">, string> = {
+  stderr: "stderr",
+  error: "error",
+  result: "value",
+};
+
+/** A block's output once it has run: never saved, gone with the page. */
+export function Output({ block, scope }: { block: IrBlock; scope: RunScope }) {
+  const { runs, run, python } = useRun(scope, block.id);
+  if (!run) return null;
+  return (
+    <div className="run-output">
+      <div className="run-output-bar">
+        <p role="status">{status(run, python)}</p>
+        <button type="button" disabled={!run.done} onClick={() => runs.clear(block.id)}>
+          Clear
+        </button>
+        <button type="button" onClick={() => runs.restart(block.id)}>
+          <ArrowCounterClockwiseIcon size={16} aria-hidden />
+          Restart
+        </button>
+      </div>
+      {run.note && <p className="run-note">{run.note}</p>}
+      {run.output.length > 0 && (
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: output that scrolls must be reachable by keyboard (WCAG 2.1.1; axe scrollable-region-focusable).
+        <pre tabIndex={0} className="run-text">
+          {run.output.map((chunk, i) =>
+            chunk.kind === "stdout" ? (
+              // biome-ignore lint/suspicious/noArrayIndexKey: output only grows at its end.
+              <span key={i}>{chunk.text}</span>
+            ) : (
+              // biome-ignore lint/suspicious/noArrayIndexKey: output only grows at its end.
+              <span key={i} className={`run-${chunk.kind}`}>
+                <span className="run-label">{labels[chunk.kind]}</span>
+                {chunk.text}
+              </span>
+            ),
+          )}
+        </pre>
+      )}
+    </div>
+  );
+}
+
+function status(run: BlockRun, python: Python): string {
+  if (!run.done) return python === "ready" ? "Running…" : "Starting Python…";
+  const after = duration(run.done.ms);
+  switch (run.done.end) {
+    case "ok":
+      return `Ran in ${after}`;
+    case "error":
+      return `Ended with an error after ${after}`;
+    case "stop":
+      return `Stopped after ${after}`;
+    case "timeout":
+      return "Stopped at the 30 second limit";
+    case "output":
+      return "Stopped: the output passed 1 MB";
+    case "lost":
+      return "Didn't finish";
+  }
+}
+
+function duration(ms: number): string {
+  return ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(1)} s`;
+}

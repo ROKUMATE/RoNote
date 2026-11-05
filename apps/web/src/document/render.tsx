@@ -6,6 +6,7 @@ import { CodeLangPicker } from "./CodeLangPicker";
 import { CodeLangsContext } from "./codeLangs";
 import { type CodeMark, cutRuns, type Run } from "./codeMarks";
 import { type LinkTargets, linkAttributes, linkStatus } from "./links";
+import { RunControls, RunOutput } from "./run/RunArea";
 import { useHighlight } from "./useHighlight";
 
 /*
@@ -215,6 +216,8 @@ function HighlightedCode({ block }: { block: IrBlock }) {
       language={<CodeLangPicker block={block} choices={choices} />}
       title={block.title}
       titleHref={block.title_link?.href}
+      actions={<RunControls block={block} />}
+      footer={<RunOutput block={block} />}
     >
       {children}
     </CodeBlock>

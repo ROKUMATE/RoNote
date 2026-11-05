@@ -18,6 +18,8 @@ const budgets = {
   highlighter: 60_000,
   /** The highlight and note controls, loaded once the editor is up (ADR 0007). */
   annotations: 15_000,
+  /** Running code: classifier, controls, output and runner client, loaded with code (ADR 0008). */
+  run: 20_000,
   /** All stylesheets. */
   css: 20_000,
 };
@@ -64,6 +66,7 @@ const groups = {
   document: closure(entry("src/pages/DocumentPage.tsx"), seen),
   highlighter: closure(entry("src/document/highlighter.ts"), seen),
   annotations: closure(entry("src/document/annotations/ui.tsx"), seen),
+  run: closure(entry("src/document/run/ui.tsx"), seen),
 };
 const languages = Object.keys(manifest).filter(
   (k) => !seen.has(k) && manifest[k]?.file.endsWith(".js"),

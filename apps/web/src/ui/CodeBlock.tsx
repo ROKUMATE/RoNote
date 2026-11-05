@@ -12,6 +12,10 @@ type CodeBlockProps = {
   titleHref?: string | undefined;
   /** The code drawn another way, such as highlighted; code is still what Copy copies. */
   children?: ReactNode;
+  /** Controls for the header, before Copy, such as Run. */
+  actions?: ReactNode;
+  /** What goes under the code, such as its output. */
+  footer?: ReactNode;
   ref?: Ref<HTMLDivElement>;
 };
 
@@ -26,6 +30,8 @@ export function CodeBlock({
   title,
   titleHref,
   children,
+  actions,
+  footer,
   ref,
 }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
@@ -45,6 +51,7 @@ export function CodeBlock({
             <span className="code-title">{title}</span>
           ))}
         {language}
+        {actions}
         <button
           type="button"
           onClick={() => void copy()}
@@ -60,6 +67,7 @@ export function CodeBlock({
       <pre tabIndex={0}>
         <code>{children ?? code}</code>
       </pre>
+      {footer}
     </div>
   );
 }

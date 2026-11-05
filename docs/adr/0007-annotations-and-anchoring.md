@@ -37,7 +37,9 @@ DocContent (ADR 0006) holds the text. Highlights could live in it as marks, but 
   4. **Orphaned:** none of these found it.
 - **Why 0.75:**
   - an edited word in a quote of five or more words changes at most about a fifth of its characters, so it stays placed;
-  - replacing half the words, or editing a one- or two-word quote, falls below and orphans it.
+  - so does a typo fixed in a single word;
+  - replacing half the words, or a short quote's whole word, falls below and orphans it;
+  - quotes under four characters never match fuzzily.
 
   Matching less closely than that more often finds a different passage than the same one, edited. The anchoring tests pin cases just above and just below.
 - **Orphans are derived, never stored or deleted.** An annotation is orphaned exactly when it can't be anchored in the current content: its block was deleted, or its words changed past the threshold.

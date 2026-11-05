@@ -56,7 +56,7 @@ Create a directory when its first file needs it, not before.
 |---|---|
 | `make help` | list targets (default target) |
 | `make setup` | point git at `.githooks`, make the hook executable, set `pull.rebase true`; run once per clone |
-| `make hooks-test` | test the commit message hook (normal and strict mode), `scripts/check-commits.sh` and the clock check of `scripts/container.sh` (against fake `podman`, `docker` and `date`) |
+| `make hooks-test` | test the commit message hook (normal and strict mode), `scripts/check-commits.sh`, the clock check of `scripts/container.sh` (against fake `podman`, `docker` and `date`), and `scripts/run.sh` with `scripts/stop.sh` |
 | `make check-commits RANGE=main..HEAD` | check every commit message in `RANGE` in strict mode; in CI the event sets the range (`scripts/commit-range.sh`). `scripts/check-commits.sh` exits 0 when all pass, 1 when any is bad (report on stderr), 2 on a usage or internal error |
 | `make tools` | install the pinned golangci-lint into `./bin` |
 | `make check` | `lint`, `test`, `test-perf` and `hooks-test`: what CI's fast jobs run. Run it before pushing |
@@ -84,7 +84,8 @@ Create a directory when its first file needs it, not before.
 | `make dev` (P0x) | run API, worker and web locally |
 | `make doctor` | check the local setup: the container VM's clock is within 2s of the host's (podman machine, or Docker's VM). On failure it prints the offset and the fix, such as `podman machine ssh sudo chronyc makestep` |
 | `make dev-up` | start the dev stack (`deploy/compose.dev.yml`) and wait until healthy; creates `.env.dev` if missing |
-| `make dev-down` | stop the dev stack; the data volume is kept |
+| `make stop` | end what `make run-api`, `make run-worker` and `make web-dev` started, with everything they started (such as the binary `go run` builds): each runs through `scripts/run.sh`, which records its process group in `.run/`; `scripts/stop.sh` sends TERM to each group, then KILL after 5s |
+| `make dev-down` | `make stop`, then stop the dev stack; the data volume is kept |
 | `make dev-logs` | follow the dev stack logs |
 | `make db-shell` | psql on the dev database |
 | `make build` (P0x) | build the Go binaries and the web bundle |

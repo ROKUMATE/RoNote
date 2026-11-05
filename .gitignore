@@ -13,6 +13,9 @@ npm-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Dev processes make stop ends (scripts/run.sh)
+.run/
+
 # Environment
 .env*
 !.env.example

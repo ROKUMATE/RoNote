@@ -66,9 +66,16 @@ export default defineConfig({
       gracefulShutdown: stop,
     },
     {
+      name: "runner",
+      command: `pnpm runner --port ${new URL(stack.runner).port}`,
+      env: env({ RONOTE_APP_ORIGINS: stack.web }),
+      url: `${stack.runner}/`,
+      reuseExistingServer: false,
+    },
+    {
       name: "web",
       command: `pnpm dev --host 127.0.0.1 --port ${new URL(stack.web).port} --strictPort`,
-      env: env({ RONOTE_API_ORIGIN: stack.api }),
+      env: env({ RONOTE_API_ORIGIN: stack.api, RONOTE_RUNNER_ORIGIN: stack.runner }),
       url: stack.web,
       reuseExistingServer: false,
     },

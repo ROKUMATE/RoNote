@@ -18,6 +18,8 @@
   },
   "include": [
     "vite.config.ts",
+    "vite.runner.config.ts",
+    "browsers.ts",
     "vitest.live.config.ts",
     "playwright.config.ts",
     "e2e",

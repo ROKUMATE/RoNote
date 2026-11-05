@@ -166,6 +166,8 @@ docs/adr/0005-import-pipeline.md describes the pipeline both serve.
 - Unit tests never touch the network or paid APIs. Loopback `httptest` servers are fine; DNS lookups and outside hosts are not.
 - Extractor changes: `go test ./internal/extract -update` rewrites `testdata/golden/*/expected.json`; review that diff like code. `TestCodeIsVerbatim` and `TestGoldenHasNoJunk` must stay green, and run `go test -run '^$' -fuzz=FuzzExtract -fuzztime=60s ./internal/extract` before committing.
 - Web: Vitest + Testing Library for units and components; Playwright (Chromium) with `@axe-core/playwright` for end-to-end and accessibility. Pages must have zero axe violations in light and dark. No screenshot assertions: they differ between macOS and Linux CI.
+- A test that must stop running is quarantined, never deleted: `test.fixme` (Playwright), `test.skip` (Vitest) or `t.Skip` (Go), with a comment `Quarantined: #N` naming its tracking issue. Split a test first when only part of it is the problem, so the rest keeps running.
+- Every phase summary lists the quarantined tests.
 
 ## Verbatim rule
 

@@ -5,14 +5,16 @@ import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { requestErrorMessage } from "../../api/messages";
 import type { Annotation } from "../../api/schema";
 import { selectorOf } from "../anchoring";
-import { type Segment, selectionSegments } from "../highlights";
+import { rangeOf, type Segment, selectionSegments } from "../highlights";
 import type { Annotations } from "../useAnnotations";
+import { HighlightsList } from "./list";
 import { Notes } from "./notes";
 
 /*
  * The controls for highlights and notes (docs/adr/0007-annotations-and-anchoring.md),
  * loaded as their own chunk once the editor is up: the toolbar over a
- * selection, the popover of a highlight, and the undo of a removal.
+ * selection, the popover of a highlight, the notes, the list of every
+ * highlight, and the undo of a removal.
  */
 
 type Props = {
@@ -20,11 +22,14 @@ type Props = {
   annotations: Annotations;
   /** The element the controls are placed in, around the reader. */
   frame: HTMLElement;
+  /** Where the list of highlights goes, in the document's header. */
+  listSlot: HTMLElement;
 };
 
-export function AnnotationsUI({ editor, annotations, frame }: Props) {
+export function AnnotationsUI({ editor, annotations, frame, listSlot }: Props) {
   const [open, setOpen] = useState<{ id: string; noteFirst: boolean }>();
   const [removed, setRemoved] = useState<Annotation>();
+  const [placing, setPlacing] = useState<Annotation>();
   const [error, setError] = useState<string>();
 
   const run = async (action: () => Promise<unknown>) => {
@@ -50,6 +55,32 @@ export function AnnotationsUI({ editor, annotations, frame }: Props) {
       else if (!inCode) editor.commands.focus();
     });
 
+  /** Puts the unplaced highlight being re-applied on the selected text. */
+  const place = (segment: Segment) =>
+    run(async () => {
+      if (!placing) return;
+      await annotations.place(placing, segment);
+      setPlacing(undefined);
+      editor.commands.setTextSelection(editor.state.selection.to);
+      editor.commands.focus();
+    });
+
+  const remove = (annotation: Annotation) =>
+    run(async () => {
+      await annotations.remove(annotation);
+      setOpen(undefined);
+      setRemoved(annotation);
+    });
+
+  /** Scrolls to a highlight and puts the caret at its start. */
+  const jump = (id: string) => {
+    const mark = editor.view.dom.querySelector(`[data-annotation="${id}"]`);
+    mark?.scrollIntoView({ block: "center" });
+    const range = rangeOf(editor.state, id);
+    if (range) editor.chain().focus().setTextSelection(range.from).run();
+    else mark?.closest<HTMLElement>("pre")?.focus();
+  };
+
   // A click on a highlight opens its popover.
   useEffect(() => {
     const dom = editor.view.dom;
@@ -66,7 +97,41 @@ export function AnnotationsUI({ editor, annotations, frame }: Props) {
   const noted = annotations.list?.filter((a) => a.note) ?? [];
   return (
     <>
-      <SelectionToolbar editor={editor} frame={frame} onHighlight={highlight} />
+      <SelectionToolbar
+        editor={editor}
+        frame={frame}
+        onHighlight={highlight}
+        onPlace={placing && place}
+      />
+      {annotations.list && (
+        <HighlightsList
+          editor={editor}
+          list={annotations.list}
+          slot={listSlot}
+          onJump={jump}
+          onOpen={(id) => setOpen({ id, noteFirst: true })}
+          onRemove={remove}
+          onReapply={(annotation) => {
+            setPlacing(annotation);
+            editor.commands.focus();
+          }}
+        />
+      )}
+      {placing && (
+        <p
+          role="status"
+          className="fixed bottom-4 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-md border border-rule bg-paper px-3 py-2 font-sans text-ui-lg"
+        >
+          Select the text for “{placing.selector.quote.exact}”, then Place here.
+          <button
+            type="button"
+            onClick={() => setPlacing(undefined)}
+            className="text-accent underline underline-offset-2"
+          >
+            Cancel
+          </button>
+        </p>
+      )}
       <Notes
         editor={editor}
         notes={noted}
@@ -81,14 +146,9 @@ export function AnnotationsUI({ editor, annotations, frame }: Props) {
           frame={frame}
           focusNote={open.noteFirst}
           onNote={(note) => run(() => annotations.setNote(current, note))}
-          onRemove={() =>
-            run(async () => {
-              await annotations.remove(current);
-              setOpen(undefined);
-              setRemoved(current);
-              editor.commands.focus();
-            })
-          }
+          onRemove={() => {
+            void remove(current).then(() => editor.commands.focus());
+          }}
           onClose={() => {
             setOpen(undefined);
             editor.commands.focus();
@@ -174,10 +234,13 @@ function SelectionToolbar({
   editor,
   frame,
   onHighlight,
+  onPlace,
 }: {
   editor: Editor;
   frame: HTMLElement;
   onHighlight: (segments: readonly Segment[], withNote: boolean, inCode: boolean) => void;
+  /** Set while an unplaced highlight is being re-applied: the toolbar places it instead. */
+  onPlace?: ((segment: Segment) => void) | undefined;
 }) {
   // From the page as it is: the selection may predate this chunk loading.
   const [segments, setSegments] = useState(() => selectionSegments(editor.state));
@@ -259,7 +322,42 @@ function SelectionToolbar({
     }
   };
 
-  const one = shown.segments.length === 1;
+  const [single] = shown.segments.length === 1 ? shown.segments : [];
+  const buttons = onPlace ? (
+    single && (
+      <button
+        type="button"
+        onClick={() => onPlace(single)}
+        className="flex items-center gap-1.5 rounded-sm px-2 py-1 hover:bg-paper-2 focus-visible:bg-paper-2"
+      >
+        <HighlighterIcon size={16} aria-hidden />
+        Place here
+      </button>
+    )
+  ) : (
+    <>
+      <button
+        type="button"
+        onClick={() => onHighlight(shown.segments, false, shown.inCode)}
+        className="flex items-center gap-1.5 rounded-sm px-2 py-1 hover:bg-paper-2 focus-visible:bg-paper-2"
+      >
+        <HighlighterIcon size={16} aria-hidden />
+        Highlight
+      </button>
+      {single && (
+        <button
+          type="button"
+          tabIndex={-1}
+          onClick={() => onHighlight(shown.segments, true, shown.inCode)}
+          className="flex items-center gap-1.5 rounded-sm px-2 py-1 hover:bg-paper-2 focus-visible:bg-paper-2"
+        >
+          <NotePencilIcon size={16} aria-hidden />
+          Highlight + note
+        </button>
+      )}
+    </>
+  );
+  if (!buttons) return null;
   return (
     <div
       ref={toolbar}
@@ -277,25 +375,7 @@ function SelectionToolbar({
       style={at}
       className="absolute z-20 flex gap-1 rounded-md border border-rule bg-paper p-1 font-sans text-ink text-ui"
     >
-      <button
-        type="button"
-        onClick={() => onHighlight(shown.segments, false, shown.inCode)}
-        className="flex items-center gap-1.5 rounded-sm px-2 py-1 hover:bg-paper-2 focus-visible:bg-paper-2"
-      >
-        <HighlighterIcon size={16} aria-hidden />
-        Highlight
-      </button>
-      {one && (
-        <button
-          type="button"
-          tabIndex={-1}
-          onClick={() => onHighlight(shown.segments, true, shown.inCode)}
-          className="flex items-center gap-1.5 rounded-sm px-2 py-1 hover:bg-paper-2 focus-visible:bg-paper-2"
-        >
-          <NotePencilIcon size={16} aria-hidden />
-          Highlight + note
-        </button>
-      )}
+      {buttons}
     </div>
   );
 }

@@ -89,6 +89,7 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
   const [editor, setEditor] = useState<Editor>();
   const annotations = useAnnotations(doc.id, doc.content, editor, saving);
   const [frame, setFrame] = useState<HTMLDivElement | null>(null);
+  const [listSlot, setListSlot] = useState<HTMLDivElement | null>(null);
   const hrefs = useMemo(() => sameDomainHrefs(doc.content.blocks), [doc.content.blocks]);
   const targets = useQuery(linkTargets(doc.id, hrefs)).data;
   const { follow, following } = useFollow(targets);
@@ -125,6 +126,7 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
             <li key={count}>{count}</li>
           ))}
         </ul>
+        <div ref={setListSlot} />
         <SaveState status={status} />
       </header>
       {fallback && (
@@ -148,9 +150,14 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
           />
         </CodeLangsContext>
         {editor && <Outline editor={editor} />}
-        {editor && frame && (
+        {editor && frame && listSlot && (
           <Suspense fallback={null}>
-            <AnnotationsUI editor={editor} annotations={annotations} frame={frame} />
+            <AnnotationsUI
+              editor={editor}
+              annotations={annotations}
+              frame={frame}
+              listSlot={listSlot}
+            />
           </Suspense>
         )}
       </div>

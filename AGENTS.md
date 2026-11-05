@@ -55,7 +55,7 @@ Create a directory when its first file needs it, not before.
 |---|---|
 | `make help` | list targets (default target) |
 | `make setup` | point git at `.githooks`, make the hook executable, set `pull.rebase true`; run once per clone |
-| `make hooks-test` | test the commit message hook (normal and strict mode) and `scripts/check-commits.sh` |
+| `make hooks-test` | test the commit message hook (normal and strict mode), `scripts/check-commits.sh` and the clock check of `scripts/container.sh` (against fake `podman`, `docker` and `date`) |
 | `make check-commits RANGE=main..HEAD` | check every commit message in `RANGE` in strict mode; in CI the event sets the range (`scripts/commit-range.sh`). `scripts/check-commits.sh` exits 0 when all pass, 1 when any is bad (report on stderr), 2 on a usage or internal error |
 | `make tools` | install the pinned golangci-lint into `./bin` |
 | `make check` | `lint`, `test`, `test-perf` and `hooks-test`: what CI's fast jobs run. Run it before pushing |
@@ -81,6 +81,7 @@ Create a directory when its first file needs it, not before.
 | `make run-api` | run the API on `127.0.0.1:8080`; `RONOTE_ENV` defaults to `dev` |
 | `make extract url=... [format=text]` | fetch one page with the production fetcher rules and print its IR as JSON, or as readable text |
 | `make dev` (P0x) | run API, worker and web locally |
+| `make doctor` | check the local setup: the container VM's clock is within 2s of the host's (podman machine, or Docker's VM). On failure it prints the offset and the fix, such as `podman machine ssh sudo chronyc makestep` |
 | `make dev-up` | start the dev stack (`deploy/compose.dev.yml`) and wait until healthy; creates `.env.dev` if missing |
 | `make dev-down` | stop the dev stack; the data volume is kept |
 | `make dev-logs` | follow the dev stack logs |
@@ -100,6 +101,7 @@ Targets marked (P0x) do not exist yet. The phase that adds a target removes its 
 
 - macOS uses podman machine (rootless); Linux and CI use Docker. `scripts/container.sh` picks whichever answers.
 - `podman compose` needs a compose provider: `brew install docker-compose` (or podman-compose). `make dev-up` fails with a clear message when neither `podman compose` nor `docker compose` works.
+- After the Mac sleeps, podman machine's clock can lag the host's for minutes. Postgres then writes times on the VM's clock while the app uses the host's; River copes since P12 (ADR 0005), but a test that compares the two still fails. Run `make doctor` when integration tests fail oddly.
 - `.env.example` lists every variable. Copy it to `.env.dev` (gitignored); the Makefile loads it, its values override the shell environment, and `make VAR=value` still wins.
 
 Web targets, `make lint` and `make test` check that `node --version` matches `.nvmrc` first; with nvm, `nvm install && nvm use` picks it up.

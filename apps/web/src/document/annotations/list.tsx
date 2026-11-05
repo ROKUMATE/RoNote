@@ -65,7 +65,7 @@ export function HighlightsList({
   );
 
   return createPortal(
-    <details className="font-sans text-ui">
+    <details className="mt-3 font-sans text-ui">
       <summary className="cursor-pointer text-ink-2 hover:text-ink">
         Highlights ({list.length})
       </summary>

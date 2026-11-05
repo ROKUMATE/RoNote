@@ -7,21 +7,8 @@ import {
   ReactNodeViewRenderer,
 } from "@tiptap/react";
 import type { IrBlock } from "../api/schema";
-import { lineCount } from "../ui/CodeBlock";
 import { Block } from "./render";
 import { atomNodes, extensions } from "./schema";
-
-/**
- * What reader.css needs to guess a block's height before it is drawn
- * (content-visibility): code's lines and a table's rows.
- */
-function sizeHint(block: IrBlock): Record<string, string> {
-  if (block.kind === "code") return { style: `--lines: ${lineCount(block.text ?? "")}` };
-  if (block.kind === "table") {
-    return { style: `--rows: ${(block.head?.length ?? 0) + (block.rows?.length ?? 0)}` };
-  }
-  return {};
-}
 
 /** A block the editor shows whole: code, a table, tabs, an image or a divider. */
 function AtomView({ node }: NodeViewProps) {
@@ -59,11 +46,7 @@ export const readerExtensions = [
   ...extensions.map((ext) => {
     if ((atomNodes as readonly string[]).includes(ext.name)) {
       return (ext as Node).extend({
-        addNodeView: () =>
-          ReactNodeViewRenderer(AtomView, {
-            stopEvent: () => true,
-            attrs: ({ node }) => sizeHint(node.attrs.block as IrBlock),
-          }),
+        addNodeView: () => ReactNodeViewRenderer(AtomView, { stopEvent: () => true }),
       });
     }
     if (ext.name === "callout") {

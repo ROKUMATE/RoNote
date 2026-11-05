@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { expect, test } from "vitest";
-import type { DocBlock, IrBlock } from "../api/schema";
+import type { DocBlock, IrBlock, IrLink } from "../api/schema";
 import { followHelpId } from "./links";
 import { Reader } from "./Reader";
 
@@ -10,7 +10,7 @@ const source = (b: IrBlock): DocBlock => ({
   edited: false,
   source_block_id: b.id,
 });
-const link = (text: string, href: string, kind: "same_domain" | "external") => ({
+const link = (text: string, href: string, kind: IrLink["kind"]) => ({
   text,
   link: { href, kind },
 });

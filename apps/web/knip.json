@@ -1,6 +1,13 @@
 {
   "$schema": "./node_modules/knip/schema.json",
-  "entry": ["playwright.config.ts", "e2e/*.spec.ts", "e2e/fixture-site.ts", "scripts/budget.ts"],
+  "entry": [
+    "playwright.config.ts",
+    "e2e/*.spec.ts",
+    "e2e/fixture-site.ts",
+    "live/*.test.ts",
+    "scripts/budget.ts"
+  ],
   "playwright": false,
+  "ignoreBinaries": ["go"],
   "ignore": ["src/api/schema.d.ts"]
 }

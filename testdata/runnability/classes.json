@@ -1,0 +1,275 @@
+{
+  "adapter-fallback": [
+    "sh: shell"
+  ],
+  "br-in-pre": [
+    "-: unsupported",
+    "-: unsupported"
+  ],
+  "callouts": [
+    "sql: unsupported"
+  ],
+  "chrome-removal": [
+    "-: unsupported"
+  ],
+  "crlf": [
+    "bat: shell"
+  ],
+  "detect-generator-over-host": [
+    "go: unsupported"
+  ],
+  "docbook-chapter": [
+    "-: unsupported",
+    "-: unsupported"
+  ],
+  "docbook-postgres-select": [
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported"
+  ],
+  "docsy-k8s-pods": [
+    "yaml: unsupported",
+    "shell: shell"
+  ],
+  "docsy-tabpane": [
+    "toml: unsupported",
+    "yaml: unsupported",
+    "sh: shell",
+    "go: unsupported"
+  ],
+  "docusaurus-code-blocks": [
+    "md: unsupported",
+    "jsx: unsupported",
+    "md: unsupported",
+    "js: unsupported",
+    "js: unsupported",
+    "js: unsupported",
+    "bash: shell",
+    "bash: shell",
+    "bash: shell",
+    "bash: shell",
+    "js: unsupported"
+  ],
+  "docusaurus-v3-install": [
+    "bash: shell",
+    "bash: shell",
+    "js: unsupported",
+    "tsx: unsupported"
+  ],
+  "entities": [
+    "html: unsupported"
+  ],
+  "expressive-code": [
+    "python: browser_python",
+    "bash: shell",
+    "go: unsupported"
+  ],
+  "go-tabs": [
+    "go: unsupported"
+  ],
+  "godev-getting-started": [
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported"
+  ],
+  "leading-empty-line": [
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported"
+  ],
+  "long-line": [
+    "js: unsupported"
+  ],
+  "material-code-blocks": [
+    "yaml: unsupported",
+    "yaml: unsupported",
+    "yaml: unsupported",
+    "yaml: unsupported",
+    "markdown: unsupported",
+    "py: browser_python",
+    "markdown: unsupported",
+    "yaml: unsupported",
+    "markdown: unsupported",
+    "yaml: unsupported",
+    "markdown: unsupported",
+    "py: browser_python",
+    "markdown: unsupported",
+    "py: browser_python",
+    "markdown: unsupported",
+    "py: browser_python"
+  ],
+  "material-fastapi-first-steps": [
+    "-: unsupported",
+    "console: shell",
+    "-: unsupported",
+    "-: unsupported"
+  ],
+  "material-termy": [
+    "console: shell",
+    "html: unsupported"
+  ],
+  "mdbook-rust-data-types": [
+    "rust: unsupported",
+    "console: shell",
+    "rust: unsupported",
+    "rust: unsupported",
+    "rust: unsupported",
+    "rust: unsupported",
+    "rust: unsupported",
+    "rust: unsupported",
+    "rust: unsupported",
+    "rust: unsupported",
+    "rust: unsupported",
+    "rust: unsupported",
+    "rust: unsupported",
+    "rust: unsupported",
+    "rust: unsupported",
+    "console: shell"
+  ],
+  "mdbook-v04-reading-files": [
+    "rust: unsupported",
+    "console: shell",
+    "toml: unsupported"
+  ],
+  "mdn-closures-synthetic": [
+    "js: unsupported",
+    "js: unsupported"
+  ],
+  "mdn-live-sample-synthetic": [
+    "html: unsupported",
+    "css: unsupported",
+    "js: unsupported"
+  ],
+  "nested-highlight": [
+    "python: browser_python",
+    "shell: shell"
+  ],
+  "nested-lists": [
+    "shell: shell"
+  ],
+  "never-text-in-code": [
+    "bash: shell",
+    "python: browser_python",
+    "pycon: python_doctest"
+  ],
+  "no-main": [
+    "-: unsupported"
+  ],
+  "real-go-effective-go": [
+    "-: unsupported",
+    "-: unsupported",
+    "-: unsupported"
+  ],
+  "real-kubernetes-pods": [
+    "yaml: unsupported",
+    "shell: shell"
+  ],
+  "real-python-controlflow": [
+    "python3: needs_input",
+    "python3: python_doctest",
+    "python3: browser_python"
+  ],
+  "sphinx-linenos": [
+    "python: needs_packages",
+    "python: needs_packages",
+    "toml: unsupported",
+    "pycon: needs_packages"
+  ],
+  "sphinx-requests-quickstart": [
+    "default: unsupported",
+    "default: unsupported",
+    "default: unsupported",
+    "default: unsupported",
+    "default: unsupported",
+    "default: unsupported",
+    "default: unsupported",
+    "default: unsupported",
+    "default: unsupported",
+    "default: unsupported",
+    "default: unsupported",
+    "default: unsupported",
+    "default: unsupported",
+    "default: unsupported"
+  ],
+  "starlight-rag": [
+    "plaintext: unsupported",
+    "bash: shell",
+    "python: browser_python"
+  ],
+  "starlight-tabs": [
+    "tsx: unsupported",
+    "mdx: unsupported",
+    "markdoc: unsupported"
+  ],
+  "trailing-whitespace": [
+    "-: unsupported",
+    "yaml: unsupported"
+  ],
+  "unicode": [
+    "python: browser_python"
+  ],
+  "vitepress-markdown": [
+    "md: unsupported",
+    "md: unsupported",
+    "js: unsupported",
+    "ts: unsupported",
+    "ts: unsupported",
+    "md: unsupported",
+    "css: unsupported",
+    "md: unsupported",
+    "js: unsupported",
+    "md: unsupported",
+    "js: unsupported",
+    "md: unsupported",
+    "md: unsupported",
+    "sh: shell",
+    "js: unsupported",
+    "js: unsupported",
+    "md: unsupported",
+    "-: unsupported",
+    "js: unsupported",
+    "-: unsupported",
+    "js: unsupported",
+    "js: unsupported",
+    "md: unsupported",
+    "ts: unsupported",
+    "ts: unsupported",
+    "ts: unsupported",
+    "md: unsupported",
+    "js: unsupported",
+    "ts: unsupported",
+    "md: unsupported",
+    "js: unsupported",
+    "ts: unsupported"
+  ],
+  "vitepress-vite-guide": [
+    "bash: shell",
+    "bash: shell",
+    "bash: shell",
+    "bash: shell",
+    "bash: shell",
+    "bash: shell",
+    "bash: shell",
+    "bash: shell",
+    "bash: shell",
+    "bash: shell",
+    "bash: shell"
+  ]
+}

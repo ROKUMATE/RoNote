@@ -3,7 +3,7 @@ import { InfoIcon } from "@phosphor-icons/react/Info";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams, useRouterState } from "@tanstack/react-router";
 import type { Editor } from "@tiptap/core";
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { ApiError } from "../api/client";
 import { requestErrorMessages } from "../api/messages";
 import { documentQuery, linkTargets } from "../api/queries";
@@ -14,12 +14,18 @@ import { sameDomainHrefs } from "../document/links";
 import { Outline } from "../document/Outline";
 import { Reader } from "../document/Reader";
 import type { SaveStatus } from "../document/save";
+import { useAnnotations } from "../document/useAnnotations";
 import { useEditing } from "../document/useEditing";
 import { useFollow } from "../document/useFollow";
 import { useScrollAnchor } from "../document/useScrollAnchor";
 import { formatDate, hostOf } from "../format";
 import { buttonClass } from "../ui/button";
 import { PageTitle } from "../ui/PageTitle";
+
+// The highlight controls load once the editor is up (ADR 0007).
+const AnnotationsUI = lazy(() =>
+  import("../document/annotations/ui").then((m) => ({ default: m.AnnotationsUI })),
+);
 
 /** Warnings that mean page chrome may have come along with the content. */
 const genericWarnings: ReadonlySet<IrWarning["code"]> = new Set([
@@ -79,8 +85,10 @@ function opensWithTitle(doc: Document): boolean {
 
 function Header({ doc, existing }: { doc: Document; existing: boolean }) {
   const fallback = doc.warnings.some((w) => genericWarnings.has(w.code));
-  const { status, onEditor, revert, codeLangs } = useEditing(doc);
+  const { status, onEditor, revert, codeLangs, saving } = useEditing(doc);
   const [editor, setEditor] = useState<Editor>();
+  const annotations = useAnnotations(doc.id, doc.content, editor, saving);
+  const [frame, setFrame] = useState<HTMLDivElement | null>(null);
   const hrefs = useMemo(() => sameDomainHrefs(doc.content.blocks), [doc.content.blocks]);
   const targets = useQuery(linkTargets(doc.id, hrefs)).data;
   const { follow, following } = useFollow(targets);
@@ -125,7 +133,7 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
           Imported with the generic extractor; some page chrome may remain.
         </p>
       )}
-      <div className="mt-8">
+      <div ref={setFrame} className="relative mt-8">
         <CodeLangsContext value={codeLangs}>
           <Reader
             content={doc.content}
@@ -140,6 +148,11 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
           />
         </CodeLangsContext>
         {editor && <Outline editor={editor} />}
+        {editor && frame && (
+          <Suspense fallback={null}>
+            <AnnotationsUI editor={editor} annotations={annotations} frame={frame} />
+          </Suspense>
+        )}
       </div>
     </article>
   );

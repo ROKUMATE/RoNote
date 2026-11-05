@@ -26,3 +26,10 @@ window.scrollTo = () => {};
 // jsdom has no IntersectionObserver; nothing intersects unless a test says so.
 globalThis.IntersectionObserver =
   FakeIntersectionObserver as unknown as typeof IntersectionObserver;
+
+// jsdom has no layout, so ranges have no boxes. ProseMirror measures the
+// selection to place the highlight toolbar; everything measures as empty.
+if (!Range.prototype.getClientRects) {
+  Range.prototype.getClientRects = () => [] as unknown as DOMRectList;
+  Range.prototype.getBoundingClientRect = () => new DOMRect();
+}

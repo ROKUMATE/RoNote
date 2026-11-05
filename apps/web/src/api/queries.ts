@@ -1,6 +1,15 @@
 import { infiniteQueryOptions, QueryClient, queryOptions } from "@tanstack/react-query";
-import { ApiError, api, dataOrThrow } from "./client";
-import type { DocContent, Document, DocumentSummary, Import } from "./schema";
+import { ApiError, api, dataOrThrow, okOrThrow } from "./client";
+import type {
+  Annotation,
+  AnnotationPatch,
+  DocContent,
+  Document,
+  DocumentSummary,
+  Import,
+  NewAnnotation,
+  ReanchorRequest,
+} from "./schema";
 
 /** Every documents query sits under this key, so one invalidation refreshes them all. */
 export const documentsKey = ["documents"] as const;
@@ -90,6 +99,47 @@ export async function revertBlock(id: string, blockId: string): Promise<Document
     }),
   );
   return document;
+}
+
+/** A document's highlights and notes, oldest first (ADR 0007). */
+export function annotationsQuery(documentId: string) {
+  return queryOptions({
+    queryKey: [...documentsKey, "annotations", documentId],
+    queryFn: async () =>
+      dataOrThrow(
+        await api.GET("/documents/{id}/annotations", { params: { path: { id: documentId } } }),
+      ).annotations,
+  });
+}
+
+export async function createAnnotation(
+  documentId: string,
+  body: NewAnnotation,
+): Promise<Annotation> {
+  return dataOrThrow(
+    await api.POST("/documents/{id}/annotations", { params: { path: { id: documentId } }, body }),
+  );
+}
+
+export async function updateAnnotation(id: string, body: AnnotationPatch): Promise<Annotation> {
+  return dataOrThrow(await api.PATCH("/annotations/{id}", { params: { path: { id } }, body }));
+}
+
+export async function deleteAnnotation(id: string): Promise<void> {
+  okOrThrow(await api.DELETE("/annotations/{id}", { params: { path: { id } } }));
+}
+
+/** Saves new selectors for a document's annotations, all or none. */
+export async function reanchorAnnotations(
+  documentId: string,
+  annotations: ReanchorRequest["annotations"],
+): Promise<Annotation[]> {
+  return dataOrThrow(
+    await api.POST("/documents/{id}/annotations/reanchor", {
+      params: { path: { id: documentId } },
+      body: { annotations },
+    }),
+  ).annotations;
 }
 
 /**

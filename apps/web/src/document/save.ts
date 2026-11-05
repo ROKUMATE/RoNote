@@ -27,6 +27,11 @@ export type SaveFn = (
 const debounceMs = 1000;
 const retryMs = [1000, 2000, 5000, 10_000, 30_000];
 
+/** How long to wait before retry number attempt (from 0) after a network or server failure. */
+export function retryDelay(attempt: number): number {
+  return retryMs[Math.min(attempt, retryMs.length - 1)] ?? debounceMs;
+}
+
 export class Autosave {
   private version: number;
   private status: SaveStatus = { state: "idle" };
@@ -114,7 +119,7 @@ export class Autosave {
           // Offline, or the server failed: keep the changes and try again.
           this.changedSinceSave = true;
           this.set({ state: "offline" });
-          this.schedule(retryMs[Math.min(this.retries, retryMs.length - 1)] ?? debounceMs);
+          this.schedule(retryDelay(this.retries));
           this.retries++;
         }
       },

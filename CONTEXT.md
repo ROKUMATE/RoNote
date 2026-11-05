@@ -4,23 +4,39 @@ Current state of the project. Rewrite this file at the end of each phase; never 
 
 ## Current milestone
 
-P11, same-domain links and code languages: done.
-- **CI fixed.** `TestExtractStaysLinear` failed on CI at 3.0x and 3.5x. It timed one size against twice that size while sharing a small VM with every package's tests, under `-race`, whose overhead is not proportional to the work.
-  - It is now `TestPerfExtractStaysLinear`, behind the `perf` build tag. `make test-perf` runs it alone (`-p 1`, no race detector), and CI's go job runs that as its own step. The limit is still under 3x, with no retries.
-  - **Proof:** `make test-integration` ran 10 times in a row with `GOMAXPROCS=2` and four CPU hogs, with no failures, both after the fix and again on the finished phase. `make test-perf` also ran 10 times clean. A deliberately quadratic writer still fails it, at 3.8x.
-  - One attempt on the finished phase failed 3 of 10 right after the Mac slept, from the VM clock skew noted under open questions; the rerun, kept awake, was clean.
-- **Same-domain links follow into the library:** a resolve endpoint, link styling by library status, import on click with inline steps, the `#fragment` after navigation, and back to the same place (ADR 0006).
-- **Code language picker:** per block, or "Use for all unlabelled code in this document", saved in DocContent's new optional `code_langs` (ADR 0006).
-- **In the browser:**
-  - **vite.dev's guide:** 15 same-domain links were importable. Clicking "rich feature enhancements" showed "Fetching the page…" then "Extracting the content…", made one `POST /imports`, and opened "Features". Back, the link showed as internal.
-  - **Effective Go:** one "apply to all: go" relabelled all 153 code blocks in 55 ms and saved 153 `code_langs`. Scrolling through, all 153 were highlighted, and each one's rendered text and Copy matched its stored text exactly. After a reload, all 153 were still "Go · yours".
+P12, highlights and notes: done.
+- **The P11 clock question, answered and fixed.** River writes a job's times from the app's clock but claims jobs by the database's `now()`:
+  - its pgx driver fills `scheduled_at` with `time.Now()`;
+  - retries are `time.Now()` plus a backoff.
+
+  With the podman VM 19 minutes behind the Mac, every new job sat 19 minutes in the database's future. Migration 00006's trigger moves those times onto the database's clock and puts the job in `available`, so the claim is the only comparison that decides when a job runs (ADR 0005). `TestJobsRunWhateverTheAppClock` fakes a half-hour offset either way; it failed both ways before the fix.
+- **`make doctor`** checks the container VM's clock is within 2s of the host's, and prints the fix (`podman machine ssh sudo chronyc makestep`) when it is not.
+- **Highlights and notes** (ADR 0007):
+  - stored outside DocContent, owner-scoped, through an annotations API;
+  - anchored by position, then quote, then a fuzzy match, else unplaced;
+  - drawn in prose and in code;
+  - notes in the right margin, or under the highlight below 1100px;
+  - a list of every highlight, with recovery for unplaced ones.
+- **Time to interactive** on Effective Go, production build, median of 5 cold loads at 1280×900 on this Mac:
+  - 0 highlights: interactive 97 ms, LCP 128 ms;
+  - 300 highlights, 30 with notes: interactive 110 ms, LCP 128 ms.
+
+  That is +13 ms, against a limit of +50; it is also 11 ms under P10's 121 ms. All 300 were placed, none unplaced.
+- **In the browser, on Effective Go:**
+  - a selection across two adjacent paragraphs made one highlight in each;
+  - a note on a third highlight showed in the margin;
+  - typing at the start of a highlighted paragraph re-anchored its highlight (saved as version 2);
+  - after a reload, the same words were highlighted and the note was in its place, and every stored selector quotes its block's stored text exactly.
 - **Bundle, gzip:**
-  - initial JS 119.6 kB of 150;
-  - document route 129.6 kB of 135 (126.1 in P10);
+  - initial JS 119.8 kB of 150;
+  - document route 131.9 kB of 135 (129.6 in P11);
   - highlighter core 54.5 kB of 60;
-  - CSS 9.5 kB of 20;
-  - 43 Shiki language chunks, 275 kB in all (Makefile's grammar is new).
-- **Checks:** `make web-e2e` passes 50 tests, and `make test-live` still passes all 11 pages.
+  - the new highlight controls chunk 6.6 kB of 15;
+  - CSS 9.7 kB of 20.
+- **Checks:**
+  - `make web-e2e` passes 63 tests;
+  - `make test-live` passes all 11 pages;
+  - `make test-integration`, `make test-perf` and `make doctor` pass.
 
 ## Decisions so far
 
@@ -32,6 +48,7 @@ Product and process:
 - CI runs on the pinned `ubuntu-26.04` image. `.github/actionlint.yaml` declares that label until actionlint knows it (rhysd/actionlint#682).
 - License: MIT. Agents never push. Run `make check` unpiped and read its exit code.
 - Timing tests check growth (2n against n), never wall time, and run only in `make test-perf`: tagged `perf`, one package at a time, no race detector. `make check` includes it.
+- `make doctor` checks the local setup: so far, that the container VM's clock is the host's.
 
 IR (`internal/ir`, ADR 0004):
 - **Blocks:** a closed set of heading, paragraph, list, code, table, callout, image, quote, divider and tabs.
@@ -107,6 +124,11 @@ Import pipeline (ADR 0005):
   - permanent errors fail at once; transient ones (5xx, 429 with Retry-After, timeouts, robots.txt 5xx) retry up to 3 attempts.
 - **API** (`api/openapi.yaml`, OpenAPI 3.1, spec-first with oapi-codegen v2.8.2):
   - `POST /api/v1/imports` (202, or 200 with the existing document), `GET /imports/{id}`, `GET /imports/{id}/events` (SSE), `GET /documents` (cursor pages), `GET /documents/{id}`;
+  - annotations (since P12, ADR 0007):
+    - `GET` and `POST /documents/{id}/annotations`;
+    - `PATCH` and `DELETE /annotations/{id}`, with a 409 carrying `current_version`;
+    - `POST /documents/{id}/annotations/reanchor`, a batch, all or nothing;
+    - every write checks its selector against the stored content, with the document row locked: `unknown_block`, `quote_mismatch`, `annotation_limit` (2000 per document);
   - `POST /documents/resolve` (since P11): up to 200 URLs, each answered in order with its canonical URL and the caller's document, if any. It canonicalizes like imports and matches like an import's "already in your library" (`ResolveDocuments`, one `unnest` query, owner-scoped);
   - errors use one envelope; its codes are the `ErrorCode` enum, and an import's failure codes the `ImportErrorCode` enum, so Go uses generated constants and a classifier test keeps the worker's codes in the spec;
   - every timestamp is RFC 3339 in UTC (`Z`), whatever zone the database driver returns;
@@ -125,6 +147,13 @@ Import pipeline (ADR 0005):
     - `code_langs` (since P11), optional: each key is a code block's id, at any depth, and each value one of the spec's 30 `CodeLang`s, else `invalid_content`. An optional field like this needs no new `doc_version` (ADR 0006).
   - **Revert:** `POST /documents/{id}/blocks/{blockId}/revert` puts the extraction's block back exactly and bumps the version, keeping the chosen code languages.
   - `GET /documents/{id}` returns the extraction's warnings next to the content.
+- **One clock for jobs** (since P12, migration 00006): a trigger on `river_job` moves new jobs' and retries' times from the app's clock onto the database's, and puts them in `available`.
+  - River's stuck-job rescue still compares against the app's clock; a skew over an hour can rescue a running job early, and imports are idempotent.
+  - RoNote never snoozes jobs.
+- **Annotations** (`internal/annotation`, ADR 0007):
+  - one row per highlight: `block_id`, `kind` (`highlight`), `selector` (`{position: {start, end}, quote: {exact, prefix, suffix}}`), an optional `note` of at most 5000 characters, and a `version`;
+  - offsets count UTF-16 code units of the block's plain text, the runs of a heading or paragraph joined, or a code block's text (`doccontent.BlockText`), and `testdata/anchoring/blocktext.json` keeps Go and TypeScript agreeing on it;
+  - the composite key `(document_id, owner_id)` ties each to a document of the same owner, gone with it.
 - **Identity until P16:** dev and test inject `RONOTE_DEV_USER_EMAIL`; without it, and always in staging and prod, `/api/v1` answers 401.
 - **Tests that catch regressions:** three deliberate breaks were each caught.
   - Dropping the one-document-per-owner-and-source constraint.
@@ -139,6 +168,21 @@ Web app (`apps/web`, since P09):
 - **Import dialog:** a native `<dialog>`. The URL is checked like the server does (http or https, at most 2048 characters), but the server decides. After a 202 the steps show inline, with a polite status line; on done it opens the document. A 200 opens the document with "Already in your library". A failure gets one sentence per error code (`src/api/messages.ts`). Closing never cancels: the library shows the import as a pending row until it ends.
 - **Library:** title, source host and imported date per row, "Load more" for the next cursor, still placeholder rows while loading, one sentence and Retry on error. The sidebar lists the 8 newest documents at the sidebar breakpoint.
 - **Document page (`/doc/$id`):** title, source link (new tab, `noopener noreferrer`), host, imported date, block counts by kind (nested blocks included), and a notice when the extraction fell back to the generic rules (`adapter_fallback`, `low_confidence`).
+- **Highlights and notes** (since P12, ADR 0007):
+  - **Anchoring** (`anchoring.ts`, pure):
+    - position if the quote is still there;
+    - else the occurrence of the quote whose surroundings agree most, then the nearest;
+    - else the closest fuzzy match by edit distance (Sellers' algorithm with Ukkonen's cutoff), if at least 0.75 similar; quotes under four characters never match fuzzily;
+    - else unplaced.
+  - **Drawing:** a ProseMirror plugin (`highlights.ts`) anchors every highlight on each change and draws prose ones as `mark.hl` decorations, never marks, so nothing is an edit. Code views cut Shiki's tokens, or the plain text, at highlight edges, and the text stays the stored text.
+  - **Saving moves:** after each content save and each revert, `ReanchorSync` re-anchors every highlight against the content just stored and sends the moved selectors in one batch, a second later, with Autosave's retry schedule. A conflict reloads and tries again.
+  - **Creating:** pending edits are saved first, so the server has the text the selection quotes. Creating, a note, Remove and Undo go through `useAnnotations`.
+  - **Controls** (`annotations/`, a lazy chunk loaded once the editor is up):
+    - a toolbar over a selection, Highlight and Highlight + note, with one highlight per block for a selection across blocks; it also reads a selection inside one code block;
+    - Mod+Shift+H highlights, Alt+F10 moves into the toolbar;
+    - a popover with the note and Remove, and "Highlight removed · Undo" for 5s;
+    - notes portalled into the shell's Notes aside, level with their highlights and stacked when they would overlap; without the aside (below 1100px), a note icon beside the text;
+    - "Highlights (n)" in the header: every highlight in the order of the text (Jump to, note, Remove), then the unplaced ones (Re-apply, Remove). Re-apply turns the toolbar into Place here.
 - **Same-domain links** (since P11, ADR 0006):
   - **Status:** the document page resolves its same-domain hrefs once, deduplicated, in batches of 200, as a query under the documents key, so a finished import refreshes it. In the editor, status shows as decorations, never marks, so nothing counts as an edit. In locked blocks, the IR renderer reads the same map from context. A link already in the library is underlined; one not imported yet gets a dotted underline and a "↓". External links open a new tab.
   - **Click** (`follow.ts`, `useFollow.ts`):
@@ -203,7 +247,15 @@ Reader and editor (`apps/web/src/document`, since P10; `/doc/$id` is a lazy chun
     - the link's hash on navigation: the follow page test and the same e2e test.
   - `code_langs` accepting any block id: the doccontent tests (a paragraph, top-level and nested) and the API's 422 test.
   - The quadratic extraction writer: `make test-perf` at 3.8x.
+- **Tests that catch regressions, P12:** four deliberate breaks were each caught.
+  - Trusting a stored position without checking its text: nine anchoring tests, and the e2e test that types before a highlight.
+  - Deleting unplaced highlights instead of listing them: two page tests, and the e2e test that deletes highlighted words.
+  - The API accepting a quote that is not the text: the rule's test, three handler tests and the store's integration test.
+  - Without the clock trigger: `TestJobsRunWhateverTheAppClock`, both ways.
 - **Found while building:**
+  - P12: the highlight toolbar waited for Tiptap's focus event, which a browser window without focus never sends; it now shows for any selection until focus goes elsewhere.
+  - P12: the lazy controls could miss a selection made between their first render and their listeners; they read it again once listening.
+  - P12: an absolute-time test for fuzzy anchoring (under 50 ms) was planned and dropped, as AGENTS allows timing tests only in `make test-perf`. A 2 kB quote in a 10 kB block takes about 50 ms here, and only a highlight whose own text changed takes the fuzzy step at all.
   - P11: going back landed about 90 px off. Placeholder heights of not-yet-rendered blocks above the reader shifted the pixel offset, so places are now kept by block.
   - P11: switching a highlighted block to plain text kept the old colours. Tokens are now kept with their language.
   - P11: in Vitest, two dynamic imports of a mocked module started in one tick gave the second one the real module. Tests bring one block into view at a time.
@@ -218,7 +270,11 @@ Unchanged: `/healthz`, `/readyz`, the P04 tokens and styleguide, the extractor a
 - go.dev declares no code languages. RoNote still never guesses one; the user can choose, per block or for all unlabelled code at once.
 - Link status is resolved when a document opens and again after an import finishes. A page imported from another tab shows as not imported until then, and following it opens the existing document.
 - Following a link that fails leaves its message under the link until the next link is followed.
-- After macOS sleeps, the podman VM's clock can lag for a few minutes. Integration tests then fail with imports "still queued" and `created_at` in the past, because River schedules jobs by the host's clock. Rerun once the clocks agree (`podman machine ssh date -u`).
+- After macOS sleeps, the podman VM's clock can lag for a few minutes. Jobs no longer wait on it (P12), but tests that compare a database time with the app's, such as a user's `created_at` "about now", still fail meanwhile. `make doctor` says so and prints the fix.
+- `TestFetchRateLimitsEachHost` failed twice inside a full `make check` while the machine was at load average 20 or more. It times requests where the test server receives them, not where the limiter lets them go, and passed 6 of 6 alone. Measuring at the limiter would make it robust.
+- Highlights go in prose the editor edits, and in code; not in table cells, captions, or prose inside tabs, which are drawn read-only.
+- Jump to puts the caret at a highlight's start rather than selecting it, so the toolbar does not offer to highlight it again.
+- A highlight's note is plain text; links and formatting in notes are for later.
 - A user's document keeps the IR it was made from; re-importing returns it. Syncing to a newer snapshot will have to merge user blocks and edits, and DocContent keeps what that needs.
 - A deleted source block can only come back by undo in the same session; there is no "restore from source" for missing blocks yet.
 - Images inside source blocks are locked like code, tables and tabs, a step beyond the P10 brief, because the editor shows them as atoms.
@@ -230,4 +286,4 @@ Unchanged: `/healthz`, `/readyz`, the P04 tokens and styleguide, the extractor a
 
 ## Next step
 
-P12, per its brief. v1 still lacks highlights and annotations (the notes margin), running code blocks, and printed-PDF import, which the PDF link's message already promises.
+P13, per its brief. v1 still lacks running code blocks, and printed-PDF import, which the PDF link's message already promises.

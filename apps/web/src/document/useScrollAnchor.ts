@@ -1,61 +1,127 @@
-import { useRouterState } from "@tanstack/react-router";
+import { useRouter, useRouterState } from "@tanstack/react-router";
 import type { EditorView } from "@tiptap/pm/view";
 import { useEffect } from "react";
 import { moveTo } from "./moveTo";
+import { type Anchor, type RestoreEnv, restoreAnchor, topAnchor } from "./scrollAnchor";
 
-/** Where a page was read: its top-level block at the top of the viewport. */
-type Anchor = { index: number; offset: number };
+/** Where each history entry's document was being read, kept for reloads too. */
+const storageKey = "ronote.reading-places";
+/** How many places sessionStorage keeps: the newest. */
+const keep = 100;
 
-const anchors = new Map<string, Anchor>();
+const places = load();
 
-function blocks(): HTMLCollection | undefined {
-  return document.querySelector(".reader-content")?.children;
+function load(): Map<string, Anchor> {
+  try {
+    return new Map(JSON.parse(sessionStorage.getItem(storageKey) ?? "[]"));
+  } catch {
+    return new Map();
+  }
+}
+
+function persist() {
+  try {
+    sessionStorage.setItem(storageKey, JSON.stringify([...places].slice(-keep)));
+  } catch {
+    // Without storage, places last until the tab is reloaded.
+  }
+}
+
+/** The document's top-level blocks as drawn, in order. */
+function blocksOf(view: EditorView): { blockId: string; element: Element }[] {
+  const blocks: { blockId: string; element: Element }[] = [];
+  view.state.doc.forEach((node, offset) => {
+    const element = view.nodeDOM(offset);
+    if (element instanceof Element && node.attrs.blockId) {
+      blocks.push({ blockId: node.attrs.blockId, element });
+    }
+  });
+  return blocks;
+}
+
+/** Input that means the reader is scrolling, or about to, themselves. */
+const userInput = ["wheel", "touchmove", "keydown", "pointerdown"] as const;
+
+function browser(view: EditorView): RestoreEnv {
+  return {
+    top: (blockId) =>
+      blocksOf(view)
+        .find((b) => b.blockId === blockId)
+        ?.element.getBoundingClientRect().top,
+    scrollBy: (dy) => window.scrollBy(0, dy),
+    onLayout: (changed) => {
+      const observer = new ResizeObserver(() => changed());
+      observer.observe(document.body);
+      observer.observe(view.dom);
+      return () => observer.disconnect();
+    },
+    onUserScroll: (scrolled) => {
+      for (const type of userInput) window.addEventListener(type, scrolled, { passive: true });
+      return () => {
+        for (const type of userInput) window.removeEventListener(type, scrolled);
+      };
+    },
+    after: (ms, run) => {
+      const timer = setTimeout(run, ms);
+      return () => clearTimeout(timer);
+    },
+  };
 }
 
 /**
- * Where a document opens:
- * - coming back to it (back, forward), where the reader was, found by the
- *   block at the top of the viewport rather than by pixels: blocks the
- *   browser skips rendering (content-visibility) take a placeholder height
- *   until shown, so the same pixel offset would land elsewhere;
+ * Where a document opens, owned here rather than by the router, whose
+ * pixel restore would land elsewhere whenever the layout above differs:
+ * - coming back to it (back, forward, reload), the block that was at the
+ *   top of the viewport, at the same offset (scrollAnchor.ts);
  * - arriving by a link with a #fragment, at that heading, with the caret
- *   in it.
+ *   in it;
+ * - otherwise at the top.
  * Places are kept per history entry, so back and forward each find their own.
  */
 export function useScrollAnchor(view: EditorView | undefined) {
+  const router = useRouter();
   const key = useRouterState({ select: (s) => s.location.state.__TSR_key ?? s.location.href });
   const hash = useRouterState({ select: (s) => s.location.hash });
 
   useEffect(() => {
-    if (!view) return;
-    const saved = anchors.get(key);
-    let frame = requestAnimationFrame(() => {
-      // After the router's own restore, which runs first.
-      frame = requestAnimationFrame(() => {
-        const block = saved && blocks()?.[saved.index];
-        const heading = !saved && hash ? document.getElementById(decodeURIComponent(hash)) : null;
-        if (block) {
-          window.scrollBy(0, block.getBoundingClientRect().top - saved.offset);
-        } else if (heading && view.dom.contains(heading)) {
-          moveTo(view, heading);
-        }
-      });
-    });
-    let pending = 0;
+    const saved = places.get(key);
+    if (!view) {
+      if (!saved && !hash) window.scrollTo(0, 0);
+      return;
+    }
+    let stopRestore = () => {};
+    if (saved) {
+      stopRestore = restoreAnchor(saved, browser(view));
+    } else if (hash) {
+      const heading = document.getElementById(decodeURIComponent(hash));
+      if (heading && view.dom.contains(heading)) moveTo(view, heading);
+    }
+
     const record = () => {
+      const anchor = topAnchor(blocksOf(view));
+      if (anchor) places.set(key, anchor);
+    };
+    let pending = 0;
+    const onScroll = () => {
       pending ||= requestAnimationFrame(() => {
         pending = 0;
-        const list = [...(blocks() ?? [])];
-        const index = list.findIndex((b) => b.getBoundingClientRect().bottom > 0);
-        if (index >= 0)
-          anchors.set(key, { index, offset: list[index]?.getBoundingClientRect().top ?? 0 });
+        record();
       });
     };
-    window.addEventListener("scroll", record, { passive: true });
-    return () => {
-      cancelAnimationFrame(frame);
-      cancelAnimationFrame(pending);
-      window.removeEventListener("scroll", record);
+    // Leaving: the page as the reader last saw it, laid out still.
+    const leave = () => {
+      record();
+      persist();
     };
-  }, [key, hash, view]);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("pagehide", leave);
+    const unsubscribe = router.subscribe("onBeforeNavigate", leave);
+    return () => {
+      stopRestore();
+      cancelAnimationFrame(pending);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pagehide", leave);
+      unsubscribe();
+    };
+  }, [router, key, hash, view]);
 }

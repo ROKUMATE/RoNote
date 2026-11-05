@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 import {
   caretHeading,
   chooseTheme,
@@ -6,6 +6,7 @@ import {
   expectNoHorizontalScroll,
   importTimeout,
   openLinkedPage,
+  test,
 } from "./helpers";
 
 test("same-domain links show whether following them imports", async ({ page }) => {
@@ -81,6 +82,43 @@ test("a link to a section opens its page at that section, with the caret there",
   const usage = page.getByRole("heading", { level: 2, name: "Usage" });
   await expect(usage).toBeInViewport();
   await expect.poll(() => caretHeading(page)).toBe("Usage");
+});
+
+test("going back holds the place when something above it arrives late", async ({ page }) => {
+  await openLinkedPage(page);
+  const top = async () =>
+    (await page.getByRole("link", { name: "part B of the guide" }).boundingBox())?.y ?? -1;
+  const link = page.getByRole("link", { name: "part B of the guide" });
+  await link.scrollIntoViewIfNeeded();
+  const before = await top();
+  await link.click();
+  await expect(page.getByRole("heading", { level: 1, name: "Linked guide B" })).toBeVisible({
+    timeout: importTimeout,
+  });
+  // As on a slow runner, where part of the page came after the restore: the
+  // header grows soon after page A is back, above where the reader was.
+  // Chrome's scroll anchoring would hide the jump here, but Safari has none,
+  // and Chrome's misses a change in the same frame as a scroll, as on CI:
+  // without it, only the restore can put the reader back.
+  await page.evaluate(() => {
+    document.documentElement.style.overflowAnchor = "none";
+    const watch = new MutationObserver(() => {
+      const header = document.querySelector("article header");
+      if (!header || document.querySelector(".reader h1")?.textContent !== "Linked guide A") return;
+      watch.disconnect();
+      setTimeout(() => {
+        const late = document.createElement("div");
+        late.style.height = "60px";
+        header.append(late);
+      }, 150);
+    });
+    watch.observe(document.body, { childList: true, subtree: true });
+  });
+
+  await page.goBack();
+
+  await expect(page.locator("article header > div[style]")).toHaveCount(1);
+  await expect.poll(async () => Math.abs((await top()) - before)).toBeLessThan(5);
 });
 
 test("Cmd-click opens the original page instead", async ({ page, context }) => {

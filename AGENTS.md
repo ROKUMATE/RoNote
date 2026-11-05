@@ -209,6 +209,14 @@ Pull requests merge by rebase only (a repository setting). A merge commit would 
 
 Each job checks the toolchain it uses against its pin: Go against go.mod's `toolchain`, Node against `.nvmrc`. `make check` covers the commits, go and web jobs except `check-generated` and `web-build`. Run it before pushing.
 
+## Working economically
+- While iterating, run only the affected tests (go test ./internal/x -run Name, vitest <file>, playwright <spec>). Run make check once at the end.
+- make check at every commit only when I ask for it; otherwise once at HEAD (CI checks HEAD).
+- make test-live only when fetch or extract code changed.
+- One deliberate break per prompt, on the riskiest rule, unless I ask for more.
+- Don't re-run a passing suite to double-check. Don't print passing test output.
+- Final summary: at most 10 lines.
+
 ## Done means
 
 - `make check` (lint, test, hooks-test), run unpiped, exits 0.

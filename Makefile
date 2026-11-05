@@ -28,9 +28,10 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook and scripts/check-commits.sh
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh and the clock check
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
+	sh scripts/test-container-clock.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
@@ -85,6 +86,9 @@ lint-web: ## Lint web code (Biome, tsc, knip)
 fmt: ## Format Go code with gofumpt and goimports
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) fmt
+
+doctor: ## Check the local setup: the container VM's clock is within 2s of the host's
+	sh scripts/container.sh clock
 
 dev-up: ## Start the dev stack (Postgres) and wait until it is healthy
 	@[ -f .env.dev ] || { cp .env.example .env.dev; echo "make dev-up: created .env.dev from .env.example"; }
@@ -184,7 +188,7 @@ web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromiu
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" $(WEB) e2e
 
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker extract lint lint-go lint-web fmt
-.PHONY: dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
+.PHONY: doctor dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration test-live test-clean web-install web-deps web-browsers check-node-version
 .PHONY: web-dev web-build web-e2e

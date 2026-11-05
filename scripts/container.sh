@@ -6,6 +6,8 @@
 #   container.sh test CMD...       run CMD with testcontainers pointed at the
 #                                  runtime, then fail if it leaked containers
 #   container.sh clean             remove leftover testcontainers containers
+#   container.sh clock             fail unless the container VM's clock is
+#                                  within 2 seconds of the host's
 set -eu
 
 compose_file=$(cd "$(dirname "$0")/.." && pwd)/deploy/compose.dev.yml
@@ -70,12 +72,44 @@ clean() {
   "$rt" rm -f -v $ids
 }
 
-[ "$#" -gt 0 ] || die 'usage: container.sh compose|test|clean [ARGS...]'
+# clock compares the container VM's clock with the host's. Postgres runs on
+# the VM's clock and the app on the host's; podman machine's clock can lag
+# for minutes after the host sleeps. Each clock is read to the second, the
+# VM's between two readings of the host's.
+clock() {
+  use_runtime
+  before=$(date +%s)
+  if [ "$rt" = podman ]; then
+    vm=$(podman machine ssh date +%s) || die 'could not read the podman machine clock'
+    fix='podman machine ssh sudo chronyc makestep'
+  else
+    image=$(sed -n 's/^ *image: *//p' "$compose_file" | head -n 1)
+    vm=$(docker run --rm --pull=never --entrypoint date "$image" +%s) ||
+      die "could not run $image; run \"make dev-up\" first to pull it"
+    fix='restart Docker Desktop'
+  fi
+  after=$(date +%s)
+  if [ "$vm" -lt $((before - 2)) ]; then
+    off=$((before - vm))
+    side=behind
+  elif [ "$vm" -gt $((after + 2)) ]; then
+    off=$((vm - after))
+    side=ahead
+  else
+    echo "doctor: the $rt VM's clock is within 2s of the host's"
+    return
+  fi
+  die "the $rt VM's clock is ${off}s $side the host's, so the database's times are off from the app's.
+  Fix: $fix"
+}
+
+[ "$#" -gt 0 ] || die 'usage: container.sh compose|test|clean|clock [ARGS...]'
 cmd=$1
 shift
 case $cmd in
   compose) compose "$@" ;;
   test) run_tests "$@" ;;
   clean) clean ;;
+  clock) clock ;;
   *) die "unknown command: $cmd" ;;
 esac

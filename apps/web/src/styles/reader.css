@@ -171,6 +171,18 @@
     contain-intrinsic-size: auto 6em;
   }
 
+  /* Until drawn, code and tables take a height near their own, from their
+     lines and rows (views.tsx), so drawing them late barely moves what is
+     below. Code's estimate is the header, padding and margins (6rem) and
+     its lines. */
+  .reader .reader-content > .node-codeBlock {
+    contain-intrinsic-size: auto calc(var(--lines, 4) * var(--text-code) * 1.55 + 6rem);
+  }
+
+  .reader .reader-content > .node-table {
+    contain-intrinsic-size: auto calc(var(--rows, 3) * 2.2em + 2rem);
+  }
+
   /* Containment would clip an open language picker; the block is on
      screen while it is open, so nothing is skipped. */
   .reader .reader-content > :is(.node-codeBlock, .node-tabs):has([aria-expanded="true"]) {
@@ -183,6 +195,8 @@
 
   .reader .code-block pre {
     margin: 0;
+    /* Its lines' height from the start: highlighting can't change it. */
+    min-height: calc(var(--lines, 1) * 1lh + 2rem + 2px);
   }
 
   /* Shiki's CSS-variables theme, mapped onto six token colours. */

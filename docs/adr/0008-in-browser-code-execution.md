@@ -9,12 +9,14 @@ From P13 on, readers run code blocks from their documents. That code comes from 
 ## Decision
 
 - **Code from docs is untrusted, and never runs on the app origin.**
-- **A separate runner origin runs it** (dev `http://127.0.0.1:5174`; a subdomain in production, P18).
+- **A separate runner origin runs it** (dev `http://localhost:5174`; a subdomain in production, P18).
+  - Its cookies must never be the app's. Cookies ignore ports, so in dev the runner is on `localhost` while the app is on `127.0.0.1`; in production the app's cookies are host-only (no `Domain`, P16), so a subdomain never gets them.
   - The app embeds the runner page in a hidden iframe with `sandbox="allow-scripts allow-same-origin"` and `allow="cross-origin-isolated"`.
   - The runner page runs each runtime in a Web Worker, so a busy interpreter never blocks either page.
   - `allow-same-origin` there means the runner's own origin: the runner can load its files and keep its worker, but it is still cross-origin to the app.
 - **The two pages talk by `postMessage` only.**
-  - Each side checks `event.origin` against its configuration and `event.source` against the one window it expects: the runner its parent, the app its iframe. The runner replies only to its parent's origin.
+  - The app names its origin in the runner page's URL (`?app=`). The runner talks only if that origin is one of the app's (`RONOTE_APP_ORIGINS`), and then sends every message to that origin only, so the browser delivers nothing to any other parent.
+  - Each side checks `event.origin` against that one origin and `event.source` against the one window it expects: the runner its parent, the app its iframe.
   - The protocol is versioned (`v: 1`). Every message is validated against its shape (`src/runner/protocol.ts`, used by both sides).
   - Anything with the wrong origin, source, version or shape is dropped without a reply.
 - **The runner's headers:**

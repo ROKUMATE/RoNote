@@ -176,11 +176,11 @@ web-browsers: ## Install Playwright's Chromium (WITH_DEPS=1 adds its system pack
 check-node-version: ## Print the Node version; fail unless it is the one .nvmrc pins
 	@$(node_required); echo "Node $$(node --version), as pinned in .nvmrc"
 
-web-dev: ## Run the web dev server (styleguide at /_styleguide); make stop ends it
+web-dev: ## Run the web dev server (styleguide at /_styleguide) and the runner; make stop ends them
 	@$(node_required)
-	sh scripts/run.sh web $(WEB) dev
+	sh scripts/run.sh web sh -c '$(WEB) runner & $(WEB) dev; kill $$!'
 
-web-build: ## Build the web app; fails if dev-only code ships or it is over budget
+web-build: ## Build the web app and the runner; fails if dev-only code ships or it is over budget
 	@$(node_required)
 	$(WEB) build
 	@! grep -rIil styleguide apps/web/dist || \

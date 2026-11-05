@@ -53,3 +53,8 @@ export function dataOrThrow<T>({
   }
   return data;
 }
+
+/** Throws the ApiError for a failed response that has no body when it succeeds. */
+export function okOrThrow({ error, response }: { error?: unknown; response: Response }): void {
+  if (!response.ok) throw new ApiError(response.status, errorBody(error));
+}

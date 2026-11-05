@@ -2,11 +2,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { Editor } from "@tiptap/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { documentQuery, revertBlock, saveDocument } from "../api/queries";
-import type { CodeLang, DocBlock, Document } from "../api/schema";
+import type { CodeLang, DocBlock, DocContent, Document } from "../api/schema";
 import { type ChosenLangs, type CodeLangChoices, unlabelled, withCodeLangs } from "./codeLangs";
 import { revertMeta } from "./identity";
 import { fromEditor } from "./mapping";
 import { Autosave, type SaveStatus } from "./save";
+import type { SavedContent } from "./useAnnotations";
 
 /**
  * Editing one document: autosave of the editor's content and the chosen
@@ -24,12 +25,20 @@ export function useEditing(doc: Document) {
     ),
   );
   const [langs, setLangs] = useState<ChosenLangs>(doc.content.code_langs ?? {});
+  const [savedListeners] = useState(() => new Set<(content: DocContent) => void>());
+  const announce = (content: DocContent) => {
+    for (const listener of savedListeners) listener(content);
+  };
   const chosen = useRef(langs);
   const [autosave] = useState(
     () =>
       new Autosave({
         version: doc.version,
-        save: (content, version, options) => saveDocument(doc.id, content, version, options),
+        save: async (content, version, options) => {
+          const saved = await saveDocument(doc.id, content, version, options);
+          announce(content);
+          return saved;
+        },
         read: () =>
           withCodeLangs(
             fromEditor(editor.current?.getJSON() ?? { type: "doc" }, originals.current),
@@ -85,8 +94,18 @@ export function useEditing(doc: Document) {
     const block = reverted.content.blocks.find((b) => b.id === blockId);
     if (!block) throw new Error(`block ${blockId} is not in the reverted document`);
     originals.current.set(block.id, block);
+    announce(reverted.content);
     return block;
   };
 
-  return { status, onEditor, revert, codeLangs };
+  // Stable, so effects that hear of saves subscribe once.
+  const [saving] = useState<SavedContent>(() => ({
+    flush: () => autosave.flush(),
+    subscribeSaved: (listener) => {
+      savedListeners.add(listener);
+      return () => savedListeners.delete(listener);
+    },
+  }));
+
+  return { status, onEditor, revert, codeLangs, saving };
 }

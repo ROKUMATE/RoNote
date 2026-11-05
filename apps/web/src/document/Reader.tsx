@@ -6,6 +6,7 @@ import type { DocBlock, DocContent } from "../api/schema";
 import { BlockMenu } from "./BlockMenu";
 import { ConfirmRevert } from "./ConfirmRevert";
 import { linkAction, openOriginal } from "./follow";
+import { Highlights } from "./highlights";
 import { BlockIdentityPlugin, revertMeta } from "./identity";
 import { type InsertAt, insertUserBlock, SlashMenu, topLevelBlockAt } from "./insert";
 import { LinkStatus, setLinkTargets } from "./linkStatus";
@@ -62,6 +63,7 @@ export function Reader({
       SlashMenu.configure({ open: (at: InsertAt) => open.current(at) }),
       BlockIdentityPlugin.configure({ onRevert: setReverting }),
       LinkStatus,
+      Highlights,
     ],
     content: toEditor(content),
     immediatelyRender: true,

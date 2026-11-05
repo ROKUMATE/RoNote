@@ -16,6 +16,8 @@ const budgets = {
   document: 135_000,
   /** The syntax highlighter's core, loaded when code nears the viewport. */
   highlighter: 60_000,
+  /** The highlight and note controls, loaded once the editor is up (ADR 0007). */
+  annotations: 15_000,
   /** All stylesheets. */
   css: 20_000,
 };
@@ -61,6 +63,7 @@ const groups = {
   initial: closure(entry("index.html"), seen),
   document: closure(entry("src/pages/DocumentPage.tsx"), seen),
   highlighter: closure(entry("src/document/highlighter.ts"), seen),
+  annotations: closure(entry("src/document/annotations/ui.tsx"), seen),
 };
 const languages = Object.keys(manifest).filter(
   (k) => !seen.has(k) && manifest[k]?.file.endsWith(".js"),

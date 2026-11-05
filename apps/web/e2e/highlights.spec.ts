@@ -1,4 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
+import type { Document } from "../src/api/schema";
 import {
   chooseTheme,
   expectNoAxeViolations,
@@ -149,6 +150,43 @@ test("a selection across two paragraphs makes one highlight in each", async ({ p
   expect(new Set(ids).size).toBe(2);
   await expect(marks(page).first()).toHaveText(/^only makes the page long enough/);
   await expect(marks(page).last()).toHaveText("Setup paragraph 2: invented text");
+});
+
+test("a highlight in code persists, and Copy still copies the exact code", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  const path = await openLinkedPage(page);
+  const block = page.locator(".code-block").filter({ hasText: "func main()" });
+  await block.locator("pre code").evaluate((code) => {
+    // The browser's own selection, of "fmt.Println", inside the code.
+    const walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT);
+    let at = 0;
+    const start = (code.textContent ?? "").indexOf("fmt.Println");
+    const range = document.createRange();
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const length = node.textContent?.length ?? 0;
+      if (start >= at && start < at + length) range.setStart(node, start - at);
+      if (start + 11 > at && start + 11 <= at + length) range.setEnd(node, start + 11 - at);
+      at += length;
+    }
+    getSelection()?.removeAllRanges();
+    getSelection()?.addRange(range);
+  });
+
+  await highlightSelection(page);
+
+  await expect(block.locator("mark.hl")).toHaveText(["fmt.Println"]);
+  await page.reload();
+  await expect(block.locator("mark.hl")).toHaveText(["fmt.Println"]);
+  const stored: Document = await (
+    await page.request.get(`/api/v1${path.replace("/doc/", "/documents/")}`)
+  ).json();
+  const text = stored.content.blocks.find((b) => b.text?.includes("func main()"))?.text;
+  await block.getByRole("button", { name: "Copy code" }).click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(text);
+  expect(await block.locator("pre").textContent()).toBe(text);
 });
 
 test("keyboard only: select, highlight, and add a note", async ({ page }) => {

@@ -5,15 +5,16 @@ import { type MouseEvent, type ReactNode, useEffect, useRef, useState } from "re
 import type { DocBlock, DocContent } from "../api/schema";
 import { BlockMenu } from "./BlockMenu";
 import { ConfirmRevert } from "./ConfirmRevert";
+import { marksByBlock, sameMarks } from "./codeMarks";
 import { linkAction, openOriginal } from "./follow";
-import { Highlights } from "./highlights";
+import { Highlights, placements } from "./highlights";
 import { BlockIdentityPlugin, revertMeta } from "./identity";
 import { type InsertAt, insertUserBlock, SlashMenu, topLevelBlockAt } from "./insert";
 import { LinkStatus, setLinkTargets } from "./linkStatus";
 import { followHelpId, type LinkTargets } from "./links";
 import { toEditor, topLevelNode } from "./mapping";
 import { moveTo } from "./moveTo";
-import { LinkTargetsContext } from "./render";
+import { CodeMarksContext, LinkTargetsContext } from "./render";
 import { readerExtensions } from "./views";
 
 /** A same-domain link being followed, and how far that has got. */
@@ -85,6 +86,23 @@ export function Reader({
   useEffect(() => {
     if (linkTargets) setLinkTargets(editor.view, linkTargets);
   }, [editor, linkTargets]);
+
+  // Code views draw their own highlights; they redraw only when theirs move.
+  const [codeMarks, setCodeMarks] = useState(() => marksByBlock(placements(editor.state)));
+  useEffect(() => {
+    let last = placements(editor.state);
+    const update = () => {
+      const current = placements(editor.state);
+      if (current === last) return;
+      last = current;
+      const next = marksByBlock(current);
+      setCodeMarks((old) => (sameMarks(old, next) ? old : next));
+    };
+    editor.on("transaction", update);
+    return () => {
+      editor.off("transaction", update);
+    };
+  }, [editor]);
 
   const reportEditor = useRef(onEditor);
   useEffect(() => {
@@ -163,7 +181,9 @@ export function Reader({
       onAuxClick={clickLink}
     >
       <LinkTargetsContext value={linkTargets}>
-        <EditorContent editor={editor} className="reader" />
+        <CodeMarksContext value={codeMarks}>
+          <EditorContent editor={editor} className="reader" />
+        </CodeMarksContext>
       </LinkTargetsContext>
       <p id={followHelpId} hidden>
         Opens this page in RoNote, importing it first if it is not in your library.

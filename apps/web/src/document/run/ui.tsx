@@ -2,12 +2,13 @@ import { ArrowCounterClockwiseIcon } from "@phosphor-icons/react/ArrowCounterClo
 import { ListChecksIcon } from "@phosphor-icons/react/ListChecks";
 import { PlayIcon } from "@phosphor-icons/react/Play";
 import { StopIcon } from "@phosphor-icons/react/Stop";
-import { useContext, useId, useState, useSyncExternalStore } from "react";
+import { useContext, useEffect, useId, useState, useSyncExternalStore } from "react";
 import type { IrBlock } from "../../api/schema";
 import { outputLimit, runLimit } from "../../runner/limits";
 import { type ChosenLangs, CodeLangsContext } from "../codeLangs";
 import { classifyAll, codeBlocks, isDoctest, type RunClass, type Runnability } from "./classify";
 import { diff, type Example, known, knownReasons, prompt, summary } from "./doctest";
+import { onRunKey, runShortcut, runShortcutLabel } from "./keys";
 import type { RunScope } from "./RunArea";
 import { type BlockRun, type Chunk, runsOf, runtimeNames, type Session } from "./runs";
 
@@ -54,33 +55,39 @@ function useRun(scope: RunScope, blockId: string) {
   return { runs, run, session };
 }
 
-/** A block's chip, and Run, Run anyway or Stop; a transcript can also check its examples. */
+/**
+ * A block's chip, and Run, Run anyway or Stop; a transcript can also check
+ * its examples. Mod+Enter does what Run does, while the block is focused.
+ */
 export function Controls({ block, scope }: { block: IrBlock; scope: RunScope }) {
   const { chosen } = useContext(CodeLangsContext);
   const runnability = classesOf(scope.blocks, chosen).get(block.id);
   const { runs, run } = useRun(scope, block.id);
-  if (!runnability) return null;
   const code = block.text ?? "";
-  const { runtime } = runnability;
+  const runtime = runnability?.run === "none" ? undefined : runnability?.runtime;
+  const mode = runtime === "python" && isDoctest(code) ? "doctest" : "exec";
+  useEffect(() => {
+    if (!runtime) return;
+    return onRunKey(block.id, () => {
+      const last = runs.get(block.id);
+      if (!last || last.done) runs.run(block.id, runtime, code, mode);
+    });
+  }, [block.id, runs, runtime, code, mode]);
+  if (!runnability) return null;
   const buttons =
     run && !run.done ? (
       <button type="button" className="run-button" onClick={() => runs.stop(run.runtime)}>
         <StopIcon size={16} aria-hidden />
         Stop
       </button>
-    ) : runnability.run === "none" || !runtime ? null : (
+    ) : !runtime ? null : (
       <>
         <button
           type="button"
           className="run-button"
-          onClick={() =>
-            runs.run(
-              block.id,
-              runtime,
-              code,
-              runtime === "python" && isDoctest(code) ? "doctest" : "exec",
-            )
-          }
+          aria-keyshortcuts={runShortcut}
+          title={runShortcutLabel}
+          onClick={() => runs.run(block.id, runtime, code, mode)}
         >
           <PlayIcon size={16} aria-hidden />
           {runnability.run === "run" ? "Run" : "Run anyway"}

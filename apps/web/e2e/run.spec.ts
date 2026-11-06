@@ -113,6 +113,23 @@ test("Check examples finds the one example whose output differs, with its diff",
   await expect(transcript.locator(".run-diff")).toHaveCount(1);
 });
 
+test("Mod+Enter runs the code block the reader is in", async ({ page }) => {
+  const blocks = await openPythonPage(page);
+  const define = blocks.nth(0);
+  await define.locator("pre").click();
+  await page.keyboard.press("ControlOrMeta+Enter");
+  await expect(define.getByRole("status")).toHaveText(/^Ran in /, { timeout: 20_000 });
+
+  // From the block's own chip too; the editor never takes the Enter.
+  const topLevel = page.locator(".reader-content > *");
+  const before = await topLevel.count();
+  const use = blocks.nth(1);
+  await use.getByRole("button", { name: "Python · browser" }).focus();
+  await page.keyboard.press("ControlOrMeta+Enter");
+  await expect(use.locator(".run-text")).toHaveText("42\n");
+  expect(await topLevel.count()).toBe(before);
+});
+
 test("a block with no language asks for one, and runs once Python is chosen", async ({ page }) => {
   const blocks = await openPythonPage(page);
   const bare = blocks.nth(7);

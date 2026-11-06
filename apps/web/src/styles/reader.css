@@ -399,7 +399,7 @@
     color: var(--color-ink);
   }
 
-  .reader .run-stderr {
+  .reader :is(.run-stderr, .run-warn) {
     color: var(--color-ink-2);
   }
 

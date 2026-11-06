@@ -53,6 +53,26 @@ const cases: [string, string | undefined, RunClass][] = [
   ["a = 1\nprint(a < b)", "python", "browser_python"],
   ['print("<not> a placeholder")', "python", "browser_python"],
   ["# A comment saying input(\nx = 2", "python", "browser_python"],
+  ['console.log("hello")', "js", "browser_js"],
+  ["const total = await Promise.resolve(42);\ntotal", "javascript", "browser_js"],
+  ['// no document here\nconst s = "window";\ns', "js", "browser_js"],
+  ['/** @type {import("vitepress").UserConfig} */\nconst config = {}', "js", "browser_js"],
+  ['const re = /[(]/;\nre.test("(")', "js", "browser_js"],
+  // biome-ignore lint/suspicious/noTemplateCurlyInString: the reader's JavaScript, as text.
+  ["const s = `total: ${1 + (2 * 3)}`;\ns", "mjs", "browser_js"],
+  ['document.getElementById("out")', "js", "needs_dom"],
+  ['alert("hi")', "javascript", "needs_dom"],
+  ['fetch("https://example.org")', "js", "needs_network"],
+  ['const name = prompt("Your name?")', "js", "needs_input"],
+  ["const key = process.env.OPENAI_API_KEY", "js", "needs_secret"],
+  ['import express from "express"', "js", "needs_packages"],
+  ['const fs = require("node:fs")', "cjs", "needs_packages"],
+  ['import { getX } from "./myModule.js"\ngetX()', "js", "fragment"],
+  ["export const getX = () => x;", "mjs", "fragment"],
+  ["} else {\n  run();\n}", "js", "fragment"],
+  ["const items = [1, 2,", "js", "fragment"],
+  ["npm install express", "js", "shell"],
+  ["const x: number = 1", "ts", "unsupported"],
 ];
 
 test.each(cases)("%s (%s) is %s", (code, lang, want) => {
@@ -70,6 +90,7 @@ test("every class has a plain sentence, and only fragments and packages run anyw
   expect(runs).toEqual({
     browser_python: "run",
     python_doctest: "run",
+    browser_js: "run",
     needs_packages: "anyway",
     fragment: "anyway",
     needs_network: "none",
@@ -204,8 +225,14 @@ const across: [string, CodeBlock[], RunClass[]][] = [
   ],
   [
     "shell and other languages pass nothing on",
-    doc(["export OPENAI_API_KEY=sk", "bash"], ["const x = 1", "js"], ["print(1)"]),
-    ["shell", "unsupported", "browser_python"],
+    doc(
+      ["export OPENAI_API_KEY=sk", "bash"],
+      ["const x = 1", "js"],
+      ["fmt.Println(x)", "go"],
+      ["print(1)"],
+      ["print(x)"],
+    ),
+    ["shell", "browser_js", "unsupported", "browser_python", "fragment"],
   ],
 ];
 

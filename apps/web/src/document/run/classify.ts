@@ -1,5 +1,7 @@
 import type { IrBlock } from "../../api/schema";
+import type { Runtime } from "../../runner/protocol";
 import { eachBlock } from "../walk";
+import { jsCode } from "./javascript";
 import { codeOnly, type Names, names } from "./names";
 import { importable } from "./python";
 
@@ -13,6 +15,7 @@ import { importable } from "./python";
 export type RunClass =
   | "browser_python"
   | "python_doctest"
+  | "browser_js"
   | "needs_packages"
   | "needs_network"
   | "needs_secret"
@@ -26,6 +29,7 @@ export type RunClass =
 export const reasons: Record<RunClass, string> = {
   browser_python: "Python that runs here, in your browser.",
   python_doctest: "A Python session: it runs line by line, here in your browser.",
+  browser_js: "JavaScript that runs here, in your browser.",
   needs_packages: "It needs packages that aren't available in the browser.",
   needs_network: "It reaches the network, which code here can't.",
   needs_secret: "It needs an API key or another secret.",
@@ -33,13 +37,14 @@ export const reasons: Record<RunClass, string> = {
   needs_dom: "It needs a window or a display.",
   shell: "It runs commands on your computer: try it in a terminal.",
   fragment: "It's part of a larger program, so it may not run on its own.",
-  unsupported: "Only Python runs here for now.",
+  unsupported: "Only Python and JavaScript run here for now.",
 };
 
 /** Whether a class shows Run, "Run anyway", or only its reason. */
 const runOf: Record<RunClass, Runnability["run"]> = {
   browser_python: "run",
   python_doctest: "run",
+  browser_js: "run",
   needs_packages: "anyway",
   fragment: "anyway",
   needs_network: "none",
@@ -50,15 +55,23 @@ const runOf: Record<RunClass, Runnability["run"]> = {
   unsupported: "none",
 };
 
-export type Runnability = { class: RunClass; reason: string; run: "run" | "anyway" | "none" };
+export type Runnability = {
+  class: RunClass;
+  reason: string;
+  run: "run" | "anyway" | "none";
+  /** The language's runtime, which Run or Run anyway runs it in; none for shell or unsupported code. */
+  runtime?: Runtime;
+};
 
-function result(c: RunClass): Runnability {
-  return { class: c, reason: reasons[c], run: runOf[c] };
+function classed(c: RunClass, runtime?: Runtime): Runnability {
+  const found = { class: c, reason: reasons[c], run: runOf[c] };
+  return runtime ? { ...found, runtime } : found;
 }
 
-const fragment = result("fragment");
+const fragment = classed("fragment", "python");
 
 const python = new Set(["python", "py", "python3", "py3", "ipython", "pycon", "python-repl"]);
+const javascript = new Set(["javascript", "js", "mjs", "cjs"]);
 const shells = new Set([
   "bash",
   "sh",
@@ -140,7 +153,7 @@ export function classifyAll(blocks: readonly CodeBlock[]): Map<string, Runnabili
   for (const b of blocks) {
     const r = classify(b.code, b.lang);
     classes.set(b.id, r);
-    if (r.class !== "shell" && r.class !== "unsupported") {
+    if (r.runtime === "python") {
       read.set(b.id, names(isDoctest(b.code) ? doctestSource(b.code) : b.code));
     }
   }
@@ -183,9 +196,14 @@ export function classifyAll(blocks: readonly CodeBlock[]): Map<string, Runnabili
 /** A block's class, from its language (the reader's choice over the page's) and text alone. */
 export function classify(code: string, lang: string | undefined): Runnability {
   const language = lang?.toLowerCase();
-  if (language && shells.has(language)) return result("shell");
-  if (!language || !python.has(language)) return result("unsupported");
+  if (language && shells.has(language)) return classed("shell");
+  if (language && javascript.has(language)) return classifyJavaScript(code);
+  if (!language || !python.has(language)) return classed("unsupported");
+  return classifyPython(code);
+}
 
+function classifyPython(code: string): Runnability {
+  const result = (c: RunClass) => classed(c, c === "shell" ? undefined : "python");
   const doctest = isDoctest(code);
   const source = doctest ? doctestSource(code) : code;
   const lines = codeLines(source);
@@ -229,6 +247,64 @@ export function classify(code: string, lang: string | undefined): Runnability {
   if (modules.some((m) => !importable.has(root(m)))) return result("needs_packages");
   if (looksPartial(source)) return result("fragment");
   return result(doctest ? "python_doctest" : "browser_python");
+}
+
+/** Names only a page has, not a worker: its document and window, dialogs, storage. */
+const pageOnly =
+  /(^|[^\w$.])(document|window|alert|confirm|localStorage|sessionStorage|customElements|requestAnimationFrame|getComputedStyle|matchMedia)\b|\bnew (Image|Audio)\b/m;
+
+/** The modules a script imports or requires, by their specifiers. */
+function specifiers(source: string): string[] {
+  const found: string[] = [];
+  for (const match of source.matchAll(
+    /^\s*import\s+(?:[^'"]*?\s+from\s+)?["']([^"']+)["']|\b(?:require|import)\s*\(\s*["']([^"']+)["']\s*\)/gm,
+  )) {
+    const specifier = match[1] ?? match[2];
+    if (specifier) found.push(specifier);
+  }
+  return found;
+}
+
+function classifyJavaScript(source: string): Runnability {
+  const result = (c: RunClass) => classed(c, c === "shell" ? undefined : "javascript");
+  if (/^\s*(\$ |(npm|npx|pnpm|yarn|node|deno|bun) )/m.test(source)) return result("shell");
+  const { code, uncommented, open } = jsCode(source);
+  const lines = code.split("\n").filter((l) => l.trim() !== "");
+
+  // Reading the environment is fine; reading a secret from it is not.
+  const secretName = /(KEY|SECRET|TOKEN|PASSWORD|PASSWD|CREDENTIAL|AUTH)/i;
+  if (
+    lines.some((l) => /\bprocess\.env\b/.test(l) && secretName.test(l)) ||
+    /\b[A-Z0-9_]*(API_KEY|SECRET|ACCESS_TOKEN|PASSWORD)[A-Z0-9_]*\b|\bapi_?[kK]ey\s*[:=]/.test(code)
+  ) {
+    return result("needs_secret");
+  }
+  if (/(^|[^\w$.])prompt\s*\(|\bprocess\.(stdin|argv)\b|\breadline\b/m.test(code)) {
+    return result("needs_input");
+  }
+  if (pageOnly.test(code)) return result("needs_dom");
+  if (
+    /(^|[^\w$.])fetch\s*\(|\b(XMLHttpRequest|WebSocket|EventSource|axios)\b|\.sendBeacon\s*\(/m.test(
+      code,
+    )
+  ) {
+    return result("needs_network");
+  }
+  const modules = specifiers(uncommented);
+  if (modules.some((m) => !/^[./]/.test(m))) return result("needs_packages");
+  if (
+    open ||
+    modules.length > 0 ||
+    /^\s*export\b|\bmodule\.exports\b|^\s*exports\./m.test(code) ||
+    /^\s/.test(lines[0] ?? "") ||
+    /^(?:[}\])]|\.(?!\.\.)|(?:else|catch|finally|case|default|return|break|continue)\b)/.test(
+      lines[0] ?? "",
+    ) ||
+    lines.some((l) => /^\s*(\.\.\.|…)\s*$/.test(l))
+  ) {
+    return result("fragment");
+  }
+  return result("browser_js");
 }
 
 /** A doctest transcript's source: its >>> and ... lines, without the prompts. */

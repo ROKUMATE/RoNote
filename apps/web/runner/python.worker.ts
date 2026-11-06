@@ -1,6 +1,7 @@
 import { loadPyodide } from "pyodide";
 import type { RunnerEvent } from "../src/runner/protocol";
 import cells from "./cells.py?raw";
+import { createOutput } from "./output";
 import type { ToWorker } from "./session";
 
 /*
@@ -11,45 +12,18 @@ import type { ToWorker } from "./session";
 
 declare const self: DedicatedWorkerGlobalScope;
 
-/** How often output goes to the session while code runs. */
-const outputEvery = 50;
-/** The most output one message carries, well inside the protocol's limit. */
-const chunk = 65_536;
-
-let id = "";
-let pending: { stream: "stdout" | "stderr"; text: string }[] = [];
-let size = 0;
-let sent = 0;
-
 function post(event: RunnerEvent) {
   self.postMessage(event);
 }
 
-function flush() {
-  for (const { stream, text } of pending) {
-    for (let at = 0; at < text.length; at += chunk) {
-      post({ v: 1, type: stream, id, text: text.slice(at, at + chunk) });
-    }
-  }
-  pending = [];
-  size = 0;
-  sent = performance.now();
-}
+const output = createOutput(post);
 
-/**
- * A stream's writer: output gathers, in order, and goes out every outputEvery
- * ms, or once there is a message's worth.
- */
+/** A stream's writer, for Pyodide: bytes in, text to the session. */
 function writer(stream: "stdout" | "stderr") {
   const decoder = new TextDecoder();
   return {
     write(bytes: Uint8Array) {
-      const text = decoder.decode(bytes, { stream: true });
-      const last = pending.at(-1);
-      if (last?.stream === stream) last.text += text;
-      else if (text) pending.push({ stream, text });
-      size += text.length;
-      if (size >= chunk || performance.now() - sent >= outputEvery) flush();
+      output.write(stream, decoder.decode(bytes, { stream: true }));
       return bytes.length;
     },
   };
@@ -62,7 +36,7 @@ async function start(interrupt: Int32Array | undefined) {
   if (interrupt) pyodide.setInterruptBuffer(interrupt);
   const scope = pyodide.globals.get("dict")();
   pyodide.runPython(cells, { globals: scope, filename: "cells.py" });
-  post({ v: 1, type: "ready" });
+  post({ v: 1, type: "ready", runtime: "python" });
   return { run: scope.get("run"), interrupt };
 }
 
@@ -89,15 +63,15 @@ self.onmessage = (message: MessageEvent<ToWorker>) => {
   }
   runs = runs.then(async () => {
     const started = performance.now();
+    const { id } = request;
     try {
       const { run, interrupt } = await (python ?? Promise.reject(new Error("not started")));
       if (interrupt) interrupt[0] = 0;
-      id = request.id;
-      sent = performance.now();
+      output.start(id);
       const outcome = await run(request.code, request.mode);
       const [value, error, examples] = outcome.toJs();
       outcome.destroy();
-      flush();
+      output.flush();
       for (const [source, want, got, verdict] of examples ?? []) {
         post({ v: 1, type: "example", id, source, want, got, outcome: verdict });
       }

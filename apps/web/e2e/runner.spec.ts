@@ -154,9 +154,10 @@ function run(
   page: Page,
   code: string,
   mode: "exec" | "doctest" | "check" = "exec",
+  runtime: "python" | "javascript" = "python",
 ): Promise<Event[]> {
   return page.evaluate(
-    ([code, mode]) =>
+    ([code, mode, runtime]) =>
       new Promise<Event[]>((resolve) => {
         const id = crypto.randomUUID();
         const events: Event[] = [];
@@ -167,9 +168,9 @@ function run(
           stop();
           resolve(events);
         });
-        window.runner.send({ v: 1, type: "run", id, code, mode });
+        window.runner.send({ v: 1, type: "run", id, runtime, code, mode });
       }),
-    [code, mode] as const,
+    [code, mode, runtime] as const,
   );
 }
 
@@ -200,12 +201,12 @@ test("Python runs blocks in one session, and Restart clears it", async ({ page }
     "ready",
   ]);
 
-  await page.evaluate(() => window.runner.send({ v: 1, type: "restart" }));
+  await page.evaluate(() => window.runner.send({ v: 1, type: "restart", runtime: "python" }));
   const after = await run(page, "print(x)");
   expect(after.at(-1)?.end).toBe("error");
   expect(after[0]?.text).toContain("NameError: name 'x' is not defined");
   expect(await page.evaluate(() => window.runnerEvents.filter((e) => e.type === "ended"))).toEqual([
-    { v: 1, type: "ended", reason: "restart" },
+    { v: 1, type: "ended", runtime: "python", reason: "restart" },
   ]);
 });
 
@@ -298,12 +299,13 @@ test("Stop interrupts an endless loop within a second, and keeps the session", a
           v: 1,
           type: "run",
           id: "loop",
+          runtime: "python",
           code: "while True:\n    pass",
           mode: "exec",
         });
         setTimeout(() => {
           stopped = performance.now();
-          window.runner.send({ v: 1, type: "stop" });
+          window.runner.send({ v: 1, type: "stop", runtime: "python" });
         }, 500);
       }),
   );
@@ -337,7 +339,14 @@ test("output past 1 MB stops the run, and the page stays responsive", async ({ p
           resolve({ output, end: event.end, slowest });
         });
         const code = "while True:\n    print('x' * 999)";
-        window.runner.send({ v: 1, type: "run", id: "flood", code, mode: "exec" });
+        window.runner.send({
+          v: 1,
+          type: "run",
+          id: "flood",
+          runtime: "python",
+          code,
+          mode: "exec",
+        });
       }),
   );
   expect(end).toBe("output");
@@ -371,4 +380,126 @@ test("Python can't reach the API or the page", async ({ page }) => {
   expect(noPage?.text).toContain("AttributeError");
   const [noPackages] = await run(page, "import numpy");
   expect(noPackages?.text).toMatch(/ModuleNotFoundError: No module named 'numpy'\n$/);
+});
+
+const js = (page: Page, code: string) => run(page, code, "exec", "javascript");
+
+test("JavaScript blocks share one session, may await, and give a value", async ({ page }) => {
+  await openRunner(page);
+  expect(
+    shown(
+      await js(
+        page,
+        "const base = await Promise.resolve(40);\nconsole.log('base', base, { ok: true });",
+      ),
+    ),
+  ).toEqual([
+    { type: "stdout", text: "base 40 {ok: true}\n" },
+    { type: "done", end: "ok" },
+  ]);
+  // Declared again, as a block run twice would be; name is the worker's own, too.
+  // biome-ignore lint/suspicious/noTemplateCurlyInString: the reader's JavaScript, as text.
+  const again = "const name = 'Ada';\nconst base = 1;\n`${name} ${base + 1}`";
+  expect(shown(await js(page, again))).toEqual([
+    { type: "result", text: "'Ada 2'" },
+    { type: "done", end: "ok" },
+  ]);
+  // A run lasts until the timers it set have fired.
+  expect(
+    shown(
+      await js(
+        page,
+        "for (let step = 0; step < 3; step++) {\n  setTimeout(() => console.log(step), 10);\n}",
+      ),
+    ),
+  ).toEqual([
+    { type: "stdout", text: "0\n1\n2\n" },
+    { type: "done", end: "ok" },
+  ]);
+  expect(shown(await js(page, "console.warn('careful');\nconsole.error('broken');"))).toEqual([
+    { type: "warn", text: "careful\n" },
+    { type: "stderr", text: "broken\n" },
+    { type: "done", end: "ok" },
+  ]);
+});
+
+test("an uncaught JavaScript error starts at the reader's code, and a rejection says so", async ({
+  page,
+}) => {
+  await openRunner(page);
+  const thrown = await js(page, "function f() {\n  return missing + 1;\n}\nf();");
+  expect(shown(thrown).map((e) => e.type)).toEqual(["error", "done"]);
+  expect(thrown[0]?.text).toMatch(
+    /^Uncaught ReferenceError: missing is not defined\n {4}at f \(cell \d+:2:3\)\n {4}at cell \d+:4:1\n$/,
+  );
+  expect(thrown.at(-1)?.end).toBe("error");
+
+  const rejected = await js(page, 'Promise.reject(new Error("nobody caught this"));');
+  expect(shown(rejected).map((e) => e.type)).toEqual(["result", "error", "done"]);
+  expect(rejected[0]?.text).toBe("Promise {…}");
+  expect(rejected[1]?.text).toMatch(
+    /^Uncaught \(in promise\) Error: nobody caught this\n {4}at cell \d+:1:16\n$/,
+  );
+
+  const [syntax] = await js(page, "const = 1");
+  expect(syntax?.text).toBe("Uncaught SyntaxError: Unexpected token (1:6)\n");
+});
+
+test("Stop ends a JavaScript loop at once, and the session with it", async ({ page }) => {
+  await openRunner(page);
+  await js(page, "const kept = 'gone after Stop';");
+  const { end, ms } = await page.evaluate(
+    () =>
+      new Promise<{ end: string | undefined; ms: number }>((resolve) => {
+        let stopped = 0;
+        const stop = window.runner.listen((event) => {
+          if (event.id !== "spin" || event.type !== "done") return;
+          stop();
+          resolve({ end: event.end, ms: performance.now() - stopped });
+        });
+        window.runner.send({
+          v: 1,
+          type: "run",
+          id: "spin",
+          runtime: "javascript",
+          code: "while (true) {}",
+          mode: "exec",
+        });
+        setTimeout(() => {
+          stopped = performance.now();
+          window.runner.send({ v: 1, type: "stop", runtime: "javascript" });
+        }, 300);
+      }),
+  );
+  expect(end).toBe("stop");
+  expect(ms).toBeLessThan(1000);
+  expect(shown(await js(page, "typeof kept"))).toEqual([
+    { type: "result", text: "'undefined'" },
+    { type: "done", end: "ok" },
+  ]);
+});
+
+test("JavaScript can't reach the API or the page", async ({ page }) => {
+  await openRunner(page);
+  const reached = await js(
+    page,
+    [
+      "const refused = [];",
+      "self.addEventListener('securitypolicyviolation', (e) => refused.push(e.effectiveDirective));",
+      "let outcome;",
+      "try {",
+      `  await fetch("${stack.api}/readyz", { mode: "no-cors" });`,
+      "  outcome = 'reached';",
+      "} catch {",
+      "  outcome = 'failed';",
+      "}",
+      "await new Promise((resolve) => setTimeout(resolve, 100));",
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: the reader's JavaScript, as text.
+      "`${outcome}, refused by ${refused.join() || 'nothing'}, document is ${typeof document}`",
+    ].join("\n"),
+  );
+  expect(shown(reached)).toEqual([
+    { type: "result", text: "'failed, refused by connect-src, document is undefined'" },
+    { type: "done", end: "ok" },
+  ]);
 });

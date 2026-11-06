@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
-import { defineConfig, type Plugin } from "vite";
+import { type Connect, defineConfig, type Plugin } from "vite";
 import { browsers } from "./browsers.ts";
 
 /*
@@ -16,19 +16,49 @@ const appOrigins = (process.env.RONOTE_APP_ORIGINS ?? "http://127.0.0.1:5173")
   .split(/[\s,]+/)
   .filter(Boolean);
 
-const headers = {
-  "Content-Security-Policy": [
-    "default-src 'self'",
-    "script-src 'self' 'wasm-unsafe-eval'",
-    "connect-src 'self'",
-    `frame-ancestors ${appOrigins.join(" ")}`,
-    "base-uri 'none'",
-    "form-action 'none'",
-  ].join("; "),
-  "Cross-Origin-Opener-Policy": "same-origin",
-  "Cross-Origin-Embedder-Policy": "require-corp",
-  "Cross-Origin-Resource-Policy": "cross-origin",
-};
+// The JavaScript worker's script, in dev and in the build: the one response
+// whose code may evaluate text, which running the reader's JavaScript takes.
+const javascriptWorker = /(^|\/)javascript\.worker[.-][^/]*$/;
+
+/**
+ * The runner's headers for a response to path. Every response keeps code
+ * from reaching any other host; only the JavaScript worker's script may
+ * evaluate code, and its worker lives by that policy, not the page's.
+ */
+export function headersFor(path: string): Record<string, string> {
+  const evaluates = javascriptWorker.test(path);
+  return {
+    "Content-Security-Policy": [
+      "default-src 'self'",
+      `script-src 'self' ${evaluates ? "'unsafe-eval'" : "'wasm-unsafe-eval'"}`,
+      "connect-src 'self'",
+      `frame-ancestors ${appOrigins.join(" ")}`,
+      "base-uri 'none'",
+      "form-action 'none'",
+    ].join("; "),
+    "Cross-Origin-Opener-Policy": "same-origin",
+    "Cross-Origin-Embedder-Policy": "require-corp",
+    "Cross-Origin-Resource-Policy": "cross-origin",
+  };
+}
+
+/** Sets every response's headers by its path, in dev and in preview. */
+function headers(): Plugin {
+  const set: Connect.NextHandleFunction = (request, response, next) => {
+    const path = request.url?.split("?")[0] ?? "/";
+    for (const [name, value] of Object.entries(headersFor(path))) response.setHeader(name, value);
+    next();
+  };
+  return {
+    name: "ronote-runner-headers",
+    configureServer(server) {
+      server.middlewares.use(set);
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(set);
+    },
+  };
+}
 
 const pyodideDir = dirname(createRequire(import.meta.url).resolve("pyodide/package.json"));
 
@@ -57,7 +87,6 @@ function pyodide(): Plugin {
         const name = request.url?.split("?")[0]?.slice(1) ?? "";
         const type = pyodideFiles[name];
         if (!type) return next();
-        for (const [header, value] of Object.entries(headers)) response.setHeader(header, value);
         response.setHeader("Content-Type", type);
         response.end(pyodideFile(name));
       });
@@ -72,7 +101,11 @@ function pyodide(): Plugin {
 
 export default defineConfig({
   root: "runner",
-  plugins: [pyodide()],
+  // Its own, not the app's: two dev servers sharing one cache each rebuild
+  // it for themselves, and a worker loading a dependency the other just
+  // replaced fails to start.
+  cacheDir: "../node_modules/.vite-runner",
+  plugins: [headers(), pyodide()],
   // Pyodide finds its files from indexURL, not from where Vite would put it.
   optimizeDeps: { exclude: ["pyodide"] },
   worker: { format: "es" },
@@ -82,6 +115,6 @@ export default defineConfig({
     outDir: "../dist-runner",
     emptyOutDir: true,
   },
-  server: { port: 5174, strictPort: true, headers },
-  preview: { port: 5174, strictPort: true, headers },
+  server: { port: 5174, strictPort: true },
+  preview: { port: 5174, strictPort: true },
 });

@@ -289,6 +289,48 @@ test("a block with no language asks for one, and its chip opens the choice", asy
   expect(sent[0]).toMatchObject({ runtime: "python", code: 'print("chosen")' });
 });
 
+test("Mod+Enter runs the focused block, or the one the editor selected", async () => {
+  render(
+    <RunScopeProvider documentId="doc" blocks={blocks}>
+      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: stands in for the editor, which takes focus. */}
+      <div className="ProseMirror" tabIndex={0} data-testid="editor">
+        {blocks.map((b) => (
+          <div key={b.id} className={b.id === "js" ? "ProseMirror-selectednode" : undefined}>
+            <Block block={b} />
+          </div>
+        ))}
+      </div>
+    </RunScopeProvider>,
+  );
+  const run = await code("py").findByRole("button", { name: "Run" });
+  expect(run.getAttribute("aria-keyshortcuts")).toBe("Control+Enter");
+  expect(run.title).toBe("Ctrl+Enter");
+
+  const pre = document.querySelector<HTMLElement>('[data-block-id="py"] pre');
+  pre?.focus();
+  fireEvent.keyDown(pre as HTMLElement, { key: "Enter" });
+  fireEvent.keyDown(pre as HTMLElement, { key: "Enter", metaKey: true });
+  expect(sent).toHaveLength(0);
+  const pressed = fireEvent.keyDown(pre as HTMLElement, { key: "Enter", ctrlKey: true });
+  expect(pressed, "the editor never sees the key").toBe(false);
+  await waitFor(() => expect(sent).toHaveLength(1));
+  expect(sent[0]).toMatchObject({ id: "py:1", runtime: "python" });
+
+  // While it runs, the key runs nothing more.
+  fireEvent.keyDown(pre as HTMLElement, { key: "Enter", ctrlKey: true });
+  await code("js").findByRole("button", { name: "Run" });
+  const editor = screen.getByTestId("editor");
+  editor.focus();
+  fireEvent.keyDown(editor, { key: "Enter", ctrlKey: true });
+  await waitFor(() => expect(sent).toHaveLength(2));
+  expect(sent[1]).toMatchObject({ id: "js:2", runtime: "javascript" });
+
+  // A block with no Run takes no key.
+  const net = document.querySelector<HTMLElement>('[data-block-id="net"] pre');
+  net?.focus();
+  expect(fireEvent.keyDown(net as HTMLElement, { key: "Enter", ctrlKey: true })).toBe(true);
+});
+
 test("blocks outside a document have no controls", async () => {
   render(<Block block={blocks[0] as IrBlock} />);
   await screen.findByRole("button", { name: "Copy code" });

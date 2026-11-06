@@ -272,9 +272,10 @@ function imports(lines: readonly string[]): string[] {
 }
 
 /**
- * Whether code looks cut from something larger: it starts indented, ends
- * on a block opener with no body, leaves a bracket or string open, or holds
- * a <placeholder> where a value goes.
+ * Whether code looks cut from something larger: it starts indented or with a
+ * clause of a statement that starts elsewhere, ends on a block opener with no
+ * body, leaves a bracket or string open, or holds a <placeholder> where a
+ * value goes.
  */
 function looksPartial(source: string): boolean {
   const lines = codeLines(source);
@@ -283,6 +284,16 @@ function looksPartial(source: string): boolean {
   if (!first || /^\s/.test(first) || last?.endsWith(":")) return true;
   const { code, open } = codeOnly(source);
   if (open) return true;
+  // case is a keyword only where a clause starts, so case = 1 is code.
+  const opening =
+    code
+      .split("\n")
+      .find((line) => line.trim() !== "")
+      ?.trimEnd() ?? "";
+  if (
+    /^(?:elif|except|return|yield|break|continue)\b|^(?:else|finally)\s*:|^case\b.*:$/.test(opening)
+  )
+    return true;
   let depth = 0;
   for (const c of code) {
     if ("([{".includes(c)) depth++;

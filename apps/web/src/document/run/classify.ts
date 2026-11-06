@@ -23,6 +23,7 @@ export type RunClass =
   | "needs_dom"
   | "shell"
   | "fragment"
+  | "unlabelled"
   | "unsupported";
 
 /** One plain sentence per class, as the reader sees it. */
@@ -37,6 +38,7 @@ export const reasons: Record<RunClass, string> = {
   needs_dom: "It needs a window or a display.",
   shell: "It runs commands on your computer: try it in a terminal.",
   fragment: "It's part of a larger program, so it may not run on its own.",
+  unlabelled: "This block has no language set. Choose one to run it.",
   unsupported: "Only Python and JavaScript run here for now.",
 };
 
@@ -52,6 +54,7 @@ const runOf: Record<RunClass, Runnability["run"]> = {
   needs_input: "none",
   needs_dom: "none",
   shell: "none",
+  unlabelled: "none",
   unsupported: "none",
 };
 
@@ -196,9 +199,11 @@ export function classifyAll(blocks: readonly CodeBlock[]): Map<string, Runnabili
 /** A block's class, from its language (the reader's choice over the page's) and text alone. */
 export function classify(code: string, lang: string | undefined): Runnability {
   const language = lang?.toLowerCase();
-  if (language && shells.has(language)) return classed("shell");
-  if (language && javascript.has(language)) return classifyJavaScript(code);
-  if (!language || !python.has(language)) return classed("unsupported");
+  // RoNote never guesses a language: the reader chooses one.
+  if (!language) return classed("unlabelled");
+  if (shells.has(language)) return classed("shell");
+  if (javascript.has(language)) return classifyJavaScript(code);
+  if (!python.has(language)) return classed("unsupported");
   return classifyPython(code);
 }
 

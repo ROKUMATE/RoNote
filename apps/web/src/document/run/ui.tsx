@@ -28,6 +28,7 @@ const chips: Record<RunClass, string> = {
   needs_dom: "Needs a display",
   shell: "Shell",
   fragment: "Fragment",
+  unlabelled: "No language",
   unsupported: "Can't run",
 };
 
@@ -104,10 +105,15 @@ export function Controls({ block, scope }: { block: IrBlock; scope: RunScope }) 
   );
 }
 
-/** The class as a chip, its reason a tooltip that Escape dismisses. */
+/**
+ * The class as a chip, its reason a tooltip that Escape dismisses. A block
+ * with no language opens its own language list from the chip, so the choice
+ * its reason asks for is right there.
+ */
 function Chip({ runnability }: { runnability: Runnability }) {
   const id = useId();
   const [dismissed, setDismissed] = useState(false);
+  const chooses = runnability.class === "unlabelled";
   return (
     <span className="run-chip-wrap" data-dismissed={dismissed || undefined}>
       <button
@@ -115,6 +121,16 @@ function Chip({ runnability }: { runnability: Runnability }) {
         className="run-chip"
         data-run={runnability.run}
         aria-describedby={id}
+        aria-haspopup={chooses ? "listbox" : undefined}
+        onClick={
+          chooses
+            ? (e) =>
+                e.currentTarget
+                  .closest(".code-block")
+                  ?.querySelector<HTMLButtonElement>(".code-lang")
+                  ?.click()
+            : undefined
+        }
         onKeyDown={(e) => {
           if (e.key === "Escape") setDismissed(true);
         }}

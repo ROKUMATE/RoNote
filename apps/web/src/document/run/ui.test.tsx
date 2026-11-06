@@ -1,7 +1,9 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { useState } from "react";
 import { beforeEach, expect, test, vi } from "vitest";
-import type { IrBlock } from "../../api/schema";
+import type { CodeLang, IrBlock } from "../../api/schema";
 import type { RunnerEvent, RunnerRequest } from "../../runner/protocol";
+import { type ChosenLangs, CodeLangsContext } from "../codeLangs";
 import { Block } from "../render";
 import { openRunner } from "./client";
 import { RunScopeProvider } from "./RunArea";
@@ -15,6 +17,7 @@ const blocks: IrBlock[] = [
   { id: "repl", kind: "code", lang: "pycon", text: ">>> 1 + 1\n2" },
   { id: "js", kind: "code", lang: "js", text: "console.log(1)" },
   { id: "dom", kind: "code", lang: "js", text: 'document.querySelector("p")' },
+  { id: "bare", kind: "code", text: 'print("chosen")' },
 ];
 
 let sent: RunnerRequest[];
@@ -243,6 +246,47 @@ test("a runner that never answers is said so, and leaving closes it", async () =
   await waitFor(() => expect(sent).toHaveLength(1));
   page.unmount();
   await waitFor(() => expect(close).toHaveBeenCalled());
+});
+
+/** The document's blocks, with languages the reader can choose, as on a document page. */
+function Choosing() {
+  const [chosen, setChosen] = useState<ChosenLangs>({});
+  const choices = {
+    chosen,
+    choose: (blockId: string, lang: CodeLang | undefined) =>
+      setChosen((old) => (lang ? { ...old, [blockId]: lang } : old)),
+    chooseForUnlabelled: () => {},
+  };
+  return (
+    <CodeLangsContext value={choices}>
+      <RunScopeProvider documentId="doc" blocks={blocks}>
+        {blocks.map((b) => (
+          <Block key={b.id} block={b} />
+        ))}
+      </RunScopeProvider>
+    </CodeLangsContext>
+  );
+}
+
+test("a block with no language asks for one, and its chip opens the choice", async () => {
+  // jsdom lays nothing out; the list scrolls its choice into view.
+  Element.prototype.scrollIntoView = vi.fn();
+  render(<Choosing />);
+  const bare = code("bare");
+  const chip = await bare.findByRole("button", {
+    name: "No language",
+    description: "This block has no language set. Choose one to run it.",
+  });
+  expect(bare.queryByRole("button", { name: /^Run/ })).toBeNull();
+
+  fireEvent.click(chip);
+  const list = bare.getByRole("listbox", { name: "Code language" });
+  await waitFor(() => expect(document.activeElement).toBe(list));
+  fireEvent.click(within(list).getByRole("option", { name: "Python" }));
+  await bare.findByRole("button", { name: "Python · browser" });
+  fireEvent.click(bare.getByRole("button", { name: "Run" }));
+  await waitFor(() => expect(sent).toHaveLength(1));
+  expect(sent[0]).toMatchObject({ runtime: "python", code: 'print("chosen")' });
 });
 
 test("blocks outside a document have no controls", async () => {

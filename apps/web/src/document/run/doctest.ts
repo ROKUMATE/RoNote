@@ -21,7 +21,12 @@ export const knownReasons: Record<Known, string> = {
   version: `Only the error's wording differs, which changes between Python versions; this browser runs Python ${pythonVersion}.`,
 };
 
-const address = /0x[0-9a-f]+/gi;
+/**
+ * An object's address where a repr ends (`at 0x7f3a2c1e5d90>`), its 0x left
+ * out as some pages print it (`at 10042ed0>`). Other hex, such as hex(255)'s,
+ * is output like any other.
+ */
+const address = /(?<=\bat )(?:0x)?[0-9a-f]+(?=>)/gi;
 const header = "Traceback (most recent call last):";
 
 /** The exception a traceback ends with: its type's last name, and its message. */
@@ -37,7 +42,7 @@ function exception(output: string): { type: string; message: string } | undefine
 export function known(example: Example): Known | undefined {
   if (example.outcome === "passed") return undefined;
   const { want, got } = example;
-  if (want.replace(address, "0x") === got.replace(address, "0x")) return "address";
+  if (want.replace(address, "@") === got.replace(address, "@")) return "address";
   const expected = exception(want);
   const raised = exception(got);
   if (expected && raised && expected.type === raised.type) return "version";

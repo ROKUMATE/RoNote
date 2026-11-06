@@ -1,6 +1,6 @@
 # 0008: In-browser code execution
 
-Accepted, 2026-11-05
+Accepted, 2026-11-05. Amended 2026-11-06: the production runner gets its own registrable domain.
 
 ## Context
 
@@ -9,8 +9,10 @@ From P13 on, readers run code blocks from their documents. That code comes from 
 ## Decision
 
 - **Code from docs is untrusted, and never runs on the app origin.**
-- **A separate runner origin runs it** (dev `http://localhost:5174`; a subdomain in production, P18).
-  - Its cookies must never be the app's. Cookies ignore ports, so in dev the runner is on `localhost` while the app is on `127.0.0.1`; in production the app's cookies are host-only (no `Domain`, P16), so a subdomain never gets them.
+- **A separate runner origin runs it** (dev `http://localhost:5174`; in production, P18, a separate registrable domain such as `ronote-run.dev`, never a subdomain of the app's).
+  - It must never be the same site as the app. A subdomain is: `SameSite` cookies would go with every request the runner's code made to the app, and a cookie the app set with `Domain=` on its parent domain would be readable on the runner. Another registrable domain is another site, and gets neither.
+  - The session cookie (P16) must be host-only: no `Domain` attribute.
+  - In dev the two are different sites too: cookies ignore ports, so the runner is on `localhost` while the app is on `127.0.0.1`.
   - The app embeds the runner page in a hidden iframe with `sandbox="allow-scripts allow-same-origin"` and `allow="cross-origin-isolated"`.
   - The runner page runs each runtime in a Web Worker, so a busy interpreter never blocks either page.
   - `allow-same-origin` there means the runner's own origin: the runner can load its files and keep its worker, but it is still cross-origin to the app.
@@ -49,5 +51,5 @@ From P13 on, readers run code blocks from their documents. That code comes from 
 
 - Code from a page can compute and print, and nothing more: it can't read the reader's data, call the API, or reach the network.
 - Code that needs packages, the network, secrets, input or a display is explained rather than run. Network and packages may come later, behind the same origin and policy.
-- Every deployment needs a second origin for the runner, with its headers (P18).
+- Every deployment needs a second registrable domain for the runner, with its headers (P18).
 - The app's own COOP and COEP apply to everything it serves from P13 on.

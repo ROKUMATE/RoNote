@@ -8,6 +8,7 @@ import {
   useMemo,
 } from "react";
 import type { IrBlock } from "../../api/schema";
+import { eachBlock } from "../walk";
 
 /*
  * Running code blocks (docs/adr/0008-in-browser-code-execution.md). The
@@ -48,6 +49,27 @@ export function RunScopeProvider({
 
 const Controls = lazy(() => import("./ui").then((m) => ({ default: m.Controls })));
 const Output = lazy(() => import("./ui").then((m) => ({ default: m.Output })));
+const Sessions = lazy(() => import("./ui").then((m) => ({ default: m.Sessions })));
+
+/** Whether blocks hold code, at any depth. */
+function hasCode(blocks: readonly IrBlock[]): boolean {
+  let found = false;
+  eachBlock(blocks, (b) => {
+    found ||= b.kind === "code";
+  });
+  return found;
+}
+
+/** Each runtime's session and its Restart, for the document's header; nothing without code. */
+export function RunSessions() {
+  const scope = useContext(RunScopeContext);
+  const code = useMemo(() => (scope ? hasCode(scope.blocks) : false), [scope]);
+  return scope && code ? (
+    <Suspense fallback={null}>
+      <Sessions scope={scope} />
+    </Suspense>
+  ) : null;
+}
 
 /** A code block's run controls, for its header; nothing outside a document. */
 export function RunControls({ block }: { block: IrBlock }) {

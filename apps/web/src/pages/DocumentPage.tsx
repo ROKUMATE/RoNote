@@ -13,7 +13,7 @@ import { blockCounts } from "../document/counts";
 import { sameDomainHrefs } from "../document/links";
 import { Outline } from "../document/Outline";
 import { Reader } from "../document/Reader";
-import { RunScopeProvider } from "../document/run/RunArea";
+import { RunScopeProvider, RunSessions } from "../document/run/RunArea";
 import type { SaveStatus } from "../document/save";
 import { useAnnotations } from "../document/useAnnotations";
 import { useEditing } from "../document/useEditing";
@@ -96,49 +96,50 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
   const { follow, following } = useFollow(targets);
   useScrollAnchor(editor?.view);
   return (
-    <article className="max-w-[68ch]">
-      {existing && (
-        <p role="status" className="mb-4 text-ink-2 text-ui-lg">
-          Already in your library
-        </p>
-      )}
-      <header>
-        {!opensWithTitle(doc) && <PageTitle>{doc.title || hostOf(doc.source_url)}</PageTitle>}
-        <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-ink-2 text-ui-lg">
-          <span>
-            From{" "}
-            <a
-              href={doc.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-ink underline underline-offset-2"
-            >
-              {hostOf(doc.source_url)}
-              <ArrowSquareOutIcon size={16} aria-hidden />
-              <span className="sr-only">(opens in a new tab)</span>
-            </a>
-          </span>
-          <span>
-            Imported <time dateTime={doc.created_at}>{formatDate(doc.created_at)}</time>
-          </span>
-        </p>
-        <ul aria-label="Blocks" className="mt-2 flex flex-wrap gap-x-3 text-ink-2 text-ui">
-          {blockCounts(doc.content.blocks).map((count) => (
-            <li key={count}>{count}</li>
-          ))}
-        </ul>
-        <div ref={setListSlot} />
-        <SaveState status={status} />
-      </header>
-      {fallback && (
-        <p role="note" className="mt-6 flex gap-2 border-rule border-l-2 pl-3 text-ui-lg">
-          <InfoIcon size={16} aria-hidden className="mt-0.5 shrink-0 text-ink-2" />
-          Imported with the generic extractor; some page chrome may remain.
-        </p>
-      )}
-      <div ref={setFrame} className="relative mt-8">
-        <CodeLangsContext value={codeLangs}>
-          <RunScopeProvider documentId={doc.id} blocks={doc.content.blocks}>
+    <CodeLangsContext value={codeLangs}>
+      <RunScopeProvider documentId={doc.id} blocks={doc.content.blocks}>
+        <article className="max-w-[68ch]">
+          {existing && (
+            <p role="status" className="mb-4 text-ink-2 text-ui-lg">
+              Already in your library
+            </p>
+          )}
+          <header>
+            {!opensWithTitle(doc) && <PageTitle>{doc.title || hostOf(doc.source_url)}</PageTitle>}
+            <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-ink-2 text-ui-lg">
+              <span>
+                From{" "}
+                <a
+                  href={doc.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-ink underline underline-offset-2"
+                >
+                  {hostOf(doc.source_url)}
+                  <ArrowSquareOutIcon size={16} aria-hidden />
+                  <span className="sr-only">(opens in a new tab)</span>
+                </a>
+              </span>
+              <span>
+                Imported <time dateTime={doc.created_at}>{formatDate(doc.created_at)}</time>
+              </span>
+            </p>
+            <ul aria-label="Blocks" className="mt-2 flex flex-wrap gap-x-3 text-ink-2 text-ui">
+              {blockCounts(doc.content.blocks).map((count) => (
+                <li key={count}>{count}</li>
+              ))}
+            </ul>
+            <RunSessions />
+            <div ref={setListSlot} />
+            <SaveState status={status} />
+          </header>
+          {fallback && (
+            <p role="note" className="mt-6 flex gap-2 border-rule border-l-2 pl-3 text-ui-lg">
+              <InfoIcon size={16} aria-hidden className="mt-0.5 shrink-0 text-ink-2" />
+              Imported with the generic extractor; some page chrome may remain.
+            </p>
+          )}
+          <div ref={setFrame} className="relative mt-8">
             <Reader
               content={doc.content}
               onEditor={(e) => {
@@ -150,21 +151,21 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
               onFollow={(href, link) => void follow(href, link)}
               following={following}
             />
-          </RunScopeProvider>
-        </CodeLangsContext>
-        {editor && <Outline editor={editor} />}
-        {editor && frame && listSlot && (
-          <Suspense fallback={null}>
-            <AnnotationsUI
-              editor={editor}
-              annotations={annotations}
-              frame={frame}
-              listSlot={listSlot}
-            />
-          </Suspense>
-        )}
-      </div>
-    </article>
+            {editor && <Outline editor={editor} />}
+            {editor && frame && listSlot && (
+              <Suspense fallback={null}>
+                <AnnotationsUI
+                  editor={editor}
+                  annotations={annotations}
+                  frame={frame}
+                  listSlot={listSlot}
+                />
+              </Suspense>
+            )}
+          </div>
+        </article>
+      </RunScopeProvider>
+    </CodeLangsContext>
   );
 }
 

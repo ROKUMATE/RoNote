@@ -30,6 +30,9 @@ export type BlockRun = {
 /** Where a runtime's session stands: not started, starting, or ready to run. */
 export type Session = "off" | "starting" | "ready";
 
+/** A session as the document header shows it. */
+export type Status = "not started" | "starting" | "idle" | "running";
+
 /** Each runtime as the reader knows it. */
 export const runtimeNames: Record<Runtime, string> = {
   python: "Python",
@@ -76,6 +79,16 @@ export class DocumentRuns {
     return this.#sessions[runtime].state;
   }
 
+  status(runtime: Runtime): Status {
+    const { state } = this.#sessions[runtime];
+    if (state === "off") return "not started";
+    if (state === "starting") return "starting";
+    for (const run of this.#runs.values()) {
+      if (run.runtime === runtime && !run.done) return "running";
+    }
+    return "idle";
+  }
+
   get(blockId: string): BlockRun | undefined {
     return this.#runs.get(blockId);
   }
@@ -110,7 +123,10 @@ export class DocumentRuns {
     void this.#runner?.then((runner) => runner.send({ v: 1, type: "stop", runtime }));
   }
 
-  /** Restarts runtime's session; the news goes to blockId, when a block's Restart asked. */
+  /**
+   * Restarts runtime's session. The news goes to blockId when a block's
+   * Restart asked, else to the last block that ran.
+   */
   restart(runtime: Runtime, blockId?: string) {
     this.#sessions[runtime].restarting = blockId;
     void this.#runner?.then((runner) => runner.send({ v: 1, type: "restart", runtime }));

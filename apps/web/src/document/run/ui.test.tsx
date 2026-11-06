@@ -6,7 +6,7 @@ import type { RunnerEvent, RunnerRequest } from "../../runner/protocol";
 import { type ChosenLangs, CodeLangsContext } from "../codeLangs";
 import { Block } from "../render";
 import { openRunner } from "./client";
-import { RunScopeProvider } from "./RunArea";
+import { RunScopeProvider, RunSessions } from "./RunArea";
 
 vi.mock("./client", () => ({ openRunner: vi.fn() }));
 
@@ -329,6 +329,50 @@ test("Mod+Enter runs the focused block, or the one the editor selected", async (
   const net = document.querySelector<HTMLElement>('[data-block-id="net"] pre');
   net?.focus();
   expect(fireEvent.keyDown(net as HTMLElement, { key: "Enter", ctrlKey: true })).toBe(true);
+});
+
+test("the header shows each runtime's session as it goes, with its own Restart", async () => {
+  render(
+    <RunScopeProvider documentId="doc" blocks={blocks}>
+      <RunSessions />
+      {blocks.map((b) => (
+        <Block key={b.id} block={b} />
+      ))}
+    </RunScopeProvider>,
+  );
+  const sessions = await screen.findByRole("list", { name: "Code sessions" });
+  const items = () =>
+    within(sessions)
+      .getAllByRole("listitem")
+      .map((li) => li.firstChild?.textContent);
+  expect(items()).toEqual(["Python: not started", "JavaScript: not started"]);
+  const restart = within(sessions).getByRole("button", { name: "Restart Python" });
+  expect(restart).toHaveProperty("disabled", true);
+
+  await runPython();
+  expect(items()).toEqual(["Python: starting", "JavaScript: not started"]);
+  act(() => hear({ v: 1, type: "ready", runtime: "python" }));
+  expect(items()).toEqual(["Python: running", "JavaScript: not started"]);
+  act(() => hear({ v: 1, type: "done", id: "py:1", ms: 1, end: "ok" }));
+  expect(items()).toEqual(["Python: idle", "JavaScript: not started"]);
+
+  fireEvent.click(restart);
+  await waitFor(() => expect(sent.at(-1)).toEqual({ v: 1, type: "restart", runtime: "python" }));
+  act(() => hear({ v: 1, type: "ended", runtime: "python", reason: "restart" }));
+  expect(items()).toEqual(["Python: not started", "JavaScript: not started"]);
+  code("py").getByText("Python restarted. Earlier results are gone.");
+});
+
+test("a document with nothing to run shows no sessions", async () => {
+  const go: IrBlock[] = [{ id: "go", kind: "code", lang: "go", text: "fmt.Println(1)" }];
+  render(
+    <RunScopeProvider documentId="doc" blocks={go}>
+      <RunSessions />
+      <Block block={go[0] as IrBlock} />
+    </RunScopeProvider>,
+  );
+  await code("go").findByRole("button", { name: "Can't run" });
+  expect(screen.queryByRole("list", { name: "Code sessions" })).toBeNull();
 });
 
 test("blocks outside a document have no controls", async () => {

@@ -31,6 +31,9 @@ const duration: Check<number> = (value): value is number =>
 /** A run's id: the app's choice, such as a block id. */
 const id = text(200);
 
+/** The languages the runner runs, each in a session of its own. */
+const runtime = oneOf("python", "javascript");
+
 /** The most code one run takes: the size of the largest page RoNote fetches. */
 const codeLimit = 5_000_000;
 
@@ -46,29 +49,33 @@ type Messages<S extends Shapes> = {
 const requests = {
   // Asks the runner to say it is there, and what it can do.
   hello: {},
-  // Runs code in the session, starting it if need be. Runs wait their turn.
-  // exec runs code whole and gives its last value; doctest runs a >>>
-  // transcript statement by statement; check runs a transcript's examples
-  // through doctest, comparing each with the output the page shows.
-  run: { id, code: text(codeLimit), mode: oneOf("exec", "doctest", "check") },
-  // Stops the run in progress and drops those waiting.
-  stop: {},
-  // Ends the session; the next run starts a new one.
-  restart: {},
+  // Runs code in the runtime's session, starting it if need be. Runs wait
+  // their turn. exec runs code whole and gives its last value; doctest runs a
+  // Python >>> transcript statement by statement; check runs a transcript's
+  // examples through doctest, comparing each with the output the page shows.
+  run: { id, runtime, code: text(codeLimit), mode: oneOf("exec", "doctest", "check") },
+  // Stops the runtime's run in progress and drops those waiting.
+  stop: { runtime },
+  // Ends the runtime's session; the next run starts a new one.
+  restart: { runtime },
 } satisfies Shapes;
 
 const events = {
-  // The runner is there. isolated: whether Stop can interrupt code, rather
-  // than restart its session.
+  // The runner is there. isolated: whether Stop can interrupt Python, rather
+  // than restart its session; Stop always restarts a JavaScript session.
   hello: { isolated: boolean },
-  // Python is loading, for the first run or the first after the session ended.
-  starting: {},
-  ready: {},
+  // A runtime is loading, for its first run or the first after its session ended.
+  starting: { runtime },
+  ready: { runtime },
   stdout: { id, text: text(outputLimit) },
   stderr: { id, text: text(outputLimit) },
-  // The repr of the code's last value, when it has one.
+  // A warning the code logged, such as JavaScript's console.warn.
+  warn: { id, text: text(outputLimit) },
+  // The code's last value, when it has one: Python's repr, or JavaScript's
+  // completion value as devtools would show it.
   result: { id, text: text(outputLimit) },
-  // The traceback the code ended with, from the reader's code on.
+  // An error the code raised and nothing caught, its trace from the reader's
+  // code on: Python's traceback, or JavaScript's uncaught error or rejection.
   error: { id, text: text(outputLimit) },
   // One example a check ran, in order: its source, the output the page
   // expects, the output it gave, and doctest's verdict. error is an
@@ -83,11 +90,13 @@ const events = {
   // The run is over, after ms: it ended by itself (ok or error), was stopped
   // (stop, timeout, or output past the limit), or lost with its session.
   done: { id, ms: duration, end: oneOf("ok", "error", "stop", "timeout", "output", "lost") },
-  // The session ended and its state is gone, because the reader restarted it,
-  // stopping needed it, it crashed or ran out of memory, or it failed to start.
-  ended: { reason: oneOf("restart", "stop", "crash", "failed") },
+  // A runtime's session ended and its state is gone, because the reader
+  // restarted it, stopping needed it, it crashed or ran out of memory, or it
+  // failed to start.
+  ended: { runtime, reason: oneOf("restart", "stop", "crash", "failed") },
 } satisfies Shapes;
 
+export type Runtime = typeof runtime extends Check<infer R> ? R : never;
 export type RunnerRequest = Messages<typeof requests>;
 export type RunnerEvent = Messages<typeof events>;
 

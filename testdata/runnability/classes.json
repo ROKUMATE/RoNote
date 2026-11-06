@@ -51,19 +51,19 @@
     "md: unsupported",
     "jsx: unsupported",
     "md: unsupported",
-    "js: unsupported",
-    "js: unsupported",
-    "js: unsupported",
+    "js: browser_js",
+    "js: needs_packages",
+    "js: fragment",
     "bash: shell",
     "bash: shell",
     "bash: shell",
     "bash: shell",
-    "js: unsupported"
+    "js: fragment"
   ],
   "docusaurus-v3-install": [
     "bash: shell",
     "bash: shell",
-    "js: unsupported",
+    "js: fragment",
     "tsx: unsupported"
   ],
   "entities": [
@@ -95,7 +95,7 @@
     "-: unsupported"
   ],
   "long-line": [
-    "js: unsupported"
+    "js: browser_js"
   ],
   "material-code-blocks": [
     "yaml: unsupported",
@@ -149,13 +149,13 @@
     "toml: unsupported"
   ],
   "mdn-closures-synthetic": [
-    "js: unsupported",
-    "js: unsupported"
+    "js: browser_js",
+    "js: browser_js"
   ],
   "mdn-live-sample-synthetic": [
     "html: unsupported",
     "css: unsupported",
-    "js: unsupported"
+    "js: needs_dom"
   ],
   "nested-highlight": [
     "python: browser_python",
@@ -228,35 +228,35 @@
   "vitepress-markdown": [
     "md: unsupported",
     "md: unsupported",
-    "js: unsupported",
+    "js: browser_js",
     "ts: unsupported",
     "ts: unsupported",
     "md: unsupported",
     "css: unsupported",
     "md: unsupported",
-    "js: unsupported",
+    "js: browser_js",
     "md: unsupported",
-    "js: unsupported",
+    "js: browser_js",
     "md: unsupported",
     "md: unsupported",
     "sh: shell",
-    "js: unsupported",
-    "js: unsupported",
+    "js: needs_packages",
+    "js: browser_js",
     "md: unsupported",
     "-: unsupported",
-    "js: unsupported",
+    "js: fragment",
     "-: unsupported",
-    "js: unsupported",
-    "js: unsupported",
+    "js: fragment",
+    "js: fragment",
     "md: unsupported",
     "ts: unsupported",
     "ts: unsupported",
     "ts: unsupported",
     "md: unsupported",
-    "js: unsupported",
+    "js: fragment",
     "ts: unsupported",
     "md: unsupported",
-    "js: unsupported",
+    "js: fragment",
     "ts: unsupported"
   ],
   "vitepress-vite-guide": [

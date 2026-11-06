@@ -13,6 +13,8 @@ const blocks: IrBlock[] = [
   { id: "net", kind: "code", lang: "python", text: "import requests" },
   { id: "go", kind: "code", lang: "go", text: "fmt.Println(1)" },
   { id: "repl", kind: "code", lang: "pycon", text: ">>> 1 + 1\n2" },
+  { id: "js", kind: "code", lang: "js", text: "console.log(1)" },
+  { id: "dom", kind: "code", lang: "js", text: 'document.querySelector("p")' },
 ];
 
 let sent: RunnerRequest[];
@@ -88,13 +90,15 @@ test("a run shows Python starting, its output labelled, and how it ended", async
   open();
   await runPython();
   const py = code("py");
-  expect(sent).toEqual([{ v: 1, type: "run", id: "py:1", code: "print(1)", mode: "exec" }]);
+  expect(sent).toEqual([
+    { v: 1, type: "run", id: "py:1", runtime: "python", code: "print(1)", mode: "exec" },
+  ]);
   expect(py.getByRole("status").textContent).toBe("Starting Python…");
 
-  act(() => hear({ v: 1, type: "ready" }));
+  act(() => hear({ v: 1, type: "ready", runtime: "python" }));
   expect(py.getByRole("status").textContent).toBe("Running…");
   fireEvent.click(py.getByRole("button", { name: "Stop" }));
-  await waitFor(() => expect(sent.at(-1)).toEqual({ v: 1, type: "stop" }));
+  await waitFor(() => expect(sent.at(-1)).toEqual({ v: 1, type: "stop", runtime: "python" }));
 
   act(() => {
     hear({ v: 1, type: "stdout", id: "py:1", text: "1\n" });
@@ -121,8 +125,8 @@ test("Restart says the state is gone, and Clear removes the output", async () =>
   expect(py.getByRole("status").textContent).toBe("Stopped at the 30 second limit");
 
   fireEvent.click(py.getByRole("button", { name: "Restart" }));
-  await waitFor(() => expect(sent.at(-1)).toEqual({ v: 1, type: "restart" }));
-  act(() => hear({ v: 1, type: "ended", reason: "restart" }));
+  await waitFor(() => expect(sent.at(-1)).toEqual({ v: 1, type: "restart", runtime: "python" }));
+  act(() => hear({ v: 1, type: "ended", runtime: "python", reason: "restart" }));
   py.getByText("Python restarted. Earlier results are gone.");
 
   fireEvent.click(py.getByRole("button", { name: "Clear" }));
@@ -137,7 +141,7 @@ test("a transcript runs as one, and a crash says what was lost", async () => {
 
   act(() => {
     hear({ v: 1, type: "done", id: "repl:1", ms: 3, end: "lost" });
-    hear({ v: 1, type: "ended", reason: "crash" });
+    hear({ v: 1, type: "ended", runtime: "python", reason: "crash" });
   });
   const repl = code("repl");
   expect(repl.getByRole("status").textContent).toBe("Didn't finish");
@@ -149,12 +153,19 @@ test("Check examples gives each example's verdict, and a failure's diff", async 
   expect(code("py").queryByRole("button", { name: "Check examples" })).toBeNull();
   fireEvent.click(await code("repl").findByRole("button", { name: "Check examples" }));
   await waitFor(() => expect(sent).toHaveLength(1));
-  expect(sent[0]).toEqual({ v: 1, type: "run", id: "repl:1", code: ">>> 1 + 1\n2", mode: "check" });
+  expect(sent[0]).toEqual({
+    v: 1,
+    type: "run",
+    id: "repl:1",
+    runtime: "python",
+    code: ">>> 1 + 1\n2",
+    mode: "check",
+  });
 
   const example = (source: string, want: string, got: string, outcome: "passed" | "failed") =>
     hear({ v: 1, type: "example", id: "repl:1", source, want, got, outcome });
   act(() => {
-    hear({ v: 1, type: "ready" });
+    hear({ v: 1, type: "ready", runtime: "python" });
     example("1 + 1\n", "2\n", "2\n", "passed");
     example("len('abc')\n", "4\n", "3\n", "failed");
     example("object()\n", "<object object at 0x7f1>\n", "<object object at 0x1a2>\n", "failed");
@@ -173,6 +184,53 @@ test("Check examples gives each example's verdict, and a failure's diff", async 
   expect(items[0]?.textContent).toBe("Passed>>> 1 + 1");
   expect(items[1]?.querySelector(".run-diff")?.textContent).toBe("- 4\n+ 3\n");
   expect(items[2]?.textContent).toContain("addresses change on every run");
+});
+
+test("JavaScript runs in its own session, its warnings labelled", async () => {
+  open();
+  const js = code("js");
+  await js.findByRole("button", {
+    name: "JavaScript · browser",
+    description: "JavaScript that runs here, in your browser.",
+  });
+  fireEvent.click(js.getByRole("button", { name: "Run" }));
+  await waitFor(() => expect(sent).toHaveLength(1));
+  expect(sent[0]).toEqual({
+    v: 1,
+    type: "run",
+    id: "js:1",
+    runtime: "javascript",
+    code: "console.log(1)",
+    mode: "exec",
+  });
+  expect(js.getByRole("status").textContent).toBe("Starting JavaScript…");
+
+  act(() => {
+    hear({ v: 1, type: "ready", runtime: "javascript" });
+    hear({ v: 1, type: "stdout", id: "js:1", text: "1\n" });
+    hear({ v: 1, type: "warn", id: "js:1", text: "careful\n" });
+    hear({ v: 1, type: "done", id: "js:1", ms: 2, end: "ok" });
+  });
+  const output = document.querySelector(".run-text");
+  expect([...(output?.children ?? [])].map((c) => [c.className, c.textContent])).toEqual([
+    ["", "1\n"],
+    ["run-warn", "warningcareful\n"],
+  ]);
+
+  // Python's news is Python's: a JavaScript Restart says so to the JavaScript block.
+  fireEvent.click(js.getByRole("button", { name: "Restart" }));
+  await waitFor(() =>
+    expect(sent.at(-1)).toEqual({ v: 1, type: "restart", runtime: "javascript" }),
+  );
+  act(() => hear({ v: 1, type: "ended", runtime: "javascript", reason: "restart" }));
+  js.getByText("JavaScript restarted. Earlier results are gone.");
+
+  const dom = code("dom");
+  await dom.findByRole("button", {
+    name: "Needs a display",
+    description: "It needs a window or a display.",
+  });
+  expect(dom.queryByRole("button", { name: /^Run/ })).toBeNull();
 });
 
 test("a runner that never answers is said so, and leaving closes it", async () => {

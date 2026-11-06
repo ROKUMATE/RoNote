@@ -1,5 +1,10 @@
 import { limitRun, type RunLimits, type Stopped, stopGrace } from "../src/runner/limits";
-import { parseEvent, type RunnerEvent, type RunnerRequest } from "../src/runner/protocol";
+import {
+  parseEvent,
+  type RunnerEvent,
+  type RunnerRequest,
+  type Runtime,
+} from "../src/runner/protocol";
 
 /*
  * One session of a runtime: a worker running it, the runs waiting for it,
@@ -25,6 +30,7 @@ export type RuntimeWorker = {
 };
 
 export type SessionOptions = {
+  runtime: Runtime;
   /** Starts a worker that runs the runtime. */
   spawn: () => RuntimeWorker;
   /** Whether Stop can interrupt the code, through a shared buffer, rather than end the session. */
@@ -33,27 +39,27 @@ export type SessionOptions = {
   post: (event: RunnerEvent) => void;
 };
 
-export function createSession({ spawn, interruptible, post }: SessionOptions) {
+export function createSession({ runtime, spawn, interruptible, post }: SessionOptions) {
   let worker:
-    | { runtime: RuntimeWorker; interrupt: Int32Array | undefined; ready: boolean }
+    | { thread: RuntimeWorker; interrupt: Int32Array | undefined; ready: boolean }
     | undefined;
   const waiting: Run[] = [];
   let current: (Run & { limits: RunLimits; stopped?: Stopped; grace?: number }) | undefined;
 
   function start() {
-    post({ v: 1, type: "starting" });
-    const runtime = spawn();
+    post({ v: 1, type: "starting", runtime });
+    const thread = spawn();
     const interrupt = interruptible ? new Int32Array(new SharedArrayBuffer(4)) : undefined;
-    const started = { runtime, interrupt, ready: false };
+    const started = { thread, interrupt, ready: false };
     worker = started;
-    runtime.onmessage = (message) => {
+    thread.onmessage = (message) => {
       if (worker === started) heard(message.data);
     };
-    runtime.onerror = (error) => {
+    thread.onerror = (error) => {
       error.preventDefault();
       if (worker === started) end(started.ready ? "crash" : "failed");
     };
-    runtime.postMessage({ type: "init", interrupt });
+    thread.postMessage({ type: "init", interrupt });
   }
 
   /** Starts the next waiting run, if none is in progress. */
@@ -64,7 +70,7 @@ export function createSession({ spawn, interruptible, post }: SessionOptions) {
     if (!worker) start();
     current = { ...run, limits: limitRun(() => stop("timeout")) };
     if (worker?.ready) current.limits.start();
-    worker?.runtime.postMessage({ type: "run", id: run.id, code: run.code, mode: run.mode });
+    worker?.thread.postMessage({ type: "run", id: run.id, code: run.code, mode: run.mode });
   }
 
   function heard(data: unknown) {
@@ -73,7 +79,7 @@ export function createSession({ spawn, interruptible, post }: SessionOptions) {
     if (event.type === "ready") {
       if (worker.ready) return;
       worker.ready = true;
-      post(event);
+      post({ v: 1, type: "ready", runtime });
       current?.limits.start();
       return;
     }
@@ -81,6 +87,7 @@ export function createSession({ spawn, interruptible, post }: SessionOptions) {
     switch (event.type) {
       case "stdout":
       case "stderr":
+      case "warn":
       case "result":
       case "error": {
         // The KeyboardInterrupt that stopping raised is no news.
@@ -128,10 +135,10 @@ export function createSession({ spawn, interruptible, post }: SessionOptions) {
 
   /** Ends the session, and the run in it; the next run starts a new one. */
   function end(reason: Extract<RunnerEvent, { type: "ended" }>["reason"]) {
-    worker?.runtime.terminate();
+    worker?.thread.terminate();
     worker = undefined;
     finish(current?.stopped ?? (reason === "restart" ? "stop" : "lost"));
-    post({ v: 1, type: "ended", reason });
+    post({ v: 1, type: "ended", runtime, reason });
     next();
   }
 

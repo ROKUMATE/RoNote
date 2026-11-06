@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>JavaScript in the browser</title></head>
+<body>
+<main>
+<h1>JavaScript in the browser</h1>
+<p>A synthetic page for RoNote's end-to-end tests: JavaScript that runs in the reader's browser, and JavaScript that can't. The last two blocks are MDN's, from the synthetic fixtures mdn-live-sample-synthetic and mdn-closures-synthetic.</p>
+<h2 id="state">State</h2>
+<pre><code class="language-js">const greeting = "Hello";
+</code></pre>
+<pre><code class="language-js">greeting + ", JavaScript"
+</code></pre>
+<h2 id="limits">Limits</h2>
+<pre><code class="language-js">while (true) {}
+</code></pre>
+<pre><code class="language-js">Promise.reject(new Error("nobody caught this"));
+</code></pre>
+<h2 id="mdn">MDN's examples</h2>
+<pre><code class="language-js">const out = document.getElementById("out");
+document.getElementById("greet").addEventListener("click", () =&gt; {
+  out.textContent = "Hello!";
+});
+</code></pre>
+<pre><code class="language-js">function makeTally() {
+  let total = 0; // stays alive between calls
+  return () =&gt; ++total;
+}
+
+const tally = makeTally();
+tally(); // 1
+tally(); // 2
+</code></pre>
+</main>
+</body>
+</html>

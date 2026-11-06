@@ -43,9 +43,10 @@ test("a request with an event's fields, or of another version, is dropped", () =
 });
 
 test("a run, and the events it brings, parse only with their fields in range", () => {
-  const run = { v: 1, type: "run", id: "b1", code: "print(1)", mode: "exec" };
+  const run = { v: 1, type: "run", id: "b1", runtime: "python", code: "print(1)", mode: "exec" };
   expect(parseRequest(run)).toEqual(run);
   expect(parseRequest({ ...run, mode: "shell" })).toBeUndefined();
+  expect(parseRequest({ ...run, runtime: "ruby" })).toBeUndefined();
   expect(parseRequest({ ...run, code: "x".repeat(5_000_001) })).toBeUndefined();
   expect(parseRequest({ ...run, id: "x".repeat(201) })).toBeUndefined();
 
@@ -57,15 +58,20 @@ test("a run, and the events it brings, parse only with their fields in range", (
   expect(
     parseEvent({ v: 1, type: "stdout", id: "b1", text: "x".repeat(1_000_001) }),
   ).toBeUndefined();
-  expect(parseEvent({ v: 1, type: "ended", reason: "crash" })).toEqual({
+  expect(parseEvent({ v: 1, type: "ended", runtime: "javascript", reason: "crash" })).toEqual({
     v: 1,
     type: "ended",
+    runtime: "javascript",
     reason: "crash",
   });
+  expect(parseEvent({ v: 1, type: "ended", reason: "crash" })).toBeUndefined();
+  expect(parseRequest({ v: 1, type: "stop" })).toBeUndefined();
 });
 
 test("a check's examples parse only with a known outcome and every field", () => {
-  expect(parseRequest({ v: 1, type: "run", id: "b1", code: ">>> 1", mode: "check" })).toBeDefined();
+  expect(
+    parseRequest({ v: 1, type: "run", id: "b1", runtime: "python", code: ">>> 1", mode: "check" }),
+  ).toBeDefined();
   const example = {
     v: 1,
     type: "example",

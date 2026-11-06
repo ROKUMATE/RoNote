@@ -21,7 +21,8 @@ test("no block of the RAG tutorial runs as is", () => {
   const blocks = codeBlocks(ir.blocks);
   const found = classifyAll(blocks);
   const classes = blocks.map((b) => `${b.lang ?? "-"}: ${found.get(b.id)?.class}`);
+  const runs = blocks.filter((b) => found.get(b.id)?.run === "run");
 
   expect(classes.length).toBeGreaterThan(5);
-  expect(classes.filter((c) => /browser_python|python_doctest/.test(c))).toEqual([]);
+  expect(runs.map((b) => `${b.lang ?? "-"}: ${found.get(b.id)?.class}`)).toEqual([]);
 });

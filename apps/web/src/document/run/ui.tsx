@@ -9,7 +9,7 @@ import { type ChosenLangs, CodeLangsContext } from "../codeLangs";
 import { classifyAll, codeBlocks, isDoctest, type RunClass, type Runnability } from "./classify";
 import { diff, type Example, known, knownReasons, prompt, summary } from "./doctest";
 import type { RunScope } from "./RunArea";
-import { type BlockRun, type Chunk, type Python, runsOf } from "./runs";
+import { type BlockRun, type Chunk, runsOf, runtimeNames, type Session } from "./runs";
 
 /*
  * Run controls and output for code blocks, a lazy chunk
@@ -20,6 +20,7 @@ import { type BlockRun, type Chunk, type Python, runsOf } from "./runs";
 const chips: Record<RunClass, string> = {
   browser_python: "Python · browser",
   python_doctest: "Python · browser",
+  browser_js: "JavaScript · browser",
   needs_packages: "Needs packages",
   needs_network: "Needs network",
   needs_secret: "Needs a key",
@@ -45,8 +46,11 @@ function classesOf(blocks: readonly IrBlock[], chosen: ChosenLangs) {
 function useRun(scope: RunScope, blockId: string) {
   const runs = runsOf(scope.documentId);
   const run = useSyncExternalStore(runs.subscribe, () => runs.get(blockId));
-  const python = useSyncExternalStore(runs.subscribe, runs.python);
-  return { runs, run, python };
+  const session = useSyncExternalStore(runs.subscribe, () => {
+    const last = runs.get(blockId);
+    return last ? runs.session(last.runtime) : "off";
+  });
+  return { runs, run, session };
 }
 
 /** A block's chip, and Run, Run anyway or Stop; a transcript can also check its examples. */
@@ -56,18 +60,26 @@ export function Controls({ block, scope }: { block: IrBlock; scope: RunScope }) 
   const { runs, run } = useRun(scope, block.id);
   if (!runnability) return null;
   const code = block.text ?? "";
+  const { runtime } = runnability;
   const buttons =
     run && !run.done ? (
-      <button type="button" className="run-button" onClick={() => runs.stop()}>
+      <button type="button" className="run-button" onClick={() => runs.stop(run.runtime)}>
         <StopIcon size={16} aria-hidden />
         Stop
       </button>
-    ) : runnability.run === "none" ? null : (
+    ) : runnability.run === "none" || !runtime ? null : (
       <>
         <button
           type="button"
           className="run-button"
-          onClick={() => runs.run(block.id, code, isDoctest(code) ? "doctest" : "exec")}
+          onClick={() =>
+            runs.run(
+              block.id,
+              runtime,
+              code,
+              runtime === "python" && isDoctest(code) ? "doctest" : "exec",
+            )
+          }
         >
           <PlayIcon size={16} aria-hidden />
           {runnability.run === "run" ? "Run" : "Run anyway"}
@@ -76,7 +88,7 @@ export function Controls({ block, scope }: { block: IrBlock; scope: RunScope }) 
           <button
             type="button"
             className="run-button"
-            onClick={() => runs.run(block.id, code, "check")}
+            onClick={() => runs.run(block.id, runtime, code, "check")}
           >
             <ListChecksIcon size={16} aria-hidden />
             Check examples
@@ -120,22 +132,23 @@ function Chip({ runnability }: { runnability: Runnability }) {
 
 const labels: Record<Exclude<Chunk["kind"], "stdout">, string> = {
   stderr: "stderr",
+  warn: "warning",
   error: "error",
   result: "value",
 };
 
 /** A block's output once it has run: never saved, gone with the page. */
 export function Output({ block, scope }: { block: IrBlock; scope: RunScope }) {
-  const { runs, run, python } = useRun(scope, block.id);
+  const { runs, run, session } = useRun(scope, block.id);
   if (!run) return null;
   return (
     <div className="run-output">
       <div className="run-output-bar">
-        <p role="status">{status(run, python)}</p>
+        <p role="status">{status(run, session)}</p>
         <button type="button" disabled={!run.done} onClick={() => runs.clear(block.id)}>
           Clear
         </button>
-        <button type="button" onClick={() => runs.restart(block.id)}>
+        <button type="button" onClick={() => runs.restart(run.runtime, block.id)}>
           <ArrowCounterClockwiseIcon size={16} aria-hidden />
           Restart
         </button>
@@ -215,8 +228,8 @@ function Diff({ want, got }: { want: string; got: string }) {
   );
 }
 
-function status(run: BlockRun, python: Python): string {
-  if (!run.done) return python === "ready" ? "Running…" : "Starting Python…";
+function status(run: BlockRun, session: Session): string {
+  if (!run.done) return session === "ready" ? "Running…" : `Starting ${runtimeNames[run.runtime]}…`;
   const after = duration(run.done.ms);
   switch (run.done.end) {
     case "ok":

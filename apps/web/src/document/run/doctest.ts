@@ -14,10 +14,11 @@ export type Example = Pick<
 >;
 
 /** A failure that isn't the reader's: the output differs only where it always would. */
-export type Known = "address" | "version";
+export type Known = "address" | "whitespace" | "version";
 
 export const knownReasons: Record<Known, string> = {
   address: "Only an object's address differs, and addresses change on every run.",
+  whitespace: "Only spaces at line ends or blank lines differ, which a page doesn't show.",
   version: `Only the error's wording differs, which changes between Python versions; this browser runs Python ${pythonVersion}.`,
 };
 
@@ -38,11 +39,21 @@ function exception(output: string): { type: string; message: string } | undefine
   return { type: match[1].split(".").at(-1) ?? match[1], message: match[2] ?? "" };
 }
 
+/** text without what a page can't show: spaces at line ends, and blank lines. */
+function visible(text: string): string {
+  return text
+    .split("\n")
+    .map((line) => line.trimEnd())
+    .filter((line) => line !== "")
+    .join("\n");
+}
+
 /** Why a failed example isn't the reader's mistake, if it isn't. */
 export function known(example: Example): Known | undefined {
   if (example.outcome === "passed") return undefined;
   const { want, got } = example;
   if (want.replace(address, "@") === got.replace(address, "@")) return "address";
+  if (visible(want) === visible(got)) return "whitespace";
   const expected = exception(want);
   const raised = exception(got);
   if (expected && raised && expected.type === raised.type) return "version";

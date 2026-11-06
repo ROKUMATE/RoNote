@@ -52,7 +52,7 @@ From P13 on, readers run code blocks from their documents. That code comes from 
   - the runner passes the block's text, as is, to Python's own doctest, in the session's `__main__`, so a check sees what earlier blocks defined and keeps what it defines, as a run does;
   - doctest's checker decides each verdict; the runner sends each example's source, expected and actual output, and verdict, counted against the 1 MB output limit;
   - a traceback is shown as pages show one: its header and the exception;
-  - the app labels two known false failures, so they never read as the reader's mistake: output that differs only in an object's address (`at 0x…>`, or without its `0x`, as some pages print one), and the same exception in other words, as Python's messages change between versions (the browser runs Python 3.14);
+  - the app labels three known false failures, so they never read as the reader's mistake: output that differs only in an object's address (`at 0x…>`, or without its `0x`, as some pages print one); only in spaces at line ends or blank lines, which a page doesn't show; and the same exception in other words, as Python's messages change between versions (the browser runs Python 3.14);
   - a failure shows a line diff of expected against actual, in the text's own colours.
 - **What can run is derived, never stored.** A pure classifier reads each code block's language (the reader's choice over the page's) and text, and the names it shares with the document's other blocks, and names a class: `browser_python`, `python_doctest`, `browser_js`, `needs_packages`, `needs_network`, `needs_secret`, `needs_input`, `needs_dom`, `shell`, `fragment`, `unlabelled` or `unsupported`.
   - Each class has one plain sentence saying why.

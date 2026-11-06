@@ -49,7 +49,8 @@ const cases: [string, string | undefined, RunClass][] = [
   ["open(<path>)", "python", "fragment"],
   ['print("still open)', "python", "fragment"],
   ["fmt.Println(1)", "go", "unsupported"],
-  ['print("hello")', undefined, "unsupported"],
+  ['print("hello")', undefined, "unlabelled"],
+  ['print("hello")', "", "unlabelled"],
   ["a = 1\nprint(a < b)", "python", "browser_python"],
   ['print("<not> a placeholder")', "python", "browser_python"],
   ["# A comment saying input(\nx = 2", "python", "browser_python"],
@@ -98,6 +99,7 @@ test("every class has a plain sentence, and only fragments and packages run anyw
     needs_input: "none",
     needs_dom: "none",
     shell: "none",
+    unlabelled: "none",
     unsupported: "none",
   });
   for (const sentence of Object.values(reasons)) expect(sentence).toMatch(/^[A-Z].*\.$/);

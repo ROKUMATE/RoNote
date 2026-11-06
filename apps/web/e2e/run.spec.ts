@@ -15,7 +15,7 @@ async function openPythonPage(page: Page) {
     page.getByRole("heading", { level: 1, name: "Python in the browser" }),
   ).toBeVisible();
   const blocks = page.locator(".code-block");
-  await expect(blocks).toHaveCount(7);
+  await expect(blocks).toHaveCount(8);
   await expect(blocks.first().getByRole("button", { name: "Run" })).toBeVisible();
   return blocks;
 }
@@ -111,6 +111,25 @@ test("Check examples finds the one example whose output differs, with its diff",
   await expect(examples.nth(2).locator("code")).toHaveText('>>> len("abc")');
   await expect(examples.nth(2).locator(".run-diff")).toHaveText("- 4\n+ 3\n");
   await expect(transcript.locator(".run-diff")).toHaveCount(1);
+});
+
+test("a block with no language asks for one, and runs once Python is chosen", async ({ page }) => {
+  const blocks = await openPythonPage(page);
+  const bare = blocks.nth(7);
+  await expect(bare.getByRole("button", { name: /^Run/ })).toHaveCount(0);
+  const chip = bare.getByRole("button", { name: "No language" });
+  await chip.focus();
+  await expect(bare.getByRole("tooltip")).toHaveText(
+    "This block has no language set. Choose one to run it.",
+  );
+
+  await chip.click();
+  const list = bare.getByRole("listbox", { name: "Code language" });
+  await expect(list).toBeFocused();
+  await list.getByRole("option", { name: "Python" }).click();
+  await bare.getByRole("button", { name: "Run" }).click();
+  await expect(bare.getByRole("status")).toHaveText(/^Ran in /, { timeout: 20_000 });
+  await expect(bare.locator(".run-text")).toHaveText("chosen as Python\n");
 });
 
 for (const theme of ["light", "dark"] as const) {

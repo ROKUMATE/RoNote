@@ -1,6 +1,6 @@
 # 0008: In-browser code execution
 
-Accepted, 2026-11-05. Amended 2026-11-06: the production runner gets its own registrable domain. Amended in P13b: checking examples, JavaScript.
+Accepted, 2026-11-05. Amended 2026-11-06: the production runner gets its own registrable domain. Amended in P13b: checking examples, JavaScript, unlabelled blocks.
 
 ## Context
 
@@ -54,12 +54,12 @@ From P13 on, readers run code blocks from their documents. That code comes from 
   - a traceback is shown as pages show one: its header and the exception;
   - the app labels two known false failures, so they never read as the reader's mistake: output that differs only in an object's address (`0x…`), and the same exception in other words, as Python's messages change between versions (the browser runs Python 3.14);
   - a failure shows a line diff of expected against actual, in the text's own colours.
-- **What can run is derived, never stored.** A pure classifier reads each code block's language (the reader's choice over the page's) and text, and the names it shares with the document's other blocks, and names a class: `browser_python`, `python_doctest`, `browser_js`, `needs_packages`, `needs_network`, `needs_secret`, `needs_input`, `needs_dom`, `shell`, `fragment` or `unsupported`.
+- **What can run is derived, never stored.** A pure classifier reads each code block's language (the reader's choice over the page's) and text, and the names it shares with the document's other blocks, and names a class: `browser_python`, `python_doctest`, `browser_js`, `needs_packages`, `needs_network`, `needs_secret`, `needs_input`, `needs_dom`, `shell`, `fragment`, `unlabelled` or `unsupported`.
   - Each class has one plain sentence saying why.
   - JavaScript that uses a page's own names (`document`, `window`, `alert`, storage) is `needs_dom`; `fetch` and sockets are `needs_network`; a bare `import` or `require` is `needs_packages`, and a relative one or an `export` is a `fragment`. Strings and comments never count.
   - Only `browser_python`, `python_doctest` and `browser_js` show Run. `fragment` and `needs_packages` offer "Run anyway", since they may well run; the rest only explain.
   - A Python block that uses a name only blocks that can't run define can't run either, and takes the stricter of their classes; one that uses a name no block defines is a `fragment`. JavaScript blocks are read on their own.
-  - RoNote still never guesses a language: an unlabelled block is `unsupported` until the reader chooses one.
+  - RoNote still never guesses a language: a block with none is `unlabelled`, "This block has no language set. Choose one to run it.", and its chip opens the block's own language list.
 - **Outputs are never saved.** They belong to the open page, and go when it closes.
 - **Size:** the app's side of running (classifier, controls, output panel and the runner client) is its own lazy chunk with its own budget; Pyodide loads from the runner origin only when a reader first runs code.
 

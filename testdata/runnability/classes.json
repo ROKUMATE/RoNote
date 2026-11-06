@@ -3,14 +3,14 @@
     "sh: shell"
   ],
   "br-in-pre": [
-    "-: unsupported",
-    "-: unsupported"
+    "-: unlabelled",
+    "-: unlabelled"
   ],
   "callouts": [
     "sql: unsupported"
   ],
   "chrome-removal": [
-    "-: unsupported"
+    "-: unlabelled"
   ],
   "crlf": [
     "bat: shell"
@@ -19,23 +19,23 @@
     "go: unsupported"
   ],
   "docbook-chapter": [
-    "-: unsupported",
-    "-: unsupported"
+    "-: unlabelled",
+    "-: unlabelled"
   ],
   "docbook-postgres-select": [
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported"
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled"
   ],
   "docsy-k8s-pods": [
     "yaml: unsupported",
@@ -78,21 +78,21 @@
     "go: unsupported"
   ],
   "godev-getting-started": [
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported"
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled"
   ],
   "leading-empty-line": [
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported"
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled"
   ],
   "long-line": [
     "js: browser_js"
@@ -116,10 +116,10 @@
     "py: browser_python"
   ],
   "material-fastapi-first-steps": [
-    "-: unsupported",
+    "-: unlabelled",
     "console: shell",
-    "-: unsupported",
-    "-: unsupported"
+    "-: unlabelled",
+    "-: unlabelled"
   ],
   "material-termy": [
     "console: shell",
@@ -170,12 +170,12 @@
     "pycon: python_doctest"
   ],
   "no-main": [
-    "-: unsupported"
+    "-: unlabelled"
   ],
   "real-go-effective-go": [
-    "-: unsupported",
-    "-: unsupported",
-    "-: unsupported"
+    "-: unlabelled",
+    "-: unlabelled",
+    "-: unlabelled"
   ],
   "real-kubernetes-pods": [
     "yaml: unsupported",
@@ -219,7 +219,7 @@
     "markdoc: unsupported"
   ],
   "trailing-whitespace": [
-    "-: unsupported",
+    "-: unlabelled",
     "yaml: unsupported"
   ],
   "unicode": [
@@ -243,9 +243,9 @@
     "js: needs_packages",
     "js: browser_js",
     "md: unsupported",
-    "-: unsupported",
+    "-: unlabelled",
     "js: fragment",
-    "-: unsupported",
+    "-: unlabelled",
     "js: fragment",
     "js: fragment",
     "md: unsupported",

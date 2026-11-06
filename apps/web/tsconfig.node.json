@@ -18,6 +18,7 @@
   },
   "include": [
     "vite.config.ts",
+    "vite.config.test.ts",
     "vite.runner.config.ts",
     "browsers.ts",
     "vitest.live.config.ts",

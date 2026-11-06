@@ -27,11 +27,13 @@ export default defineConfig({
   plugins: [react(), tailwindcss({ optimize: false })],
   define: { "import.meta.env.RONOTE_RUNNER_ORIGIN": JSON.stringify(runnerOrigin) },
   build: { target: browsers, manifest: true },
-  server: { proxy, headers },
+  // An address, not localhost, which may resolve to IPv6 alone: the runner
+  // answers only this origin. A busy port fails rather than taking the runner's.
+  server: { host: "127.0.0.1", port: 5173, strictPort: true, proxy, headers },
   preview: { proxy, headers },
   test: {
     environment: "jsdom",
-    include: ["src/**/*.test.{ts,tsx}", "runner/**/*.test.ts"],
+    include: ["src/**/*.test.{ts,tsx}", "runner/**/*.test.ts", "vite.config.test.ts"],
     setupFiles: ["src/test-setup.ts"],
     // Vitest's on-disk module cache keys a test's build by the test file's
     // own text, but an import.meta.glob in it also depends on which files

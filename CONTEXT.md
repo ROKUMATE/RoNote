@@ -4,29 +4,23 @@ Current state of the project. Rewrite this file at the end of each phase; never 
 
 ## Current milestone
 
-P13a, the isolated runner and Python in the browser: done.
-- **Leftovers:**
-  - quieter make targets: Vitest's dot reporter, and Playwright's line reporter locally (CI keeps the HTML report);
-  - `TestFetchRateLimitsEachHost` runs in a `testing/synctest` bubble on an in-memory listener, so the gap it measures is exactly the 100 ms interval, whatever the machine's load;
-  - `make stop` ends what `make run-api`, `make run-worker` and `make web-dev` started, child processes included; `make dev-down` calls it.
-- **Running code** (ADR 0008): Python blocks run in the reader's browser, on a runner origin of their own, with Run, Stop, Restart and an output panel under the block.
-- **In the browser, on the e2e stack:**
-  - `greet.py` from the expressive-code fixture page ran: "Hello, Ada!", 24 ms;
-  - every code block of the real RAG tutorial shows its reason, and none offers Run: 1 can't run (plain text), 2 shell, 3 need packages (with Run anyway), 4 need a key, 1 fragment (with Run anyway).
-- **Measured** on this Mac in Chromium, against production builds served by `vite preview`, median of 5 cold loads, with the load average about 3.7:
-  - Pyodide as served: 12.4 MB uncompressed (wasm 9.6 MB, standard library zip 2.5 MB, loader 1.25 MB, worker 22 kB), 6.3 MB with gzip;
-  - cold start, from the first Run to Python ready: 4.2 s. Pyodide's own load is most of it, and takes as long in Node here;
-  - warm runs: `print(1)` 2 ms there and back; summing a million squares 0.4 s.
-- **Bundle, gzip:**
-  - initial JS 120.4 kB of 150;
-  - document route 132.3 kB of 135 (131.9 in P12);
-  - highlighter core 54.5 kB of 60;
-  - highlight controls 6.7 kB of 15;
-  - the new run chunk 8.8 kB of 20;
-  - CSS 10.0 kB of 20.
-- **Checks:**
-  - `make web-e2e`: 79 passed, 1 skipped (quarantined);
-  - `make test-live`: all 11 pages and the RAG check pass. vite.dev's robots.txt timed out once, and the rerun passed.
+P13b, doctest checks, JavaScript runs and run polish: done.
+- **Check examples** (`python_doctest` blocks, next to Run): doctest runs the transcript in the session and lists each example as Passed, Failed or Known difference, a failure with a line diff in the text's own colours. Known differences: an object's address (with or without its `0x`), only line-end spaces or blank lines, and the same exception in other words (the browser runs Python 3.14).
+- **JavaScript runs** in a worker of its own on the runner origin: `browser_js` blocks show "JavaScript · browser"; one shared global object per document, top-level `await`, the completion value, console output as devtools shows it, uncaught errors and rejections with the reader's frames only. Stop, the 30 s limit and the 1 MB limit end its session; one limits module (`src/runner/limits.ts`) serves both runtimes.
+- **Polish:**
+  - a block with no language says "This block has no language set. Choose one to run it.", and its chip opens the block's language list;
+  - Mod+Enter runs the focused code block, or the one the editor selected;
+  - the header shows each runtime the document uses, not started / starting / idle / running, each with its own Restart;
+  - Python starts on the first hover or focus of a Python Run or Check examples button, never on page load.
+- **In the browser, on the dev stack:**
+  - docs.python.org's control-flow page: Check examples gave a pass/fail list for all 30 transcripts checked (the endless loop left out): 24 all passed; 3 had only known differences (fib's line-end space and blank lines, `<function fib at 10042ed0>`); 3 failed for real (`foo` from a block not yet run, a blank line inside `__doc__`'s output, Python 3.14's annotation order);
+  - MDN's Closures page: its 13 pure blocks run (one ends in MDN's own `ReferenceError`), its 7 DOM blocks say "Needs a display", its 5 module blocks are fragments, its HTML and CSS can't run.
+- **Cold start, click to first output,** on docs.python.org's first plain block that prints, production builds served by `vite preview`, Chromium, a fresh browser each time, median of 5, load about 1.6:
+  - before warm-up: 745 ms clicked at once, 755 ms after a 0.5 s or 2 s hover;
+  - after: 733 ms clicked at once (only a script clicks without hovering), 226 ms after a 0.5 s hover, 13 ms after 2 s.
+  - P13a's 4.2 s was not reproduced: cold start on fresh browsers is about 0.75 s here today.
+- **Bundle, gzip:** initial JS 120.4 kB of 150; document route 132.4 kB of 135 (132.3 in P13a); highlighter core 54.5 kB of 60; highlight controls 6.7 kB of 15; run chunk 13.2 kB of 20 (8.8); CSS 10.2 kB of 20 (10.0). The runner's JavaScript worker is 38.2 kB with acorn, not budgeted.
+- **Checks:** `make check` exits 0; `make web-e2e`: 94 passed, 1 skipped (quarantined); the live RAG check passes.
 - **Quarantined:** #13, "going back returns to the same place" in `apps/web/e2e/links.spec.ts`.
 
 ## Decisions so far
@@ -203,7 +197,7 @@ Running code (ADR 0008, since P13a):
   - the app names its origin in the runner's URL (`?app=`); the runner talks only when that origin is in `RONOTE_APP_ORIGINS`, and only to it;
   - each side also checks `event.source`.
 - **Sessions:**
-  - one Pyodide session per open document, in a module worker, started by the first Run and ended when the page closes;
+  - one Pyodide session per open document, in a module worker, started by the first Run, or since P13b by the first hover or focus of a Python Run button (a `warm` request), and ended when the page closes;
   - blocks share `__main__`, as notebook cells do; a block gives back the repr of its last value; a `>>>` transcript runs a statement at a time, like the REPL;
   - tracebacks start at the reader's code (`<cell n>`, with source lines);
   - the runner page keeps the limits on its own clock and treats what the worker says as untrusted, since the code in the worker shares its realm:
@@ -212,16 +206,29 @@ Running code (ADR 0008, since P13a):
     - a crash or a failed start ends the session and says so;
     - without isolation (Safari), Stop ends the session instead.
   - Pyodide 314.0.7 is served from the runner origin, standard library only: its lock file lists no packages.
+  - the limits live in `src/runner/limits.ts`, used by both runtimes' sessions (since P13b); the app's messages about them are built from the same numbers.
+- **Check examples** (since P13b): `cells.py`'s `check` runs doctest's own runner over the block's text, as is, with the session's `__main__` as its globals and `clear_globs=False`, collecting each example's source, expected and actual output (a traceback cut to its header and exception) and verdict. The app (`doctest.ts`) labels known differences and diffs the lines (longest common subsequence).
+- **JavaScript** (since P13b, `runner/javascript.worker.ts`):
+  - each block is parsed with acorn as a script with top-level `await` (`runner/evaluate.ts`) and runs wrapped in an async function: top-level declarations become names on the worker's global object, made plain writable properties first (so `const name` works though the worker has a `name` of its own), and a trailing expression is returned in an array, so a promise comes back as itself. Lines keep their numbers, and columns map back through the inserted text;
+  - a run lasts until its code has settled and the timers it set have fired or been cleared, two tasks on, so an unhandled rejection lands in it;
+  - `runner/format.ts` shows values as devtools does: top-level strings raw, two levels deep, `[Circular]`, `Map(n)`, `Set(n)`, class names, getters as `(...)`, `%s`-style specifiers; errors keep only frames from the reader's cells;
+  - only the worker's script may evaluate code: the runner's headers are chosen by path (`headersFor` in `vite.runner.config.ts`), `script-src 'self' 'unsafe-eval'` for `javascript.worker.*` alone;
+  - Python's and JavaScript's workers batch output through `runner/output.ts`.
 - **Classifier** (`src/document/run/classify.ts`):
   - derived, never stored, from each block's language (the reader's choice first) and text;
-  - classes: browser_python, python_doctest, needs_packages, needs_network, needs_secret, needs_input, needs_dom, shell, fragment and unsupported, each with one sentence;
-  - read across the document: a block that uses a name only blocks that can't run define takes the stricter of their classes, and a name no block defines makes it a fragment. The RAG tutorial needed this, as four of its blocks first classified as runnable;
+  - classes: browser_python, python_doctest, browser_js, needs_packages, needs_network, needs_secret, needs_input, needs_dom, shell, fragment, unlabelled and unsupported, each with one sentence;
+  - JavaScript (since P13b) is read through a small lexer (`javascript.ts`) that drops comments and blanks literals: a page's names (`document`, `window`, `alert`, storage) are `needs_dom`, `fetch` and sockets `needs_network`, a bare import or `require` `needs_packages`, a relative one or an `export` a fragment, as are unbalanced brackets and clause-first openings;
+  - read across the document, for Python: a block that uses a name only blocks that can't run define takes the stricter of their classes, and a name no block defines makes it a fragment. The RAG tutorial needed this, as four of its blocks first classified as runnable. JavaScript blocks are read on their own;
   - `testdata/runnability/classes.json` keeps every golden fixture's classes, and `make test-live` checks the real RAG tutorial offers no Run.
 - **UI:**
-  - Run (or Run anyway, for fragments and missing packages) and a chip in the code header; the chip's reason shows on hover and focus, and Escape hides it;
+  - Run (or Run anyway, for fragments and missing packages) and a chip in the code header; the chip's reason shows on hover and focus, and Escape hides it; an unlabelled block's chip opens its language list;
+  - Mod+Enter (`keys.ts`): one capture-phase listener runs the block holding focus, or the editor's selected one, before the editor sees the key; Run carries `aria-keyshortcuts` and a title;
+  - the header's "Code sessions" (`RunSessions`, lazy) show each runtime the document uses, with its own Restart;
   - the output under the block: stdout plain, stderr and errors labelled, the last value, the duration, Clear and Restart;
   - outputs are never saved;
   - a lazy chunk (`src/document/run/ui.tsx`, budget 20 kB); the document chunk only carries `RunArea.tsx`.
+- **Tests that catch regressions, P13b:** one deliberate break was caught.
+  - Check examples calling a failed example passed: the e2e check (it read "All 3 examples passed") and the protocol-level check test in `runner.spec.ts`.
 - **Tests that catch regressions:** two deliberate breaks were each caught.
   - The runner answering any origin: the e2e test that forges messages from other origins.
     - The first design, which replied to the sender's origin, let this break pass: the browser dropped the replies anyway.
@@ -233,6 +240,11 @@ Running code (ADR 0008, since P13a):
   - output written faster than 1 MB in 50 ms came as one message over the protocol's limit, which was dropped, so the 1 MB cap never fired; the worker now sends 64 kB chunks;
   - importing `doctest` cost a second of every cold start; it loads with the first transcript now;
   - the chip's reason was keyed to `:focus-visible`, which Chrome doesn't apply to focus after mouse use.
+- **Found while building P13b:**
+  - the app's and the runner's dev servers shared Vite's dependency cache; once the runner had a dependency to bundle (acorn), each rebuilt it for itself, and the JavaScript worker failed to start. The runner has its own cache (`node_modules/.vite-runner`);
+  - V8 places a `ReferenceError` at the start of its statement, and a stack's columns count from 1 where acorn's count from 0;
+  - a completion value returned from the async wrapper was awaited, so `Promise.reject(...)` read as a plain uncaught error; it comes back in an array now;
+  - on docs.python.org, Check examples first called fib's examples failures: the tutorial prints an address without `0x`, and output with a line-end space and blank lines a page doesn't show. Both are known differences now (two Fix commits, tests first).
 - **Found by checking on the dev stack** (all 23 reader checks then passed: Python on docs.python.org, Go and JS blocks, language choices, the runner origin):
   - `make web-dev` served the app on `[::1]:5173` alone, as `localhost` resolved to IPv6 first, so the documented `127.0.0.1:5173` didn't load and Python never started. The app's dev server is now pinned to `127.0.0.1:5173` with `strictPort`, and a test keeps the two configs naming each other;
   - only module-level names count across blocks now. A function's parameter (`def where_is(point)`) or a call's keyword (`Point(x=1)`) had made `match point:` look runnable. `match` patterns bind their names;
@@ -309,11 +321,15 @@ Unchanged: `/healthz`, `/readyz`, the P04 tokens and styleguide, the extractor a
 - Link status is resolved when a document opens and again after an import finishes. A page imported from another tab shows as not imported until then, and following it opens the existing document.
 - Following a link that fails leaves its message under the link until the next link is followed.
 - After macOS sleeps, the podman VM's clock can lag for a few minutes. Jobs no longer wait on it (P12), but tests that compare a database time with the app's, such as a user's `created_at` "about now", still fail meanwhile. `make doctor` says so and prints the fix.
-- Code in the runner's worker can post a false "done", which stops its run's clock while it keeps running. The next run then waits behind it and is interrupted at its own limit, so the waste lasts until the reader runs something or leaves.
+- Code in a runner worker can post a false "done", which stops its run's clock while it keeps running. The next run then waits behind it and is interrupted at its own limit, so the waste lasts until the reader runs something or leaves.
 - Safari isn't cross-origin isolated (no COEP `credentialless`), so Stop there ends the session; the e2e tests run Chromium only, so that path is covered by unit tests alone.
-- A cold start takes about 4 s on this Mac, and Pyodide is 6.3 MB with gzip. The production runner (P18) should serve it compressed and cacheable.
+- Pyodide is 6.3 MB with gzip; a cold start took 0.75 s on fresh browsers here in P13b (P13a measured 4.2 s). The production runner (P18) should serve it compressed and cacheable.
+- P18's host must serve the JavaScript worker's script (`javascript.worker.*`) with its own policy, `'unsafe-eval'` added, and every other file without it, as `headersFor` does.
 - In dev, open the app at `127.0.0.1:5173`: the runner answers only the origins in `RONOTE_APP_ORIGINS`. At `localhost:5173` the app still loads, and a Run says the code runner didn't answer.
-- A block with no language says "Only Python runs here for now." even when it is Python, as go.dev's and some docs.python.org blocks are; choosing Python makes it run.
+- JavaScript blocks are read on their own: one that uses a name another block imports (VitePress's `postcssIsolateStyles({...})`) offers Run, and fails with a `ReferenceError`.
+- A JavaScript `setInterval` never cleared keeps its run going until Stop or the 30 s limit, as a Node script would. Output Python prints after its run has ended (from an asyncio task) is dropped.
+- doctest ends an example's expected output at a blank line, so output a page shows with blank lines (the tutorial's `__doc__` example) fails without `<BLANKLINE>`. Version differences other than an exception's wording, such as Python 3.14's annotation order, are failures.
+- Code blocks in documents wrap instead of scrolling sideways: Tiptap injects `.ProseMirror pre { white-space: pre-wrap }`, which wins over `.reader pre` (since P10; the styleguide's test checks the component outside the editor). Found in P13b, not fixed.
 - The runner's Vite build warns that Pyodide's Node-only imports are left out; that is expected.
 - Highlights go in prose the editor edits, and in code; not in table cells, captions, or prose inside tabs, which are drawn read-only.
 - Jump to puts the caret at a highlight's start rather than selecting it, so the toolbar does not offer to highlight it again.
@@ -329,4 +345,4 @@ Unchanged: `/healthz`, `/readyz`, the P04 tokens and styleguide, the extractor a
 
 ## Next step
 
-The rest of P13, per its brief. v1 still lacks printed-PDF import, which the PDF link's message already promises; the runner origin's deployment is P18.
+The next phase, per its brief. v1 still lacks printed-PDF import, which the PDF link's message already promises; the runner origin's deployment is P18.

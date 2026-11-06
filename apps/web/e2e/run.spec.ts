@@ -15,7 +15,7 @@ async function openPythonPage(page: Page) {
     page.getByRole("heading", { level: 1, name: "Python in the browser" }),
   ).toBeVisible();
   const blocks = page.locator(".code-block");
-  await expect(blocks).toHaveCount(6);
+  await expect(blocks).toHaveCount(7);
   await expect(blocks.first().getByRole("button", { name: "Run" })).toBeVisible();
   return blocks;
 }
@@ -96,6 +96,23 @@ test("blocks that can't run say why, and outputs are never saved", async ({ page
   await expect(page.locator(".run-output")).toHaveCount(0);
 });
 
+test("Check examples finds the one example whose output differs, with its diff", async ({
+  page,
+}) => {
+  const blocks = await openPythonPage(page);
+  const transcript = blocks.nth(6);
+  await transcript.getByRole("button", { name: "Check examples" }).click();
+  await expect(transcript.getByRole("status")).toHaveText(
+    /^2 of 3 examples passed, 1 failed, in /,
+    { timeout: 20_000 },
+  );
+  const examples = transcript.getByRole("list", { name: "Examples" }).getByRole("listitem");
+  await expect(examples.locator(".run-verdict")).toHaveText(["Passed", "Passed", "Failed"]);
+  await expect(examples.nth(2).locator("code")).toHaveText('>>> len("abc")');
+  await expect(examples.nth(2).locator(".run-diff")).toHaveText("- 4\n+ 3\n");
+  await expect(transcript.locator(".run-diff")).toHaveCount(1);
+});
+
 for (const theme of ["light", "dark"] as const) {
   test(`the output panel has no axe violations in ${theme}, and fits 375px`, async ({ page }) => {
     await chooseTheme(page, theme);
@@ -104,6 +121,9 @@ for (const theme of ["light", "dark"] as const) {
     const use = blocks.nth(1);
     await use.getByRole("button", { name: "Run" }).click();
     await expect(use.getByRole("status")).toHaveText(/^Ended with an error/, { timeout: 20_000 });
+    const transcript = blocks.nth(6);
+    await transcript.getByRole("button", { name: "Check examples" }).click();
+    await expect(transcript.locator(".run-diff")).toBeVisible({ timeout: 20_000 });
     await blocks.nth(4).getByRole("button", { name: "Needs network" }).focus();
 
     await expectNoAxeViolations(page);

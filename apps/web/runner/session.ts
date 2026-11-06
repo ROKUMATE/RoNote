@@ -109,6 +109,18 @@ export function createSession({ spawn, isolated, post }: SessionOptions) {
         if (event.text.length >= room) stop("output");
         return;
       }
+      case "example": {
+        if (current.stopped) return;
+        // An example is whole or not at all: one past the limit stops the run.
+        const size = event.source.length + event.want.length + event.got.length;
+        if (size > outputLimit - current.output) {
+          stop("output");
+          return;
+        }
+        current.output += size;
+        post(event);
+        return;
+      }
       case "done":
         finish(current.stopped ?? (event.end === "error" ? "error" : "ok"));
         next();

@@ -63,3 +63,20 @@ test("a run, and the events it brings, parse only with their fields in range", (
     reason: "crash",
   });
 });
+
+test("a check's examples parse only with a known outcome and every field", () => {
+  expect(parseRequest({ v: 1, type: "run", id: "b1", code: ">>> 1", mode: "check" })).toBeDefined();
+  const example = {
+    v: 1,
+    type: "example",
+    id: "b1",
+    source: "1 + 1\n",
+    want: "3\n",
+    got: "2\n",
+    outcome: "failed",
+  };
+  expect(parseEvent(example)).toEqual(example);
+  expect(parseEvent({ ...example, outcome: "skipped" })).toBeUndefined();
+  const { got: _, ...withoutGot } = example;
+  expect(parseEvent(withoutGot)).toBeUndefined();
+});

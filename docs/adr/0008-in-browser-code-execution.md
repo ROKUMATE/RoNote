@@ -1,6 +1,6 @@
 # 0008: In-browser code execution
 
-Accepted, 2026-11-05. Amended 2026-11-06: the production runner gets its own registrable domain.
+Accepted, 2026-11-05. Amended 2026-11-06: the production runner gets its own registrable domain. Amended in P13b: checking examples.
 
 ## Context
 
@@ -39,6 +39,12 @@ From P13 on, readers run code blocks from their documents. That code comes from 
   - a crash or running out of memory restarts the session, and says so.
   - The worker shares its realm with the code it runs, which can post messages as the worker would. So the runner page treats what its worker sends like a message from another origin (parsed, and about the run in progress, or dropped), and keeps the limits on its own clock.
   - `connect-src 'self'` is what keeps a request from being sent at all. COEP also refuses answers without a CORP header, but only after the request has gone.
+- **Checking a transcript's examples** (`python_doctest` blocks, "Check examples", next to Run):
+  - the runner passes the block's text, as is, to Python's own doctest, in the session's `__main__`, so a check sees what earlier blocks defined and keeps what it defines, as a run does;
+  - doctest's checker decides each verdict; the runner sends each example's source, expected and actual output, and verdict, counted against the 1 MB output limit;
+  - a traceback is shown as pages show one: its header and the exception;
+  - the app labels two known false failures, so they never read as the reader's mistake: output that differs only in an object's address (`0x…`), and the same exception in other words, as Python's messages change between versions (the browser runs Python 3.14);
+  - a failure shows a line diff of expected against actual, in the text's own colours.
 - **What can run is derived, never stored.** A pure classifier reads each code block's language (the reader's choice over the page's) and text, and the names it shares with the document's other blocks, and names a class: `browser_python`, `python_doctest`, `needs_packages`, `needs_network`, `needs_secret`, `needs_input`, `needs_dom`, `shell`, `fragment` or `unsupported`.
   - Each class has one plain sentence saying why.
   - Only `browser_python` and `python_doctest` show Run. `fragment` and `needs_packages` offer "Run anyway", since they may well run; the rest only explain.

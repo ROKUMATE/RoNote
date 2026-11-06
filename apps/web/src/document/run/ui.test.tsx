@@ -144,6 +144,37 @@ test("a transcript runs as one, and a crash says what was lost", async () => {
   repl.getByText(/^Python stopped working, perhaps out of memory/);
 });
 
+test("Check examples gives each example's verdict, and a failure's diff", async () => {
+  open();
+  expect(code("py").queryByRole("button", { name: "Check examples" })).toBeNull();
+  fireEvent.click(await code("repl").findByRole("button", { name: "Check examples" }));
+  await waitFor(() => expect(sent).toHaveLength(1));
+  expect(sent[0]).toEqual({ v: 1, type: "run", id: "repl:1", code: ">>> 1 + 1\n2", mode: "check" });
+
+  const example = (source: string, want: string, got: string, outcome: "passed" | "failed") =>
+    hear({ v: 1, type: "example", id: "repl:1", source, want, got, outcome });
+  act(() => {
+    hear({ v: 1, type: "ready" });
+    example("1 + 1\n", "2\n", "2\n", "passed");
+    example("len('abc')\n", "4\n", "3\n", "failed");
+    example("object()\n", "<object object at 0x7f1>\n", "<object object at 0x1a2>\n", "failed");
+    hear({ v: 1, type: "done", id: "repl:1", ms: 9, end: "ok" });
+  });
+  const repl = code("repl");
+  expect(repl.getByRole("status").textContent).toBe(
+    "1 of 3 examples passed, 1 failed, 1 with a known difference, in 9 ms",
+  );
+  const items = within(repl.getByRole("list", { name: "Examples" })).getAllByRole("listitem");
+  expect(items.map((item) => item.querySelector(".run-verdict")?.textContent)).toEqual([
+    "Passed",
+    "Failed",
+    "Known difference",
+  ]);
+  expect(items[0]?.textContent).toBe("Passed>>> 1 + 1");
+  expect(items[1]?.querySelector(".run-diff")?.textContent).toBe("- 4\n+ 3\n");
+  expect(items[2]?.textContent).toContain("addresses change on every run");
+});
+
 test("a runner that never answers is said so, and leaving closes it", async () => {
   vi.mocked(openRunner).mockRejectedValueOnce(new Error("The code runner didn't answer."));
   const page = open();

@@ -1,5 +1,6 @@
-import type { RunnerEvent } from "../../runner/protocol";
+import type { RunnerEvent, RunnerRequest } from "../../runner/protocol";
 import { openRunner, type Runner } from "./client";
+import type { Example } from "./doctest";
 import { onClose } from "./RunArea";
 
 /*
@@ -12,8 +13,12 @@ type End = Extract<RunnerEvent, { type: "done" }>["end"];
 /** Output as it came: stdout plain, the rest labelled. */
 export type Chunk = { kind: "stdout" | "stderr" | "result" | "error"; text: string };
 
+type Mode = Extract<RunnerRequest, { type: "run" }>["mode"];
+
 export type BlockRun = {
   output: readonly Chunk[];
+  /** A check's examples, in order, as they come. */
+  examples?: readonly Example[];
   /** Until the run is done, it is waiting or running. */
   done?: { ms: number; end: End };
   /** News of the session from this run, such as that its state is gone. */
@@ -55,11 +60,11 @@ export class DocumentRuns {
     return this.#runs.get(blockId);
   }
 
-  run(blockId: string, code: string, mode: "exec" | "doctest") {
+  run(blockId: string, code: string, mode: Mode) {
     this.#count += 1;
     const id = `${blockId}:${this.#count}`;
     this.#blocks.set(id, blockId);
-    this.#set(blockId, { output: [] });
+    this.#set(blockId, mode === "check" ? { output: [], examples: [] } : { output: [] });
     this.#open().then(
       (runner) => runner.send({ v: 1, type: "run", id, code, mode }),
       () => {
@@ -132,6 +137,14 @@ export class DocumentRuns {
       this.#blocks.delete(event.id);
       this.#news = blockId;
       this.#set(blockId, { ...run, done: { ms: event.ms, end: event.end } });
+      return;
+    }
+    if (event.type === "example") {
+      const { source, want, got, outcome } = event;
+      this.#set(blockId, {
+        ...run,
+        examples: [...(run.examples ?? []), { source, want, got, outcome }],
+      });
       return;
     }
     const last = run.output.at(-1);

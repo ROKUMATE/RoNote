@@ -21,6 +21,12 @@ test("an object whose address alone differs is a known difference", () => {
     ),
   ).toBe("address");
   expect(known(failed("<Thing at 0x1f>\n", "<Other at 0x2e>\n"))).toBeUndefined();
+  // docs.python.org's tutorial shows one without its 0x.
+  expect(known(failed("<function fib at 10042ed0>\n", "<function fib at 0x195c968>\n"))).toBe(
+    "address",
+  );
+  expect(known(failed("at 10042ed0\n", "at 195c968\n"))).toBeUndefined();
+  expect(known(failed("'0xff'\n", "'0xfe'\n"))).toBeUndefined();
 });
 
 test("the same exception in other words is a known difference between versions", () => {

@@ -147,7 +147,7 @@ export function classifyAll(blocks: readonly CodeBlock[]): Map<string, Runnabili
   const binders = new Map<string, string[]>();
   const stars: string[] = [];
   for (const [id, n] of read) {
-    for (const name of n.binds) binders.set(name, [...(binders.get(name) ?? []), id]);
+    for (const name of n.exports) binders.set(name, [...(binders.get(name) ?? []), id]);
     if (n.star) stars.push(id);
   }
   const strictest = (ids: readonly string[]) =>

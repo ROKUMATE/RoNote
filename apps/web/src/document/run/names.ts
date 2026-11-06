@@ -90,9 +90,29 @@ function parameters(code: string, open: number): string {
   return code.slice(open + 1);
 }
 
+/**
+ * The names a case pattern captures: bare names, not a class pattern's class,
+ * a keyword pattern's attribute, a dotted constant or the wildcard.
+ */
+function captures(pattern: string): string[] {
+  return [...pattern.matchAll(identifier)]
+    .filter((m) => {
+      const before = pattern.slice(0, m.index).trimEnd();
+      const after = pattern.slice(m.index + m[0].length).trimStart();
+      return !before.endsWith(".") && !/^(?:[(.]|=(?!=))/.test(after) && !/\d$/.test(before);
+    })
+    .map((m) => m[0])
+    .filter((name) => name !== "_" && !predefined.has(name));
+}
+
 export type Names = {
   /** The names the block binds: definitions, imports, assignments, parameters, loop targets. */
   binds: Set<string>;
+  /**
+   * The names it binds for the code after it: those bound outside any def or
+   * class (and declared global), not parameters, locals or keyword arguments.
+   */
+  exports: Set<string>;
   /** The names it uses without binding them, builtins and keywords left out. */
   free: Set<string>;
   /** Whether it imports everything from a module, so any name may be bound. */
@@ -102,52 +122,81 @@ export type Names = {
 export function names(source: string): Names {
   const { code } = codeOnly(source);
   const binds = new Set<string>();
-  const bind = (list: Iterable<string>) => {
-    for (const name of list) binds.add(name);
+  const exports = new Set<string>();
+  const bind = (list: Iterable<string>, exported: boolean) => {
+    for (const name of list) {
+      binds.add(name);
+      if (exported) exports.add(name);
+    }
   };
   let star = false;
 
-  for (const m of code.matchAll(/\b(?:def|class)\s+([A-Za-z_]\w*)\s*(\()?/g)) {
-    if (m[1]) binds.add(m[1]);
-    if (m[2] && m.index !== undefined) {
-      bind(firstOfEach(parameters(code, m.index + m[0].length - 1)));
-    }
-  }
-  for (const m of code.matchAll(/\blambda\b([^:]*):/g)) bind(firstOfEach(m[1] ?? ""));
-  for (const line of code.split("\n")) {
+  /** What the statement starting on line binds; at module level, for later blocks too. */
+  const statement = (line: string, module: boolean) => {
     const from = /^\s*from\s+[\w.]+\s+import\s+(.+)$/.exec(line);
     if (from?.[1]) {
       if (from[1].trim().startsWith("*")) star = true;
       for (const part of from[1].replace(/[()]/g, "").split(",")) {
-        const words = identifiers(part);
-        const name = words.at(-1);
-        if (name) binds.add(name);
+        bind(identifiers(part).slice(-1), module);
       }
-      continue;
+      return;
     }
     const plain = /^\s*import\s+(.+)$/.exec(line);
     if (plain?.[1]) {
       for (const part of plain[1].split(",")) {
         const alias = /\bas\s+(\w+)/.exec(part)?.[1];
-        const name = alias ?? identifiers(part)[0];
-        if (name) binds.add(name);
+        bind(alias ? [alias] : identifiers(part).slice(0, 1), module);
       }
-      continue;
+      return;
     }
-    // Assignment targets, plain, annotated, augmented or unpacked.
+    const definition = /^\s*(?:async\s+)?(?:def|class)\s+([A-Za-z_]\w*)/.exec(line)?.[1];
+    if (definition) bind([definition], module);
+    const loop = /^\s*(?:async\s+)?for\s+(.+?)\s+in\b/.exec(line)?.[1];
+    if (loop) bind(identifiers(loop), module);
+    const pattern = /^\s*case\s+(.+?)(?:\s+if\b.*)?:\s*$/.exec(line)?.[1];
+    if (pattern) bind(captures(pattern), module);
+    for (const m of line.matchAll(/\bas\s+([A-Za-z_]\w*)/g)) bind(m.slice(1, 2), module);
+    for (const m of line.matchAll(/([A-Za-z_]\w*)\s*:=/g)) bind(m.slice(1, 2), module);
+    // Assignment targets, plain, annotated, augmented or unpacked; one with a
+    // bracket left open is a call's keyword argument.
     const assign = /^\s*([^=]*?[\w)\]])\s*(?::[^=]*)?(?:[-+*/%&|^@]|\/\/|\*\*|>>|<<)?=(?!=)/.exec(
       line,
     );
-    if (assign?.[1] && !/\b(if|elif|while|return|assert|lambda)\b/.test(assign[1])) {
-      bind(identifiers(assign[1].replace(/\[[^\]]*\]/g, "")));
+    const target = assign?.[1] ?? "";
+    const open = (target.match(/[([{]/g)?.length ?? 0) > (target.match(/[)\]}]/g)?.length ?? 0);
+    if (target && !open && !/\b(if|elif|while|return|assert|lambda)\b/.test(target)) {
+      bind(identifiers(target.replace(/\[[^\]]*\]/g, "")), module);
+    }
+  };
+
+  // Each statement's first line, with whether it is outside every def and
+  // class body: bodies are what is indented past their def or class line.
+  // Lines inside brackets continue a statement and change no scope.
+  const scopes: number[] = [];
+  let depth = 0;
+  for (const line of code.split("\n")) {
+    if (depth === 0 && line.trim() !== "") {
+      const indent = line.length - line.trimStart().length;
+      while (scopes.length > 0 && indent <= (scopes.at(-1) ?? 0)) scopes.pop();
+      statement(line, scopes.length === 0);
+      if (/^\s*(?:async\s+)?(?:def|class)\b/.test(line)) scopes.push(indent);
+    }
+    for (const c of line) {
+      if ("([{".includes(c)) depth++;
+      else if (")]}".includes(c)) depth = Math.max(0, depth - 1);
     }
   }
-  for (const m of code.matchAll(/\bfor\s+(.+?)\s+in\b/g)) bind(identifiers(m[1] ?? ""));
-  for (const m of code.matchAll(/\bas\s+([A-Za-z_]\w*)/g)) if (m[1]) binds.add(m[1]);
-  for (const m of code.matchAll(/\b(?:global|nonlocal)\s+([\w,\s]+)/g))
-    bind(identifiers(m[1] ?? ""));
-  // Keyword arguments and walrus targets.
-  for (const m of code.matchAll(/([A-Za-z_]\w*)\s*:?=(?!=)/g)) if (m[1]) binds.add(m[1]);
+
+  // Bound inside the block, but never for the code after it.
+  for (const m of code.matchAll(/\b(?:def|class)\s+[A-Za-z_]\w*\s*\(/g)) {
+    bind(firstOfEach(parameters(code, m.index + m[0].length - 1)), false);
+  }
+  for (const m of code.matchAll(/\blambda\b([^:]*):/g)) bind(firstOfEach(m[1] ?? ""), false);
+  // Comprehension variables, and keyword arguments, which name no variable at all.
+  for (const m of code.matchAll(/\bfor\s+(.+?)\s+in\b/g)) bind(identifiers(m[1] ?? ""), false);
+  for (const m of code.matchAll(/([A-Za-z_]\w*)\s*=(?!=)/g)) bind(m.slice(1, 2), false);
+  for (const m of code.matchAll(/\bnonlocal\s+([\w,\s]+)/g)) bind(identifiers(m[1] ?? ""), false);
+  for (const m of code.matchAll(/\bglobal\s+([\w,\s]+)/g)) bind(identifiers(m[1] ?? ""), true);
 
   // An import line's module names are bindings or paths, never uses.
   const uses = code
@@ -157,5 +206,5 @@ export function names(source: string): Names {
   const free = new Set(
     identifiers(uses).filter((n) => !binds.has(n) && !predefined.has(n) && !/^__\w+__$/.test(n)),
   );
-  return { binds, free, star };
+  return { binds, exports, free, star };
 }

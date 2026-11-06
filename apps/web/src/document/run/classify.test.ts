@@ -149,6 +149,54 @@ const across: [string, CodeBlock[], RunClass[]][] = [
     ["needs_network", "python_doctest"],
   ],
   [
+    "a function's parameters and locals define nothing for other blocks",
+    doc(
+      ["def where_is(point):\n    found = point\n    return found"],
+      ["print(where_is(1))"],
+      ["print(point, found)"],
+    ),
+    ["browser_python", "browser_python", "fragment"],
+  ],
+  [
+    "a class's body and a call's keywords define nothing either",
+    doc(
+      ["class Point:\n    def __init__(self, x, y):\n        self.x = x"],
+      ["Point(x=1, y=2)"],
+      ["x"],
+    ),
+    ["browser_python", "browser_python", "fragment"],
+  ],
+  [
+    "a match on a name nothing defines is a fragment, though its patterns bind",
+    doc(
+      [
+        "match point:\n    case (0, y):\n        print(y)\n    case [first, *rest] if first:\n        print(rest)",
+      ],
+      [
+        "spot = (0, 1)\nmatch spot:\n    case (x, 0) | (0, x):\n        print(x)\n    case Point(x=px) as p:\n        print(px, p)",
+      ],
+      ["class Point:\n    pass"],
+    ),
+    ["fragment", "browser_python", "browser_python"],
+  ],
+  [
+    "names bound under a top-level if, for or with, or declared global, count",
+    doc(
+      ["if True:\n    limit = 3\nfor i in range(2):\n    last = i"],
+      ["def setup():\n    global ready\n    ready = True"],
+      ["print(limit, last, i, ready)"],
+    ),
+    ["browser_python", "browser_python", "browser_python"],
+  ],
+  [
+    "a signature over several lines keeps its body local",
+    doc(
+      ["def area(\n    width,\n    height,\n):\n    size = width * height\n    return size"],
+      ["size"],
+    ),
+    ["browser_python", "fragment"],
+  ],
+  [
     "shell and other languages pass nothing on",
     doc(["export OPENAI_API_KEY=sk", "bash"], ["const x = 1", "js"], ["print(1)"]),
     ["shell", "unsupported", "browser_python"],

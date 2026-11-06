@@ -49,6 +49,9 @@ if (window.parent !== window && import.meta.env.RONOTE_APP_ORIGINS.includes(app)
       case "run":
         sessions[request.runtime].run(request);
         break;
+      case "warm":
+        sessions[request.runtime].warm();
+        break;
       case "stop":
         sessions[request.runtime].stop();
         break;

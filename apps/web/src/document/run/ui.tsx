@@ -75,6 +75,9 @@ export function Controls({ block, scope }: { block: IrBlock; scope: RunScope }) 
     });
   }, [block.id, runs, runtime, code, mode]);
   if (!runnability) return null;
+  // Pyodide takes a while to load, so a reader's first sign of running
+  // Python starts it; JavaScript is ready at once.
+  const warm = runtime === "python" ? () => runs.warm(runtime) : undefined;
   const buttons =
     run && !run.done ? (
       <button type="button" className="run-button" onClick={() => runs.stop(run.runtime)}>
@@ -88,6 +91,8 @@ export function Controls({ block, scope }: { block: IrBlock; scope: RunScope }) 
           className="run-button"
           aria-keyshortcuts={runShortcut}
           title={runShortcutLabel}
+          onPointerEnter={warm}
+          onFocus={warm}
           onClick={() => runs.run(block.id, runtime, code, mode)}
         >
           <PlayIcon size={16} aria-hidden />
@@ -97,6 +102,8 @@ export function Controls({ block, scope }: { block: IrBlock; scope: RunScope }) 
           <button
             type="button"
             className="run-button"
+            onPointerEnter={warm}
+            onFocus={warm}
             onClick={() => runs.run(block.id, runtime, code, "check")}
           >
             <ListChecksIcon size={16} aria-hidden />

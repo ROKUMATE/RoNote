@@ -233,6 +233,10 @@ Running code (ADR 0008, since P13a):
   - output written faster than 1 MB in 50 ms came as one message over the protocol's limit, which was dropped, so the 1 MB cap never fired; the worker now sends 64 kB chunks;
   - importing `doctest` cost a second of every cold start; it loads with the first transcript now;
   - the chip's reason was keyed to `:focus-visible`, which Chrome doesn't apply to focus after mouse use.
+- **Found by checking on the dev stack** (all 23 reader checks then passed: Python on docs.python.org, Go and JS blocks, language choices, the runner origin):
+  - `make web-dev` served the app on `[::1]:5173` alone, as `localhost` resolved to IPv6 first, so the documented `127.0.0.1:5173` didn't load and Python never started. The app's dev server is now pinned to `127.0.0.1:5173` with `strictPort`, and a test keeps the two configs naming each other;
+  - only module-level names count across blocks now. A function's parameter (`def where_is(point)`) or a call's keyword (`Point(x=1)`) had made `match point:` look runnable. `match` patterns bind their names;
+  - a block that opens with `case`, `elif`, `else`, `except`, `finally` or `return` is a fragment.
 
 Reader and editor (`apps/web/src/document`, since P10; `/doc/$id` is a lazy chunk):
 - **Mapping:** `mapping.ts` converts IR ⇄ Tiptap JSON, and every golden fixture round-trips through a real editor unchanged. Unedited source blocks are saved exactly as loaded, never re-serialized.
@@ -308,7 +312,8 @@ Unchanged: `/healthz`, `/readyz`, the P04 tokens and styleguide, the extractor a
 - Code in the runner's worker can post a false "done", which stops its run's clock while it keeps running. The next run then waits behind it and is interrupted at its own limit, so the waste lasts until the reader runs something or leaves.
 - Safari isn't cross-origin isolated (no COEP `credentialless`), so Stop there ends the session; the e2e tests run Chromium only, so that path is covered by unit tests alone.
 - A cold start takes about 4 s on this Mac, and Pyodide is 6.3 MB with gzip. The production runner (P18) should serve it compressed and cacheable.
-- In dev, open the app at `127.0.0.1:5173`: the runner answers only the origins in `RONOTE_APP_ORIGINS`.
+- In dev, open the app at `127.0.0.1:5173`: the runner answers only the origins in `RONOTE_APP_ORIGINS`. At `localhost:5173` the app still loads, and a Run says the code runner didn't answer.
+- A block with no language says "Only Python runs here for now." even when it is Python, as go.dev's and some docs.python.org blocks are; choosing Python makes it run.
 - The runner's Vite build warns that Pyodide's Node-only imports are left out; that is expected.
 - Highlights go in prose the editor edits, and in code; not in table cells, captions, or prose inside tabs, which are drawn read-only.
 - Jump to puts the caret at a highlight's start rather than selecting it, so the toolbar does not offer to highlight it again.

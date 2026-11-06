@@ -5,6 +5,9 @@ Current state of the project. Rewrite this file at the end of each phase; never 
 ## Current milestone
 
 P13b, doctest checks, JavaScript runs and run polish: done.
+- **CI hooks:** `scripts/run.sh` now creates an explicit process session instead of
+  relying on non-interactive shell job control, with `setsid`, Python and Perl
+  launch fallbacks. `scripts/test-run-stop.sh` passes under `dash`.
 - **Check examples** (`python_doctest` blocks, next to Run): doctest runs the transcript in the session and lists each example as Passed, Failed or Known difference, a failure with a line diff in the text's own colours. Known differences: an object's address (with or without its `0x`), only line-end spaces or blank lines, and the same exception in other words (the browser runs Python 3.14).
 - **JavaScript runs** in a worker of its own on the runner origin: `browser_js` blocks show "JavaScript · browser"; one shared global object per document, top-level `await`, the completion value, console output as devtools shows it, uncaught errors and rejections with the reader's frames only. Stop, the 30 s limit and the 1 MB limit end its session; one limits module (`src/runner/limits.ts`) serves both runtimes.
 - **Polish:**

@@ -135,6 +135,26 @@ test("output stops at 1 MB, and the run with it", () => {
   expect(kinds().at(-1)).toBe("done a output");
 });
 
+test("a check's examples count towards the output limit, each whole", () => {
+  const python = open();
+  python.run({ ...run("a"), mode: "check" });
+  const [worker] = workers;
+  say(worker, { v: 1, type: "ready" });
+  const example = (got: string) => ({
+    v: 1,
+    type: "example",
+    id: "a",
+    source: "1\n",
+    want: "1\n",
+    got,
+    outcome: "failed",
+  });
+  say(worker, example("x".repeat(600_000)));
+  say(worker, example("y".repeat(600_000)));
+  say(worker, done("a"));
+  expect(kinds()).toEqual(["starting", "ready", "example", "done a output"]);
+});
+
 test("runs wait their turn, and Stop drops those waiting", () => {
   const python = open();
   python.run(run("a"));

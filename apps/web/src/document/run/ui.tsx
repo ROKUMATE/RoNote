@@ -1,10 +1,12 @@
 import { ArrowCounterClockwiseIcon } from "@phosphor-icons/react/ArrowCounterClockwise";
+import { ListChecksIcon } from "@phosphor-icons/react/ListChecks";
 import { PlayIcon } from "@phosphor-icons/react/Play";
 import { StopIcon } from "@phosphor-icons/react/Stop";
 import { useContext, useId, useState, useSyncExternalStore } from "react";
 import type { IrBlock } from "../../api/schema";
 import { type ChosenLangs, CodeLangsContext } from "../codeLangs";
 import { classifyAll, codeBlocks, isDoctest, type RunClass, type Runnability } from "./classify";
+import { diff, type Example, known, knownReasons, prompt, summary } from "./doctest";
 import type { RunScope } from "./RunArea";
 import { type BlockRun, type Chunk, type Python, runsOf } from "./runs";
 
@@ -46,33 +48,45 @@ function useRun(scope: RunScope, blockId: string) {
   return { runs, run, python };
 }
 
-/** A block's chip, and Run, Run anyway or Stop. */
+/** A block's chip, and Run, Run anyway or Stop; a transcript can also check its examples. */
 export function Controls({ block, scope }: { block: IrBlock; scope: RunScope }) {
   const { chosen } = useContext(CodeLangsContext);
   const runnability = classesOf(scope.blocks, chosen).get(block.id);
   const { runs, run } = useRun(scope, block.id);
   if (!runnability) return null;
   const code = block.text ?? "";
-  const button =
+  const buttons =
     run && !run.done ? (
       <button type="button" className="run-button" onClick={() => runs.stop()}>
         <StopIcon size={16} aria-hidden />
         Stop
       </button>
     ) : runnability.run === "none" ? null : (
-      <button
-        type="button"
-        className="run-button"
-        onClick={() => runs.run(block.id, code, isDoctest(code) ? "doctest" : "exec")}
-      >
-        <PlayIcon size={16} aria-hidden />
-        {runnability.run === "run" ? "Run" : "Run anyway"}
-      </button>
+      <>
+        <button
+          type="button"
+          className="run-button"
+          onClick={() => runs.run(block.id, code, isDoctest(code) ? "doctest" : "exec")}
+        >
+          <PlayIcon size={16} aria-hidden />
+          {runnability.run === "run" ? "Run" : "Run anyway"}
+        </button>
+        {runnability.class === "python_doctest" && (
+          <button
+            type="button"
+            className="run-button"
+            onClick={() => runs.run(block.id, code, "check")}
+          >
+            <ListChecksIcon size={16} aria-hidden />
+            Check examples
+          </button>
+        )}
+      </>
     );
   return (
     <>
       <Chip runnability={runnability} />
-      {button}
+      {buttons}
     </>
   );
 }
@@ -126,6 +140,7 @@ export function Output({ block, scope }: { block: IrBlock; scope: RunScope }) {
         </button>
       </div>
       {run.note && <p className="run-note">{run.note}</p>}
+      {run.examples && run.examples.length > 0 && <Examples examples={run.examples} />}
       {run.output.length > 0 && (
         // biome-ignore lint/a11y/noNoninteractiveTabindex: output that scrolls must be reachable by keyboard (WCAG 2.1.1; axe scrollable-region-focusable).
         <pre tabIndex={0} className="run-text">
@@ -147,12 +162,64 @@ export function Output({ block, scope }: { block: IrBlock; scope: RunScope }) {
   );
 }
 
+const verdicts: Record<Example["outcome"], string> = {
+  passed: "Passed",
+  failed: "Failed",
+  error: "Failed",
+};
+
+/** A check's examples, each with its verdict, and a failure's diff. */
+function Examples({ examples }: { examples: readonly Example[] }) {
+  return (
+    <ol aria-label="Examples" className="run-examples">
+      {examples.map((example, i) => {
+        const why = known(example);
+        return (
+          // biome-ignore lint/suspicious/noArrayIndexKey: examples only grow at their end.
+          <li key={i} data-outcome={why ? "known" : example.outcome}>
+            <p className="run-example">
+              <span className="run-verdict">
+                {why ? "Known difference" : verdicts[example.outcome]}
+              </span>
+              <code>{prompt(example.source)}</code>
+            </p>
+            {why && <p className="run-known">{knownReasons[why]}</p>}
+            {example.outcome !== "passed" && <Diff want={example.want} got={example.got} />}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+const marks = { same: " ", want: "-", got: "+" } as const;
+
+/** What the page expected against what the example gave, line by line. */
+function Diff({ want, got }: { want: string; got: string }) {
+  return (
+    <>
+      <p className="run-diff-legend">- expected, + got</p>
+      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a diff that scrolls must be reachable by keyboard (WCAG 2.1.1; axe scrollable-region-focusable). */}
+      <pre tabIndex={0} className="run-diff">
+        {diff(want, got).map((line, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: a diff's lines are positional.
+          <span key={i} data-kind={line.kind}>
+            <span className="run-diff-mark">{marks[line.kind]} </span>
+            {line.text}
+            {"\n"}
+          </span>
+        ))}
+      </pre>
+    </>
+  );
+}
+
 function status(run: BlockRun, python: Python): string {
   if (!run.done) return python === "ready" ? "Running…" : "Starting Python…";
   const after = duration(run.done.ms);
   switch (run.done.end) {
     case "ok":
-      return `Ran in ${after}`;
+      return run.examples ? `${summary(run.examples)}, in ${after}` : `Ran in ${after}`;
     case "error":
       return `Ended with an error after ${after}`;
     case "stop":

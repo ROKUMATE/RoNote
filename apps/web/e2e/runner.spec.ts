@@ -1,7 +1,17 @@
 import { expect, type Frame, type Page, test } from "@playwright/test";
 import { stack } from "./stack";
 
-type Event = { type: string; id?: string; text?: string; end?: string; reason?: string };
+type Event = {
+  type: string;
+  id?: string;
+  text?: string;
+  end?: string;
+  reason?: string;
+  source?: string;
+  want?: string;
+  got?: string;
+  outcome?: string;
+};
 
 declare global {
   interface Window {
@@ -140,7 +150,11 @@ test("only the app may frame the runner", async ({ page }) => {
 });
 
 /** Runs code in the page's runner, resolving with the run's events, done last. */
-function run(page: Page, code: string, mode: "exec" | "doctest" = "exec"): Promise<Event[]> {
+function run(
+  page: Page,
+  code: string,
+  mode: "exec" | "doctest" | "check" = "exec",
+): Promise<Event[]> {
   return page.evaluate(
     ([code, mode]) =>
       new Promise<Event[]>((resolve) => {
@@ -211,6 +225,59 @@ test("a traceback starts at the reader's code, and a transcript runs like the RE
   const transcript = ">>> 6 * 7\n42\n>>> print('hi')\nhi\n>>> for i in range(2):\n...     i\n0\n1";
   expect(shown(await run(page, transcript, "doctest"))).toEqual([
     { type: "stdout", text: "42\nhi\n" },
+    { type: "done", end: "ok" },
+  ]);
+});
+
+test("a check compares each example with the page's output, in the session", async ({ page }) => {
+  await openRunner(page);
+  const transcript = [
+    ">>> 6 * 7",
+    "42",
+    ">>> print('hi')",
+    "bye",
+    ">>> 1 / 0",
+    "Traceback (most recent call last):",
+    "  ...",
+    "ZeroDivisionError: division by zero",
+    ">>> int('x')",
+    "Traceback (most recent call last):",
+    "  ...",
+    "ValueError: other words",
+    ">>> nowhere_at_all",
+    ">>> kept = 5",
+  ].join("\n");
+  const events = await run(page, transcript, "check");
+  expect(
+    events.map(({ type, source, want, got, outcome, end }) =>
+      type === "example" ? { source, want, got, outcome } : { type, end },
+    ),
+  ).toEqual([
+    { source: "6 * 7\n", want: "42\n", got: "42\n", outcome: "passed" },
+    { source: "print('hi')\n", want: "bye\n", got: "hi\n", outcome: "failed" },
+    {
+      source: "1 / 0\n",
+      want: "Traceback (most recent call last):\n  ...\nZeroDivisionError: division by zero\n",
+      got: "Traceback (most recent call last):\nZeroDivisionError: division by zero\n",
+      outcome: "passed",
+    },
+    {
+      source: "int('x')\n",
+      want: "Traceback (most recent call last):\n  ...\nValueError: other words\n",
+      got: "Traceback (most recent call last):\nValueError: invalid literal for int() with base 10: 'x'\n",
+      outcome: "failed",
+    },
+    {
+      source: "nowhere_at_all\n",
+      want: "",
+      got: "Traceback (most recent call last):\nNameError: name 'nowhere_at_all' is not defined\n",
+      outcome: "error",
+    },
+    { source: "kept = 5\n", want: "", got: "", outcome: "passed" },
+    { type: "done", end: "ok" },
+  ]);
+  expect(shown(await run(page, "kept"))).toEqual([
+    { type: "result", text: "5" },
     { type: "done", end: "ok" },
   ]);
 });

@@ -1,3 +1,6 @@
+/** The Python the browser runs: Pyodide 314's. */
+export const pythonVersion = "3.14";
+
 /**
  * The standard library modules Python code can import in the browser: those
  * of Python 3.14 that Pyodide 314.0.7 imports without loading packages,

@@ -354,7 +354,7 @@
     margin-left: auto;
   }
 
-  .reader .run-button + .code-copy {
+  .reader .run-button + :is(.run-button, .code-copy) {
     margin-left: 0;
   }
 
@@ -407,6 +407,64 @@
     margin-right: 0.5rem;
     font-family: var(--font-sans);
     font-size: var(--text-ui);
+    color: var(--color-ink-2);
+  }
+
+  /* A check's examples: a word for each verdict, and a failure's diff in
+     the text's own colours, a changed line on a faint ground. */
+  .reader .run-examples {
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .reader .run-examples li + li {
+    margin-top: 0.5rem;
+  }
+
+  .reader .run-example {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin: 0;
+  }
+
+  .reader .run-verdict {
+    flex: none;
+    min-width: 7rem;
+  }
+
+  .reader .run-examples [data-outcome="failed"] .run-verdict,
+  .reader .run-examples [data-outcome="error"] .run-verdict {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  .reader .run-example code {
+    white-space: pre-wrap;
+    color: var(--color-ink);
+  }
+
+  .reader .run-known,
+  .reader .run-diff-legend {
+    margin: 0.25rem 0 0;
+  }
+
+  .reader .run-output .run-diff {
+    max-height: 12rem;
+    overflow: auto;
+    margin: 0.25rem 0 0;
+    padding: 0.5rem;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  .reader .run-diff [data-kind="want"],
+  .reader .run-diff [data-kind="got"] {
+    background-color: var(--color-paper-2);
+  }
+
+  .reader .run-diff-mark {
     color: var(--color-ink-2);
   }
 

@@ -49,8 +49,9 @@ const requests = {
   hello: {},
   // Runs code in the session, starting it if need be. Runs wait their turn.
   // exec runs code whole and gives its last value; doctest runs a >>>
-  // transcript statement by statement.
-  run: { id, code: text(codeLimit), mode: oneOf("exec", "doctest") },
+  // transcript statement by statement; check runs a transcript's examples
+  // through doctest, comparing each with the output the page shows.
+  run: { id, code: text(codeLimit), mode: oneOf("exec", "doctest", "check") },
   // Stops the run in progress and drops those waiting.
   stop: {},
   // Ends the session; the next run starts a new one.
@@ -70,6 +71,16 @@ const events = {
   result: { id, text: text(outputLimit) },
   // The traceback the code ended with, from the reader's code on.
   error: { id, text: text(outputLimit) },
+  // One example a check ran, in order: its source, the output the page
+  // expects, the output it gave, and doctest's verdict. error is an
+  // exception the page didn't expect.
+  example: {
+    id,
+    source: text(outputLimit),
+    want: text(outputLimit),
+    got: text(outputLimit),
+    outcome: oneOf("passed", "failed", "error"),
+  },
   // The run is over, after ms: it ended by itself (ok or error), was stopped
   // (stop, timeout, or output past the limit), or lost with its session.
   done: { id, ms: duration, end: oneOf("ok", "error", "stop", "timeout", "output", "lost") },

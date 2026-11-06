@@ -94,10 +94,13 @@ self.onmessage = (message: MessageEvent<ToWorker>) => {
       if (interrupt) interrupt[0] = 0;
       id = request.id;
       sent = performance.now();
-      const outcome = await run(request.code, request.mode === "doctest");
-      const [value, error] = outcome.toJs();
+      const outcome = await run(request.code, request.mode);
+      const [value, error, examples] = outcome.toJs();
       outcome.destroy();
       flush();
+      for (const [source, want, got, verdict] of examples ?? []) {
+        post({ v: 1, type: "example", id, source, want, got, outcome: verdict });
+      }
       if (error !== undefined) post({ v: 1, type: "error", id, text: error });
       else if (value !== undefined) post({ v: 1, type: "result", id, text: value });
       const ms = Math.round(performance.now() - started);

@@ -49,6 +49,16 @@ test("the same exception in other words is a known difference between versions",
   ).toBe("version");
 });
 
+// A page shows neither a space at a line's end nor, without <BLANKLINE>, a
+// blank line of output: docs.python.org's fib examples print both.
+test("a difference only in line-end spaces or blank lines is a known one", () => {
+  expect(known(failed("0 1 1 2 3\n", "0 1 1 2 3 \n"))).toBe("whitespace");
+  expect(known(failed("", "\n"))).toBe("whitespace");
+  expect(known(failed("None\n", "\nNone\n"))).toBe("whitespace");
+  expect(known(failed("a b\n", "a  b\n"))).toBeUndefined();
+  expect(known(failed("  indented\n", "indented\n"))).toBeUndefined();
+});
+
 test("other differences are the example's, not known", () => {
   expect(known(failed("4\n", "3\n"))).toBeUndefined();
   expect(

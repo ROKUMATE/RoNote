@@ -39,6 +39,25 @@ test("blocks share one JavaScript session, and Restart clears it", async ({ page
   );
 });
 
+test("the header shows the session as it goes, and its Restart clears it", async ({ page }) => {
+  const blocks = await openJavaScriptPage(page);
+  const sessions = page.getByRole("list", { name: "Code sessions" });
+  await expect(sessions.getByRole("listitem")).toHaveText(["JavaScript: not startedRestart"]);
+  await expect(sessions.getByRole("button", { name: "Restart JavaScript" })).toBeDisabled();
+
+  await blocks.nth(2).getByRole("button", { name: "Run" }).click();
+  await expect(sessions.getByRole("listitem")).toHaveText(["JavaScript: runningRestart"]);
+  await blocks.nth(2).getByRole("button", { name: "Stop" }).click();
+  await expect(sessions.getByRole("listitem")).toHaveText(["JavaScript: not startedRestart"]);
+
+  await blocks.nth(0).getByRole("button", { name: "Run" }).click();
+  await expect(sessions.getByRole("listitem")).toHaveText(["JavaScript: idleRestart"]);
+  await sessions.getByRole("button", { name: "Restart JavaScript" }).click();
+  await expect(sessions.getByRole("listitem")).toHaveText(["JavaScript: not startedRestart"]);
+  await blocks.nth(1).getByRole("button", { name: "Run" }).click();
+  await expect(blocks.nth(1).locator(".run-error")).toContainText("greeting is not defined");
+});
+
 test("Stop ends an endless JavaScript loop within a second", async ({ page }) => {
   const blocks = await openJavaScriptPage(page);
   const loop = blocks.nth(2);

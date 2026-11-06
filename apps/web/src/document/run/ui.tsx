@@ -5,6 +5,7 @@ import { StopIcon } from "@phosphor-icons/react/Stop";
 import { useContext, useEffect, useId, useState, useSyncExternalStore } from "react";
 import type { IrBlock } from "../../api/schema";
 import { outputLimit, runLimit } from "../../runner/limits";
+import type { Runtime } from "../../runner/protocol";
 import { type ChosenLangs, CodeLangsContext } from "../codeLangs";
 import { classifyAll, codeBlocks, isDoctest, type RunClass, type Runnability } from "./classify";
 import { diff, type Example, known, knownReasons, prompt, summary } from "./doctest";
@@ -159,6 +160,52 @@ const labels: Record<Exclude<Chunk["kind"], "stdout">, string> = {
   error: "error",
   result: "value",
 };
+
+const runtimes: readonly Runtime[] = ["python", "javascript"];
+
+/**
+ * Each runtime the document has blocks to run in (with Run or Run anyway):
+ * where its session stands, and its Restart. For the document's header.
+ */
+export function Sessions({ scope }: { scope: RunScope }) {
+  const { chosen } = useContext(CodeLangsContext);
+  const classes = [...classesOf(scope.blocks, chosen).values()];
+  const present = runtimes.filter((r) => classes.some((c) => c.run !== "none" && c.runtime === r));
+  if (present.length === 0) return null;
+  return (
+    <ul
+      aria-label="Code sessions"
+      className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-ink-2 text-ui"
+    >
+      {present.map((runtime) => (
+        <SessionStatus key={runtime} scope={scope} runtime={runtime} />
+      ))}
+    </ul>
+  );
+}
+
+function SessionStatus({ scope, runtime }: { scope: RunScope; runtime: Runtime }) {
+  const runs = runsOf(scope.documentId);
+  const status = useSyncExternalStore(runs.subscribe, () => runs.status(runtime));
+  const name = runtimeNames[runtime];
+  return (
+    <li className="flex items-center gap-2">
+      <span>
+        {name}: {status}
+      </span>
+      <button
+        type="button"
+        aria-label={`Restart ${name}`}
+        disabled={status === "not started"}
+        onClick={() => runs.restart(runtime)}
+        className="inline-flex items-center gap-1 rounded-sm px-2 py-0.5 hover:enabled:bg-paper-2 hover:enabled:text-ink disabled:opacity-60"
+      >
+        <ArrowCounterClockwiseIcon size={16} aria-hidden />
+        Restart
+      </button>
+    </li>
+  );
+}
 
 /** A block's output once it has run: never saved, gone with the page. */
 export function Output({ block, scope }: { block: IrBlock; scope: RunScope }) {

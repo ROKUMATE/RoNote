@@ -43,7 +43,7 @@ From P13 on, readers run code blocks from their documents. That code comes from 
   - nothing interrupts a busy JavaScript worker, so Stop, the time limit and the output limit end its session, and say the state is gone.
 - **Sessions:**
   - one session per runtime per open document: blocks of a language share state, as cells of a notebook do;
-  - each starts on its first Run, and Restart starts it again;
+  - each starts on its first Run, and Restart starts it again; the document's header shows where each runtime the document uses stands (not started, starting, idle, running), each with its own Restart;
   - Stop interrupts Python within a second; a run stops after 30 seconds, and output stops at 1 MB, for every runtime, kept by one limits module (`src/runner/limits.ts`);
   - a crash or running out of memory restarts the session, and says so.
   - The worker shares its realm with the code it runs, which can post messages as the worker would. So the runner page treats what its worker sends like a message from another origin (parsed, and about the run in progress, or dropped), and keeps the limits on its own clock.

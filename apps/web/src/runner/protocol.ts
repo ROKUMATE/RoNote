@@ -1,3 +1,5 @@
+import { outputLimit } from "./limits";
+
 /*
  * The messages between the app and the runner origin
  * (docs/adr/0008-in-browser-code-execution.md). Each side checks who sent a
@@ -31,9 +33,6 @@ const id = text(200);
 
 /** The most code one run takes: the size of the largest page RoNote fetches. */
 const codeLimit = 5_000_000;
-
-/** The most output one run sends; past it the runner stops the run. */
-export const outputLimit = 1_000_000;
 
 /** Each message type's fields besides v and type, and how to check them. */
 type Shapes = Record<string, Record<string, Check<unknown>>>;

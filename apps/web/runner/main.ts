@@ -22,7 +22,7 @@ if (window.parent !== window && import.meta.env.RONOTE_APP_ORIGINS.includes(app)
       new Worker(new URL("./python.worker.ts", import.meta.url), {
         type: "module",
       }),
-    isolated: crossOriginIsolated,
+    interruptible: crossOriginIsolated,
     post,
   });
   window.addEventListener("message", (event) => {

@@ -4,6 +4,7 @@ import { PlayIcon } from "@phosphor-icons/react/Play";
 import { StopIcon } from "@phosphor-icons/react/Stop";
 import { useContext, useId, useState, useSyncExternalStore } from "react";
 import type { IrBlock } from "../../api/schema";
+import { outputLimit, runLimit } from "../../runner/limits";
 import { type ChosenLangs, CodeLangsContext } from "../codeLangs";
 import { classifyAll, codeBlocks, isDoctest, type RunClass, type Runnability } from "./classify";
 import { diff, type Example, known, knownReasons, prompt, summary } from "./doctest";
@@ -225,9 +226,9 @@ function status(run: BlockRun, python: Python): string {
     case "stop":
       return `Stopped after ${after}`;
     case "timeout":
-      return "Stopped at the 30 second limit";
+      return `Stopped at the ${runLimit / 1000} second limit`;
     case "output":
-      return "Stopped: the output passed 1 MB";
+      return `Stopped: the output passed ${outputLimit / 1_000_000} MB`;
     case "lost":
       return "Didn't finish";
   }

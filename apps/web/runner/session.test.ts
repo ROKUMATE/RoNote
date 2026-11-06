@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import type { RunnerEvent } from "../src/runner/protocol";
-import { createSession, type PythonWorker, type ToWorker } from "./session";
+import { createSession, type RuntimeWorker, type ToWorker } from "./session";
 
-type Fake = PythonWorker & { posted: ToWorker[]; terminated: boolean };
+type Fake = RuntimeWorker & { posted: ToWorker[]; terminated: boolean };
 
 let workers: Fake[];
 let events: RunnerEvent[];
@@ -17,7 +17,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-function open(isolated = true) {
+function open(interruptible = true) {
   return createSession({
     spawn: () => {
       const worker: Fake = {
@@ -35,7 +35,7 @@ function open(isolated = true) {
       workers.push(worker);
       return worker;
     },
-    isolated,
+    interruptible,
     post: (event) => events.push(event),
   });
 }

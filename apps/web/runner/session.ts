@@ -1,24 +1,15 @@
-import {
-  outputLimit,
-  parseEvent,
-  type RunnerEvent,
-  type RunnerRequest,
-} from "../src/runner/protocol";
+import { limitRun, type RunLimits, type Stopped, stopGrace } from "../src/runner/limits";
+import { parseEvent, type RunnerEvent, type RunnerRequest } from "../src/runner/protocol";
 
 /*
- * One Python session: a worker running Pyodide, the runs waiting for it, and
- * the limits on each. The worker runs the reader's code in its own realm, so
- * whatever it sends is parsed and checked like a message from another origin,
- * and the limits run on this page's clock, never the worker's say-so.
+ * One session of a runtime: a worker running it, the runs waiting for it,
+ * and the limits on each (src/runner/limits.ts). The worker runs the reader's
+ * code in its own realm, so whatever it sends is parsed and checked like a
+ * message from another origin, and the limits run on this page's clock,
+ * never the worker's say-so.
  */
 
-/** How long one run may take. */
-const runLimit = 30_000;
-/** How long an interrupted run has to end before its session is ended instead. */
-const stopGrace = 1_000;
-
 type Run = Extract<RunnerRequest, { type: "run" }>;
-type Stopped = "stop" | "timeout" | "output";
 
 /** What the session sends its worker. */
 export type ToWorker =
@@ -26,7 +17,7 @@ export type ToWorker =
   | { type: "run"; id: string; code: string; mode: Run["mode"] };
 
 /** What the session needs of a worker; the test seam. */
-export type PythonWorker = {
+export type RuntimeWorker = {
   postMessage(message: ToWorker): void;
   terminate(): void;
   onmessage: ((message: MessageEvent) => void) | null;
@@ -34,37 +25,35 @@ export type PythonWorker = {
 };
 
 export type SessionOptions = {
-  /** Starts a worker that runs Python. */
-  spawn: () => PythonWorker;
-  /** Whether Stop can interrupt Python, rather than end the session. */
-  isolated: boolean;
+  /** Starts a worker that runs the runtime. */
+  spawn: () => RuntimeWorker;
+  /** Whether Stop can interrupt the code, through a shared buffer, rather than end the session. */
+  interruptible: boolean;
   /** Sends an event to the app. */
   post: (event: RunnerEvent) => void;
 };
 
-export function createSession({ spawn, isolated, post }: SessionOptions) {
+export function createSession({ spawn, interruptible, post }: SessionOptions) {
   let worker:
-    | { python: PythonWorker; interrupt: Int32Array | undefined; ready: boolean }
+    | { runtime: RuntimeWorker; interrupt: Int32Array | undefined; ready: boolean }
     | undefined;
   const waiting: Run[] = [];
-  let current:
-    | (Run & { started: number; output: number; stopped?: Stopped; timer?: number; grace?: number })
-    | undefined;
+  let current: (Run & { limits: RunLimits; stopped?: Stopped; grace?: number }) | undefined;
 
   function start() {
     post({ v: 1, type: "starting" });
-    const python = spawn();
-    const interrupt = isolated ? new Int32Array(new SharedArrayBuffer(4)) : undefined;
-    const started = { python, interrupt, ready: false };
+    const runtime = spawn();
+    const interrupt = interruptible ? new Int32Array(new SharedArrayBuffer(4)) : undefined;
+    const started = { runtime, interrupt, ready: false };
     worker = started;
-    python.onmessage = (message) => {
+    runtime.onmessage = (message) => {
       if (worker === started) heard(message.data);
     };
-    python.onerror = (error) => {
+    runtime.onerror = (error) => {
       error.preventDefault();
       if (worker === started) end(started.ready ? "crash" : "failed");
     };
-    python.postMessage({ type: "init", interrupt });
+    runtime.postMessage({ type: "init", interrupt });
   }
 
   /** Starts the next waiting run, if none is in progress. */
@@ -73,16 +62,9 @@ export function createSession({ spawn, isolated, post }: SessionOptions) {
     const run = waiting.shift();
     if (!run) return;
     if (!worker) start();
-    current = { ...run, started: performance.now(), output: 0 };
-    if (worker?.ready) limit();
-    worker?.python.postMessage({ type: "run", id: run.id, code: run.code, mode: run.mode });
-  }
-
-  /** Starts the current run's clock, once Python is ready for it. */
-  function limit() {
-    if (!current) return;
-    current.started = performance.now();
-    current.timer = setTimeout(() => stop("timeout"), runLimit);
+    current = { ...run, limits: limitRun(() => stop("timeout")) };
+    if (worker?.ready) current.limits.start();
+    worker?.runtime.postMessage({ type: "run", id: run.id, code: run.code, mode: run.mode });
   }
 
   function heard(data: unknown) {
@@ -92,7 +74,7 @@ export function createSession({ spawn, isolated, post }: SessionOptions) {
       if (worker.ready) return;
       worker.ready = true;
       post(event);
-      limit();
+      current?.limits.start();
       return;
     }
     if (!current || !("id" in event) || event.id !== current.id) return;
@@ -103,21 +85,18 @@ export function createSession({ spawn, isolated, post }: SessionOptions) {
       case "error": {
         // The KeyboardInterrupt that stopping raised is no news.
         if (current.stopped) return;
-        const room = outputLimit - current.output;
-        current.output += Math.min(event.text.length, room);
-        post(event.text.length <= room ? event : { ...event, text: event.text.slice(0, room) });
-        if (event.text.length >= room) stop("output");
+        const { text, full } = current.limits.take(event.text);
+        post({ ...event, text });
+        if (full) stop("output");
         return;
       }
       case "example": {
         if (current.stopped) return;
         // An example is whole or not at all: one past the limit stops the run.
-        const size = event.source.length + event.want.length + event.got.length;
-        if (size > outputLimit - current.output) {
+        if (!current.limits.fits(event.source.length + event.want.length + event.got.length)) {
           stop("output");
           return;
         }
-        current.output += size;
         post(event);
         return;
       }
@@ -129,10 +108,9 @@ export function createSession({ spawn, isolated, post }: SessionOptions) {
 
   function finish(end: Extract<RunnerEvent, { type: "done" }>["end"]) {
     if (!current) return;
-    clearTimeout(current.timer);
+    current.limits.end();
     clearTimeout(current.grace);
-    const ms = Math.round(performance.now() - current.started);
-    post({ v: 1, type: "done", id: current.id, ms, end });
+    post({ v: 1, type: "done", id: current.id, ms: current.limits.elapsed(), end });
     current = undefined;
   }
 
@@ -150,7 +128,7 @@ export function createSession({ spawn, isolated, post }: SessionOptions) {
 
   /** Ends the session, and the run in it; the next run starts a new one. */
   function end(reason: Extract<RunnerEvent, { type: "ended" }>["reason"]) {
-    worker?.python.terminate();
+    worker?.runtime.terminate();
     worker = undefined;
     finish(current?.stopped ?? (reason === "restart" ? "stop" : "lost"));
     post({ v: 1, type: "ended", reason });

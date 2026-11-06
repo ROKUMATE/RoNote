@@ -18,13 +18,19 @@ dir=${RONOTE_RUN_DIR:-$(cd "$(dirname "$0")/.." && pwd)/.run}
 mkdir -p "$dir"
 file=$dir/$name.pgid
 
-# With job control on, a background job leads a process group of its own.
-# Its input is not the terminal, which a background group may not read.
-set -m
-"$@" </dev/null &
+# A non-interactive shell cannot enable job control portably. Start a new
+# session explicitly so the command and its children share a killable group.
+if command -v setsid >/dev/null 2>&1; then
+  setsid "$@" </dev/null &
+elif command -v python3 >/dev/null 2>&1; then
+  python3 -c 'import os, sys; os.setsid(); os.execvp(sys.argv[1], sys.argv[1:])' "$@" </dev/null &
+elif command -v perl >/dev/null 2>&1; then
+  perl -MPOSIX -e 'POSIX::setsid() or die "setsid: $!\n"; exec @ARGV or die "exec: $!\n"' "$@" </dev/null &
+else
+  echo 'run.sh: no session launcher found (need setsid, python3, or perl)' >&2
+  exit 1
+fi
 pid=$!
-# The group is set; without job control the shell reports nothing about it.
-set +m
 echo "$pid" >"$file"
 trap 'kill -s TERM -- "-$pid" 2>/dev/null' INT TERM HUP
 status=0

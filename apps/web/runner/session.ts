@@ -154,6 +154,10 @@ export function createSession({ runtime, spawn, interruptible, post }: SessionOp
       waiting.push(request);
       next();
     },
+    /** Starts the session ahead of its first run. */
+    warm() {
+      if (!worker) start();
+    },
     stop() {
       drop();
       stop("stop");

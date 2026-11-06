@@ -66,6 +66,11 @@ test("a run, and the events it brings, parse only with their fields in range", (
   });
   expect(parseEvent({ v: 1, type: "ended", reason: "crash" })).toBeUndefined();
   expect(parseRequest({ v: 1, type: "stop" })).toBeUndefined();
+  expect(parseRequest({ v: 1, type: "warm", runtime: "python" })).toEqual({
+    v: 1,
+    type: "warm",
+    runtime: "python",
+  });
 });
 
 test("a check's examples parse only with a known outcome and every field", () => {

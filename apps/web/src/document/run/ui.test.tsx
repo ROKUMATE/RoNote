@@ -268,6 +268,27 @@ function Choosing() {
   );
 }
 
+test("the first sign of running Python starts it, and nothing before", async () => {
+  open();
+  const run = await code("py").findByRole("button", { name: "Run" });
+  await code("js").findByRole("button", { name: "Run" });
+  expect(openRunner).not.toHaveBeenCalled();
+
+  fireEvent.pointerEnter(code("js").getByRole("button", { name: "Run" }));
+  fireEvent.pointerEnter(run);
+  await waitFor(() => expect(sent).toEqual([{ v: 1, type: "warm", runtime: "python" }]));
+  // Starting already: another sign, or a check, asks nothing more.
+  fireEvent.focus(run);
+  fireEvent.pointerEnter(code("repl").getByRole("button", { name: "Check examples" }));
+  act(() => hear({ v: 1, type: "starting", runtime: "python" }));
+  expect(sent).toHaveLength(1);
+
+  fireEvent.click(run);
+  await waitFor(() => expect(sent).toHaveLength(2));
+  expect(sent[1]).toMatchObject({ type: "run", runtime: "python" });
+  expect(openRunner).toHaveBeenCalledOnce();
+});
+
 test("a block with no language asks for one, and its chip opens the choice", async () => {
   // jsdom lays nothing out; the list scrolls its choice into view.
   Element.prototype.scrollIntoView = vi.fn();

@@ -75,6 +75,24 @@ test("a run starts its runtime, and its clock starts once the runtime is ready",
   ]);
 });
 
+test("warming starts the session ahead of a run, once, and the run then waits for nothing", () => {
+  const python = open();
+  python.warm();
+  python.warm();
+  expect(workers).toHaveLength(1);
+  expect(workers[0]?.posted).toEqual([{ type: "init", interrupt: expect.any(Int32Array) }]);
+  say(workers[0], ready());
+  vi.advanceTimersByTime(5_000);
+  python.run(run("a"));
+  expect(workers[0]?.posted.at(-1)).toEqual({ type: "run", id: "a", code: "pass", mode: "exec" });
+  say(workers[0], done("a"));
+  expect(events).toEqual([
+    { v: 1, type: "starting", runtime: "python" },
+    { v: 1, type: "ready", runtime: "python" },
+    { v: 1, type: "done", id: "a", ms: 0, end: "ok" },
+  ]);
+});
+
 test("a session names its own runtime, whatever its worker claims", () => {
   const javascript = open("javascript");
   javascript.run(run("a", "1", "javascript"));

@@ -1,6 +1,6 @@
 # 0008: In-browser code execution
 
-Accepted, 2026-11-05. Amended 2026-11-06: the production runner gets its own registrable domain. Amended in P13b: checking examples, JavaScript, unlabelled blocks.
+Accepted, 2026-11-05. Amended 2026-11-06: the production runner gets its own registrable domain. Amended in P13b: checking examples, JavaScript, unlabelled blocks, warming up Python.
 
 ## Context
 
@@ -61,7 +61,7 @@ From P13 on, readers run code blocks from their documents. That code comes from 
   - A Python block that uses a name only blocks that can't run define can't run either, and takes the stricter of their classes; one that uses a name no block defines is a `fragment`. JavaScript blocks are read on their own.
   - RoNote still never guesses a language: a block with none is `unlabelled`, "This block has no language set. Choose one to run it.", and its chip opens the block's own language list.
 - **Outputs are never saved.** They belong to the open page, and go when it closes.
-- **Size:** the app's side of running (classifier, controls, output panel and the runner client) is its own lazy chunk with its own budget; Pyodide loads from the runner origin only when a reader first runs code.
+- **Size:** the app's side of running (classifier, controls, output panel and the runner client) is its own lazy chunk with its own budget; Pyodide loads from the runner origin only when a reader first shows they mean to run Python: the first hover or focus of a Python Run or Check examples button starts the session (a `warm` request). Opening a page never does.
 
 ## Consequences
 

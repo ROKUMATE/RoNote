@@ -119,6 +119,22 @@ export class DocumentRuns {
     );
   }
 
+  /** Starts runtime's session ahead of a first run, unless it has started. */
+  warm(runtime: Runtime) {
+    const session = this.#sessions[runtime];
+    if (session.state !== "off") return;
+    session.state = "starting";
+    this.#changed();
+    this.#open().then(
+      (runner) => runner.send({ v: 1, type: "warm", runtime }),
+      () => {
+        this.#runner = undefined;
+        session.state = "off";
+        this.#changed();
+      },
+    );
+  }
+
   stop(runtime: Runtime) {
     void this.#runner?.then((runner) => runner.send({ v: 1, type: "stop", runtime }));
   }

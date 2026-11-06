@@ -54,6 +54,9 @@ const requests = {
   // Python >>> transcript statement by statement; check runs a transcript's
   // examples through doctest, comparing each with the output the page shows.
   run: { id, runtime, code: text(codeLimit), mode: oneOf("exec", "doctest", "check") },
+  // Starts the runtime's session, if it hasn't started, so a first run need
+  // not wait for it: the reader is about to run something.
+  warm: { runtime },
   // Stops the runtime's run in progress and drops those waiting.
   stop: { runtime },
   // Ends the runtime's session; the next run starts a new one.

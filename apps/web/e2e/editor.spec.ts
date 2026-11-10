@@ -69,6 +69,25 @@ async function expectSaved(page: Page, text: string) {
   });
 }
 
+// The editor's own stylesheet makes every pre inside it wrap; code must not.
+test("a long line of code scrolls sideways inside a document, and the page doesn't", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await importPage(page, fixtureURL("pages", "long-line"));
+  const pre = page.locator(".reader-content .code-block > pre");
+  await expect(pre).toBeVisible();
+  for (const width of [1280, 375]) {
+    await page.setViewportSize({ width, height: 800 });
+    const looks = await pre.evaluate((el) => ({
+      whiteSpace: getComputedStyle(el).whiteSpace,
+      scrolls: el.scrollWidth > el.clientWidth,
+    }));
+    expect(looks, `at ${width}px`).toEqual({ whiteSpace: "pre", scrolls: true });
+    await expectNoHorizontalScroll(page);
+  }
+});
+
 test("the fixture has the blocks these tests rely on", () => {
   expect(golden.blocks.some((b) => b.kind === "paragraph")).toBe(true);
   expect(configCode?.text).toBeTruthy();

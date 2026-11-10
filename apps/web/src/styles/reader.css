@@ -575,3 +575,10 @@
     color: var(--color-gen);
   }
 }
+
+/* Tiptap injects .ProseMirror pre { white-space: pre-wrap } outside any
+   layer, which beats every layered rule and would wrap code inside documents.
+   Unlayered too, and more specific, this keeps code on its lines. */
+.reader .ProseMirror pre {
+  white-space: pre;
+}

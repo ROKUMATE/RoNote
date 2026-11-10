@@ -6,12 +6,13 @@ Every make target and what it runs, in detail. AGENTS.md keeps one line each.
 |---|---|
 | `make help` | list targets (default target) |
 | `make setup` | point git at `.githooks`, make the hook executable, set `pull.rebase true`; run once per clone |
-| `make hooks-test` | test the commit message hook (normal and strict mode), `scripts/check-commits.sh`, the clock check of `scripts/container.sh` (against fake `podman`, `docker` and `date`), and `scripts/run.sh` with `scripts/stop.sh` |
+| `make hooks-test` | test the commit message hook (normal and strict mode), `scripts/check-commits.sh`, the clock check of `scripts/container.sh` (against fake `podman`, `docker` and `date`), and `scripts/run.sh` with `scripts/stop.sh`, and `scripts/check-doc-sizes.sh` |
 | `make check-commits RANGE=main..HEAD` | check every commit message in `RANGE` in strict mode; in CI the event sets the range (`scripts/commit-range.sh`). `scripts/check-commits.sh` exits 0 when all pass, 1 when any is bad (report on stderr), 2 on a usage or internal error |
 | `make tools` | install the pinned golangci-lint into `./bin` |
 | `make check` | `lint`, `test`, `test-perf` and `hooks-test`: what CI's fast jobs run. Run it before pushing |
-| `make lint` | `lint-go` and `lint-web` |
+| `make lint` | `lint-go`, `lint-web` and `lint-docs` |
 | `make lint-go` | golangci-lint (`.golangci.yml`, includes `integration`, `live` and `perf` files), then `go tool deadcode -test -tags integration,live,perf ./...`, which must print nothing outside `internal/httpapi/gen/` (generated helpers may go unused), then `go mod tidy -diff`, then `go tool actionlint` on `.github/workflows` |
+| `make lint-docs` | `scripts/check-doc-sizes.sh`: fails when CONTEXT.md passes 80 lines or 6 KB, or AGENTS.md 150 lines or 10 KB (a KB is 1,024 bytes) |
 | `make lint-web` | `biome check --error-on-warnings`, `tsc -b`, `knip`, all with zero findings |
 | `make fmt` | format Go code with gofumpt and goimports |
 | `make test` | `test-go` and `test-web` |

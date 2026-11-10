@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Rules for any coding agent working in this repo. Read CONTEXT.md before you start and rewrite it before you finish. CONTEXT.md stays within 80 lines and 6 KB, this file within 150 lines and 10 KB.
+Rules for any coding agent working in this repo. Read CONTEXT.md before you start and rewrite it before you finish. CONTEXT.md stays within 80 lines and 6 KB, this file within 150 lines and 10 KB; `make lint` checks both.
 
 ## Product
 
@@ -30,8 +30,9 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 |---|---|
 | `make setup` | point git at `.githooks`; once per clone |
 | `make check` | `lint`, `test`, `test-perf`, `hooks-test`: CI's fast jobs. Run before pushing |
-| `make lint` | `lint-go` and `lint-web` |
+| `make lint` | `lint-go`, `lint-web`, `lint-docs` |
 | `make lint-go` / `lint-web` | golangci-lint, deadcode, tidy, actionlint / Biome, tsc, knip |
+| `make lint-docs` | CONTEXT.md and AGENTS.md within their sizes |
 | `make test` | `test-go` (with `-race`) and `test-web` (Vitest) |
 | `make test-perf` | timing tests alone (`perf` tag, one package at a time) |
 | `make test-integration` | unit and integration tests on testcontainers |

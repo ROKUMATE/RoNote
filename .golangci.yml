@@ -11,6 +11,7 @@ linters:
   enable:
     - bodyclose
     - contextcheck
+    - depguard
     - dupl
     - errcheck
     - errorlint
@@ -24,6 +25,17 @@ linters:
     - staticcheck
     - unparam
     - unused
+  settings:
+    depguard:
+      rules:
+        river:
+          # River is the jobs port's default adapter, and stays behind it.
+          files:
+            - "$all"
+            - "!**/internal/jobs/riverjobs/**"
+          deny:
+            - pkg: github.com/riverqueue
+              desc: reach River through internal/jobs; only internal/jobs/riverjobs imports it (docs/adr/0009-jobs-port.md)
 
 formatters:
   enable:

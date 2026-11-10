@@ -10,7 +10,7 @@ Read before changing `.github/workflows` or a target CI calls.
 
 | Job | Runs | Reproduce locally |
 |---|---|---|
-| commits | `make check-commits` (the strict hook over a PR's base..head, or a push's before..sha; `sha~1..sha` after a force push or a new branch), then `make hooks-test` with dash and GNU tools | `make check-commits RANGE=main..HEAD`, `make hooks-test` |
+| commits | `make check-commits` (the strict hook over a PR's base..head, or a push's before..sha; `sha~1..sha` after a force push or a new branch), then `make hooks-test` with dash and GNU tools, then `make lint-docs` | `make check-commits RANGE=main..HEAD`, `make hooks-test`, `make lint-docs` |
 | go | `make check-go-version`, `make tools`, `make lint-go`, `make test-go`, `make test-perf`, then Node and `make web-deps` for `make check-generated` | the same targets |
 | integration | `make check-go-version`, `make test-integration` on the runner's Docker with Ryuk on | `make test-integration` |
 | web | `make check-node-version`, `make web-deps`, `make lint-web`, `make test-web`, `make web-build` (styleguide guard and bundle budget) | the same targets |

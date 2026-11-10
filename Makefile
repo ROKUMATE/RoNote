@@ -33,6 +33,7 @@ hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the clock
 	sh scripts/test-check-commits.sh
 	sh scripts/test-container-clock.sh
 	sh scripts/test-run-stop.sh
+	sh scripts/test-doc-sizes.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
@@ -69,7 +70,7 @@ extract: ## Print a page's IR: make extract url=https://... [format=text]
 	@test -n "$(url)" || { echo "usage: make extract url=https://... [format=text]" >&2; exit 1; }
 	go run ./cmd/extract --format=$(or $(format),json) "$(url)"
 
-lint: lint-go lint-web ## Lint Go and web code
+lint: lint-go lint-web lint-docs ## Lint Go and web code, and the agent docs' sizes
 
 lint-go: ## Lint Go code and CI workflows (golangci-lint, deadcode, go mod tidy, actionlint)
 	@$(golangci_lint_required)
@@ -79,6 +80,9 @@ lint-go: ## Lint Go code and CI workflows (golangci-lint, deadcode, go mod tidy,
 		[ -z "$$dead" ] || { printf '%s\n' "$$dead" >&2; echo "make lint-go: deadcode found unreachable functions" >&2; exit 1; }
 	go mod tidy -diff
 	go tool actionlint
+
+lint-docs: ## Fail when CONTEXT.md or AGENTS.md outgrows its size (80 lines and 6 KB; 150 lines and 10 KB)
+	sh scripts/check-doc-sizes.sh
 
 lint-web: ## Lint web code (Biome, tsc, knip)
 	@$(node_required)

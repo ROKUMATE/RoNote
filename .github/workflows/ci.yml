@@ -33,6 +33,8 @@ jobs:
           PUSH_SHA: ${{ github.sha }}
       - name: Test the commit message hook with dash and GNU tools
         run: make hooks-test
+      - name: Check the agent docs' sizes
+        run: make lint-docs
 
   go:
     name: Go lint, tests and generated code

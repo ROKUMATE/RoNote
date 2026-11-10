@@ -6,6 +6,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net"
@@ -19,11 +20,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/riverqueue/river"
-	"github.com/riverqueue/river/rivertype"
 
 	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/fetch"
+	"github.com/rokumate/ronote/internal/jobs"
+	"github.com/rokumate/ronote/internal/jobs/riverjobs"
 	"github.com/rokumate/ronote/internal/pgtest"
 	"github.com/rokumate/ronote/internal/store"
 )
@@ -44,13 +45,6 @@ func (loopback) LookupNetIP(_ context.Context, _, host string) ([]netip.Addr, er
 		return []netip.Addr{netip.MustParseAddr("127.0.0.1")}, nil
 	}
 	return nil, &net.DNSError{Err: "no such host", Name: host, IsNotFound: true}
-}
-
-// fastRetry retries failed jobs after 100ms instead of River's backoff.
-type fastRetry struct{}
-
-func (fastRetry) NextRetry(*rivertype.JobRow) time.Time {
-	return time.Now().Add(100 * time.Millisecond)
 }
 
 func htmlPage(title, code string) string {
@@ -147,12 +141,13 @@ func (s *site) hitTimes(path string) []time.Time {
 	return append([]time.Time(nil), s.hits["docs.test:"+port+path]...)
 }
 
-// harness runs a real worker against the test database and site.
+// harness runs a real worker on River against the test database and site.
 type harness struct {
 	t          *testing.T
 	store      *store.Store
 	service    *Service
-	client     *river.Client[pgx.Tx]
+	queue      *riverjobs.Queue
+	stop       func()
 	site       *site
 	ada, grace store.User
 }
@@ -171,24 +166,52 @@ func newHarness(t *testing.T, ttl time.Duration) *harness {
 	}
 	fetcher := fetch.New(fetch.Options{AllowPrivateNetworks: true, Resolver: loopback{}})
 	worker := NewWorker(h.store, fetcher, ttl, discard)
-	h.client, err = NewClient(testDB.Pool, worker, ClientOptions{
-		Logger: discard, RetryPolicy: fastRetry{}, FetchCooldown: 20 * time.Millisecond, FetchPollInterval: 50 * time.Millisecond,
+	// Failed jobs retry after 100ms instead of River's backoff.
+	h.queue, err = riverjobs.New(testDB.Pool, riverjobs.Options{
+		Logger:            discard,
+		RetryDelay:        func(int) time.Duration { return 100 * time.Millisecond },
+		FetchCooldown:     20 * time.Millisecond,
+		FetchPollInterval: 50 * time.Millisecond,
+		StopTimeout:       10 * time.Second,
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := h.client.Start(context.WithoutCancel(ctx)); err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() {
-		stopCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		if err := h.client.Stop(stopCtx); err != nil {
-			t.Errorf("stop River: %v", err)
-		}
-	})
-	h.service = NewService(h.store, h.client)
+	h.queue.Handle(Kind, worker.Handle, JobOptions)
+	h.start()
+	t.Cleanup(func() { h.stop() })
+	h.service = NewService(h.store, h.queue)
 	return h
+}
+
+// start runs the worker until stop.
+func (h *harness) start() {
+	ctx, cancel := context.WithCancel(context.WithoutCancel(h.t.Context()))
+	done := make(chan error, 1)
+	go func() { done <- h.queue.Run(ctx) }()
+	h.stop = func() {
+		cancel()
+		if err := <-done; err != nil {
+			h.t.Errorf("stop River: %v", err)
+		}
+		h.stop = func() {}
+	}
+}
+
+// enqueue enqueues an import's job again, without its key, as a job
+// delivered twice would run.
+func (h *harness) enqueue(args Args) {
+	h.t.Helper()
+	payload, err := json.Marshal(args)
+	if err != nil {
+		h.t.Fatal(err)
+	}
+	err = h.store.InTx(h.t.Context(), func(_ *store.Store, raw pgx.Tx) error {
+		return h.queue.EnqueueTx(h.t.Context(), raw, jobs.Job{Kind: Kind, Payload: payload})
+	})
+	if err != nil {
+		h.t.Fatal(err)
+	}
 }
 
 func (h *harness) request(owner store.User, url string) Requested {
@@ -232,7 +255,7 @@ func (h *harness) count(table string) int {
 func (h *harness) jobs(id uuid.UUID) []string {
 	h.t.Helper()
 	rows, err := testDB.Pool.Query(h.t.Context(),
-		"SELECT state || '/' || attempt FROM river_job WHERE args->>'import_id' = $1 ORDER BY id", id.String())
+		"SELECT state || '/' || attempt FROM river_job WHERE args->'payload'->>'import_id' = $1 ORDER BY id", id.String())
 	if err != nil {
 		h.t.Fatal(err)
 	}
@@ -466,9 +489,7 @@ func TestDuplicateJobsMakeOneDocument(t *testing.T) {
 
 	t.Run("the same job twice", func(t *testing.T) {
 		req := h.request(h.ada, url)
-		if _, err := h.client.Insert(t.Context(), Args{ImportID: req.Import.ID, OwnerID: h.ada.ID}, nil); err != nil {
-			t.Fatal(err)
-		}
+		h.enqueue(Args{ImportID: req.Import.ID, OwnerID: h.ada.ID})
 		imp := h.wait(h.ada, req.Import.ID)
 		jobs := h.waitJobs(req.Import.ID)
 		if imp.Status != store.ImportDone || h.count("documents") != 1 {
@@ -493,6 +514,29 @@ func TestDuplicateJobsMakeOneDocument(t *testing.T) {
 			t.Errorf("Grace's documents = %d, %v; want 1", len(docs), err)
 		}
 	})
+}
+
+// A job delivered again after its import finished, as when the worker dies
+// between the import's transaction and the job's completion, leaves the
+// import exactly as it was.
+func TestRedeliveryLeavesAFinishedImportAlone(t *testing.T) {
+	h := newHarness(t, time.Hour)
+	h.site.set("docs.test", "/guide", htmlPage("Guide", "x\n"))
+	done := h.wait(h.ada, h.request(h.ada, h.site.url("docs.test", "/guide")).Import.ID)
+	if done.Status != store.ImportDone {
+		t.Fatalf("import = %+v, want done", done)
+	}
+	h.enqueue(Args{ImportID: done.ID, OwnerID: h.ada.ID})
+	if jobs := h.waitJobs(done.ID); fmt.Sprint(jobs) != "[completed/1 completed/1]" {
+		t.Fatalf("jobs = %v, want both completed", jobs)
+	}
+	again, err := h.store.GetImport(t.Context(), h.ada.ID, done.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !again.UpdatedAt.Equal(done.UpdatedAt) || again.Status != done.Status || again.DocumentID != done.DocumentID {
+		t.Errorf("import after the redelivery = %+v, want it untouched: %+v", again, done)
+	}
 }
 
 func TestCrossHostCanonicalIsIgnored(t *testing.T) {
@@ -520,19 +564,13 @@ func TestJobForAnotherOwnerIsCancelled(t *testing.T) {
 	h := newHarness(t, time.Hour)
 	h.site.set("docs.test", "/guide", htmlPage("Guide", "x\n"))
 	// Stop the worker so Ada's own job cannot run first.
-	if err := h.client.Stop(t.Context()); err != nil {
-		t.Fatal(err)
-	}
+	h.stop()
 	req := h.request(h.ada, h.site.url("docs.test", "/guide"))
 	if _, err := testDB.Pool.Exec(t.Context(), "DELETE FROM river_job"); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := h.client.Insert(t.Context(), Args{ImportID: req.Import.ID, OwnerID: h.grace.ID}, nil); err != nil {
-		t.Fatal(err)
-	}
-	if err := h.client.Start(context.WithoutCancel(t.Context())); err != nil {
-		t.Fatal(err)
-	}
+	h.enqueue(Args{ImportID: req.Import.ID, OwnerID: h.grace.ID})
+	h.start()
 	if jobs := h.waitJobs(req.Import.ID); fmt.Sprint(jobs) != "[cancelled/1]" {
 		t.Errorf("jobs = %v, want the mismatched job cancelled", jobs)
 	}

@@ -1,6 +1,6 @@
 //go:build integration
 
-package pgtest
+package riverjobs
 
 import (
 	"context"
@@ -18,6 +18,8 @@ import (
 	"github.com/riverqueue/river"
 	"github.com/riverqueue/river/riverdriver/riverpgxv5"
 	"github.com/riverqueue/river/rivermigrate"
+
+	"github.com/rokumate/ronote/internal/pgtest"
 )
 
 // riverHeader is the first line scripts/river-migration.sh writes.
@@ -27,7 +29,7 @@ var riverHeader = regexp.MustCompile(`(?m)^-- River main-line migrations (\d+) t
 // knows a migration that no goose migration holds yet.
 func TestRiverMigrationsAreCurrent(t *testing.T) {
 	t.Parallel()
-	migrations := os.DirFS(filepath.Join(repoRoot(), "migrations"))
+	migrations := os.DirFS(filepath.Join("..", "..", "..", "migrations"))
 	files, err := fs.Glob(migrations, "*.sql")
 	if err != nil {
 		t.Fatal(err)
@@ -67,7 +69,7 @@ func (pingWorker) Work(context.Context, *river.Job[pingArgs]) error { return nil
 // TestRiverRunsOnGooseSchema works one job through a River client on a
 // database migrated by goose alone.
 func TestRiverRunsOnGooseSchema(t *testing.T) {
-	db := New(t)
+	db := pgtest.New(t)
 	workers := river.NewWorkers()
 	river.AddWorker(workers, pingWorker{})
 	client, err := river.NewClient(riverpgxv5.New(db.Pool), &river.Config{
@@ -133,7 +135,7 @@ func (w flakyWorker) NextRetry(*river.Job[flakyArgs]) time.Time {
 // both a new job waits out the offset (P11: the podman VM's clock lagged
 // the Mac's after sleep, and imports stayed queued).
 func TestJobsRunWhateverTheAppClock(t *testing.T) {
-	db := New(t)
+	db := pgtest.New(t)
 	// Every unqualified now() on a connection that puts this schema before
 	// pg_catalog reads the skewed clock: River's queries, and triggers.
 	if _, err := db.Pool.Exec(t.Context(), "CREATE SCHEMA clockskew"); err != nil {

@@ -37,9 +37,9 @@ flowchart LR
     Browser["Student browser<br/>React + TypeScript + Tiptap"]
     App["RoNote web app origin<br/>Vite / production static host"]
     API["Go API service<br/>HTTP + SSE"]
-    Worker["Go import worker<br/>River consumers"]
+    Worker["Go import worker<br/>jobs port, River adapter"]
     DB[("Postgres + pgvector<br/>system of record")]
-    Queue["River job tables<br/>imports queue"]
+    Queue["River job tables<br/>import queue"]
     Source["External documentation page<br/>HTTP(S)"]
     Runner["Separate runner origin<br/>sandboxed iframe"]
     Py["Python Web Worker<br/>Pyodide + doctest"]
@@ -96,7 +96,7 @@ sequenceDiagram
         API-->>Web: 200 ExistingImportResponse
         Web->>Web: Open existing document
     else New import
-        API->>DB: Insert import(status=queued) + River job in one transaction
+        API->>DB: Insert import(status=queued) + its job in one transaction
         DB-->>SSE: NOTIFY import_status on commit
         API-->>Web: 202 ImportResponse
         Web->>API: GET /imports/{id}/events
@@ -110,7 +110,7 @@ sequenceDiagram
         Worker->>Worker: Parse HTML into validated IR
         Worker->>DB: Upsert source, snapshot, extraction
         Worker->>DB: Create owner document + mark import done
-        Worker->>DB: Complete River job in same transaction
+        River->>River: Complete the job once the handler returns
         DB-->>SSE: NOTIFY done + document_id
         SSE-->>Web: done
         Web->>API: GET /documents/{id}
@@ -314,7 +314,7 @@ erDiagram
 - Every private query includes `owner_id`.
 - Composite foreign keys prevent cross-user document/import/annotation references.
 - A unique `(owner_id, source_id)` constraint enforces one live document per user and source.
-- A completed import, its document, and River job completion commit atomically.
+- A completed import and its document commit atomically; the job completes after, and a job delivered again finds the import done (ADR 0009).
 - Source snapshots are gzip-compressed in Postgres and deduplicated by body SHA-256.
 - A source is reused within `RONOTE_SOURCE_TTL` (default 24 hours). After expiry, the worker sends conditional requests.
 - Extractions are reused by snapshot and extractor version; deterministic extraction still runs to detect the current adapter behavior.

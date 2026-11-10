@@ -3,57 +3,34 @@ package importer
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
-	"sync"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/riverqueue/river"
-	"github.com/riverqueue/river/riverdriver/riverpgxv5"
 
 	"github.com/rokumate/ronote/internal/canon"
 	"github.com/rokumate/ronote/internal/extract"
 	"github.com/rokumate/ronote/internal/fetch"
 	"github.com/rokumate/ronote/internal/ir"
+	"github.com/rokumate/ronote/internal/jobs"
 	"github.com/rokumate/ronote/internal/store"
 )
 
 // Worker runs import jobs.
 type Worker struct {
-	river.WorkerDefaults[Args]
 	store   *store.Store
 	fetcher *fetch.Fetcher
 	ttl     time.Duration
 	logger  *slog.Logger
-
-	mu sync.Mutex
-	// retryAfter holds, by job ID, the wait a server asked for on the
-	// attempt that just failed, for NextRetry to use.
-	retryAfter map[int64]time.Duration
 }
 
 // NewWorker returns a Worker that keeps fetched pages fresh for ttl.
 func NewWorker(s *store.Store, f *fetch.Fetcher, ttl time.Duration, logger *slog.Logger) *Worker {
-	return &Worker{store: s, fetcher: f, ttl: ttl, logger: logger, retryAfter: map[int64]time.Duration{}}
-}
-
-// Timeout bounds one attempt.
-func (w *Worker) Timeout(*river.Job[Args]) time.Duration { return jobTimeout }
-
-// NextRetry honours a Retry-After from the attempt that just failed; without
-// one, River's backoff decides.
-func (w *Worker) NextRetry(job *river.Job[Args]) time.Time {
-	w.mu.Lock()
-	wait, ok := w.retryAfter[job.ID]
-	delete(w.retryAfter, job.ID)
-	w.mu.Unlock()
-	if !ok {
-		return time.Time{}
-	}
-	return time.Now().Add(wait)
+	return &Worker{store: s, fetcher: f, ttl: ttl, logger: logger}
 }
 
 // page is a page's body and where it came from, fetched or stored.
@@ -63,15 +40,19 @@ type page struct {
 	fetchedAt                                             time.Time
 }
 
-// Work runs one import: fetch (or reuse the stored copy), extract, and
-// store the owner's document. The document, the import's done status and
-// the job's completion commit in one transaction, so a retried job finds the
-// import done and never makes a second document.
-func (w *Worker) Work(ctx context.Context, job *river.Job[Args]) (err error) {
-	owner, id := job.Args.OwnerID, job.Args.ImportID
+// Handle runs one attempt at an import job: fetch (or reuse the stored
+// copy), extract, and store the owner's document. The document and the
+// import's done status commit in one transaction; the job completes after
+// it, so a job delivered again finds the import done and does nothing.
+func (w *Worker) Handle(ctx context.Context, d jobs.Delivery) (err error) {
+	var args Args
+	if err := json.Unmarshal(d.Job.Payload, &args); err != nil {
+		return jobs.Permanent(fmt.Errorf("import job payload: %w", err))
+	}
+	owner, id := args.OwnerID, args.ImportID
 	defer func() {
 		// Whatever went wrong on the last attempt, the import must end.
-		if err != nil && job.Attempt >= job.MaxAttempts {
+		if err != nil && d.Attempt >= maxAttempts {
 			w.fail(context.WithoutCancel(ctx), owner, id, codeInternal)
 		}
 	}()
@@ -79,7 +60,7 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[Args]) (err error) {
 	imp, err := w.store.GetImport(ctx, owner, id)
 	switch {
 	case errors.Is(err, store.ErrNotFound):
-		return river.JobCancel(fmt.Errorf("import %s of user %s: %w", id, owner, err))
+		return jobs.Permanent(fmt.Errorf("import %s of user %s: %w", id, owner, err))
 	case err != nil:
 		return err
 	case imp.Status.Terminal():
@@ -87,8 +68,8 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[Args]) (err error) {
 	}
 
 	if doc, err := w.store.FindOwnerDocumentForURL(ctx, owner, imp.CanonicalURL); err == nil {
-		return w.store.InTx(ctx, func(tx *store.Store, raw pgx.Tx) error {
-			return complete(ctx, tx, raw, job, imp, doc)
+		return w.store.InTx(ctx, func(tx *store.Store, _ pgx.Tx) error {
+			return complete(ctx, tx, imp, doc)
 		})
 	} else if !errors.Is(err, store.ErrNotFound) {
 		return err
@@ -99,17 +80,17 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[Args]) (err error) {
 	}
 	pg, err := w.load(ctx, imp)
 	if err != nil {
-		return w.failed(ctx, job, imp, err)
+		return w.failed(ctx, d.Attempt, imp, err)
 	}
 	if done, err := w.advance(ctx, imp, store.ImportExtracting); done || err != nil {
 		return err
 	}
 	doc, canonical, err := extractPage(imp, pg)
 	if err != nil {
-		return w.failed(ctx, job, imp, err)
+		return w.failed(ctx, d.Attempt, imp, err)
 	}
 
-	return w.store.InTx(ctx, func(tx *store.Store, raw pgx.Tx) error {
+	return w.store.InTx(ctx, func(tx *store.Store, _ pgx.Tx) error {
 		src, err := tx.UpsertSource(ctx, store.Source{
 			CanonicalURL: canonical, FinalURL: pg.finalURL, ETag: pg.etag, LastModified: pg.lastModified, LastFetchedAt: pg.fetchedAt,
 		})
@@ -132,17 +113,13 @@ func (w *Worker) Work(ctx context.Context, job *river.Job[Args]) (err error) {
 		if err != nil {
 			return err
 		}
-		return complete(ctx, tx, raw, job, imp, docID)
+		return complete(ctx, tx, imp, docID)
 	})
 }
 
-// complete marks the import done with doc and the job completed, in the
-// caller's transaction.
-func complete(ctx context.Context, tx *store.Store, raw pgx.Tx, job *river.Job[Args], imp store.Import, doc uuid.UUID) error {
-	if _, err := tx.FinishImport(ctx, imp.OwnerID, imp.ID, doc); err != nil {
-		return err
-	}
-	_, err := river.JobCompleteTx[*riverpgxv5.Driver](ctx, raw, job)
+// complete marks the import done with doc, in the caller's transaction.
+func complete(ctx context.Context, tx *store.Store, imp store.Import, doc uuid.UUID) error {
+	_, err := tx.FinishImport(ctx, imp.OwnerID, imp.ID, doc)
 	return err
 }
 
@@ -233,25 +210,33 @@ func extractPage(imp store.Import, pg page) (*ir.Doc, string, error) {
 	return doc, canonical, nil
 }
 
-// failed handles an error from fetching or extracting. A permanent one fails
-// the import and cancels the job. A transient one is retried, after the
-// server's Retry-After if it gave one; on the last attempt it fails the
-// import and River discards the job.
-func (w *Worker) failed(ctx context.Context, job *river.Job[Args], imp store.Import, cause error) error {
+// failed handles an error from fetching or extracting: it fails the import
+// when outcome says so, and returns what the job does next.
+func (w *Worker) failed(ctx context.Context, attempt int, imp store.Import, cause error) error {
+	code, err := outcome(cause, attempt)
+	if code != "" {
+		w.fail(ctx, imp.OwnerID, imp.ID, code)
+	}
+	return err
+}
+
+// outcome says what an error from fetching or extracting means on attempt:
+// the code to fail the import with now, if any, and the error for the jobs
+// port. A permanent error fails the import and stops the job. A transient
+// one is retried, after the server's Retry-After if it gave one, capped at
+// maxRetryAfter; on the last attempt it fails the import.
+func outcome(cause error, attempt int) (code string, err error) {
 	f := classify(cause)
-	if !f.permanent && job.Attempt < job.MaxAttempts {
-		if f.retryAfter > 0 {
-			w.mu.Lock()
-			w.retryAfter[job.ID] = min(f.retryAfter, maxRetryAfter)
-			w.mu.Unlock()
-		}
-		return cause
+	switch {
+	case f.permanent:
+		return f.code, jobs.Permanent(cause)
+	case attempt >= maxAttempts:
+		return f.code, cause
+	case f.retryAfter > 0:
+		return "", jobs.RetryAfter(cause, min(f.retryAfter, maxRetryAfter))
+	default:
+		return "", cause
 	}
-	w.fail(ctx, imp.OwnerID, imp.ID, f.code)
-	if f.permanent {
-		return river.JobCancel(cause)
-	}
-	return cause
 }
 
 // fail marks an unfinished import failed with code; one that has already

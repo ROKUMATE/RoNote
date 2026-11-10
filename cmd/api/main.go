@@ -20,6 +20,8 @@ import (
 	"github.com/rokumate/ronote/internal/events"
 	"github.com/rokumate/ronote/internal/httpapi"
 	"github.com/rokumate/ronote/internal/importer"
+	"github.com/rokumate/ronote/internal/jobs"
+	"github.com/rokumate/ronote/internal/jobs/riverjobs"
 	"github.com/rokumate/ronote/internal/store"
 )
 
@@ -49,8 +51,12 @@ func run() error {
 	defer pool.Close()
 
 	st := store.New(pool)
-	// The API only queues jobs; the worker process runs them.
-	queue, err := importer.NewClient(pool, nil, importer.ClientOptions{Logger: logger})
+	// The API only enqueues jobs; the worker process runs them. River keeps
+	// a job's attempt limit with it, so the kind is declared here too.
+	queue, err := riverjobs.New(pool, riverjobs.Options{
+		Logger: logger,
+		Kinds:  map[string]jobs.Options{importer.Kind: importer.JobOptions},
+	})
 	if err != nil {
 		return err
 	}

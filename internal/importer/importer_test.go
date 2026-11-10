@@ -9,12 +9,11 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/riverqueue/river"
-	"github.com/riverqueue/river/rivertype"
 
 	"github.com/rokumate/ronote/internal/fetch"
 	"github.com/rokumate/ronote/internal/httpapi/gen"
-	"github.com/rokumate/ronote/internal/store"
+	"github.com/rokumate/ronote/internal/jobs"
+	"github.com/rokumate/ronote/internal/jobs/memjobs"
 )
 
 func TestClassify(t *testing.T) {
@@ -83,22 +82,78 @@ func TestValidate(t *testing.T) {
 	}
 }
 
-func TestRetryAfterIsUsedOnce(t *testing.T) {
+func TestOutcome(t *testing.T) {
 	t.Parallel()
-	w := NewWorker(nil, nil, 0, nil)
-	job := &river.Job[Args]{JobRow: &rivertype.JobRow{ID: 7, Attempt: 1, MaxAttempts: 3}}
-	err := w.failed(t.Context(), job, importFixture(), &fetch.StatusError{Code: http.StatusTooManyRequests, RetryAfter: time.Hour})
-	if err == nil {
-		t.Fatal("failed() = nil, want the error back for a retry")
+	busy := &fetch.StatusError{Code: http.StatusTooManyRequests, RetryAfter: 2 * time.Second}
+	tests := []struct {
+		name      string
+		cause     error
+		attempt   int
+		code      string
+		permanent bool
+		delay     time.Duration
+	}{
+		{name: "transient, retried by backoff", cause: &fetch.StatusError{Code: http.StatusBadGateway}, attempt: 1},
+		{name: "Retry-After, honoured", cause: busy, attempt: 2, delay: 2 * time.Second},
+		{name: "Retry-After, capped", cause: &fetch.StatusError{Code: http.StatusServiceUnavailable, RetryAfter: time.Hour}, attempt: 1, delay: maxRetryAfter},
+		{name: "transient on the last attempt", cause: busy, attempt: maxAttempts, code: "rate_limited"},
+		{name: "permanent", cause: &fetch.StatusError{Code: http.StatusNotFound}, attempt: 1, code: "not_found", permanent: true},
 	}
-	if next := w.NextRetry(job); time.Until(next) < maxRetryAfter-time.Minute || time.Until(next) > maxRetryAfter {
-		t.Errorf("NextRetry() = %v from now, want the 10 minute cap", time.Until(next))
-	}
-	if next := w.NextRetry(job); !next.IsZero() {
-		t.Errorf("second NextRetry() = %v, want zero so River's backoff applies", next)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			code, err := outcome(tt.cause, tt.attempt)
+			delay, _ := jobs.RetryDelay(err)
+			if code != tt.code || jobs.IsPermanent(err) != tt.permanent || delay != tt.delay || !errors.Is(err, tt.cause) {
+				t.Errorf("outcome() = %q, %v (permanent %v, delay %v); want %q, permanent %v, delay %v",
+					code, err, jobs.IsPermanent(err), delay, tt.code, tt.permanent, tt.delay)
+			}
+		})
 	}
 }
 
-func importFixture() store.Import {
-	return store.Import{ID: uuid.New(), OwnerID: uuid.New(), Status: store.ImportFetching}
+// A site's Retry-After of an hour, through the jobs port: the next attempt
+// comes at the 10-minute cap, and no sooner.
+func TestRetryAfterIsCappedOnTheQueue(t *testing.T) {
+	t.Parallel()
+	clock := memjobs.NewFakeClock(time.Date(2026, 11, 10, 9, 0, 0, 0, time.UTC))
+	q := memjobs.New(memjobs.Options{Clock: clock})
+	attempts := make(chan time.Time, 4)
+	q.Handle(Kind, func(_ context.Context, d jobs.Delivery) error {
+		attempts <- clock.Now()
+		_, err := outcome(&fetch.StatusError{Code: http.StatusTooManyRequests, RetryAfter: time.Hour}, d.Attempt)
+		return err
+	}, JobOptions)
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	go func() { _ = q.Run(ctx) }()
+
+	j, err := job(Args{ImportID: uuid.New(), OwnerID: uuid.New()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	tx := q.Begin()
+	if err := q.EnqueueTx(ctx, tx, j); err != nil {
+		t.Fatal(err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		t.Fatal(err)
+	}
+	first := <-attempts
+	q.Idle()
+	clock.Advance(maxRetryAfter - time.Second)
+	select {
+	case at := <-attempts:
+		t.Fatalf("retried %v after the first attempt, before the cap", at.Sub(first))
+	case <-time.After(100 * time.Millisecond):
+	}
+	clock.Advance(time.Second)
+	select {
+	case at := <-attempts:
+		if gap := at.Sub(first); gap != maxRetryAfter {
+			t.Errorf("retried %v after the first attempt, want %v", gap, maxRetryAfter)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("no retry at the cap")
+	}
 }

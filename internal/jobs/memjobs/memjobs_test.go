@@ -21,7 +21,7 @@ func TestConformance(t *testing.T) {
 			Runner:   q,
 			Begin:    func(context.Context) (pgx.Tx, error) { return q.Begin(), nil },
 			Wait: func(d time.Duration) {
-				idle(q)
+				q.Idle()
 				clock.Advance(d)
 			},
 			Now:        clock.Now,
@@ -29,23 +29,6 @@ func TestConformance(t *testing.T) {
 			Settle:     100 * time.Millisecond,
 		}
 	})
-}
-
-// idle waits until no handler runs, so the retry a finished attempt asked
-// for is scheduled before the clock moves past it.
-func idle(q *Queue) {
-	for {
-		q.mu.Lock()
-		busy := false
-		for _, k := range q.kinds {
-			busy = busy || k.running > 0
-		}
-		q.mu.Unlock()
-		if !busy {
-			return
-		}
-		time.Sleep(time.Millisecond)
-	}
 }
 
 func TestTransactions(t *testing.T) {

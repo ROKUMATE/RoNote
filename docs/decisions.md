@@ -100,10 +100,10 @@ Recorded in [ADR 0005](adr/0005-import-pipeline.md); editing [ADR 0006](adr/0006
   - per user: `documents` (one per owner and source, `version` for later edits) and `imports` (queued|fetching|extracting|done|failed, stable `error_code`).
 - **Owner scoping:** every documents/imports query takes `owner_id`, and a static test enforces it; a composite key stops an import pointing at another user's document; isolation is tested in the store, worker and API.
 - **Canonical URLs** (`internal/canon`): normalized, tracking parameters dropped; a page's canonical link counts only on its own host.
-- **Worker** (`cmd/worker`, `internal/importer`, River v0.51.0, queue `imports`, 4 workers, 60s per attempt):
+- **Worker** (`cmd/worker`, `internal/importer`, kind `import` through the jobs port on River v0.51.0, 4 at a time, 60s per attempt; since P14, ADR 0009):
   - `RONOTE_SOURCE_TTL` (24h) skips fetching; past it a conditional GET, where a 304 reuses the snapshot;
   - extraction always runs and reuses the stored row for the same extractor version;
-  - document, done status and `JobCompleteTx` commit in one transaction, so duplicate or retried jobs make one document;
+  - document and done status commit in one transaction, so duplicate or retried jobs make one document; the job completes after it, and a job delivered again finds the import done and leaves it as it was (`TestRedeliveryLeavesAFinishedImportAlone`);
   - permanent errors fail at once; transient ones (5xx, 429 with Retry-After, timeouts, robots.txt 5xx) retry up to 3 attempts.
 - **API** (`api/openapi.yaml`, OpenAPI 3.1, spec-first with oapi-codegen v2.8.2):
   - `POST /api/v1/imports` (202, or 200 with the existing document), `GET /imports/{id}`, `GET /imports/{id}/events` (SSE), `GET /documents` (cursor pages), `GET /documents/{id}`;

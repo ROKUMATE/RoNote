@@ -1,6 +1,6 @@
 # 0005: Import pipeline, caching and idempotency
 
-Accepted, 2026-11-04
+Accepted, 2026-11-04. Amended 2026-11-10: jobs run through the jobs port, and their completion leaves the final transaction (ADR 0009).
 
 ## Context
 
@@ -12,7 +12,7 @@ From P08 on, a user's import is stored: the API takes a URL, a worker fetches an
   - lowercase scheme and host, default port dropped, fragment dropped;
   - `utm_*`, `gclid` and `fbclid` dropped; IP-literal hosts refused.
 
-  If the user already has a document for that URL, the API answers 200 with it. Otherwise it creates the import (`queued`) and its River job in one transaction (202). The worker (`cmd/worker`, River queue `imports`, 4 at a time, 60s per attempt) runs the job.
+  If the user already has a document for that URL, the API answers 200 with it. Otherwise it creates the import (`queued`) and its job in one transaction (202), through the jobs port (ADR 0009). The worker (`cmd/worker`, kind `import` on River, 4 at a time, 60s per attempt) runs the job.
 - **Shared cache, private documents.**
   - The cache is shared by all users: a source per canonical URL, a snapshot per distinct body (gzip in Postgres for now), and an extraction per snapshot and extractor version.
   - A document is the user's own IR copy, one per owner and source (`documents_owner_source_key`).
@@ -23,10 +23,10 @@ From P08 on, a user's import is stored: the API takes a URL, a worker fetches an
   - The extractor always runs, since it is milliseconds and deterministic. Its result is stored only when that snapshot has no extraction by that extractor version; otherwise the stored one is reused, so detection always follows the current code.
 - **Canonical URLs.** A page's `<link rel=canonical>` is trusted only on the page's own host. Otherwise any page could claim another site's URL and replace that site's cached copy for everyone.
 - **Idempotency.**
-  - The worker writes source, snapshot, extraction, document, the `done` status and River's job completion (`JobCompleteTx`) in one final transaction. Every insert there reuses existing rows on its unique key.
+  - The worker writes source, snapshot, extraction, document and the `done` status in one final transaction. Every insert there reuses existing rows on its unique key. The job completes after it (ADR 0009, which replaced River's `JobCompleteTx` in that transaction).
   - A retried or duplicate job finds the import done, or the document already there; it never makes a second one.
 - **Errors.**
-  - **Permanent** (`JobCancel` on the first attempt): invalid URL, blocked address, robots.txt disallow, too large, unsupported type, too many redirects, 404/410, other 4xx, extraction failure.
+  - **Permanent** (`jobs.Permanent`, River's `JobCancel`, on the first attempt): invalid URL, blocked address, robots.txt disallow, too large, unsupported type, too many redirects, 404/410, other 4xx, extraction failure.
   - **Transient** (River backoff, 3 attempts in all): timeout, 5xx, 429, network errors, robots.txt answering 5xx (RFC 9309: nothing is fetched until it can be read).
   - A `Retry-After` on a 429 or 503 sets the next attempt's time, capped at 10 minutes.
   - The last failed attempt marks the import failed with a stable `error_code`.
@@ -43,7 +43,7 @@ From P08 on, a user's import is stored: the API takes a URL, a worker fetches an
 - **Schema.** Goose owns all schema, River's tables included (`make river-migration`). A test fails when the pinned River knows a migration we have not added.
 - **One clock for jobs (P12).** River writes a job's times from the app's clock but claims jobs by the database's `now()`:
   - its pgx driver fills a new job's `created_at` and `scheduled_at` with `time.Now()`;
-  - a retry's time is `time.Now()` plus a backoff, from River's policy or the worker's `NextRetry`;
+  - a retry's time is `time.Now()` plus a backoff, from River's policy or the River adapter's `NextRetry` (a handler's `jobs.RetryAfter`);
   - the claim takes `available` jobs whose `scheduled_at` is at or before `now()`.
 
   When the podman VM's clock lagged the Mac's by 19 minutes after sleep, every new job was 19 minutes in the database's future, and imports stayed `queued`. A database clock running ahead let River's scheduler hand retries to the claim early.

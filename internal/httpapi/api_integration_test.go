@@ -19,6 +19,7 @@ import (
 	"github.com/rokumate/ronote/internal/fetch"
 	"github.com/rokumate/ronote/internal/importer"
 	"github.com/rokumate/ronote/internal/ir"
+	"github.com/rokumate/ronote/internal/jobs/riverjobs"
 	"github.com/rokumate/ronote/internal/pgtest"
 	"github.com/rokumate/ronote/internal/store"
 )
@@ -67,23 +68,23 @@ func TestAPIImportsEndToEnd(t *testing.T) {
 	pageURL := "http://docs.test:" + port + "/guide"
 
 	worker := importer.NewWorker(st, fetch.New(fetch.Options{AllowPrivateNetworks: true, Resolver: loopback{}}), time.Hour, discardLogger)
-	client, err := importer.NewClient(db.Pool, worker, importer.ClientOptions{
+	queue, err := riverjobs.New(db.Pool, riverjobs.Options{
 		Logger: discardLogger, FetchCooldown: 20 * time.Millisecond, FetchPollInterval: 50 * time.Millisecond,
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := client.Start(context.WithoutCancel(ctx)); err != nil {
-		t.Fatal(err)
-	}
+	queue.Handle(importer.Kind, worker.Handle, importer.JobOptions)
+	runCtx, stopRun := context.WithCancel(context.WithoutCancel(ctx))
+	ran := make(chan error, 1)
+	go func() { ran <- queue.Run(runCtx) }()
 	t.Cleanup(func() {
-		stopCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		if err := client.Stop(stopCtx); err != nil {
+		stopRun()
+		if err := <-ran; err != nil {
 			t.Errorf("stop River: %v", err)
 		}
 	})
-	backend := integrationBackend{Store: st, Service: importer.NewService(st, client)}
+	backend := integrationBackend{Store: st, Service: importer.NewService(st, queue)}
 	adaAPI := New(Options{Logger: discardLogger, DB: db.Pool, Backend: backend, DevUser: ada.ID})
 	graceAPI := New(Options{Logger: discardLogger, DB: db.Pool, Backend: backend, DevUser: grace.ID})
 

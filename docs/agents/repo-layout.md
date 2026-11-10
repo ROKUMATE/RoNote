@@ -16,7 +16,8 @@ Where things live, in full. AGENTS.md keeps the short version.
 | `internal/ir/` | the document model every importer produces (docs/adr/0004-ir-and-links.md) |
 | `internal/doccontent/` | a user's document: IR blocks marked source or user, and the rules a save must keep (docs/adr/0006-editor-and-doc-content.md) |
 | `internal/annotation/` | a user's highlights and notes: selectors into one block's plain text, in UTF-16 code units, and the rules a write must keep (docs/adr/0007-annotations-and-anchoring.md) |
-| `internal/importer/` | the import pipeline: the River job that fetches, extracts and stores a document, and the service the API queues imports with |
+| `internal/importer/` | the import pipeline: the job handler that fetches, extracts and stores a document, and the service the API enqueues imports with |
+| `internal/jobs/` | the jobs port: enqueue in the caller's transaction, deliver at least once (docs/adr/0009-jobs-port.md); `riverjobs` runs it on River and is the only package that imports River, `memjobs` in memory for unit tests, `jobstest` is the suite both pass |
 | `internal/events/` | import status changes from Postgres (LISTEN import_status, one connection per API process) to the API's event streams |
 | `internal/canon/` | canonical URLs: what sources and imports are keyed by, and the same-host rule for a page's canonical link |
 | `internal/fetch/` | the only way to fetch a user-supplied URL: SSRF guard, limits, robots.txt, rate limit |

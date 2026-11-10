@@ -238,6 +238,23 @@ func (q *Queue) deliver(ctx context.Context, k *kind, p *pending) {
 	q.poke()
 }
 
+// Idle waits until no handler is running, so the retry a finished attempt
+// asked for is scheduled: a test moves a FakeClock only after it.
+func (q *Queue) Idle() {
+	for {
+		q.mu.Lock()
+		busy := false
+		for _, k := range q.kinds {
+			busy = busy || k.running > 0
+		}
+		q.mu.Unlock()
+		if !busy {
+			return
+		}
+		time.Sleep(time.Millisecond)
+	}
+}
+
 // poke wakes Run to look at the queue again.
 func (q *Queue) poke() {
 	select {

@@ -9,9 +9,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/riverqueue/river"
 
 	"github.com/rokumate/ronote/internal/canon"
+	"github.com/rokumate/ronote/internal/jobs"
 	"github.com/rokumate/ronote/internal/store"
 )
 
@@ -26,12 +26,12 @@ var (
 // Service starts imports for the API.
 type Service struct {
 	store *store.Store
-	queue *river.Client[pgx.Tx]
+	queue jobs.Enqueuer
 }
 
-// NewService returns a Service that records imports in s and queues their
+// NewService returns a Service that records imports in s and enqueues their
 // jobs on queue.
-func NewService(s *store.Store, queue *river.Client[pgx.Tx]) *Service {
+func NewService(s *store.Store, queue jobs.Enqueuer) *Service {
 	return &Service{store: s, queue: queue}
 }
 
@@ -71,8 +71,11 @@ func (s *Service) Request(ctx context.Context, owner uuid.UUID, rawURL string) (
 		if imp, err = tx.CreateImport(ctx, owner, strings.TrimSpace(rawURL), canonical); err != nil {
 			return err
 		}
-		_, err = s.queue.InsertTx(ctx, raw, Args{ImportID: imp.ID, OwnerID: owner}, nil)
-		return err
+		j, err := job(Args{ImportID: imp.ID, OwnerID: owner})
+		if err != nil {
+			return err
+		}
+		return s.queue.EnqueueTx(ctx, raw, j)
 	})
 	if err != nil {
 		return Requested{}, err

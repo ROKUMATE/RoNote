@@ -5,6 +5,7 @@ Current state of the project. Rewrite this file at the end of each phase; never 
 ## Current milestone
 
 P13b, doctest checks, JavaScript runs and run polish: done.
+- **System design:** `SYSTEM-DESIGN.md` documents the current architecture for Eraser.io: services, data model, import flow, extraction, editor, annotations, isolated runner, security boundaries, deployment, invariants, and planned gaps.
 - **CI hooks:** `scripts/run.sh` now creates an explicit process session instead of
   relying on non-interactive shell job control, with `setsid`, Python and Perl
   launch fallbacks. `scripts/test-run-stop.sh` passes under `dash`.

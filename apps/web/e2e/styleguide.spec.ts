@@ -1,5 +1,6 @@
-import { expect, type Page, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { chooseTheme, expectNoAxeViolations, expectNoHorizontalScroll } from "./helpers";
+import { expect, test } from "./test";
 
 async function openStyleguide(page: Page, theme: "light" | "dark") {
   await chooseTheme(page, theme);

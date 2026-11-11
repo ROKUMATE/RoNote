@@ -1,5 +1,6 @@
-import { expect, type Frame, type Page, test } from "@playwright/test";
+import type { Frame, Page } from "@playwright/test";
 import { stack } from "./stack";
+import { expect, test } from "./test";
 
 type Event = {
   type: string;

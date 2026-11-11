@@ -1,4 +1,4 @@
-import { expect, type Page, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import {
   caretHeading,
   chooseTheme,
@@ -7,6 +7,7 @@ import {
   importTimeout,
   openLinkedPage,
 } from "./helpers";
+import { expect, test } from "./test";
 
 test("same-domain links show whether following them imports", async ({ page }) => {
   await openLinkedPage(page);

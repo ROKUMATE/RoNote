@@ -1,4 +1,3 @@
-import { expect, test } from "@playwright/test";
 import {
   expected,
   fixtureURL,
@@ -8,6 +7,7 @@ import {
   startImport,
 } from "./helpers";
 import { stack } from "./stack";
+import { expect, test } from "./test";
 
 declare global {
   interface Window {

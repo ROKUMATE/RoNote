@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page, test } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import type { Document } from "../src/api/schema";
 import {
   chooseTheme,
@@ -6,6 +6,7 @@ import {
   expectNoHorizontalScroll,
   openLinkedPage,
 } from "./helpers";
+import { expect, test } from "./test";
 
 /** Linked page A's code blocks, by a line each holds. */
 function codeBlock(page: Page, text: string): Locator {

@@ -1,0 +1,135 @@
+[
+  {
+    "id": 2000,
+    "login": "e2e-w0",
+    "name": "Worker 0",
+    "email": "e2e-w0@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2001,
+    "login": "e2e-w1",
+    "name": "Worker 1",
+    "email": "e2e-w1@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2002,
+    "login": "e2e-w2",
+    "name": "Worker 2",
+    "email": "e2e-w2@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2003,
+    "login": "e2e-w3",
+    "name": "Worker 3",
+    "email": "e2e-w3@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2004,
+    "login": "e2e-w4",
+    "name": "Worker 4",
+    "email": "e2e-w4@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2005,
+    "login": "e2e-w5",
+    "name": "Worker 5",
+    "email": "e2e-w5@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2006,
+    "login": "e2e-w6",
+    "name": "Worker 6",
+    "email": "e2e-w6@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2007,
+    "login": "e2e-w7",
+    "name": "Worker 7",
+    "email": "e2e-w7@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2008,
+    "login": "e2e-w8",
+    "name": "Worker 8",
+    "email": "e2e-w8@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2009,
+    "login": "e2e-w9",
+    "name": "Worker 9",
+    "email": "e2e-w9@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2010,
+    "login": "e2e-w10",
+    "name": "Worker 10",
+    "email": "e2e-w10@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2011,
+    "login": "e2e-w11",
+    "name": "Worker 11",
+    "email": "e2e-w11@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2012,
+    "login": "e2e-w12",
+    "name": "Worker 12",
+    "email": "e2e-w12@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2013,
+    "login": "e2e-w13",
+    "name": "Worker 13",
+    "email": "e2e-w13@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2014,
+    "login": "e2e-w14",
+    "name": "Worker 14",
+    "email": "e2e-w14@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2015,
+    "login": "e2e-w15",
+    "name": "Worker 15",
+    "email": "e2e-w15@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2100,
+    "login": "e2e-other",
+    "name": "Other",
+    "email": "e2e-other@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2101,
+    "login": "e2e-deleter",
+    "name": "Deleter",
+    "email": "e2e-deleter@ronote.local",
+    "verified": true
+  },
+  {
+    "id": 2102,
+    "login": "e2e-unverified",
+    "name": "Unverified",
+    "email": "e2e-unverified@ronote.local",
+    "verified": false
+  }
+]

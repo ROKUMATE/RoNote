@@ -1,0 +1,5 @@
+[
+  { "id": 1001, "login": "dev", "name": "Dev", "email": "dev@ronote.local", "verified": true },
+  { "id": 1002, "login": "ada", "name": "Ada Lovelace", "email": "ada@ronote.local", "verified": true },
+  { "id": 1003, "login": "unverified", "name": "Unverified", "email": "unverified@ronote.local", "verified": false }
+]

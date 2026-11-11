@@ -28,6 +28,12 @@ const backend = env({
   RONOTE_LOG_LEVEL: "info",
 });
 
+// The OAuth app the API signs in with, which the fake provider accepts.
+const oauthApp = {
+  RONOTE_GITHUB_CLIENT_ID: "ronote-e2e",
+  RONOTE_GITHUB_CLIENT_SECRET: "ronote-e2e-secret",
+};
+
 const stop = { signal: "SIGTERM", timeout: 5000 } as const;
 
 export default defineConfig({
@@ -45,6 +51,19 @@ export default defineConfig({
       command: "node e2e/fixture-site.ts",
       url: `${stack.fixtures}/robots.txt`,
       reuseExistingServer: false,
+    },
+    {
+      name: "idp",
+      command: "bin/e2e/fakeidp",
+      cwd: "../..",
+      env: env({
+        ...oauthApp,
+        RONOTE_FAKEIDP_ADDR: new URL(stack.idp).host,
+        RONOTE_FAKEIDP_USERS: "apps/web/e2e/fixtures/idp-users.json",
+      }),
+      url: `${stack.idp}/healthz`,
+      reuseExistingServer: false,
+      gracefulShutdown: stop,
     },
     {
       name: "api",

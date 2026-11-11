@@ -7,7 +7,31 @@ package sqlcdb
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
+
+const createIdentity = `-- name: CreateIdentity :exec
+INSERT INTO user_identities (provider, provider_user_id, user_id, login)
+VALUES ($1, $2, $3, $4)
+`
+
+type CreateIdentityParams struct {
+	Provider       string
+	ProviderUserID string
+	UserID         uuid.UUID
+	Login          string
+}
+
+func (q *Queries) CreateIdentity(ctx context.Context, arg CreateIdentityParams) error {
+	_, err := q.db.Exec(ctx, createIdentity,
+		arg.Provider,
+		arg.ProviderUserID,
+		arg.UserID,
+		arg.Login,
+	)
+	return err
+}
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (email, display_name)
@@ -22,6 +46,93 @@ type CreateUserParams struct {
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, createUser, arg.Email, arg.DisplayName)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.DisplayName,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const deleteUser = `-- name: DeleteUser :execrows
+DELETE FROM users
+WHERE id = $1
+`
+
+// Everything the user owns goes with them; shared sources stay.
+func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteUser, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const getAccount = `-- name: GetAccount :one
+SELECT u.id, u.email, u.display_name, i.login
+FROM users u
+JOIN user_identities i ON i.user_id = u.id
+WHERE u.id = $1 AND i.provider = $2
+`
+
+type GetAccountParams struct {
+	ID       uuid.UUID
+	Provider string
+}
+
+type GetAccountRow struct {
+	ID          uuid.UUID
+	Email       string
+	DisplayName string
+	Login       string
+}
+
+func (q *Queries) GetAccount(ctx context.Context, arg GetAccountParams) (GetAccountRow, error) {
+	row := q.db.QueryRow(ctx, getAccount, arg.ID, arg.Provider)
+	var i GetAccountRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.DisplayName,
+		&i.Login,
+	)
+	return i, err
+}
+
+const getIdentity = `-- name: GetIdentity :one
+SELECT provider, provider_user_id, user_id, login, created_at
+FROM user_identities
+WHERE provider = $1 AND provider_user_id = $2
+`
+
+type GetIdentityParams struct {
+	Provider       string
+	ProviderUserID string
+}
+
+func (q *Queries) GetIdentity(ctx context.Context, arg GetIdentityParams) (UserIdentity, error) {
+	row := q.db.QueryRow(ctx, getIdentity, arg.Provider, arg.ProviderUserID)
+	var i UserIdentity
+	err := row.Scan(
+		&i.Provider,
+		&i.ProviderUserID,
+		&i.UserID,
+		&i.Login,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getUser = `-- name: GetUser :one
+SELECT id, email, display_name, created_at
+FROM users
+WHERE id = $1
+`
+
+func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, getUser, id)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -48,6 +159,23 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const setIdentityLogin = `-- name: SetIdentityLogin :exec
+UPDATE user_identities
+SET login = $3
+WHERE provider = $1 AND provider_user_id = $2 AND login <> $3
+`
+
+type SetIdentityLoginParams struct {
+	Provider       string
+	ProviderUserID string
+	Login          string
+}
+
+func (q *Queries) SetIdentityLogin(ctx context.Context, arg SetIdentityLoginParams) error {
+	_, err := q.db.Exec(ctx, setIdentityLogin, arg.Provider, arg.ProviderUserID, arg.Login)
+	return err
 }
 
 const upsertUserByEmail = `-- name: UpsertUserByEmail :one

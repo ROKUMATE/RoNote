@@ -7,8 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/google/uuid"
-
+	"github.com/rokumate/ronote/internal/auth"
 	"github.com/rokumate/ronote/internal/httpapi/gen"
 )
 
@@ -33,11 +32,12 @@ type Options struct {
 	// Done closes when the server begins to shut down, which ends event
 	// streams so the shutdown need not wait for their clients.
 	Done <-chan struct{}
-	// DevUser is the user every /api/v1 request acts as until real sign-in
-	// exists; uuid.Nil answers 401. Config allows one in dev and test only.
-	DevUser uuid.UUID
-	// SignIn serves the sign-in routes.
-	SignIn SignIn
+	// Accounts keeps users and their sessions.
+	Accounts Accounts
+	// Cookies carry sessions and sign-ins in progress.
+	Cookies auth.Cookies
+	// GitHub is where people sign in.
+	GitHub auth.GitHub
 }
 
 // New returns the API handler: /healthz, /readyz and the routes of
@@ -46,9 +46,9 @@ func New(o Options) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", healthz)
 	mux.HandleFunc("GET /readyz", readyz(o.Logger, o.DB))
-	mux.Handle("GET /api/v1/auth/github/start", signInStart(o.SignIn))
-	mux.Handle("GET /api/v1/auth/github/callback", signInCallback(o.Logger, o.SignIn))
-	mux.Handle("/api/v1/", requireUser(o.DevUser, router{mux: apiRoutes(o)}))
+	mux.Handle("GET /api/v1/auth/github/start", signInStart(o))
+	mux.Handle("GET /api/v1/auth/github/callback", signInCallback(o))
+	mux.Handle("/api/v1/", requireSession(o, router{mux: apiRoutes(o)}))
 	return withMiddleware(o.Logger, router{mux: mux})
 }
 

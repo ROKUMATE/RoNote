@@ -25,7 +25,7 @@ func TestResolveDocuments(t *testing.T) {
 	t.Parallel()
 	guide := uuid.New()
 	b := &fakeBackend{resolved: map[string]uuid.UUID{"https://docs.example.com/guide": guide}}
-	h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+	h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 
 	rec := apiRequest(t, h, http.MethodPost, "/api/v1/documents/resolve", resolveBody(t,
 		"https://Docs.Example.com/guide#install",
@@ -51,14 +51,14 @@ func TestResolveDocuments(t *testing.T) {
 	if !slices.Equal(got, want) {
 		t.Errorf("links =\n%s\nwant\n%s", got, want)
 	}
-	if !slices.Equal(b.asked, []string{"https://docs.example.com/guide", "https://docs.example.com/other"}) || b.owners[0] != devUser {
+	if !slices.Equal(b.asked, []string{"https://docs.example.com/guide", "https://docs.example.com/other"}) || b.owners[0] != testUser {
 		t.Errorf("backend asked %v for %v, want the canonical URLs for the dev user", b.asked, b.owners)
 	}
 }
 
 func TestResolveDocumentsLimits(t *testing.T) {
 	t.Parallel()
-	h := New(Options{Logger: discardLogger, DB: dbUp, Backend: &fakeBackend{}, DevUser: devUser})
+	h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: &fakeBackend{}})
 	many := make([]string, maxResolve+1)
 	for i := range many {
 		many[i] = fmt.Sprintf("https://docs.example.com/%d", i)

@@ -49,29 +49,33 @@ func (q *Queries) DeleteUserSessions(ctx context.Context, userID uuid.UUID) erro
 }
 
 const getSession = `-- name: GetSession :one
-SELECT user_id, last_seen_at
+SELECT user_id, last_seen_at,
+       (last_seen_at < now() - make_interval(secs => $2::double precision))::boolean AS stale
 FROM sessions
 WHERE token_hash = $1
   AND expires_at > now()
-  AND last_seen_at > now() - make_interval(secs => $2::double precision)
+  AND last_seen_at > now() - make_interval(secs => $3::double precision)
 `
 
 type GetSessionParams struct {
-	TokenHash   []byte
-	IdleSeconds float64
+	TokenHash    []byte
+	TouchSeconds float64
+	IdleSeconds  float64
 }
 
 type GetSessionRow struct {
 	UserID     uuid.UUID
 	LastSeenAt time.Time
+	Stale      bool
 }
 
 // A session past its absolute limit, or unused for longer than the idle
-// limit, is no session.
+// limit, is no session. Stale says its last use is older than touch_seconds,
+// by the database's clock, which wrote it.
 func (q *Queries) GetSession(ctx context.Context, arg GetSessionParams) (GetSessionRow, error) {
-	row := q.db.QueryRow(ctx, getSession, arg.TokenHash, arg.IdleSeconds)
+	row := q.db.QueryRow(ctx, getSession, arg.TokenHash, arg.TouchSeconds, arg.IdleSeconds)
 	var i GetSessionRow
-	err := row.Scan(&i.UserID, &i.LastSeenAt)
+	err := row.Scan(&i.UserID, &i.LastSeenAt, &i.Stale)
 	return i, err
 }
 

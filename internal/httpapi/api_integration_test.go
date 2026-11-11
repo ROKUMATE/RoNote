@@ -15,6 +15,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/rokumate/ronote/internal/auth"
 	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/fetch"
 	"github.com/rokumate/ronote/internal/importer"
@@ -34,6 +35,22 @@ func (loopback) LookupNetIP(_ context.Context, _, host string) ([]netip.Addr, er
 	return nil, &net.DNSError{Err: "no such host", Name: host, IsNotFound: true}
 }
 
+// signedInAs returns the API built from o on st's accounts, with every
+// request carrying a session of user.
+func signedInAs(t *testing.T, st *store.Store, o Options, user uuid.UUID) http.Handler {
+	t.Helper()
+	token, hash := auth.NewSessionToken()
+	if err := st.CreateSession(t.Context(), hash, user, time.Hour); err != nil {
+		t.Fatal(err)
+	}
+	o.Accounts = st
+	h := New(o)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.AddCookie(o.Cookies.Session(token))
+		h.ServeHTTP(w, r)
+	})
+}
+
 type integrationBackend struct {
 	*store.Store
 	*importer.Service
@@ -45,11 +62,11 @@ func TestAPIImportsEndToEnd(t *testing.T) {
 	db := pgtest.New(t)
 	ctx := t.Context()
 	st := store.New(db.Pool)
-	ada, err := st.UpsertUserByEmail(ctx, "ada@example.com", "Ada")
+	ada, err := st.CreateUser(ctx, "ada@example.com", "Ada")
 	if err != nil {
 		t.Fatal(err)
 	}
-	grace, err := st.UpsertUserByEmail(ctx, "grace@example.com", "Grace")
+	grace, err := st.CreateUser(ctx, "grace@example.com", "Grace")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -85,8 +102,8 @@ func TestAPIImportsEndToEnd(t *testing.T) {
 		}
 	})
 	backend := integrationBackend{Store: st, Service: importer.NewService(st, queue)}
-	adaAPI := New(Options{Logger: discardLogger, DB: db.Pool, Backend: backend, DevUser: ada.ID})
-	graceAPI := New(Options{Logger: discardLogger, DB: db.Pool, Backend: backend, DevUser: grace.ID})
+	adaAPI := signedInAs(t, st, Options{Logger: discardLogger, DB: db.Pool, Backend: backend}, ada.ID)
+	graceAPI := signedInAs(t, st, Options{Logger: discardLogger, DB: db.Pool, Backend: backend}, grace.ID)
 
 	type importJSON struct {
 		ID         string `json:"id"`
@@ -196,7 +213,7 @@ func TestDocumentPagesThroughAPI(t *testing.T) {
 	db := pgtest.New(t)
 	ctx := t.Context()
 	st := store.New(db.Pool)
-	ada, err := st.UpsertUserByEmail(ctx, "ada@example.com", "Ada")
+	ada, err := st.CreateUser(ctx, "ada@example.com", "Ada")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -224,7 +241,7 @@ func TestDocumentPagesThroughAPI(t *testing.T) {
 		}
 		want[id] = true
 	}
-	h := New(Options{Logger: discardLogger, DB: db.Pool, Backend: integrationBackend{Store: st}, DevUser: ada.ID})
+	h := signedInAs(t, st, Options{Logger: discardLogger, DB: db.Pool, Backend: integrationBackend{Store: st}}, ada.ID)
 
 	var sizes []int
 	seen := map[string]bool{}

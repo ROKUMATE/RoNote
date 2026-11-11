@@ -177,27 +177,3 @@ func (q *Queries) SetIdentityLogin(ctx context.Context, arg SetIdentityLoginPara
 	_, err := q.db.Exec(ctx, setIdentityLogin, arg.Provider, arg.ProviderUserID, arg.Login)
 	return err
 }
-
-const upsertUserByEmail = `-- name: UpsertUserByEmail :one
-INSERT INTO users (email, display_name)
-VALUES ($1, $2)
-ON CONFLICT ((lower(email))) DO UPDATE SET email = users.email
-RETURNING id, email, display_name, created_at
-`
-
-type UpsertUserByEmailParams struct {
-	Email       string
-	DisplayName string
-}
-
-func (q *Queries) UpsertUserByEmail(ctx context.Context, arg UpsertUserByEmailParams) (User, error) {
-	row := q.db.QueryRow(ctx, upsertUserByEmail, arg.Email, arg.DisplayName)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.DisplayName,
-		&i.CreatedAt,
-	)
-	return i, err
-}

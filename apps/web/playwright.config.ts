@@ -23,13 +23,12 @@ const oauthApp = {
 };
 
 // Set here rather than inherited, so .env.dev can never point the tests at
-// the dev database or the dev user.
+// the dev database or the dev sign-in.
 const backend = env({
   RONOTE_ENV: "test",
   RONOTE_DATABASE_URL: databaseURL,
   RONOTE_HTTP_ADDR: new URL(stack.api).host,
   RONOTE_FETCH_ALLOW_PRIVATE: "true",
-  RONOTE_DEV_USER_EMAIL: "e2e@ronote.local",
   RONOTE_SOURCE_TTL: "24h",
   RONOTE_LOG_LEVEL: "info",
   RONOTE_PUBLIC_URL: stack.web,

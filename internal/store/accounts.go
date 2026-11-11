@@ -26,7 +26,8 @@ type Identity struct {
 // Account is a user with their login at one provider.
 type Account = sqlcdb.GetAccountRow
 
-// Session is a signed-in browser's user, and when it was last seen.
+// Session is a signed-in browser's user, when it was last seen, and whether
+// that is long enough ago to record this use.
 type Session = sqlcdb.GetSessionRow
 
 // SignIn returns the user of id, refreshing its login. An identity seen for
@@ -110,9 +111,9 @@ func (s *Store) CreateSession(ctx context.Context, hash []byte, user uuid.UUID, 
 
 // GetSession returns the session whose token hashes to hash, or ErrNotFound
 // when there is none, it has expired, or it went unused for longer than
-// idle.
-func (s *Store) GetSession(ctx context.Context, hash []byte, idle time.Duration) (Session, error) {
-	sess, err := s.q.GetSession(ctx, sqlcdb.GetSessionParams{TokenHash: hash, IdleSeconds: idle.Seconds()})
+// idle. The session is Stale when it was last seen more than touch ago.
+func (s *Store) GetSession(ctx context.Context, hash []byte, idle, touch time.Duration) (Session, error) {
+	sess, err := s.q.GetSession(ctx, sqlcdb.GetSessionParams{TokenHash: hash, IdleSeconds: idle.Seconds(), TouchSeconds: touch.Seconds()})
 	if err != nil {
 		return Session{}, mapErr("get session", err)
 	}

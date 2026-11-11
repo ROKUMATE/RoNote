@@ -194,26 +194,6 @@ func TestLoad(t *testing.T) {
 			wantErr: []string{`RONOTE_SOURCE_TTL: "-1h" is negative`},
 		},
 		{
-			name: "dev user",
-			env:  validEnv(map[string]string{"RONOTE_DEV_USER_EMAIL": " dev@ronote.local "}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, DevUserEmail: "dev@ronote.local", PublicURL: "https://ronote.test", GitHub: github},
-		},
-		{
-			name:    "dev user refused in prod",
-			env:     validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_DEV_USER_EMAIL": "dev@ronote.local"}),
-			wantErr: []string{"RONOTE_DEV_USER_EMAIL: may only be set when RONOTE_ENV is dev or test"},
-		},
-		{
-			name:    "dev user refused in staging",
-			env:     validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_DEV_USER_EMAIL": "dev@ronote.local"}),
-			wantErr: []string{"RONOTE_DEV_USER_EMAIL: may only be set when RONOTE_ENV is dev or test"},
-		},
-		{
-			name:    "dev user not an email",
-			env:     validEnv(map[string]string{"RONOTE_DEV_USER_EMAIL": "dev"}),
-			wantErr: []string{`RONOTE_DEV_USER_EMAIL: "dev" is not an email address`},
-		},
-		{
 			name: "the fake provider in dev",
 			env:  validEnv(fakeProvider),
 			want: Config{

@@ -158,10 +158,10 @@ func newHarness(t *testing.T, ttl time.Duration) *harness {
 	h := &harness{t: t, store: store.New(testDB.Pool), site: newSite(t)}
 	ctx := t.Context()
 	var err error
-	if h.ada, err = h.store.UpsertUserByEmail(ctx, "ada@example.com", "Ada"); err != nil {
+	if h.ada, err = h.store.CreateUser(ctx, "ada@example.com", "Ada"); err != nil {
 		t.Fatal(err)
 	}
-	if h.grace, err = h.store.UpsertUserByEmail(ctx, "grace@example.com", "Grace"); err != nil {
+	if h.grace, err = h.store.CreateUser(ctx, "grace@example.com", "Grace"); err != nil {
 		t.Fatal(err)
 	}
 	fetcher := fetch.New(fetch.Options{AllowPrivateNetworks: true, Resolver: loopback{}})
@@ -377,7 +377,7 @@ func TestRevalidation(t *testing.T) {
 
 	t.Run("changed content makes a new snapshot", func(t *testing.T) {
 		h.site.set("docs.test", "/guide", htmlPage("Guide, revised", "v2()\n"))
-		lin, err := h.store.UpsertUserByEmail(t.Context(), "lin@example.com", "Lin")
+		lin, err := h.store.CreateUser(t.Context(), "lin@example.com", "Lin")
 		if err != nil {
 			t.Fatal(err)
 		}

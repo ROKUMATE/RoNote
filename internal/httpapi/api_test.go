@@ -21,8 +21,8 @@ import (
 )
 
 var (
-	devUser = uuid.MustParse("0192f1c4-0000-7000-8000-000000000001")
-	t0      = time.Date(2026, 11, 4, 9, 0, 0, 0, time.UTC)
+	testUser = uuid.MustParse("0192f1c4-0000-7000-8000-000000000001")
+	t0       = time.Date(2026, 11, 4, 9, 0, 0, 0, time.UTC)
 )
 
 // fakeBackend answers from its fields and records the owner it was asked for.
@@ -204,7 +204,7 @@ func TestCreateImport(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			b := &fakeBackend{docs: []store.Document{doc}, request: func(string) (importer.Requested, error) { return tt.result, tt.err }}
-			h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+			h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 
 			rec := apiRequest(t, h, http.MethodPost, "/api/v1/imports", tt.body)
 
@@ -227,7 +227,7 @@ func TestCreateImport(t *testing.T) {
 			if tt.result.Existing != (got.Document != nil) || (got.Document != nil && got.Document["title"] != "Doc 1") {
 				t.Errorf("document = %v, want it only when the user already had one", got.Document)
 			}
-			if len(b.owners) == 0 || b.owners[0] != devUser {
+			if len(b.owners) == 0 || b.owners[0] != testUser {
 				t.Errorf("backend asked for owners %v, want the dev user", b.owners)
 			}
 		})
@@ -239,7 +239,7 @@ func TestGetImportAndDocument(t *testing.T) {
 	doc := testDoc(1)
 	imp := store.Import{ID: uuid.New(), Status: store.ImportFailed, ErrorCode: "not_found", CreatedAt: t0, UpdatedAt: t0}
 	b := &fakeBackend{imports: map[uuid.UUID]store.Import{imp.ID: imp}, docs: []store.Document{doc}}
-	h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+	h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 
 	rec := apiRequest(t, h, http.MethodGet, "/api/v1/imports/"+imp.ID.String(), "")
 	if got := decodeJSON[map[string]map[string]any](t, rec)["import"]; rec.Code != http.StatusOK || got["error_code"] != "not_found" || got["document_id"] != nil {
@@ -283,7 +283,7 @@ func TestListDocuments(t *testing.T) {
 	for i := range 5 {
 		b.docs = append(b.docs, testDoc(i))
 	}
-	h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+	h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 
 	type list struct {
 		Documents []struct {
@@ -356,7 +356,7 @@ func TestTimestampsAreUTC(t *testing.T) {
 			return importer.Requested{Import: imp, Existing: existing}, nil
 		},
 	}
-	h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+	h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 
 	requests := []struct{ method, target, body string }{
 		{http.MethodPost, "/api/v1/imports", `{"url":"https://docs.example.com/1"}`},

@@ -45,7 +45,7 @@ func apiRoutes(o Options) *http.ServeMux {
 	logger := o.Logger
 	mux := http.NewServeMux()
 	mux.Handle("GET /api/v1/imports/{id}/events", importEvents(o.Backend, o.Events, o.Done, heartbeat))
-	strict := gen.NewStrictHandlerWithOptions(apiServer{backend: o.Backend}, nil, gen.StrictHTTPServerOptions{
+	strict := gen.NewStrictHandlerWithOptions(apiServer{backend: o.Backend, accounts: o.Accounts}, nil, gen.StrictHTTPServerOptions{
 		RequestErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, _ error) {
 			writeError(w, r, http.StatusBadRequest, gen.ErrorCodeInvalidRequest, "the request body is not valid JSON for this operation")
 		},
@@ -65,7 +65,8 @@ func apiRoutes(o Options) *http.ServeMux {
 
 // apiServer implements the operations of api/openapi.yaml.
 type apiServer struct {
-	backend Backend
+	backend  Backend
+	accounts Accounts
 }
 
 func apiError(ctx context.Context, code gen.ErrorCode, message string) gen.Error {

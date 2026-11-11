@@ -4,8 +4,8 @@ info:
   version: 1.0.0
   description: |
     Import documentation pages and read them back as documents. Every route
-    needs a signed-in user; until real sign-in exists, dev and test inject
-    RONOTE_DEV_USER_EMAIL, and staging and prod answer 401.
+    but the two that sign in needs a signed-in user: a session cookie that
+    signing in with GitHub sets (docs/adr/0010-sign-in-and-sessions.md).
 
     Errors always use the Error envelope. Its code is stable; its message is
     for people.
@@ -70,6 +70,21 @@ paths:
             Location:
               schema:
                 type: string
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /me:
+    get:
+      operationId: getMe
+      summary: The signed-in user
+      responses:
+        "200":
+          description: The signed-in user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Me"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
         "500":
           $ref: "#/components/responses/InternalError"
   /imports:
@@ -590,6 +605,20 @@ components:
         - annotation_limit
         - unauthenticated
         - internal_error
+    Me:
+      type: object
+      required: [id, display_name, email, login]
+      properties:
+        id:
+          type: string
+          format: uuid
+        display_name:
+          type: string
+        email:
+          type: string
+        login:
+          type: string
+          description: The user's GitHub login; deleting the account asks for it.
     SignInErrorCode:
       type: string
       description: >-

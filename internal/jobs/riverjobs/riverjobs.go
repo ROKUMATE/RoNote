@@ -235,7 +235,9 @@ func (w *worker) NextRetry(job *river.Job[args]) time.Time {
 
 // retryPolicy retries after delay, by the attempt that failed, or after
 // River's own backoff when delay is nil.
-type retryPolicy struct{ delay func(attempt int) time.Duration }
+type retryPolicy struct {
+	delay func(attempt int) time.Duration
+}
 
 func (p retryPolicy) NextRetry(job *rivertype.JobRow) time.Time {
 	if p.delay != nil {

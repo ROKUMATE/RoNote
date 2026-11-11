@@ -39,3 +39,21 @@ FROM imports
 WHERE owner_id = $1 AND document_id = $2
 ORDER BY created_at DESC, id DESC
 LIMIT 1;
+
+-- name: LockOwner :exec
+-- Holds the owner's quota lock until the transaction ends, so two imports
+-- can't both pass a check that only one fits under.
+SELECT pg_advisory_xact_lock(hashtextextended(sqlc.arg(owner_id)::uuid::text, 0));
+
+-- name: QuotaUsage :one
+-- What counts against the owner's quotas: imports started within the window
+-- and how many seconds until the oldest of them leaves it; and documents,
+-- with the imports still under way, which may each make one.
+SELECT
+    count(*) FILTER (WHERE created_at > now() - make_interval(secs => sqlc.arg(window_seconds)::double precision))::int AS recent_imports,
+    coalesce(extract(epoch FROM min(created_at) FILTER (WHERE created_at > now() - make_interval(secs => sqlc.arg(window_seconds)::double precision))
+        + make_interval(secs => sqlc.arg(window_seconds)::double precision) - now()), 0)::double precision AS seconds_until_oldest_leaves,
+    ((SELECT count(*) FROM documents d WHERE d.owner_id = sqlc.arg(owner_id))
+        + count(*) FILTER (WHERE status NOT IN ('done', 'failed')))::int AS documents
+FROM imports
+WHERE owner_id = sqlc.arg(owner_id);

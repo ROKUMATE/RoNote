@@ -40,7 +40,7 @@ func deleteMe(o Options) http.HandlerFunc {
 		ctx := r.Context()
 		var req gen.DeleteAccountRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			writeError(w, r, http.StatusBadRequest, gen.ErrorCodeInvalidRequest, "a JSON body with confirm is required")
+			badBody(w, r, err, "a JSON body with confirm is required")
 			return
 		}
 		user := userFrom(ctx)

@@ -121,3 +121,35 @@ func (s *Store) LatestImportForDocument(ctx context.Context, owner, document uui
 	}
 	return importFrom(row), nil
 }
+
+// Usage is what counts against an owner's quotas.
+type Usage struct {
+	// RecentImports counts the imports started within the window, and
+	// UntilOldestLeaves is how long until the oldest of them leaves it.
+	RecentImports     int
+	UntilOldestLeaves time.Duration
+	// Documents counts documents and the imports still under way.
+	Documents int
+}
+
+// LockOwner holds owner's quota lock until s's transaction ends. Outside a
+// transaction it holds nothing.
+func (s *Store) LockOwner(ctx context.Context, owner uuid.UUID) error {
+	if err := s.q.LockOwner(ctx, owner); err != nil {
+		return mapErr("lock owner", err)
+	}
+	return nil
+}
+
+// QuotaUsage returns owner's usage, counting imports started within window.
+func (s *Store) QuotaUsage(ctx context.Context, owner uuid.UUID, window time.Duration) (Usage, error) {
+	row, err := s.q.QuotaUsage(ctx, sqlcdb.QuotaUsageParams{OwnerID: owner, WindowSeconds: window.Seconds()})
+	if err != nil {
+		return Usage{}, mapErr("quota usage", err)
+	}
+	return Usage{
+		RecentImports:     int(row.RecentImports),
+		UntilOldestLeaves: time.Duration(row.SecondsUntilOldestLeaves * float64(time.Second)),
+		Documents:         int(row.Documents),
+	}, nil
+}

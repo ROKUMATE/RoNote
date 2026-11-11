@@ -41,16 +41,16 @@ type Backend interface {
 // apiRoutes returns a mux with the routes of api/openapi.yaml: the
 // generated ones, and the hand-written event stream. Errors from parsing a
 // request become the error envelope.
-func apiRoutes(o Options) *http.ServeMux {
+func apiRoutes(o Options, lim limiters) *http.ServeMux {
 	logger := o.Logger
 	mux := http.NewServeMux()
 	mux.Handle("GET /api/v1/imports/{id}/events", importEvents(o.Backend, o.Events, o.Done, heartbeat))
-	mux.Handle("POST /api/v1/auth/logout", logout(o))
-	mux.Handle("POST /api/v1/auth/logout-all", logoutAll(o))
+	mux.Handle("POST /api/v1/auth/logout", lim.byIP(logout(o)))
+	mux.Handle("POST /api/v1/auth/logout-all", lim.byIP(logoutAll(o)))
 	mux.Handle("DELETE /api/v1/me", deleteMe(o))
 	strict := gen.NewStrictHandlerWithOptions(apiServer{backend: o.Backend, accounts: o.Accounts}, nil, gen.StrictHTTPServerOptions{
-		RequestErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, _ error) {
-			writeError(w, r, http.StatusBadRequest, gen.ErrorCodeInvalidRequest, "the request body is not valid JSON for this operation")
+		RequestErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {
+			badBody(w, r, err, "the request body is not valid JSON for this operation")
 		},
 		ResponseErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {
 			internalError(logger, w, r, err)
@@ -97,6 +97,16 @@ func (s apiServer) CreateImport(ctx context.Context, req gen.CreateImportRequest
 		if errors.Is(err, e.err) {
 			return gen.CreateImport400JSONResponse(apiError(ctx, e.code, err.Error())), nil
 		}
+	}
+	if over := new(importer.QuotaError); errors.As(err, &over) {
+		res := gen.CreateImport429JSONResponse{TooManyImportsJSONResponse: gen.TooManyImportsJSONResponse{
+			Body: apiError(ctx, gen.ErrorCodeQuotaExceeded, err.Error()),
+		}}
+		if over.RetryAfter > 0 {
+			seconds := retrySeconds(over.RetryAfter)
+			res.Headers.RetryAfter = &seconds
+		}
+		return res, nil
 	}
 	if err != nil {
 		return nil, err

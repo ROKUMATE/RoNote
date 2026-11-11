@@ -36,6 +36,12 @@ const backend = env({
   RONOTE_GITHUB_AUTHORIZE_URL: `${stack.idp}/login/oauth/authorize`,
   RONOTE_GITHUB_TOKEN_URL: `${stack.idp}/login/oauth/access_token`,
   RONOTE_GITHUB_API_URL: stack.idp,
+  // The suite imports and signs in far more than a person does; Go tests
+  // check the limits.
+  RONOTE_LIMIT_IMPORTS_PER_DAY: "100000",
+  RONOTE_LIMIT_DOCUMENTS: "100000",
+  RONOTE_LIMIT_API_PER_MINUTE: "100000",
+  RONOTE_LIMIT_AUTH_PER_MINUTE: "100000",
 });
 
 const stop = { signal: "SIGTERM", timeout: 5000 } as const;

@@ -37,6 +37,8 @@ paths:
             Location:
               schema:
                 type: string
+        "429":
+          $ref: "#/components/responses/RateLimited"
   /auth/github/callback:
     get:
       operationId: finishGitHubSignIn
@@ -70,6 +72,8 @@ paths:
             Location:
               schema:
                 type: string
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
   /auth/logout:
@@ -86,6 +90,8 @@ paths:
           $ref: "#/components/responses/Unauthenticated"
         "403":
           $ref: "#/components/responses/CrossOrigin"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
   /auth/logout-all:
@@ -103,6 +109,8 @@ paths:
           $ref: "#/components/responses/Unauthenticated"
         "403":
           $ref: "#/components/responses/CrossOrigin"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
   /me:
@@ -135,6 +143,10 @@ paths:
           $ref: "#/components/responses/Unauthenticated"
         "403":
           $ref: "#/components/responses/CrossOrigin"
+        "413":
+          $ref: "#/components/responses/BodyTooLarge"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
     get:
@@ -149,6 +161,8 @@ paths:
                 $ref: "#/components/schemas/Me"
         "401":
           $ref: "#/components/responses/Unauthenticated"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
   /imports:
@@ -190,6 +204,10 @@ paths:
           $ref: "#/components/responses/Unauthenticated"
         "403":
           $ref: "#/components/responses/CrossOrigin"
+        "413":
+          $ref: "#/components/responses/BodyTooLarge"
+        "429":
+          $ref: "#/components/responses/TooManyImports"
         "500":
           $ref: "#/components/responses/InternalError"
   /imports/{id}:
@@ -209,6 +227,8 @@ paths:
           $ref: "#/components/responses/InvalidParameter"
         "401":
           $ref: "#/components/responses/Unauthenticated"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
         "404":
@@ -278,6 +298,8 @@ paths:
                 $ref: "#/components/schemas/Error"
         "401":
           $ref: "#/components/responses/Unauthenticated"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
   /documents/{id}:
@@ -297,6 +319,8 @@ paths:
           $ref: "#/components/responses/InvalidParameter"
         "401":
           $ref: "#/components/responses/Unauthenticated"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
         "404":
@@ -354,6 +378,10 @@ paths:
                 $ref: "#/components/schemas/Error"
         "403":
           $ref: "#/components/responses/CrossOrigin"
+        "413":
+          $ref: "#/components/responses/BodyTooLarge"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
   /documents/resolve:
@@ -387,6 +415,10 @@ paths:
           $ref: "#/components/responses/Unauthenticated"
         "403":
           $ref: "#/components/responses/CrossOrigin"
+        "413":
+          $ref: "#/components/responses/BodyTooLarge"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
   /documents/{id}/blocks/{blockId}/revert:
@@ -422,6 +454,8 @@ paths:
                 $ref: "#/components/schemas/Error"
         "403":
           $ref: "#/components/responses/CrossOrigin"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
   /documents/{id}/annotations:
@@ -448,6 +482,8 @@ paths:
           $ref: "#/components/responses/Unauthenticated"
         "404":
           $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
     post:
@@ -488,6 +524,10 @@ paths:
                 $ref: "#/components/schemas/Error"
         "403":
           $ref: "#/components/responses/CrossOrigin"
+        "413":
+          $ref: "#/components/responses/BodyTooLarge"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
   /documents/{id}/annotations/reanchor:
@@ -541,6 +581,10 @@ paths:
                 $ref: "#/components/schemas/Error"
         "403":
           $ref: "#/components/responses/CrossOrigin"
+        "413":
+          $ref: "#/components/responses/BodyTooLarge"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
   /annotations/{id}:
@@ -590,6 +634,10 @@ paths:
                 $ref: "#/components/schemas/Error"
         "403":
           $ref: "#/components/responses/CrossOrigin"
+        "413":
+          $ref: "#/components/responses/BodyTooLarge"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
     delete:
@@ -608,6 +656,8 @@ paths:
           $ref: "#/components/responses/NotFound"
         "403":
           $ref: "#/components/responses/CrossOrigin"
+        "429":
+          $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
 components:
@@ -634,6 +684,45 @@ components:
             $ref: "#/components/schemas/Error"
     InvalidParameter:
       description: "A path or query parameter is malformed. Code: invalid_parameter."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    RateLimited:
+      description: >-
+        Too many requests: 120 a minute per user, or 20 sign-in requests a
+        minute per IP. Code: rate_limited.
+      headers:
+        Retry-After:
+          description: Seconds until a request fits.
+          required: true
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    TooManyImports:
+      description: >-
+        Too many requests (code rate_limited), or over a quota (code
+        quota_exceeded): 60 imports a day, or 500 documents, counting
+        imports under way.
+      headers:
+        Retry-After:
+          description: >-
+            Seconds until an import fits; absent when waiting won't help,
+            as when the library is full.
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    BodyTooLarge:
+      description: >-
+        The request body is larger than the route takes: 8 MiB for saving a
+        document, 1 MiB for re-anchoring highlights, 64 KiB otherwise. Code:
+        body_too_large.
       content:
         application/json:
           schema:
@@ -694,6 +783,9 @@ components:
         - annotation_limit
         - unauthenticated
         - cross_origin
+        - rate_limited
+        - quota_exceeded
+        - body_too_large
         - internal_error
     Me:
       type: object

@@ -347,7 +347,7 @@ export interface components {
          * @description Why a request failed. Each response lists the codes it can carry.
          * @enum {string}
          */
-        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unknown_block" | "quote_mismatch" | "annotation_limit" | "unauthenticated" | "cross_origin" | "internal_error";
+        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unknown_block" | "quote_mismatch" | "annotation_limit" | "unauthenticated" | "cross_origin" | "rate_limited" | "quota_exceeded" | "body_too_large" | "internal_error";
         Me: {
             /** Format: uuid */
             id: string;
@@ -663,6 +663,37 @@ export interface components {
                 "application/json": components["schemas"]["Error"];
             };
         };
+        /** @description Too many requests: 120 a minute per user, or 20 sign-in requests a minute per IP. Code: rate_limited. */
+        RateLimited: {
+            headers: {
+                /** @description Seconds until a request fits. */
+                "Retry-After": number;
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Too many requests (code rate_limited), or over a quota (code quota_exceeded): 60 imports a day, or 500 documents, counting imports under way. */
+        TooManyImports: {
+            headers: {
+                /** @description Seconds until an import fits; absent when waiting won't help, as when the library is full. */
+                "Retry-After"?: number;
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description The request body is larger than the route takes: 8 MiB for saving a document, 1 MiB for re-anchoring highlights, 64 KiB otherwise. Code: body_too_large. */
+        BodyTooLarge: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
         /** @description A browser sent this from another site; only RoNote's own pages may change anything (docs/adr/0010-sign-in-and-sessions.md). Code: cross_origin. */
         CrossOrigin: {
             headers: {
@@ -735,6 +766,9 @@ export type IrLink = components['schemas']['IRLink'];
 export type ResponseUnauthenticated = components['responses']['Unauthenticated'];
 export type ResponseNotFound = components['responses']['NotFound'];
 export type ResponseInvalidParameter = components['responses']['InvalidParameter'];
+export type ResponseRateLimited = components['responses']['RateLimited'];
+export type ResponseTooManyImports = components['responses']['TooManyImports'];
+export type ResponseBodyTooLarge = components['responses']['BodyTooLarge'];
 export type ResponseCrossOrigin = components['responses']['CrossOrigin'];
 export type ResponseInternalError = components['responses']['InternalError'];
 export type ParameterId = components['parameters']['ID'];
@@ -760,6 +794,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            429: components["responses"]["RateLimited"];
         };
     };
     finishGitHubSignIn: {
@@ -784,6 +819,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -805,6 +841,7 @@ export interface operations {
             };
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["CrossOrigin"];
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -826,6 +863,7 @@ export interface operations {
             };
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["CrossOrigin"];
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -848,6 +886,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthenticated"];
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -882,6 +921,8 @@ export interface operations {
             };
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["CrossOrigin"];
+            413: components["responses"]["BodyTooLarge"];
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -927,6 +968,8 @@ export interface operations {
             };
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["CrossOrigin"];
+            413: components["responses"]["BodyTooLarge"];
+            429: components["responses"]["TooManyImports"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -953,6 +996,7 @@ export interface operations {
             400: components["responses"]["InvalidParameter"];
             401: components["responses"]["Unauthenticated"];
             404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -1021,6 +1065,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthenticated"];
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -1047,6 +1092,7 @@ export interface operations {
             400: components["responses"]["InvalidParameter"];
             401: components["responses"]["Unauthenticated"];
             404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -1095,6 +1141,7 @@ export interface operations {
                     "application/json": components["schemas"]["VersionConflict"];
                 };
             };
+            413: components["responses"]["BodyTooLarge"];
             /** @description The content breaks a rule. Codes: invalid_content, unknown_source_block, source_block_modified, block_kind_not_allowed. */
             422: {
                 headers: {
@@ -1104,6 +1151,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -1140,6 +1188,8 @@ export interface operations {
             };
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["CrossOrigin"];
+            413: components["responses"]["BodyTooLarge"];
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -1176,6 +1226,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -1202,6 +1253,7 @@ export interface operations {
             400: components["responses"]["InvalidParameter"];
             401: components["responses"]["Unauthenticated"];
             404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -1241,6 +1293,7 @@ export interface operations {
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["CrossOrigin"];
             404: components["responses"]["NotFound"];
+            413: components["responses"]["BodyTooLarge"];
             /** @description The selector does not fit the document, or the document is full. Codes: unknown_block, quote_mismatch, annotation_limit. */
             422: {
                 headers: {
@@ -1250,6 +1303,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -1306,6 +1360,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            413: components["responses"]["BodyTooLarge"];
             /** @description A selector does not fit the document. Codes: unknown_block, quote_mismatch. */
             422: {
                 headers: {
@@ -1315,6 +1370,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -1340,6 +1396,7 @@ export interface operations {
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["CrossOrigin"];
             404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -1388,6 +1445,7 @@ export interface operations {
                     "application/json": components["schemas"]["VersionConflict"];
                 };
             };
+            413: components["responses"]["BodyTooLarge"];
             /** @description The selector does not fit the document. Codes: unknown_block, quote_mismatch. */
             422: {
                 headers: {
@@ -1397,6 +1455,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };
     };

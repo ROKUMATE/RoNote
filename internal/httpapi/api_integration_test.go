@@ -101,7 +101,7 @@ func TestAPIImportsEndToEnd(t *testing.T) {
 			t.Errorf("stop River: %v", err)
 		}
 	})
-	backend := integrationBackend{Store: st, Service: importer.NewService(st, queue)}
+	backend := integrationBackend{Store: st, Service: importer.NewService(st, queue, importer.Quota{ImportsPerDay: 1000, Documents: 1000})}
 	adaAPI := signedInAs(t, st, Options{Logger: discardLogger, DB: db.Pool, Backend: backend}, ada.ID)
 	graceAPI := signedInAs(t, st, Options{Logger: discardLogger, DB: db.Pool, Backend: backend}, grace.ID)
 

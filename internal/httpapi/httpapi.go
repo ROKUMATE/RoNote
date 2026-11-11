@@ -3,6 +3,7 @@ package httpapi
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -38,6 +39,9 @@ type Options struct {
 	Cookies auth.Cookies
 	// GitHub is where people sign in.
 	GitHub auth.GitHub
+	// PublicURL is RoNote's origin, the one origin trusted to send unsafe
+	// requests from another site.
+	PublicURL string
 }
 
 // New returns the API handler: /healthz, /readyz and the routes of
@@ -46,10 +50,30 @@ func New(o Options) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", healthz)
 	mux.HandleFunc("GET /readyz", readyz(o.Logger, o.DB))
-	mux.Handle("GET /api/v1/auth/github/start", signInStart(o))
-	mux.Handle("GET /api/v1/auth/github/callback", signInCallback(o))
-	mux.Handle("/api/v1/", requireSession(o, router{mux: apiRoutes(o)}))
+	protect := crossOrigin(o.PublicURL)
+	mux.Handle("GET /api/v1/auth/github/start", protect(signInStart(o)))
+	mux.Handle("GET /api/v1/auth/github/callback", protect(signInCallback(o)))
+	mux.Handle("/api/v1/", protect(requireSession(o, router{mux: apiRoutes(o)})))
 	return withMiddleware(o.Logger, router{mux: mux})
+}
+
+// crossOrigin returns what wraps every /api route: Go's CSRF protection,
+// which refuses unsafe requests a browser says came from another site, by
+// Sec-Fetch-Site or, without it, by Origin against Host. publicURL is the
+// only origin trusted besides; there are no bypass patterns
+// (docs/adr/0010-sign-in-and-sessions.md).
+func crossOrigin(publicURL string) func(http.Handler) http.Handler {
+	cop := http.NewCrossOriginProtection()
+	if publicURL != "" {
+		if err := cop.AddTrustedOrigin(publicURL); err != nil {
+			// Config checked it is an origin.
+			panic(fmt.Sprintf("httpapi: trusted origin: %v", err))
+		}
+	}
+	cop.SetDenyHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		writeError(w, r, http.StatusForbidden, gen.ErrorCodeCrossOrigin, "cross-origin request refused")
+	}))
+	return cop.Handler
 }
 
 // router answers with the error envelope when the mux has no route for a

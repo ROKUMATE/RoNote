@@ -142,6 +142,7 @@ func (e CodeLang) Valid() bool {
 const (
 	ErrorCodeAnnotationLimit     ErrorCode = "annotation_limit"
 	ErrorCodeBlockKindNotAllowed ErrorCode = "block_kind_not_allowed"
+	ErrorCodeCrossOrigin         ErrorCode = "cross_origin"
 	ErrorCodeIPLiteralHost       ErrorCode = "ip_literal_host"
 	ErrorCodeInternalError       ErrorCode = "internal_error"
 	ErrorCodeInvalidContent      ErrorCode = "invalid_content"
@@ -167,6 +168,8 @@ func (e ErrorCode) Valid() bool {
 	case ErrorCodeAnnotationLimit:
 		return true
 	case ErrorCodeBlockKindNotAllowed:
+		return true
+	case ErrorCodeCrossOrigin:
 		return true
 	case ErrorCodeIPLiteralHost:
 		return true
@@ -611,6 +614,9 @@ type VersionConflict struct {
 
 // ID defines model for ID.
 type ID = openapi_types.UUID
+
+// CrossOrigin defines model for CrossOrigin.
+type CrossOrigin = Error
 
 // InternalError defines model for InternalError.
 type InternalError = Error
@@ -1169,6 +1175,8 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	return m
 }
 
+type CrossOriginJSONResponse Error
+
 type InternalErrorJSONResponse Error
 
 type InvalidParameterJSONResponse Error
@@ -1217,6 +1225,20 @@ func (response DeleteAnnotation401JSONResponse) VisitDeleteAnnotationResponse(w 
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteAnnotation403JSONResponse struct{ CrossOriginJSONResponse }
+
+func (response DeleteAnnotation403JSONResponse) VisitDeleteAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -1296,6 +1318,20 @@ func (response UpdateAnnotation401JSONResponse) VisitUpdateAnnotationResponse(w 
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateAnnotation403JSONResponse struct{ CrossOriginJSONResponse }
+
+func (response UpdateAnnotation403JSONResponse) VisitUpdateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -1470,6 +1506,20 @@ func (response ResolveDocuments401JSONResponse) VisitResolveDocumentsResponse(w 
 	return err
 }
 
+type ResolveDocuments403JSONResponse struct{ CrossOriginJSONResponse }
+
+func (response ResolveDocuments403JSONResponse) VisitResolveDocumentsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ResolveDocuments500JSONResponse struct{ InternalErrorJSONResponse }
 
 func (response ResolveDocuments500JSONResponse) VisitResolveDocumentsResponse(w http.ResponseWriter) error {
@@ -1609,6 +1659,20 @@ func (response SaveDocument401JSONResponse) VisitSaveDocumentResponse(w http.Res
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveDocument403JSONResponse struct{ CrossOriginJSONResponse }
+
+func (response SaveDocument403JSONResponse) VisitSaveDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -1798,6 +1862,20 @@ func (response CreateAnnotation401JSONResponse) VisitCreateAnnotationResponse(w 
 	return err
 }
 
+type CreateAnnotation403JSONResponse struct{ CrossOriginJSONResponse }
+
+func (response CreateAnnotation403JSONResponse) VisitCreateAnnotationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type CreateAnnotation404JSONResponse struct{ NotFoundJSONResponse }
 
 func (response CreateAnnotation404JSONResponse) VisitCreateAnnotationResponse(w http.ResponseWriter) error {
@@ -1887,6 +1965,20 @@ func (response ReanchorAnnotations401JSONResponse) VisitReanchorAnnotationsRespo
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ReanchorAnnotations403JSONResponse struct{ CrossOriginJSONResponse }
+
+func (response ReanchorAnnotations403JSONResponse) VisitReanchorAnnotationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -1998,6 +2090,20 @@ func (response RevertBlock401JSONResponse) VisitRevertBlockResponse(w http.Respo
 	return err
 }
 
+type RevertBlock403JSONResponse struct{ CrossOriginJSONResponse }
+
+func (response RevertBlock403JSONResponse) VisitRevertBlockResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type RevertBlock404JSONResponse Error
 
 func (response RevertBlock404JSONResponse) VisitRevertBlockResponse(w http.ResponseWriter) error {
@@ -2086,6 +2192,20 @@ func (response CreateImport401JSONResponse) VisitCreateImportResponse(w http.Res
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateImport403JSONResponse struct{ CrossOriginJSONResponse }
+
+func (response CreateImport403JSONResponse) VisitCreateImportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
 	_, err := buf.WriteTo(w)
 	return err
 }

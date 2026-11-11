@@ -51,3 +51,11 @@ type User struct {
 	DisplayName string
 	CreatedAt   time.Time
 }
+
+type UserIdentity struct {
+	Provider       string
+	ProviderUserID string
+	UserID         uuid.UUID
+	Login          string
+	CreatedAt      time.Time
+}

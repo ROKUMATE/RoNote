@@ -392,6 +392,12 @@ type CreateImportRequest struct {
 	URL string `json:"url"`
 }
 
+// DeleteAccountRequest defines model for DeleteAccountRequest.
+type DeleteAccountRequest struct {
+	// Confirm The user's GitHub login, typed to confirm.
+	Confirm string `json:"confirm"`
+}
+
 // DocBlock A top-level block: an IRBlock's fields, plus where it came from. Source blocks set edited and source_block_id (equal to id); user blocks set neither, and have UUIDv7 ids. A spec test keeps these properties IRBlock's plus the three.
 type DocBlock = doccontent.Block
 

@@ -13,7 +13,10 @@ import (
 	"github.com/rokumate/ronote/internal/store"
 )
 
-type userKey struct{}
+type (
+	userKey    struct{}
+	sessionKey struct{}
+)
 
 // requireSession makes the user of the request's session cookie the
 // signed-in user, or answers 401 when there is no live session. It records
@@ -44,7 +47,8 @@ func requireSession(o Options, next http.Handler) http.Handler {
 					slog.String("error", err.Error()), slog.String("request_id", requestID(ctx)))
 			}
 		}
-		next.ServeHTTP(w, r.WithContext(context.WithValue(ctx, userKey{}, sess.UserID)))
+		ctx = context.WithValue(ctx, userKey{}, sess.UserID)
+		next.ServeHTTP(w, r.WithContext(context.WithValue(ctx, sessionKey{}, hash)))
 	})
 }
 
@@ -52,4 +56,10 @@ func requireSession(o Options, next http.Handler) http.Handler {
 func userFrom(ctx context.Context) uuid.UUID {
 	user, _ := ctx.Value(userKey{}).(uuid.UUID)
 	return user
+}
+
+// sessionFrom returns the hash of the session requireSession found.
+func sessionFrom(ctx context.Context) []byte {
+	hash, _ := ctx.Value(sessionKey{}).([]byte)
+	return hash
 }

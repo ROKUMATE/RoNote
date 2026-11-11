@@ -75,6 +75,30 @@ func (f *fakeAccounts) GetSession(_ context.Context, hash []byte, _, _ time.Dura
 	return store.Session{UserID: u, Stale: f.stale[key]}, nil
 }
 
+func (f *fakeAccounts) DeleteUserSessions(_ context.Context, user uuid.UUID) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	for k, u := range f.sessions {
+		if u == user {
+			delete(f.sessions, k)
+		}
+	}
+	return nil
+}
+
+// DeleteUser takes the user's sessions with them, as the database's cascade
+// does.
+func (f *fakeAccounts) DeleteUser(ctx context.Context, user uuid.UUID) error {
+	f.mu.Lock()
+	for id, u := range f.users {
+		if u.ID == user {
+			delete(f.users, id)
+		}
+	}
+	f.mu.Unlock()
+	return f.DeleteUserSessions(ctx, user)
+}
+
 func (f *fakeAccounts) TouchSession(_ context.Context, hash []byte) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()

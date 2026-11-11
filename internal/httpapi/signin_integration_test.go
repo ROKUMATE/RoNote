@@ -5,6 +5,8 @@ package httpapi
 import (
 	"encoding/json"
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/rokumate/ronote/internal/httpapi/gen"
@@ -40,5 +42,36 @@ func TestSignInLinksAVerifiedEmail(t *testing.T) {
 	}
 	if me.Code != http.StatusOK || got.ID != existing.ID || got.Login != "ada" {
 		t.Errorf("/me = %d %+v, want the existing account %v with login ada", me.Code, got, existing.ID)
+	}
+}
+
+// TestDeletedUsersSessionsStop signs Ada in twice, deletes her account from
+// one browser, and checks the other browser's session went with it.
+func TestDeletedUsersSessionsStop(t *testing.T) {
+	db := pgtest.New(t)
+	rig := newSignInRig(t, false, store.New(db.Pool))
+	signIn := func() *http.Cookie {
+		flow, to := rig.start(t, "/")
+		return cookieNamed(rig.callback(t, rig.atProvider(t, to, idpAda.ID), flow), "ronote_session")
+	}
+	here, there := signIn(), signIn()
+	send := func(method, target string, c *http.Cookie, body string) int {
+		req := httptest.NewRequestWithContext(t.Context(), method, target, strings.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.AddCookie(c)
+		return record(rig.h, req).Code
+	}
+	if code := send(http.MethodGet, "/api/v1/me", there, ""); code != http.StatusOK {
+		t.Fatalf("/me in the other browser = %d before deleting, want 200", code)
+	}
+
+	if code := send(http.MethodDelete, "/api/v1/me", here, `{"confirm":"ada"}`); code != http.StatusNoContent {
+		t.Fatalf("DELETE /me = %d, want 204", code)
+	}
+
+	for name, c := range map[string]*http.Cookie{"this browser": here, "the other browser": there} {
+		if code := send(http.MethodGet, "/api/v1/me", c, ""); code != http.StatusUnauthorized {
+			t.Errorf("/me in %s after deleting = %d, want 401", name, code)
+		}
 	}
 }

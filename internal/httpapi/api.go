@@ -45,6 +45,9 @@ func apiRoutes(o Options) *http.ServeMux {
 	logger := o.Logger
 	mux := http.NewServeMux()
 	mux.Handle("GET /api/v1/imports/{id}/events", importEvents(o.Backend, o.Events, o.Done, heartbeat))
+	mux.Handle("POST /api/v1/auth/logout", logout(o))
+	mux.Handle("POST /api/v1/auth/logout-all", logoutAll(o))
+	mux.Handle("DELETE /api/v1/me", deleteMe(o))
 	strict := gen.NewStrictHandlerWithOptions(apiServer{backend: o.Backend, accounts: o.Accounts}, nil, gen.StrictHTTPServerOptions{
 		RequestErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, _ error) {
 			writeError(w, r, http.StatusBadRequest, gen.ErrorCodeInvalidRequest, "the request body is not valid JSON for this operation")

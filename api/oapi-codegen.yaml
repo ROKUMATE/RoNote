@@ -15,3 +15,6 @@ output-options:
     - getImportEvents
     - startGitHubSignIn
     - finishGitHubSignIn
+    - logout
+    - logoutAll
+    - deleteMe

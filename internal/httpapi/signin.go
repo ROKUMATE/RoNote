@@ -26,6 +26,8 @@ type Accounts interface {
 	GetSession(ctx context.Context, hash []byte, idle, touch time.Duration) (store.Session, error)
 	TouchSession(ctx context.Context, hash []byte) error
 	DeleteSession(ctx context.Context, hash []byte) error
+	DeleteUserSessions(ctx context.Context, user uuid.UUID) error
+	DeleteUser(ctx context.Context, user uuid.UUID) error
 }
 
 // signInStart sends the browser to GitHub, keeping the sign-in's state, PKCE

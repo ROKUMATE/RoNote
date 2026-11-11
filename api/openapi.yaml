@@ -72,7 +72,71 @@ paths:
                 type: string
         "500":
           $ref: "#/components/responses/InternalError"
+  /auth/logout:
+    post:
+      operationId: logout
+      summary: Sign out
+      description: >-
+        Ends this session and removes its cookie. This handler is written by
+        hand; the spec documents it.
+      responses:
+        "204":
+          description: Signed out.
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /auth/logout-all:
+    post:
+      operationId: logoutAll
+      summary: Sign out everywhere
+      description: >-
+        Ends every session of the signed-in user, in every browser, and
+        removes this one's cookie. This handler is written by hand; the spec
+        documents it.
+      responses:
+        "204":
+          description: Signed out everywhere.
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /me:
+    delete:
+      operationId: deleteMe
+      summary: Delete the signed-in user's account
+      description: >-
+        Deletes the account and everything in it: documents, imports,
+        highlights and notes, and every session. Pages shared with other
+        users stay. confirm must be the user's GitHub login. This handler is
+        written by hand; the spec documents it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteAccountRequest"
+      responses:
+        "204":
+          description: Deleted, and signed out.
+        "400":
+          description: >-
+            No body, or confirm is not the user's GitHub login. Code:
+            invalid_request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
+        "500":
+          $ref: "#/components/responses/InternalError"
     get:
       operationId: getMe
       summary: The signed-in user
@@ -645,6 +709,14 @@ components:
         login:
           type: string
           description: The user's GitHub login; deleting the account asks for it.
+    DeleteAccountRequest:
+      type: object
+      required: [confirm]
+      properties:
+        confirm:
+          type: string
+          maxLength: 100
+          description: The user's GitHub login, typed to confirm.
     SignInErrorCode:
       type: string
       description: >-

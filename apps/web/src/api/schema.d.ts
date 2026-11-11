@@ -51,6 +51,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign out
+         * @description Ends this session and removes its cookie. This handler is written by hand; the spec documents it.
+         */
+        post: operations["logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign out everywhere
+         * @description Ends every session of the signed-in user, in every browser, and removes this one's cookie. This handler is written by hand; the spec documents it.
+         */
+        post: operations["logoutAll"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/me": {
         parameters: {
             query?: never;
@@ -62,7 +102,11 @@ export interface paths {
         get: operations["getMe"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete the signed-in user's account
+         * @description Deletes the account and everything in it: documents, imports, highlights and notes, and every session. Pages shared with other users stay. confirm must be the user's GitHub login. This handler is written by hand; the spec documents it.
+         */
+        delete: operations["deleteMe"];
         options?: never;
         head?: never;
         patch?: never;
@@ -311,6 +355,10 @@ export interface components {
             email: string;
             /** @description The user's GitHub login; deleting the account asks for it. */
             login: string;
+        };
+        DeleteAccountRequest: {
+            /** @description The user's GitHub login, typed to confirm. */
+            confirm: string;
         };
         /**
          * @description Why signing in failed, in /login?error=: the user or GitHub refused (denied); the sign-in's cookie was missing, expired or another (state_mismatch); the GitHub account has no primary, verified email (no_verified_email); or GitHub didn't answer (provider_unavailable).
@@ -645,6 +693,7 @@ export type Error = components['schemas']['Error'];
 export type ErrorBody = components['schemas']['ErrorBody'];
 export type ErrorCode = components['schemas']['ErrorCode'];
 export type Me = components['schemas']['Me'];
+export type DeleteAccountRequest = components['schemas']['DeleteAccountRequest'];
 export type SignInErrorCode = components['schemas']['SignInErrorCode'];
 export type CreateImportRequest = components['schemas']['CreateImportRequest'];
 export type ImportStatus = components['schemas']['ImportStatus'];
@@ -738,6 +787,48 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signed out. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    logoutAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signed out everywhere. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
+            500: components["responses"]["InternalError"];
+        };
+    };
     getMe: {
         parameters: {
             query?: never;
@@ -757,6 +848,40 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthenticated"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    deleteMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteAccountRequest"];
+            };
+        };
+        responses: {
+            /** @description Deleted, and signed out. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No body, or confirm is not the user's GitHub login. Code: invalid_request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
             500: components["responses"]["InternalError"];
         };
     };

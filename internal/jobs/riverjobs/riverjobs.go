@@ -159,9 +159,7 @@ func (q *Queue) Run(ctx context.Context) error {
 		FetchCooldown:     q.opts.FetchCooldown,
 		FetchPollInterval: q.opts.FetchPollInterval,
 	}
-	if q.opts.RetryDelay != nil {
-		cfg.RetryPolicy = fixedRetry{delay: q.opts.RetryDelay}
-	}
+	cfg.RetryPolicy = retryPolicy{delay: q.opts.RetryDelay}
 	client, err := river.NewClient(riverpgxv5.New(q.pool), cfg)
 	if err != nil {
 		return err
@@ -223,7 +221,7 @@ func (w *worker) Work(ctx context.Context, job *river.Job[args]) error {
 
 // NextRetry honours a RetryAfter from the attempt that just failed; without
 // one, the retry policy decides. On River's retry path, unlike a snooze,
-// migration 00006's trigger moves the time onto the database's clock.
+// migration 00008's trigger makes the delay the database's clock plus d.
 func (w *worker) NextRetry(job *river.Job[args]) time.Time {
 	w.queue.retryMu.Lock()
 	delay, ok := w.queue.retryAfter[job.ID]
@@ -232,12 +230,29 @@ func (w *worker) NextRetry(job *river.Job[args]) time.Time {
 	if !ok {
 		return time.Time{}
 	}
-	return time.Now().Add(delay)
+	return afterDelay(delay)
 }
 
-// fixedRetry retries after delay, by the attempt that failed.
-type fixedRetry struct{ delay func(int) time.Duration }
+// retryPolicy retries after delay, by the attempt that failed, or after
+// River's own backoff when delay is nil.
+type retryPolicy struct{ delay func(attempt int) time.Duration }
 
-func (f fixedRetry) NextRetry(job *rivertype.JobRow) time.Time {
-	return time.Now().Add(f.delay(job.Attempt))
+func (p retryPolicy) NextRetry(job *rivertype.JobRow) time.Time {
+	if p.delay != nil {
+		return afterDelay(p.delay(job.Attempt))
+	}
+	return afterDelay(time.Until((&river.DefaultClientRetryPolicy{}).NextRetry(job)))
+}
+
+// delayOrigin is the time River stores for a retry delay of nothing. River
+// only takes a retry time in the future, so a delay can't be sent as a
+// distance from the epoch.
+var delayOrigin = time.Date(3000, 1, 1, 0, 0, 0, 0, time.UTC)
+
+// afterDelay is the retry time River stores for a retry delay from the
+// failure: d past delayOrigin. A delay is not a point on the app's clock, so
+// migration 00008's trigger turns it into the database's clock plus d,
+// whichever clock the app has and however long the attempt waited or ran.
+func afterDelay(d time.Duration) time.Time {
+	return delayOrigin.Add(max(d, 0))
 }

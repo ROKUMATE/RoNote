@@ -48,9 +48,9 @@ From P08 on, a user's import is stored: the API takes a URL, a worker fetches an
 
   When the podman VM's clock lagged the Mac's by 19 minutes after sleep, every new job was 19 minutes in the database's future, and imports stayed `queued`. A database clock running ahead let River's scheduler hand retries to the claim early.
 
-  Migration 00006's trigger on `river_job` moves those times onto the database's clock:
+  Migration 00006's trigger on `river_job`, amended by 00008, moves those times onto the database's clock:
   - **New jobs:** shifted by the database's `now()` minus the app's `created_at`.
-  - **Retries:** shifted by `attempted_at` minus the failed attempt's error time. Both are the attempt's start, one on each clock.
+  - **Retries:** the River adapter sends a delay as that far past the year 3000, a time River accepts as in the future, and migration 00008's trigger makes it `now()` plus the delay. Migration 00006 had shifted the app's time by `attempted_at` minus the failed attempt's error time; the two differ by the wait between the claim and the executor's start, so a retry came that much early (a flaky `RetryAfter` conformance case under load).
   - **State:** both go straight to `available`, which River's completer already treats as a retry.
 
   So the claim is the only comparison that decides when a job runs, and it uses the database's clock. `TestJobsRunWhateverTheAppClock` fakes a half-hour offset either way.

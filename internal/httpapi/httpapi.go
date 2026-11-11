@@ -42,6 +42,8 @@ type Options struct {
 	// PublicURL is RoNote's origin, the one origin trusted to send unsafe
 	// requests from another site.
 	PublicURL string
+	// Limits are the rate limits.
+	Limits Limits
 }
 
 // New returns the API handler: /healthz, /readyz and the routes of
@@ -51,9 +53,10 @@ func New(o Options) http.Handler {
 	mux.HandleFunc("GET /healthz", healthz)
 	mux.HandleFunc("GET /readyz", readyz(o.Logger, o.DB))
 	protect := crossOrigin(o.PublicURL)
-	mux.Handle("GET /api/v1/auth/github/start", protect(signInStart(o)))
-	mux.Handle("GET /api/v1/auth/github/callback", protect(signInCallback(o)))
-	mux.Handle("/api/v1/", protect(requireSession(o, router{mux: apiRoutes(o)})))
+	lim := newLimiters(o.Limits)
+	mux.Handle("GET /api/v1/auth/github/start", protect(lim.byIP(limitBody(signInStart(o)))))
+	mux.Handle("GET /api/v1/auth/github/callback", protect(lim.byIP(limitBody(signInCallback(o)))))
+	mux.Handle("/api/v1/", protect(requireSession(o, lim.byUser(limitBody(router{mux: apiRoutes(o, lim)})))))
 	return withMiddleware(o.Logger, router{mux: mux})
 }
 

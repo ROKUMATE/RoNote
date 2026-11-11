@@ -180,7 +180,7 @@ func newHarness(t *testing.T, ttl time.Duration) *harness {
 	h.queue.Handle(Kind, worker.Handle, JobOptions)
 	h.start()
 	t.Cleanup(func() { h.stop() })
-	h.service = NewService(h.store, h.queue)
+	h.service = NewService(h.store, h.queue, Quota{ImportsPerDay: 1000, Documents: 1000})
 	return h
 }
 

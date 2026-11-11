@@ -165,6 +165,49 @@ func (q *Queries) LatestImportForDocument(ctx context.Context, arg LatestImportF
 	return i, err
 }
 
+const lockOwner = `-- name: LockOwner :exec
+SELECT pg_advisory_xact_lock(hashtextextended($1::uuid::text, 0))
+`
+
+// Holds the owner's quota lock until the transaction ends, so two imports
+// can't both pass a check that only one fits under.
+func (q *Queries) LockOwner(ctx context.Context, ownerID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, lockOwner, ownerID)
+	return err
+}
+
+const quotaUsage = `-- name: QuotaUsage :one
+SELECT
+    count(*) FILTER (WHERE created_at > now() - make_interval(secs => $1::double precision))::int AS recent_imports,
+    coalesce(extract(epoch FROM min(created_at) FILTER (WHERE created_at > now() - make_interval(secs => $1::double precision))
+        + make_interval(secs => $1::double precision) - now()), 0)::double precision AS seconds_until_oldest_leaves,
+    ((SELECT count(*) FROM documents d WHERE d.owner_id = $2)
+        + count(*) FILTER (WHERE status NOT IN ('done', 'failed')))::int AS documents
+FROM imports
+WHERE owner_id = $2
+`
+
+type QuotaUsageParams struct {
+	WindowSeconds float64
+	OwnerID       uuid.UUID
+}
+
+type QuotaUsageRow struct {
+	RecentImports            int32
+	SecondsUntilOldestLeaves float64
+	Documents                int32
+}
+
+// What counts against the owner's quotas: imports started within the window
+// and how many seconds until the oldest of them leaves it; and documents,
+// with the imports still under way, which may each make one.
+func (q *Queries) QuotaUsage(ctx context.Context, arg QuotaUsageParams) (QuotaUsageRow, error) {
+	row := q.db.QueryRow(ctx, quotaUsage, arg.WindowSeconds, arg.OwnerID)
+	var i QuotaUsageRow
+	err := row.Scan(&i.RecentImports, &i.SecondsUntilOldestLeaves, &i.Documents)
+	return i, err
+}
+
 const setImportStatus = `-- name: SetImportStatus :one
 UPDATE imports
 SET status = $1, updated_at = now()

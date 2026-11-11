@@ -43,6 +43,19 @@ type Config struct {
 	PublicURL string
 	// GitHub is the OAuth app people sign in with.
 	GitHub GitHub
+	// Limits bound what one user, or one IP, may do.
+	Limits Limits
+}
+
+// Limits are RoNote's quotas and rate limits
+// (docs/adr/0010-sign-in-and-sessions.md).
+type Limits struct {
+	ImportsPerDay int
+	Documents     int
+	// APIPerMinute counts one user's API requests, the import event
+	// stream excepted; AuthPerMinute counts one IP's sign-in requests.
+	APIPerMinute  int
+	AuthPerMinute int
 }
 
 // GitHub is an OAuth app at GitHub, or, in dev and test, at the fake
@@ -109,6 +122,21 @@ func Load(getenv func(string) string) (Config, error) {
 	check("RONOTE_GITHUB_AUTHORIZE_URL", validateProviderURL(gh.AuthorizeURL, "github.com", env))
 	check("RONOTE_GITHUB_TOKEN_URL", validateProviderURL(gh.TokenURL, "github.com", env))
 	check("RONOTE_GITHUB_API_URL", validateProviderURL(gh.APIURL, "api.github.com", env))
+	var limits Limits
+	for _, l := range []struct {
+		name     string
+		fallback int
+		into     *int
+	}{
+		{"RONOTE_LIMIT_IMPORTS_PER_DAY", 60, &limits.ImportsPerDay},
+		{"RONOTE_LIMIT_DOCUMENTS", 500, &limits.Documents},
+		{"RONOTE_LIMIT_API_PER_MINUTE", 120, &limits.APIPerMinute},
+		{"RONOTE_LIMIT_AUTH_PER_MINUTE", 20, &limits.AuthPerMinute},
+	} {
+		n, err := parseLimit(getenv(l.name), l.fallback)
+		check(l.name, err)
+		*l.into = n
+	}
 
 	if len(errs) > 0 {
 		return Config{}, fmt.Errorf("invalid config:\n%w", errors.Join(errs...))
@@ -122,7 +150,20 @@ func Load(getenv func(string) string) (Config, error) {
 		SourceTTL:                 ttl,
 		PublicURL:                 publicURL,
 		GitHub:                    gh,
+		Limits:                    limits,
 	}, nil
+}
+
+// parseLimit reads a positive whole number, fallback when unset.
+func parseLimit(s string, fallback int) (int, error) {
+	if s == "" {
+		return fallback, nil
+	}
+	n, err := strconv.Atoi(s)
+	if err != nil || n < 1 {
+		return 0, fmt.Errorf("%q is not a whole number of at least 1", s)
+	}
+	return n, nil
 }
 
 // Deployed reports whether env is one people use, staging or prod, where

@@ -42,6 +42,10 @@ export const requestErrorMessages: Record<ErrorCode, string> = {
   annotation_limit: "This document already has 2000 highlights, the most it can hold.",
   unauthenticated: "You're signed out. Sign in and try again.",
   cross_origin: "RoNote only accepts changes from its own pages. Reload RoNote and try again.",
+  rate_limited: "That's a lot of requests at once. Wait a minute and try again.",
+  quota_exceeded:
+    "You've reached an import limit: 60 pages a day, or 500 documents in your library.",
+  body_too_large: "That change is too large to save in one go.",
   internal_error: "Something went wrong on RoNote's side. Try again.",
 };
 

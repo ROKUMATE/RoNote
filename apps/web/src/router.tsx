@@ -7,20 +7,43 @@ import {
   type RouterHistory,
 } from "@tanstack/react-router";
 import { Library } from "./pages/Library";
+import { Login, validateLoginSearch } from "./pages/Login";
 import { NotFound } from "./pages/NotFound";
 import { AppShell } from "./shell/AppShell";
 
-const rootRoute = createRootRoute({ component: AppShell, notFoundComponent: NotFound });
+const rootRoute = createRootRoute({
+  notFoundComponent: () => (
+    <AppShell>
+      <NotFound />
+    </AppShell>
+  ),
+});
+
+/** Every page but sign-in sits in the app's frame. */
+const shellRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  id: "shell",
+  component: AppShell,
+});
+
+const loginRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/login",
+  validateSearch: validateLoginSearch,
+  component: function LoginPage() {
+    return <Login search={loginRoute.useSearch()} />;
+  },
+});
 
 const libraryRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: "/",
   component: Library,
 });
 
 /** The document reader and editor, with everything it needs, is its own chunk. */
 const documentRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: "/doc/$id",
   component: lazyRouteComponent(() => import("./pages/DocumentPage"), "DocumentPage"),
 });
@@ -31,16 +54,19 @@ const documentRoute = createRoute({
  */
 function styleguideRoute() {
   return createRoute({
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => shellRoute,
     path: "/_styleguide",
     component: lazyRouteComponent(() => import("./styleguide/Styleguide"), "Styleguide"),
   });
 }
 
 const routeTree = rootRoute.addChildren([
-  libraryRoute,
-  documentRoute,
-  ...(import.meta.env.DEV ? [styleguideRoute()] : []),
+  loginRoute,
+  shellRoute.addChildren([
+    libraryRoute,
+    documentRoute,
+    ...(import.meta.env.DEV ? [styleguideRoute()] : []),
+  ]),
 ]);
 
 export function createAppRouter(history: RouterHistory = createBrowserHistory()) {

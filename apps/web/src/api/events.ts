@@ -1,4 +1,4 @@
-import { apiBase } from "./client";
+import { api, apiBase } from "./client";
 import type { ImportEvent } from "./schema";
 
 const finalStatuses: ReadonlySet<ImportEvent["status"]> = new Set(["done", "failed"]);
@@ -8,8 +8,10 @@ const finalStatuses: ReadonlySet<ImportEvent["status"]> = new Set(["done", "fail
  * each status, and closes the stream once the import is done or failed. When
  * the connection drops the browser reconnects by itself, and the server
  * starts again with the current status. onLost is called if the browser
- * gives up instead, as when the server refuses the stream. The returned
- * function stops following.
+ * gives up instead, as when the server refuses the stream. An EventSource
+ * can't see why it was refused, so it then asks the API who is signed in: a
+ * session that ended answers 401, and the client goes to sign in. The
+ * returned function stops following.
  */
 export function subscribeImport(
   id: string,
@@ -26,6 +28,7 @@ export function subscribeImport(
   });
   source.addEventListener("error", () => {
     if (source.readyState === EventSource.CLOSED) {
+      void api.GET("/me").catch(() => {});
       onLost?.();
     }
   });

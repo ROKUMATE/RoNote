@@ -11,6 +11,28 @@ import type {
   ReanchorRequest,
 } from "./schema";
 
+/** The signed-in user. */
+export const meQuery = queryOptions({
+  queryKey: ["me"],
+  queryFn: async () => dataOrThrow(await api.GET("/me")),
+  staleTime: Number.POSITIVE_INFINITY,
+});
+
+/** Ends this browser's session. */
+export async function signOut(): Promise<void> {
+  okOrThrow(await api.POST("/auth/logout"));
+}
+
+/** Ends every session of the user, in every browser. */
+export async function signOutEverywhere(): Promise<void> {
+  okOrThrow(await api.POST("/auth/logout-all"));
+}
+
+/** Deletes the user's account; confirm is their GitHub login. */
+export async function deleteAccount(confirm: string): Promise<void> {
+  okOrThrow(await api.DELETE("/me", { body: { confirm } }));
+}
+
 /** Every documents query sits under this key, so one invalidation refreshes them all. */
 export const documentsKey = ["documents"] as const;
 

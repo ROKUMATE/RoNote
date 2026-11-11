@@ -1,8 +1,9 @@
 import { BooksIcon } from "@phosphor-icons/react/Books";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet } from "@tanstack/react-router";
-import { useId } from "react";
+import { type ReactNode, useId } from "react";
 import { recentDocuments } from "../api/queries";
+import { Account } from "./Account";
 import { Settings } from "./Settings";
 
 /** Where a page can put an outline of itself, below the main navigation. */
@@ -16,9 +17,9 @@ const navLink =
 /**
  * The page frame: a 240px sidebar, the reading column and a notes margin.
  * Below the sidebar breakpoint the sidebar becomes a top bar; below the notes
- * breakpoint the margin is hidden.
+ * breakpoint the margin is hidden. It shows its route's page, or children.
  */
-export function AppShell() {
+export function AppShell({ children }: { children?: ReactNode }) {
   return (
     <div className="min-h-dvh sidebar:grid sidebar:grid-cols-[240px_minmax(0,1fr)]">
       <a
@@ -45,10 +46,11 @@ export function AppShell() {
           <div id={outlineSlotId} className="hidden sidebar:block" />
         </nav>
         <Settings />
+        <Account />
       </header>
       <div className="min-w-0 notes:grid notes:grid-cols-[minmax(0,1fr)_280px]">
         <main id="main" tabIndex={-1} className="min-w-0 px-4 py-8 sidebar:px-12 sidebar:py-12">
-          <Outlet />
+          {children ?? <Outlet />}
         </main>
         <aside
           aria-label="Notes"

@@ -11,7 +11,7 @@ From P13 on, readers run code blocks from their documents. That code comes from 
 - **Code from docs is untrusted, and never runs on the app origin.**
 - **A separate runner origin runs it** (dev `http://localhost:5174`; in production, P18, a separate registrable domain such as `ronote-run.dev`, never a subdomain of the app's).
   - It must never be the same site as the app. A subdomain is: `SameSite` cookies would go with every request the runner's code made to the app, and a cookie the app set with `Domain=` on its parent domain would be readable on the runner. Another registrable domain is another site, and gets neither.
-  - The session cookie (P16) must be host-only: no `Domain` attribute.
+  - The session cookie (P15, ADR 0010) must be host-only: no `Domain` attribute.
   - In dev the two are different sites too: cookies ignore ports, so the runner is on `localhost` while the app is on `127.0.0.1`.
   - The app embeds the runner page in a hidden iframe with `sandbox="allow-scripts allow-same-origin"` and `allow="cross-origin-isolated"`.
   - The runner page runs each runtime in a Web Worker, so a busy interpreter never blocks either page.
@@ -32,7 +32,7 @@ From P13 on, readers run code blocks from their documents. That code comes from 
   - **Why:** a `SharedArrayBuffer` is what lets Stop interrupt Python while keeping its state (Pyodide's interrupt buffer), and an iframe gets one only when the top-level page is isolated.
   - **`credentialless`, not `require-corp`:** imported pages show images from their own sites, which don't send CORP headers; `credentialless` loads them without credentials instead of blocking them.
   - **Safari** supports no `credentialless`, so it isn't isolated. There, Stop ends the worker and starts a fresh session, and says the earlier state is gone.
-  - COOP `same-origin` cuts the link to windows the app opens; sign-in (P16) must not depend on a popup's `window.opener`.
+  - COOP `same-origin` cuts the link to windows the app opens; sign-in (P15, ADR 0010) must not depend on a popup's `window.opener`.
 - **Python is Pyodide, self-hosted** from the runner origin: the WebAssembly runtime and Python's standard library, in the version the lockfile pins. No package loading, no micropip, no PyPI: code that imports anything else is told so.
 - **JavaScript runs in a worker of its own** on the runner origin, in the browser's own engine, with no packages and no page:
   - a block runs as a script with top-level `await`. Before it runs, its top-level declarations (`let`, `const`, `var`, `class`, `function`) become assignments to names on the worker's global object, read with acorn, so later blocks see them and a block runs twice without "already declared", as in devtools' console. The block's text never changes, and positions in what ran map back to it;

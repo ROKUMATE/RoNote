@@ -137,7 +137,13 @@ Recorded in [ADR 0005](adr/0005-import-pipeline.md); editing [ADR 0006](adr/0006
   - one row per highlight: `block_id`, `kind` (`highlight`), `selector` (`{position: {start, end}, quote: {exact, prefix, suffix}}`), an optional `note` of at most 5000 characters, and a `version`;
   - offsets count UTF-16 code units of the block's plain text, the runs of a heading or paragraph joined, or a code block's text (`doccontent.BlockText`), and `testdata/anchoring/blocktext.json` keeps Go and TypeScript agreeing on it;
   - the composite key `(document_id, owner_id)` ties each to a document of the same owner, gone with it.
-- **Identity until P16:** dev and test inject `RONOTE_DEV_USER_EMAIL`; without it, and always in staging and prod, `/api/v1` answers 401.
+- **Identity** (since P15, ADR 0010): GitHub sign-in (authorization code, state and PKCE), the same path in every environment; dev and test point it at `cmd/fakeidp`, and config refuses anything but github.com in staging and prod.
+  - A user is an identity, `(provider, provider_user_id)` in `user_identities`, never an email; a new identity joins an existing user only through the provider's primary, verified email.
+  - Sessions in Postgres keep only the token's SHA-256; 30 days idle, 90 in all, a new token at every sign-in; `last_seen_at` is written at most once per 5 minutes, judged on the database's clock.
+  - The cookie is HttpOnly, `SameSite=Lax`, `Path=/`, host-only; `Secure` and `__Host-` in staging and prod.
+  - `http.CrossOriginProtection` guards every `/api` route, trusting only `RONOTE_PUBLIC_URL`; refusals answer 403 `cross_origin`.
+  - Sign-in, sign-out, sign-out-everywhere and account deletion set cookies, so they are hand-written like the event stream; the spec documents them.
+- **Limits** (since P15): 60 imports a user a day and 500 documents, counted in Postgres under a per-user advisory lock (imports under way count as documents); 120 API requests a user a minute, the event stream excepted, and 20 sign-in requests an IP a minute, counted in memory per process. All answer 429 with `Retry-After` when waiting helps. Bodies: 8 MiB for saving a document, 1 MiB for re-anchoring, 64 KiB elsewhere, else 413 `body_too_large`.
 - **Tests that catch regressions:** three deliberate breaks were each caught.
   - Dropping the one-document-per-owner-and-source constraint.
   - Trusting a cross-host canonical, which let a copy replace the real page for another user.

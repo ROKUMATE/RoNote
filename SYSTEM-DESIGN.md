@@ -72,7 +72,7 @@ flowchart LR
 | Database | PostgreSQL + pgvector | Users, source cache, snapshots, extractions, documents, imports, annotations, River tables | Implemented |
 | Runner | Separate origin, iframe, Web Workers | Execute trusted runtime code away from app origin | Implemented in dev/build; production hosting planned |
 | PDF importer | Go importer producing the same IR | Read one printed PDF and emit source blocks | Planned |
-| Authentication | Dev email identity today; real sign-in later | Establish `owner_id` for every private query | Dev/test implemented; staging/prod reject unauthenticated requests until P16 |
+| Authentication | GitHub OAuth (state, PKCE) and Postgres sessions; a fake provider in dev and test | Establish `owner_id` for every private query | Implemented (P15, ADR 0010) |
 
 ## 3. Request and import flow
 
@@ -525,7 +525,9 @@ flowchart LR
 
 ### Server-side controls
 
-- Every API route requires an authenticated owner identity. Dev/test may inject `RONOTE_DEV_USER_EMAIL`; staging/prod return 401 until real sign-in exists.
+- Every API route but sign-in requires a session: a host-only HttpOnly cookie holding a random token, of which Postgres keeps only the SHA-256 (ADR 0010).
+- Unsafe requests from another site are refused (`http.CrossOriginProtection`, trusting only `RONOTE_PUBLIC_URL`).
+- Per-user quotas (imports a day, documents) and per-user and per-IP rate limits; every route bounds its request body.
 - Every document/import/annotation query is owner-scoped.
 - Composite foreign keys enforce same-owner relationships.
 - URL fetches use SSRF protection, redirect revalidation, robots.txt, body/type/time limits, and host rate limiting.
@@ -624,7 +626,7 @@ flowchart LR
 | Gap | Impact | Planned direction |
 |---|---|---|
 | Printed-PDF importer | Product currently imports web pages only | Add PDF parser that emits the existing IR v1 |
-| Real authentication | Dev identity is not suitable for staging/prod | Implement P16 identity/session flow with host-only cookies |
+| Shared rate limits | API rate limits are process-local | Add a shared store before running a second API process |
 | Production runner hosting | Runner is currently dev/build-ready | Deploy on a separate registrable domain with immutable assets and headers |
 | Object storage | Source bodies and PDFs are stored in Postgres | Move large binary payloads to durable object storage when required |
 | Multi-worker rate limiting | Host rate limit is process-local | Add shared coordination before scaling workers horizontally |

@@ -44,7 +44,8 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make web-build` | production build and bundle budgets |
 | `make web-e2e` | Playwright and axe against the full stack (`make dev-up` first) |
 | `make run-api` / `run-worker` | the API on `127.0.0.1:8080` / the job worker |
-| `make stop` | end what `run-api`, `run-worker` and `web-dev` started |
+| `make run-idp` | the fake GitHub sign-in on `127.0.0.1:8090` (`web-dev` starts it too) |
+| `make stop` | end what `run-api`, `run-worker`, `run-idp` and `web-dev` started |
 | `make dev-up` / `dev-down` | start / stop the dev stack (Postgres) |
 | `make doctor` | check the container VM's clock against the host's |
 | `make generate` / `check-generated` | regenerate sqlc and OpenAPI output / fail if stale |

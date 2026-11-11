@@ -31,3 +31,7 @@ entry when a phase settles it; add one when a phase leaves something open.
 - River deletes completed jobs after 24 h, so after that an import's Key could be enqueued again. The handler does nothing for a finished import, and only a new import makes a job, so nothing re-runs.
 - Jobs queued in River's old args shape (`{import_id, owner_id}`, before P14) don't read in the new one and are cancelled. Only local databases hold any.
 - `memjobs` times retries on its clock but attempts' timeouts on the wall clock.
+- Rate limits count in memory per API process: a second API process needs a shared store first. The client IP is the connection's; behind a proxy (P19) every request would share one IP until its headers are trusted.
+- A rate-limited sign-in (`/api/v1/auth/github/*`) answers the JSON envelope to a browser navigation; a person sees raw JSON. Rare at 20 a minute per IP.
+- An import job already queued when its user deletes the account ends as permanent (its import is gone) and logs at error level.
+- The e2e users file holds 16 worker users; more Playwright workers than that fail at sign-in with a message saying so.

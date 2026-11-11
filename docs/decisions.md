@@ -130,7 +130,7 @@ Recorded in [ADR 0005](adr/0005-import-pipeline.md); editing [ADR 0006](adr/0006
     - `code_langs` (since P11), optional: each key is a code block's id, at any depth, and each value one of the spec's 30 `CodeLang`s, else `invalid_content`. An optional field like this needs no new `doc_version` (ADR 0006).
   - **Revert:** `POST /documents/{id}/blocks/{blockId}/revert` puts the extraction's block back exactly and bumps the version, keeping the chosen code languages.
   - `GET /documents/{id}` returns the extraction's warnings next to the content.
-- **One clock for jobs** (since P12, migration 00006): a trigger on `river_job` moves new jobs' and retries' times from the app's clock onto the database's, and puts them in `available`.
+- **One clock for jobs** (since P12, migrations 00006 and 00008): a trigger on `river_job` moves new jobs' times from the app's clock onto the database's, makes a retry the database's `now()` plus the delay the adapter sent (as that far past the year 3000), and puts both in `available`.
   - River's stuck-job rescue still compares against the app's clock; a skew over an hour can rescue a running job early, and imports are idempotent.
   - RoNote never snoozes jobs.
 - **Annotations** (`internal/annotation`, ADR 0007):

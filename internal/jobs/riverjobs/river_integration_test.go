@@ -110,7 +110,7 @@ type flakyArgs struct{}
 func (flakyArgs) Kind() string { return "flaky" }
 
 // flakyWorker fails a job's first attempt, asking for a retry after
-// retryAfter by the app's clock, and reports the start of every attempt.
+// retryAfter, and reports the start of every attempt.
 type flakyWorker struct {
 	river.WorkerDefaults[flakyArgs]
 	retryAfter time.Duration
@@ -126,7 +126,7 @@ func (w flakyWorker) Work(_ context.Context, job *river.Job[flakyArgs]) error {
 }
 
 func (w flakyWorker) NextRetry(*river.Job[flakyArgs]) time.Time {
-	return time.Now().Add(w.retryAfter)
+	return afterDelay(w.retryAfter)
 }
 
 // TestJobsRunWhateverTheAppClock runs jobs while the database's clock is
@@ -213,6 +213,55 @@ func TestJobsRunWhateverTheAppClock(t *testing.T) {
 			}
 			if gap := second.Sub(first); gap < retryAfter {
 				t.Errorf("retried %v after the first attempt, before the %v it asked for", gap, retryAfter)
+			}
+		})
+	}
+}
+
+// TestRetryDelayRunsFromTheFailure fails a running job with a retry time
+// that is a delay (afterDelay) and checks the job comes back that long after
+// the failure, on the database's clock. The attempt's start on the app's
+// clock sits at various distances from the database's claim time, as it does
+// with a skewed clock or a job that waited for a worker: none may move the
+// retry.
+func TestRetryDelayRunsFromTheFailure(t *testing.T) {
+	db := pgtest.New(t)
+	const delay = 3 * time.Second
+	for _, tt := range []struct {
+		name  string
+		start string // the attempt's start by the app's clock, from the claim
+	}{
+		{"started at the claim", "0 seconds"},
+		{"started after waiting 30s for a worker", "30 seconds"},
+		{"app clock an hour ahead", "1 hour"},
+		{"app clock an hour behind", "-1 hour"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			var id int64
+			err := db.Pool.QueryRow(t.Context(),
+				`INSERT INTO river_job (state, attempt, max_attempts, attempted_at, kind, args)
+				 VALUES ('running', 1, 3, now(), 'clock', '{}') RETURNING id`).Scan(&id)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var (
+				state     string
+				scheduled time.Time
+				failedAt  time.Time
+			)
+			err = db.Pool.QueryRow(t.Context(),
+				`UPDATE river_job SET state = 'retryable', scheduled_at = $2,
+				   errors = ARRAY[jsonb_build_object('at', attempted_at + $3::interval, 'attempt', 1, 'error', 'failed', 'trace', '')]
+				 WHERE id = $1 RETURNING state, scheduled_at, clock_timestamp()`,
+				id, afterDelay(delay), tt.start).Scan(&state, &scheduled, &failedAt)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if state != "available" {
+				t.Errorf("state = %q, want available", state)
+			}
+			if wait := scheduled.Sub(failedAt); wait > delay || wait < delay-time.Second {
+				t.Errorf("retry is %v after the failure, want %v", wait, delay)
 			}
 		})
 	}

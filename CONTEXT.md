@@ -4,24 +4,30 @@ The project's state, in at most 80 lines and 6 KB (`make lint` checks). Rewrite 
 
 ## Current milestone
 
-P14, housekeeping and the jobs port: done.
-- **Code in documents scrolls sideways again,** inside the editor too: Tiptap's injected, unlayered `.ProseMirror pre` rule had made it wrap since P10.
-- **Agent docs, state and rules only:**
-  - CONTEXT.md went from 352 lines and 41,349 B to this;
-  - AGENTS.md went from 229 lines and 23,255 B to 125 lines and 8,259 B;
-  - decisions now live in `docs/decisions.md`, open questions in `docs/open-questions.md`, reference detail in `docs/agents/`;
-  - `make lint-docs`, part of `make lint` and CI, keeps both docs within their sizes.
-- **The jobs port** (ADR 0009, `internal/jobs`):
-  - enqueue in the caller's transaction, deliver at least once;
-  - `Permanent`, `RetryAfter`, and per-kind attempts, concurrency and timeout;
-  - `riverjobs` on River is the default and the only package that imports River (depguard); `memjobs` runs in memory for unit tests;
-  - one conformance suite, `jobstest`, runs against both.
-- **Imports run through the port.** The handler is plain, its completion no longer shares the import's transaction, and a redelivered job leaves a finished import alone. Behaviour, error codes, events and the API are unchanged. The P08 curl demo (POST, SSE to done, GET the document) works.
-- **Checks:** `make check` exits 0; `make test-integration` exits 0; `make web-e2e` passed 95, skipped 1 (quarantined).
+P15, sign-in, sessions, quotas and account deletion: done (ADR 0010).
+- **Sign-in:**
+  - GitHub OAuth with state and PKCE, the same path in every environment;
+  - dev and test point it at `cmd/fakeidp` (`make run-idp`; `web-dev` and `web-e2e` start it), and config refuses anything but github.com in staging and prod;
+  - a user is a `(provider, provider_user_id)` identity; a verified email links an existing user, so `dev@ronote.local`'s documents stay reachable.
+- **Sessions:**
+  - in Postgres, SHA-256 of the token only, 30 days idle and 90 in all;
+  - the cookie is host-only and HttpOnly, `Secure` and `__Host-` in staging and prod;
+  - sign out, sign out everywhere, and account deletion that cascades and keeps shared sources.
+- **CSRF:** `http.CrossOriginProtection` on every `/api` route.
+- **Limits:**
+  - quotas of 60 imports a day and 500 documents, in Postgres under a per-user lock;
+  - 120 requests a minute per user and 20 sign-ins a minute per IP, in memory per process;
+  - a body limit on every route.
+- **Web:** `/login`, with a sentence per error; any 401, and a refused event stream, go there once and come back; the account menu and the delete dialog sit in the sidebar footer.
+- **Tests:**
+  - each e2e worker signs in as its own user; `auth.spec.ts` covers the flows;
+  - three deliberate breaks were each caught: the state check, `expires_at`, and `//host` in `return_to`.
+- **Checks:** `make check` exits 0; `make test-integration` exits 0; `make web-e2e` passed 107, skipped 1 (quarantined).
+- **#13** with `fixme` lifted: 9 of 10 runs passed locally; one landed 112px off. It stays quarantined.
 
 ## What exists
 
-- **Go** (`cmd/api`, `cmd/worker`, `internal/*`): a spec-first API (`api/openapi.yaml`), and an import pipeline on the jobs port (fetch with SSRF guard and robots.txt, extract to IR with framework adapters, documents per owner). Event streams come from Postgres LISTEN/NOTIFY; editing keeps source blocks locked; highlights and notes.
+- **Go** (`cmd/api`, `cmd/worker`, `cmd/fakeidp`, `internal/*`): a spec-first API (`api/openapi.yaml`) behind GitHub sign-in, and an import pipeline on the jobs port (fetch with SSRF guard and robots.txt, extract to IR with framework adapters, documents per owner). Event streams come from Postgres LISTEN/NOTIFY; editing keeps source blocks locked; highlights and notes.
 - **Web** (`apps/web`):
   - the library, and an import dialog with live progress;
   - the document reader and editor (Tiptap), with same-domain links that import on click;
@@ -31,11 +37,12 @@ P14, housekeeping and the jobs port: done.
 - **ADRs:**
   - 0001 stack, 0002 verbatim source, 0003 commits;
   - 0004 IR and links, 0005 import pipeline, 0006 editor and DocContent;
-  - 0007 annotations, 0008 in-browser code execution, 0009 the jobs port.
+  - 0007 annotations, 0008 in-browser code execution, 0009 the jobs port;
+  - 0010 sign-in and sessions.
 
 ## Next step
 
-The next phase, per its brief. v1 still lacks printed-PDF import; the runner's deployment is P18.
+The next phase, per its brief. v1 still lacks printed-PDF import; the runner's deployment is P18, proxy headers P19.
 
 ## Quarantined tests
 

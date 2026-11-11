@@ -319,3 +319,26 @@ Recorded in [ADR 0006](adr/0006-editor-and-doc-content.md), [ADR 0007](adr/0007-
   - Tiptap's `useEditor` reapplied options rebuilt on each render, which redrew the document mid-typing; the options are now built once.
   - The outline lost track after a fast jump (fixed, test first).
   - Tiptap's link extension pulled in linkifyjs, which is gone.
+
+## Jobs (since P14)
+
+Recorded in [ADR 0009](adr/0009-jobs-port.md).
+
+- **The port** (`internal/jobs`): `Job{Kind, Key, Payload}`, `Delivery{Job, Attempt}`, `EnqueueTx(ctx, tx, job)` in the caller's transaction, `Handle(kind, handler, Options)` and `Run(ctx)`. A handler returns nil, `jobs.Permanent(err)`, `jobs.RetryAfter(err, d)` or a plain error.
+- **Imports on it:** `importer.Service` enqueues kind `import` with the import's ID as its Key; `Worker.Handle` is a plain handler. Its error decision is the pure `outcome(cause, attempt)`: permanent, a capped Retry-After, or a plain retry, and on the last attempt the code to fail the import with.
+- **`riverjobs`** (the default, the only package that imports River, enforced by depguard):
+  - a River queue per kind, with `MaxWorkers` set to its concurrency;
+  - the attempt limit set at insert, so the API declares the import kind (`Options.Kinds`);
+  - Keys unique through a `river:"unique"` args field;
+  - `Permanent` becomes `JobCancel`; `RetryAfter` goes through River's `NextRetry`, never a snooze, so the clock trigger covers it;
+  - `Run` stops River, then cancels after 30s.
+  - Its tests: the conformance suite on real Postgres, and the River tests moved from `pgtest` (migrations current, goose schema, clock skew).
+- **`memjobs`:** in memory with an injectable clock (`FakeClock`), transactions that only commit or roll back, and `Idle` for tests that move the clock once a retry is scheduled.
+- **`jobstest`:** one suite both adapters pass. It covers redelivery, Permanent, RetryAfter, the attempt limit, rollback, Key, concurrency, the timeout and shutdown.
+- **Tests that catch regressions:** two deliberate breaks were each caught.
+  - The handler without its "import already done" check: `TestRedeliveryLeavesAFinishedImportAlone` and `TestDuplicateJobsMakeOneDocument`. A finished import's job ran its work again and needed a second attempt.
+  - The River adapter treating a handler error as success: four conformance cases (redelivery, Permanent, RetryAfter, the attempt limit) and the importer's `TestRetries`.
+- **Found while building:**
+  - `FinishImport` succeeds again with the same document, so without the "already done" check a redelivery still completes; the new test watches the import's `updated_at`;
+  - a fake clock moved right after a delivery runs ahead of the retry the handler's return schedules, hence `memjobs.Queue.Idle`;
+  - the code wrap: Tiptap injects `.ProseMirror pre { white-space: pre-wrap }` outside any cascade layer, which beats every layered rule. The fix is an unlayered, more specific rule.

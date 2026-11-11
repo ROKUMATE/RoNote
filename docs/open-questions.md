@@ -15,7 +15,6 @@ entry when a phase settles it; add one when a phase leaves something open.
 - JavaScript blocks are read on their own: one that uses a name another block imports (VitePress's `postcssIsolateStyles({...})`) offers Run, and fails with a `ReferenceError`.
 - A JavaScript `setInterval` never cleared keeps its run going until Stop or the 30 s limit, as a Node script would. Output Python prints after its run has ended (from an asyncio task) is dropped.
 - doctest ends an example's expected output at a blank line, so output a page shows with blank lines (the tutorial's `__doc__` example) fails without `<BLANKLINE>`. Version differences other than an exception's wording, such as Python 3.14's annotation order, are failures.
-- Code blocks in documents wrap instead of scrolling sideways: Tiptap injects `.ProseMirror pre { white-space: pre-wrap }`, which wins over `.reader pre` (since P10; the styleguide's test checks the component outside the editor). Found in P13b, not fixed.
 - The runner's Vite build warns that Pyodide's Node-only imports are left out; that is expected.
 - Highlights go in prose the editor edits, and in code; not in table cells, captions, or prose inside tabs, which are drawn read-only.
 - Jump to puts the caret at a highlight's start rather than selecting it, so the toolbar does not offer to highlight it again.
@@ -28,3 +27,7 @@ entry when a phase settles it; add one when a phase leaves something open.
 - Pages of a recognised framework in another layout, such as a Docusaurus blog post, fall back to generic with `adapter_fallback`.
 - A failed or lost import is shown until dismissed, but only in the session that started it.
 - The URL length check counts characters in the browser and bytes on the server.
+- Jobs: the outbox and relay a non-Postgres broker needs are specified in ADR 0009, not built. `internal/events` still needs Postgres LISTEN/NOTIFY; ADR 0009 says what a swap would take.
+- River deletes completed jobs after 24 h, so after that an import's Key could be enqueued again. The handler does nothing for a finished import, and only a new import makes a job, so nothing re-runs.
+- Jobs queued in River's old args shape (`{import_id, owner_id}`, before P14) don't read in the new one and are cancelled. Only local databases hold any.
+- `memjobs` times retries on its clock but attempts' timeouts on the wall clock.

@@ -16,6 +16,7 @@ Out of scope for v1: site crawling, AI summaries, chat, handwritten OCR, pseudoc
 |---|---|
 | `cmd/` | `api`, `worker`, and `extract` (a dev tool) |
 | `internal/<pkg>/` | Go packages, one concern each |
+| `internal/jobs/` | the jobs port (docs/adr/0009-jobs-port.md); only `riverjobs` may import River |
 | `migrations/` | goose migrations; goose owns all schema, River's included |
 | `api/` | `openapi.yaml`, which Go and TypeScript types are generated from |
 | `apps/web/` | the web app; `runner/` is the origin code from documents runs on |

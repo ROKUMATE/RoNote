@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -51,9 +50,7 @@ func apiRoutes(o Options) *http.ServeMux {
 			writeError(w, r, http.StatusBadRequest, gen.ErrorCodeInvalidRequest, "the request body is not valid JSON for this operation")
 		},
 		ResponseErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {
-			logger.LogAttrs(r.Context(), slog.LevelError, "api error",
-				slog.String("error", err.Error()), slog.String("request_id", requestID(r.Context())))
-			writeError(w, r, http.StatusInternalServerError, gen.ErrorCodeInternalError, "internal server error")
+			internalError(logger, w, r, err)
 		},
 	})
 	gen.HandlerWithOptions(strict, gen.StdHTTPServerOptions{

@@ -9,6 +9,9 @@ output-options:
   name-normalizer: ToCamelCaseWithInitialisms
   # Keep schemas only the hand-written event stream uses, such as ImportEvent.
   skip-prune: true
-  # The event stream is written by hand; the spec only documents it.
+  # The event stream and the routes that set cookies are written by hand;
+  # the spec only documents them.
   exclude-operation-ids:
     - getImportEvents
+    - startGitHubSignIn
+    - finishGitHubSignIn

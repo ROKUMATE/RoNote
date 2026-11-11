@@ -16,6 +16,12 @@ function env(overrides: Record<string, string>): Record<string, string> {
   return { ...Object.fromEntries(base), ...overrides };
 }
 
+// The OAuth app the API signs in with, which the fake provider accepts.
+const oauthApp = {
+  RONOTE_GITHUB_CLIENT_ID: "ronote-e2e",
+  RONOTE_GITHUB_CLIENT_SECRET: "ronote-e2e-secret",
+};
+
 // Set here rather than inherited, so .env.dev can never point the tests at
 // the dev database or the dev user.
 const backend = env({
@@ -26,13 +32,12 @@ const backend = env({
   RONOTE_DEV_USER_EMAIL: "e2e@ronote.local",
   RONOTE_SOURCE_TTL: "24h",
   RONOTE_LOG_LEVEL: "info",
+  RONOTE_PUBLIC_URL: stack.web,
+  ...oauthApp,
+  RONOTE_GITHUB_AUTHORIZE_URL: `${stack.idp}/login/oauth/authorize`,
+  RONOTE_GITHUB_TOKEN_URL: `${stack.idp}/login/oauth/access_token`,
+  RONOTE_GITHUB_API_URL: stack.idp,
 });
-
-// The OAuth app the API signs in with, which the fake provider accepts.
-const oauthApp = {
-  RONOTE_GITHUB_CLIENT_ID: "ronote-e2e",
-  RONOTE_GITHUB_CLIENT_SECRET: "ronote-e2e-secret",
-};
 
 const stop = { signal: "SIGTERM", timeout: 5000 } as const;
 

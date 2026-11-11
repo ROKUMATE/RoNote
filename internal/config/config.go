@@ -42,7 +42,29 @@ type Config struct {
 	// sign-in exists. Only dev and test may set it; without it the API
 	// answers 401.
 	DevUserEmail string
+	// PublicURL is the origin people reach RoNote at, such as
+	// https://ronote.app: sign-in's callback is under it.
+	PublicURL string
+	// GitHub is the OAuth app people sign in with.
+	GitHub GitHub
 }
+
+// GitHub is an OAuth app at GitHub, or, in dev and test, at the fake
+// provider (cmd/fakeidp).
+type GitHub struct {
+	ClientID     string
+	ClientSecret string
+	AuthorizeURL string
+	TokenURL     string
+	APIURL       string
+}
+
+// The provider URLs staging and prod must use (docs/adr/0010-sign-in-and-sessions.md).
+const (
+	githubAuthorizeURL = "https://github.com/login/oauth/authorize"
+	githubTokenURL     = "https://github.com/login/oauth/access_token" //nolint:gosec // a URL, not a credential
+	githubAPIURL       = "https://api.github.com"
+)
 
 const (
 	defaultHTTPAddr  = "127.0.0.1:8080"
@@ -79,6 +101,20 @@ func Load(getenv func(string) string) (Config, error) {
 	check("RONOTE_SOURCE_TTL", err)
 	devUser := strings.TrimSpace(getenv("RONOTE_DEV_USER_EMAIL"))
 	check("RONOTE_DEV_USER_EMAIL", validateDevUser(devUser, env))
+	publicURL, err := parsePublicURL(getenv("RONOTE_PUBLIC_URL"), env)
+	check("RONOTE_PUBLIC_URL", err)
+	gh := GitHub{
+		ClientID:     getenv("RONOTE_GITHUB_CLIENT_ID"),
+		ClientSecret: getenv("RONOTE_GITHUB_CLIENT_SECRET"),
+		AuthorizeURL: withDefault(getenv("RONOTE_GITHUB_AUTHORIZE_URL"), githubAuthorizeURL),
+		TokenURL:     withDefault(getenv("RONOTE_GITHUB_TOKEN_URL"), githubTokenURL),
+		APIURL:       strings.TrimSuffix(withDefault(getenv("RONOTE_GITHUB_API_URL"), githubAPIURL), "/"),
+	}
+	check("RONOTE_GITHUB_CLIENT_ID", required(gh.ClientID))
+	check("RONOTE_GITHUB_CLIENT_SECRET", required(gh.ClientSecret))
+	check("RONOTE_GITHUB_AUTHORIZE_URL", validateProviderURL(gh.AuthorizeURL, "github.com", env))
+	check("RONOTE_GITHUB_TOKEN_URL", validateProviderURL(gh.TokenURL, "github.com", env))
+	check("RONOTE_GITHUB_API_URL", validateProviderURL(gh.APIURL, "api.github.com", env))
 
 	if len(errs) > 0 {
 		return Config{}, fmt.Errorf("invalid config:\n%w", errors.Join(errs...))
@@ -91,7 +127,55 @@ func Load(getenv func(string) string) (Config, error) {
 		FetchAllowPrivateNetworks: allowPrivate,
 		SourceTTL:                 ttl,
 		DevUserEmail:              devUser,
+		PublicURL:                 publicURL,
+		GitHub:                    gh,
 	}, nil
+}
+
+// Deployed reports whether env is one people use, staging or prod, where
+// cookies are Secure and only GitHub signs people in.
+func (e Env) Deployed() bool {
+	return e == EnvStaging || e == EnvProd
+}
+
+// parsePublicURL reads the origin RoNote is served at, http or https with
+// no path; staging and prod need https, for Secure cookies.
+func parsePublicURL(s string, env Env) (string, error) {
+	if s == "" {
+		return "", errors.New("not set; want the origin people reach RoNote at, such as https://ronote.app")
+	}
+	u, err := url.Parse(s)
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
+		return "", fmt.Errorf("%q is not an http or https URL", s)
+	}
+	if (u.Path != "" && u.Path != "/") || u.RawQuery != "" || u.Fragment != "" || u.User != nil {
+		return "", fmt.Errorf("%q is not an origin: want scheme://host[:port] alone", s)
+	}
+	if env.Deployed() && u.Scheme != "https" {
+		return "", fmt.Errorf("%q must be https when RONOTE_ENV is staging or prod", s)
+	}
+	return u.Scheme + "://" + u.Host, nil
+}
+
+// validateProviderURL allows any http(s) URL in dev and test, where the fake
+// provider stands in, and only https on host in staging and prod.
+func validateProviderURL(s, host string, env Env) error {
+	u, err := url.Parse(s)
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
+		return fmt.Errorf("%q is not an http or https URL", s)
+	}
+	if env.Deployed() && (u.Scheme != "https" || u.Host != host) {
+		return fmt.Errorf("%q must be https://%s when RONOTE_ENV is staging or prod", s, host)
+	}
+	return nil
+}
+
+// required never puts the value in its error: it may be a secret.
+func required(s string) error {
+	if s == "" {
+		return errors.New("not set")
+	}
+	return nil
 }
 
 // validateDevUser allows a dev identity only in dev and test: anywhere else

@@ -12,6 +12,66 @@ info:
 servers:
   - url: /api/v1
 paths:
+  /auth/github/start:
+    get:
+      operationId: startGitHubSignIn
+      summary: Start signing in with GitHub
+      description: |
+        Sends the browser to GitHub to sign in, with a state and a PKCE
+        challenge (docs/adr/0010-sign-in-and-sessions.md). The state, the
+        verifier and return_to go in a 10-minute HttpOnly cookie for the
+        callback. This handler is written by hand; the spec documents it.
+      parameters:
+        - name: return_to
+          in: query
+          description: >-
+            Where to go once signed in: a path on RoNote's own origin.
+            Anything else, or nothing, means /.
+          schema:
+            type: string
+            maxLength: 2048
+      responses:
+        "302":
+          description: To GitHub's sign-in page.
+          headers:
+            Location:
+              schema:
+                type: string
+  /auth/github/callback:
+    get:
+      operationId: finishGitHubSignIn
+      summary: Finish signing in with GitHub
+      description: |
+        Where GitHub sends the browser back. Checks the state against the
+        cookie, exchanges the code with the PKCE verifier, signs the GitHub
+        user in and starts a session in an HttpOnly cookie. A failure goes to
+        /login?error= with a SignInErrorCode. This handler is written by
+        hand; the spec documents it.
+      parameters:
+        - name: code
+          in: query
+          schema:
+            type: string
+        - name: state
+          in: query
+          schema:
+            type: string
+        - name: error
+          in: query
+          description: Set by GitHub when the user refused.
+          schema:
+            type: string
+      responses:
+        "303":
+          description: >-
+            Signed in, to the start's return_to; or not, to
+            /login?error=<SignInErrorCode>&return_to=<return_to>.
+          headers:
+            Location:
+              schema:
+                type: string
+        "500":
+          $ref: "#/components/responses/InternalError"
   /imports:
     post:
       operationId: createImport
@@ -530,6 +590,18 @@ components:
         - annotation_limit
         - unauthenticated
         - internal_error
+    SignInErrorCode:
+      type: string
+      description: >-
+        Why signing in failed, in /login?error=: the user or GitHub refused
+        (denied); the sign-in's cookie was missing, expired or another
+        (state_mismatch); the GitHub account has no primary, verified email
+        (no_verified_email); or GitHub didn't answer (provider_unavailable).
+      enum:
+        - denied
+        - state_mismatch
+        - no_verified_email
+        - provider_unavailable
     CreateImportRequest:
       type: object
       required: [url]

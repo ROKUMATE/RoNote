@@ -291,6 +291,30 @@ func (e ImportStatus) Valid() bool {
 	}
 }
 
+// Defines values for SignInErrorCode.
+const (
+	Denied              SignInErrorCode = "denied"
+	NoVerifiedEmail     SignInErrorCode = "no_verified_email"
+	ProviderUnavailable SignInErrorCode = "provider_unavailable"
+	StateMismatch       SignInErrorCode = "state_mismatch"
+)
+
+// Valid indicates whether the value is a known member of the SignInErrorCode enum.
+func (e SignInErrorCode) Valid() bool {
+	switch e {
+	case Denied:
+		return true
+	case NoVerifiedEmail:
+		return true
+	case ProviderUnavailable:
+		return true
+	case StateMismatch:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for UserBlockKind.
 const (
 	Callout   UserBlockKind = "callout"
@@ -558,6 +582,9 @@ type SaveDocumentRequest struct {
 type SavedDocument struct {
 	Version int `json:"version"`
 }
+
+// SignInErrorCode Why signing in failed, in /login?error=: the user or GitHub refused (denied); the sign-in's cookie was missing, expired or another (state_mismatch); the GitHub account has no primary, verified email (no_verified_email); or GitHub didn't answer (provider_unavailable).
+type SignInErrorCode string
 
 // TextSelector A range of one block's plain text: a heading's or paragraph's runs joined, or a code block's text. Offsets count UTF-16 code units, end exclusive. exact is the text in the range when it was saved; prefix and suffix, the text just around it, tell repeats apart when the text changes.
 type TextSelector = annotation.Selector

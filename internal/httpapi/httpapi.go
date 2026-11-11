@@ -36,6 +36,8 @@ type Options struct {
 	// DevUser is the user every /api/v1 request acts as until real sign-in
 	// exists; uuid.Nil answers 401. Config allows one in dev and test only.
 	DevUser uuid.UUID
+	// SignIn serves the sign-in routes.
+	SignIn SignIn
 }
 
 // New returns the API handler: /healthz, /readyz and the routes of
@@ -44,6 +46,8 @@ func New(o Options) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", healthz)
 	mux.HandleFunc("GET /readyz", readyz(o.Logger, o.DB))
+	mux.Handle("GET /api/v1/auth/github/start", signInStart(o.SignIn))
+	mux.Handle("GET /api/v1/auth/github/callback", signInCallback(o.Logger, o.SignIn))
 	mux.Handle("/api/v1/", requireUser(o.DevUser, router{mux: apiRoutes(o)}))
 	return withMiddleware(o.Logger, router{mux: mux})
 }

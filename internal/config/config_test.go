@@ -10,7 +10,8 @@ import (
 
 const day = 24 * time.Hour
 
-// leakMarker stands in for a database password; no error may contain it.
+// leakMarker stands in for a database password and the OAuth client secret;
+// no error may contain it.
 const leakMarker = "s3cret"
 
 var testDatabaseURL = dbURL("postgres", "db.internal:5432/ronote?sslmode=disable")
@@ -22,7 +23,33 @@ func dbURL(scheme, rest string) string {
 
 // validEnv is a complete, valid environment; cases change one thing at a time.
 func validEnv(overrides map[string]string) map[string]string {
-	env := map[string]string{"RONOTE_ENV": "dev", "RONOTE_DATABASE_URL": testDatabaseURL}
+	env := map[string]string{
+		"RONOTE_ENV":                  "dev",
+		"RONOTE_DATABASE_URL":         testDatabaseURL,
+		"RONOTE_PUBLIC_URL":           "https://ronote.test",
+		"RONOTE_GITHUB_CLIENT_ID":     "client",
+		"RONOTE_GITHUB_CLIENT_SECRET": leakMarker,
+	}
+	maps.Copy(env, overrides)
+	return env
+}
+
+// github is the OAuth app validEnv configures.
+var github = GitHub{
+	ClientID: "client", ClientSecret: leakMarker,
+	AuthorizeURL: githubAuthorizeURL, TokenURL: githubTokenURL, APIURL: githubAPIURL,
+}
+
+// fakeProvider points every provider URL at a local fake provider.
+var fakeProvider = map[string]string{ //nolint:gosec // URLs, not credentials
+	"RONOTE_GITHUB_AUTHORIZE_URL": "http://127.0.0.1:8090/login/oauth/authorize",
+	"RONOTE_GITHUB_TOKEN_URL":     "http://127.0.0.1:8090/login/oauth/access_token",
+	"RONOTE_GITHUB_API_URL":       "http://127.0.0.1:8090/",
+}
+
+// with returns env with overrides on top.
+func with(env, overrides map[string]string) map[string]string {
+	env = maps.Clone(env)
 	maps.Copy(env, overrides)
 	return env
 }
@@ -39,7 +66,7 @@ func TestLoad(t *testing.T) {
 		{
 			name: "defaults",
 			env:  validEnv(nil),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github},
 		},
 		{
 			name: "all set",
@@ -49,12 +76,12 @@ func TestLoad(t *testing.T) {
 				"RONOTE_LOG_LEVEL":    "debug",
 				"RONOTE_DATABASE_URL": "postgresql://db/ronote",
 			}),
-			want: Config{Env: EnvProd, HTTPAddr: "0.0.0.0:9000", LogLevel: slog.LevelDebug, DatabaseURL: "postgresql://db/ronote", SourceTTL: day},
+			want: Config{Env: EnvProd, HTTPAddr: "0.0.0.0:9000", LogLevel: slog.LevelDebug, DatabaseURL: "postgresql://db/ronote", SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github},
 		},
 		{
 			name: "empty host",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_HTTP_ADDR": ":8080", "RONOTE_LOG_LEVEL": "warn"}),
-			want: Config{Env: EnvStaging, HTTPAddr: ":8080", LogLevel: slog.LevelWarn, DatabaseURL: testDatabaseURL, SourceTTL: day},
+			want: Config{Env: EnvStaging, HTTPAddr: ":8080", LogLevel: slog.LevelWarn, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github},
 		},
 		{
 			name:    "missing env",
@@ -119,17 +146,17 @@ func TestLoad(t *testing.T) {
 		{
 			name: "private fetches allowed in dev",
 			env:  validEnv(map[string]string{"RONOTE_FETCH_ALLOW_PRIVATE": "true"}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github},
 		},
 		{
 			name: "private fetches allowed in test",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "test", "RONOTE_FETCH_ALLOW_PRIVATE": "1"}),
-			want: Config{Env: EnvTest, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day},
+			want: Config{Env: EnvTest, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github},
 		},
 		{
 			name: "private fetches off in prod",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_FETCH_ALLOW_PRIVATE": "false"}),
-			want: Config{Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day},
+			want: Config{Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github},
 		},
 		{
 			name:    "private fetches refused in prod",
@@ -149,12 +176,12 @@ func TestLoad(t *testing.T) {
 		{
 			name: "source TTL",
 			env:  validEnv(map[string]string{"RONOTE_SOURCE_TTL": "90m"}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: 90 * time.Minute},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: 90 * time.Minute, PublicURL: "https://ronote.test", GitHub: github},
 		},
 		{
 			name: "source TTL of zero always revalidates",
 			env:  validEnv(map[string]string{"RONOTE_SOURCE_TTL": "0s"}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, PublicURL: "https://ronote.test", GitHub: github},
 		},
 		{
 			name:    "source TTL not a duration",
@@ -169,7 +196,7 @@ func TestLoad(t *testing.T) {
 		{
 			name: "dev user",
 			env:  validEnv(map[string]string{"RONOTE_DEV_USER_EMAIL": " dev@ronote.local "}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, DevUserEmail: "dev@ronote.local"},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, DevUserEmail: "dev@ronote.local", PublicURL: "https://ronote.test", GitHub: github},
 		},
 		{
 			name:    "dev user refused in prod",
@@ -185,6 +212,58 @@ func TestLoad(t *testing.T) {
 			name:    "dev user not an email",
 			env:     validEnv(map[string]string{"RONOTE_DEV_USER_EMAIL": "dev"}),
 			wantErr: []string{`RONOTE_DEV_USER_EMAIL: "dev" is not an email address`},
+		},
+		{
+			name: "the fake provider in dev",
+			env:  validEnv(fakeProvider),
+			want: Config{
+				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
+				PublicURL: "https://ronote.test",
+				GitHub: GitHub{
+					ClientID: "client", ClientSecret: leakMarker,
+					AuthorizeURL: fakeProvider["RONOTE_GITHUB_AUTHORIZE_URL"], TokenURL: fakeProvider["RONOTE_GITHUB_TOKEN_URL"],
+					APIURL: "http://127.0.0.1:8090",
+				},
+			},
+		},
+		{
+			name: "the fake provider refused in prod",
+			env:  validEnv(with(fakeProvider, map[string]string{"RONOTE_ENV": "prod"})),
+			wantErr: []string{
+				`RONOTE_GITHUB_AUTHORIZE_URL: "http://127.0.0.1:8090/login/oauth/authorize" must be https://github.com when RONOTE_ENV is staging or prod`,
+				`RONOTE_GITHUB_TOKEN_URL: "http://127.0.0.1:8090/login/oauth/access_token" must be https://github.com`,
+				`RONOTE_GITHUB_API_URL: "http://127.0.0.1:8090" must be https://api.github.com`,
+			},
+		},
+		{
+			name:    "another host refused in staging, even over https",
+			env:     validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_GITHUB_TOKEN_URL": "https://github.com.evil.test/login/oauth/access_token"}), //nolint:gosec // a URL, not a credential
+			wantErr: []string{"RONOTE_GITHUB_TOKEN_URL:", "must be https://github.com"},
+		},
+		{
+			name:    "missing OAuth app",
+			env:     validEnv(map[string]string{"RONOTE_GITHUB_CLIENT_ID": "", "RONOTE_GITHUB_CLIENT_SECRET": ""}),
+			wantErr: []string{"RONOTE_GITHUB_CLIENT_ID: not set", "RONOTE_GITHUB_CLIENT_SECRET: not set"},
+		},
+		{
+			name: "public URL with a trailing slash",
+			env:  validEnv(map[string]string{"RONOTE_PUBLIC_URL": "http://127.0.0.1:5173/"}),
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "http://127.0.0.1:5173", GitHub: github},
+		},
+		{
+			name:    "missing public URL",
+			env:     validEnv(map[string]string{"RONOTE_PUBLIC_URL": ""}),
+			wantErr: []string{"RONOTE_PUBLIC_URL: not set"},
+		},
+		{
+			name:    "public URL with a path",
+			env:     validEnv(map[string]string{"RONOTE_PUBLIC_URL": "https://ronote.test/app"}),
+			wantErr: []string{`RONOTE_PUBLIC_URL: "https://ronote.test/app" is not an origin`},
+		},
+		{
+			name:    "plain http public URL refused in prod",
+			env:     validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_PUBLIC_URL": "http://ronote.test"}),
+			wantErr: []string{`RONOTE_PUBLIC_URL: "http://ronote.test" must be https`},
 		},
 		{
 			name: "every bad variable reported",
@@ -227,7 +306,7 @@ func TestLoad(t *testing.T) {
 				}
 			}
 			if strings.Contains(err.Error(), leakMarker) {
-				t.Errorf("Load() error = %q leaks the database password", err)
+				t.Errorf("Load() error = %q leaks a secret", err)
 			}
 		})
 	}

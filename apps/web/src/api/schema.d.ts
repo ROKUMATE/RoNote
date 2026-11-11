@@ -4,6 +4,53 @@
  */
 
 export interface paths {
+    "/auth/github/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Start signing in with GitHub
+         * @description Sends the browser to GitHub to sign in, with a state and a PKCE
+         *     challenge (docs/adr/0010-sign-in-and-sessions.md). The state, the
+         *     verifier and return_to go in a 10-minute HttpOnly cookie for the
+         *     callback. This handler is written by hand; the spec documents it.
+         */
+        get: operations["startGitHubSignIn"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/github/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Finish signing in with GitHub
+         * @description Where GitHub sends the browser back. Checks the state against the
+         *     cookie, exchanges the code with the PKCE verifier, signs the GitHub
+         *     user in and starts a session in an HttpOnly cookie. A failure goes to
+         *     /login?error= with a SignInErrorCode. This handler is written by
+         *     hand; the spec documents it.
+         */
+        get: operations["finishGitHubSignIn"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/imports": {
         parameters: {
             query?: never;
@@ -240,6 +287,11 @@ export interface components {
          * @enum {string}
          */
         ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unknown_block" | "quote_mismatch" | "annotation_limit" | "unauthenticated" | "internal_error";
+        /**
+         * @description Why signing in failed, in /login?error=: the user or GitHub refused (denied); the sign-in's cookie was missing, expired or another (state_mismatch); the GitHub account has no primary, verified email (no_verified_email); or GitHub didn't answer (provider_unavailable).
+         * @enum {string}
+         */
+        SignInErrorCode: "denied" | "state_mismatch" | "no_verified_email" | "provider_unavailable";
         CreateImportRequest: {
             url: string;
         };
@@ -558,6 +610,7 @@ export interface components {
 export type Error = components['schemas']['Error'];
 export type ErrorBody = components['schemas']['ErrorBody'];
 export type ErrorCode = components['schemas']['ErrorCode'];
+export type SignInErrorCode = components['schemas']['SignInErrorCode'];
 export type CreateImportRequest = components['schemas']['CreateImportRequest'];
 export type ImportStatus = components['schemas']['ImportStatus'];
 export type ImportErrorCode = components['schemas']['ImportErrorCode'];
@@ -602,6 +655,53 @@ export type ResponseInternalError = components['responses']['InternalError'];
 export type ParameterId = components['parameters']['ID'];
 export type $defs = Record<string, never>;
 export interface operations {
+    startGitHubSignIn: {
+        parameters: {
+            query?: {
+                /** @description Where to go once signed in: a path on RoNote's own origin. Anything else, or nothing, means /. */
+                return_to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description To GitHub's sign-in page. */
+            302: {
+                headers: {
+                    Location?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    finishGitHubSignIn: {
+        parameters: {
+            query?: {
+                code?: string;
+                state?: string;
+                /** @description Set by GitHub when the user refused. */
+                error?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signed in, to the start's return_to; or not, to /login?error=<SignInErrorCode>&return_to=<return_to>. */
+            303: {
+                headers: {
+                    Location?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            500: components["responses"]["InternalError"];
+        };
+    };
     createImport: {
         parameters: {
             query?: never;

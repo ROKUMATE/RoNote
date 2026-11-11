@@ -15,6 +15,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/rokumate/ronote/internal/auth"
 	"github.com/rokumate/ronote/internal/config"
 	"github.com/rokumate/ronote/internal/db"
 	"github.com/rokumate/ronote/internal/events"
@@ -91,6 +92,18 @@ func run() error {
 		Events:  broker,
 		Done:    streamsDone,
 		DevUser: devUser,
+		SignIn: httpapi.SignIn{
+			GitHub: auth.GitHub{
+				ClientID:     cfg.GitHub.ClientID,
+				ClientSecret: cfg.GitHub.ClientSecret,
+				AuthorizeURL: cfg.GitHub.AuthorizeURL,
+				TokenURL:     cfg.GitHub.TokenURL,
+				APIURL:       cfg.GitHub.APIURL,
+				RedirectURL:  cfg.PublicURL + "/api/v1/auth/github/callback",
+			},
+			Cookies:  auth.Cookies{Secure: cfg.Env.Deployed()},
+			Accounts: st,
+		},
 	}), logger)
 	// Shutdown waits for open connections; ending the event streams lets it.
 	srv.RegisterOnShutdown(func() { close(streamsDone) })

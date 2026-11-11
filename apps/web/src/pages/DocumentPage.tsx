@@ -36,7 +36,7 @@ const genericWarnings: ReadonlySet<IrWarning["code"]> = new Set([
 
 /** A document: its header, then its content to read and edit. */
 export function DocumentPage() {
-  const { id } = useParams({ from: "/doc/$id" });
+  const { id } = useParams({ from: "/shell/doc/$id" });
   const doc = useQuery(documentQuery(id));
   const existing = useRouterState({ select: (s) => s.location.state.notice === "existing" });
 

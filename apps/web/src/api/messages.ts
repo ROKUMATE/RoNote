@@ -1,5 +1,14 @@
 import { ApiError } from "./client";
-import type { ErrorCode, ImportErrorCode } from "./schema";
+import type { ErrorCode, ImportErrorCode, SignInErrorCode } from "./schema";
+
+/** Why signing in failed, one plain sentence per code. */
+export const signInErrorMessages: Record<SignInErrorCode, string> = {
+  denied: "GitHub didn't sign you in. Try again.",
+  state_mismatch: "That sign-in took too long or started in another tab. Try again.",
+  no_verified_email:
+    "Your GitHub account needs a verified primary email. Add one on GitHub, then try again.",
+  provider_unavailable: "GitHub isn't answering right now. Try again in a few minutes.",
+};
 
 /** Why an import failed, one plain sentence per code. */
 export const importErrorMessages: Record<ImportErrorCode, string> = {

@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
+import { apiError, stubApi } from "../test/api";
 import { subscribeImport } from "./events";
 import type { ImportEvent } from "./schema";
+import { replaceNavigation } from "./session";
 
 /** Stands in for the browser's EventSource; the test plays the server. */
 class FakeEventSource {
@@ -53,6 +55,8 @@ function server(): FakeEventSource {
 beforeEach(() => {
   FakeEventSource.last = undefined;
   vi.stubGlobal("EventSource", FakeEventSource);
+  // A refused stream asks the API who is signed in; by default, still Ada.
+  stubApi({});
 });
 
 afterEach(() => {
@@ -109,6 +113,19 @@ test("reports a stream the browser gave up on", () => {
   server().drop({ giveUp: true });
 
   expect(onLost).toHaveBeenCalledOnce();
+});
+
+test("a stream refused for a session that ended goes to sign in", async () => {
+  const navigate = vi.fn<(url: string) => void>();
+  replaceNavigation(navigate);
+  history.replaceState(null, "", "/doc/x");
+  stubApi({ "GET /me": () => apiError(401, "unauthenticated") });
+  subscribeImport("id", () => {});
+
+  server().drop({ giveUp: true });
+
+  await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith("/login?return_to=%2Fdoc%2Fx"));
+  history.replaceState(null, "", "/");
 });
 
 test("stops following when unsubscribed", () => {

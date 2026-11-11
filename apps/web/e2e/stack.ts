@@ -6,4 +6,6 @@ export const stack = {
   runner: "http://localhost:5181",
   // A name, not an IP: the API refuses IP-literal hosts.
   fixtures: "http://localhost:18090",
+  // The fake GitHub sign-in (cmd/fakeidp).
+  idp: "http://127.0.0.1:18091",
 } as const;

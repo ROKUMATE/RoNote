@@ -66,6 +66,9 @@ run-api: ## Run the API locally (RONOTE_ENV defaults to dev); make stop ends it
 run-worker: ## Run the import worker locally (RONOTE_ENV defaults to dev); make stop ends it
 	RONOTE_ENV=$${RONOTE_ENV:-dev} sh scripts/run.sh worker go run ./cmd/worker
 
+run-idp: ## Run the fake GitHub sign-in on 127.0.0.1:8090 (dev only); make stop ends it
+	sh scripts/run.sh idp go run ./cmd/fakeidp
+
 extract: ## Print a page's IR: make extract url=https://... [format=text]
 	@test -n "$(url)" || { echo "usage: make extract url=https://... [format=text]" >&2; exit 1; }
 	go run ./cmd/extract --format=$(or $(format),json) "$(url)"
@@ -180,9 +183,9 @@ web-browsers: ## Install Playwright's Chromium (WITH_DEPS=1 adds its system pack
 check-node-version: ## Print the Node version; fail unless it is the one .nvmrc pins
 	@$(node_required); echo "Node $$(node --version), as pinned in .nvmrc"
 
-web-dev: ## Run the web dev server (styleguide at /_styleguide) and the runner; make stop ends them
+web-dev: ## Run the web dev server (styleguide at /_styleguide), the runner and the fake sign-in; make stop ends them
 	@$(node_required)
-	sh scripts/run.sh web sh -c '$(WEB) runner & $(WEB) dev; kill $$!'
+	sh scripts/run.sh web sh -c 'go run ./cmd/fakeidp & idp=$$!; $(WEB) runner & runner=$$!; $(WEB) dev; kill $$idp $$runner'
 
 web-build: ## Build the web app and the runner; fails if dev-only code ships or it is over budget
 	@$(node_required)
@@ -194,10 +197,10 @@ web-build: ## Build the web app and the runner; fails if dev-only code ships or 
 web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromium); locally needs make dev-up
 	@$(node_required)
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" sh scripts/e2e-db.sh
-	go build -o bin/e2e/ ./cmd/api ./cmd/worker
+	go build -o bin/e2e/ ./cmd/api ./cmd/worker ./cmd/fakeidp
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" $(WEB) e2e
 
-.PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker extract lint lint-go lint-web fmt
+.PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp extract lint lint-go lint-web fmt
 .PHONY: doctor stop dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration test-live test-clean web-install web-deps web-browsers check-node-version

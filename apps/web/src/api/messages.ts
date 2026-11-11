@@ -41,6 +41,7 @@ export const requestErrorMessages: Record<ErrorCode, string> = {
   quote_mismatch: "The text changed before the highlight was saved. Try again.",
   annotation_limit: "This document already has 2000 highlights, the most it can hold.",
   unauthenticated: "You're signed out. Sign in and try again.",
+  cross_origin: "RoNote only accepts changes from its own pages. Reload RoNote and try again.",
   internal_error: "Something went wrong on RoNote's side. Try again.",
 };
 

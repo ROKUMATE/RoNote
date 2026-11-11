@@ -73,13 +73,14 @@ func run() error {
 		return fmt.Errorf("listen: %w", err)
 	}
 	srv := httpapi.NewServer(httpapi.New(httpapi.Options{
-		Logger:   logger,
-		DB:       pool,
-		Backend:  backend{Store: st, Service: importer.NewService(st, queue)},
-		Events:   broker,
-		Done:     streamsDone,
-		Accounts: st,
-		Cookies:  auth.Cookies{Secure: cfg.Env.Deployed()},
+		Logger:    logger,
+		DB:        pool,
+		Backend:   backend{Store: st, Service: importer.NewService(st, queue)},
+		Events:    broker,
+		Done:      streamsDone,
+		Accounts:  st,
+		Cookies:   auth.Cookies{Secure: cfg.Env.Deployed()},
+		PublicURL: cfg.PublicURL,
 		GitHub: auth.GitHub{
 			ClientID:     cfg.GitHub.ClientID,
 			ClientSecret: cfg.GitHub.ClientSecret,

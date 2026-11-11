@@ -303,7 +303,7 @@ export interface components {
          * @description Why a request failed. Each response lists the codes it can carry.
          * @enum {string}
          */
-        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unknown_block" | "quote_mismatch" | "annotation_limit" | "unauthenticated" | "internal_error";
+        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unknown_block" | "quote_mismatch" | "annotation_limit" | "unauthenticated" | "cross_origin" | "internal_error";
         Me: {
             /** Format: uuid */
             id: string;
@@ -615,6 +615,15 @@ export interface components {
                 "application/json": components["schemas"]["Error"];
             };
         };
+        /** @description A browser sent this from another site; only RoNote's own pages may change anything (docs/adr/0010-sign-in-and-sessions.md). Code: cross_origin. */
+        CrossOrigin: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
         /** @description The server failed; the request may be retried. Code: internal_error. */
         InternalError: {
             headers: {
@@ -677,6 +686,7 @@ export type IrLink = components['schemas']['IRLink'];
 export type ResponseUnauthenticated = components['responses']['Unauthenticated'];
 export type ResponseNotFound = components['responses']['NotFound'];
 export type ResponseInvalidParameter = components['responses']['InvalidParameter'];
+export type ResponseCrossOrigin = components['responses']['CrossOrigin'];
 export type ResponseInternalError = components['responses']['InternalError'];
 export type ParameterId = components['parameters']['ID'];
 export type $defs = Record<string, never>;
@@ -791,6 +801,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -948,6 +959,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
             404: components["responses"]["NotFound"];
             /** @description The document changed since version. Code: version_conflict. */
             409: {
@@ -1002,6 +1014,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
             500: components["responses"]["InternalError"];
         };
     };
@@ -1028,6 +1041,7 @@ export interface operations {
             };
             400: components["responses"]["InvalidParameter"];
             401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
             /** @description No such document, or no source block blockId in it. Code: not_found. */
             404: {
                 headers: {
@@ -1100,6 +1114,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
             404: components["responses"]["NotFound"];
             /** @description The selector does not fit the document, or the document is full. Codes: unknown_block, quote_mismatch, annotation_limit. */
             422: {
@@ -1147,6 +1162,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
             /** @description No such document, or an annotation that is not one of it. Code: not_found. */
             404: {
                 headers: {
@@ -1197,6 +1213,7 @@ export interface operations {
             };
             400: components["responses"]["InvalidParameter"];
             401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
             404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
         };
@@ -1235,6 +1252,7 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
             404: components["responses"]["NotFound"];
             /** @description The annotation changed since version. Code: version_conflict. */
             409: {

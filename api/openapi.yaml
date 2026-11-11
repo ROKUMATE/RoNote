@@ -124,6 +124,8 @@ paths:
                 $ref: "#/components/schemas/Error"
         "401":
           $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
         "500":
           $ref: "#/components/responses/InternalError"
   /imports/{id}:
@@ -286,6 +288,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
         "500":
           $ref: "#/components/responses/InternalError"
   /documents/resolve:
@@ -317,6 +321,8 @@ paths:
                 $ref: "#/components/schemas/Error"
         "401":
           $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
         "500":
           $ref: "#/components/responses/InternalError"
   /documents/{id}/blocks/{blockId}/revert:
@@ -350,6 +356,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
         "500":
           $ref: "#/components/responses/InternalError"
   /documents/{id}/annotations:
@@ -414,6 +422,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
         "500":
           $ref: "#/components/responses/InternalError"
   /documents/{id}/annotations/reanchor:
@@ -465,6 +475,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
         "500":
           $ref: "#/components/responses/InternalError"
   /annotations/{id}:
@@ -512,6 +524,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
         "500":
           $ref: "#/components/responses/InternalError"
     delete:
@@ -528,6 +542,8 @@ paths:
           $ref: "#/components/responses/Unauthenticated"
         "404":
           $ref: "#/components/responses/NotFound"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
         "500":
           $ref: "#/components/responses/InternalError"
 components:
@@ -554,6 +570,15 @@ components:
             $ref: "#/components/schemas/Error"
     InvalidParameter:
       description: "A path or query parameter is malformed. Code: invalid_parameter."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    CrossOrigin:
+      description: >-
+        A browser sent this from another site; only RoNote's own pages may
+        change anything (docs/adr/0010-sign-in-and-sessions.md). Code:
+        cross_origin.
       content:
         application/json:
           schema:
@@ -604,6 +629,7 @@ components:
         - quote_mismatch
         - annotation_limit
         - unauthenticated
+        - cross_origin
         - internal_error
     Me:
       type: object

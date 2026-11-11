@@ -196,7 +196,7 @@ func TestCreateAnnotation(t *testing.T) {
 			if target == "" {
 				target = "/api/v1/documents/" + doc.ID.String() + "/annotations"
 			}
-			h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+			h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 
 			rec := apiRequest(t, h, http.MethodPost, target, jsonBody(t, tt.body))
 
@@ -244,7 +244,7 @@ func TestUpdateAnnotation(t *testing.T) {
 			if target == "" {
 				target = "/api/v1/annotations/" + a.ID.String()
 			}
-			h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+			h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 
 			rec := apiRequest(t, h, http.MethodPatch, target, jsonBody(t, tt.body))
 
@@ -302,7 +302,7 @@ func TestReanchorAnnotations(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			b, doc, a := annotated()
-			h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+			h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 
 			rec := apiRequest(t, h, http.MethodPost, "/api/v1/documents/"+doc.ID.String()+"/annotations/reanchor",
 				jsonBody(t, map[string]any{"annotations": tt.moves(a)}))
@@ -330,7 +330,7 @@ func TestReanchorAnnotations(t *testing.T) {
 func TestListAndDeleteAnnotations(t *testing.T) {
 	t.Parallel()
 	b, doc, a := annotated()
-	h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+	h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 	list := "/api/v1/documents/" + doc.ID.String() + "/annotations"
 
 	rec := apiRequest(t, h, http.MethodGet, list, "")
@@ -347,7 +347,7 @@ func TestListAndDeleteAnnotations(t *testing.T) {
 		t.Errorf("DELETE again = %d, want 404", rec.Code)
 	}
 	for _, owner := range b.owners {
-		if owner != devUser {
+		if owner != testUser {
 			t.Errorf("asked for owner %s, want the signed-in user", owner)
 		}
 	}

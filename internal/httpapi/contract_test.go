@@ -109,7 +109,7 @@ func TestRepeatImportReturnsTheFullImport(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			b := &fakeBackend{docs: []store.Document{doc}, request: func(string) (importer.Requested, error) { return tt.result, nil }}
-			h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+			h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 
 			got := decodeJSON[map[string]map[string]any](t, apiRequest(t, h, http.MethodPost, "/api/v1/imports", `{"url":"https://docs.example.com/1"}`))["import"]
 			for _, field := range tt.want {

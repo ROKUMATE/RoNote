@@ -12,7 +12,7 @@ The local stack: containers, the dev environment, and the processes dev runs.
 ## Running locally
 
 Dev runs two processes, each in its own terminal, after `make dev-up` and `make migrate-up`:
-- `make run-api` serves the API. Set `RONOTE_DEV_USER_EMAIL` (in `.env.dev`, or `make run-api RONOTE_DEV_USER_EMAIL=...`), or every `/api/v1` route answers 401.
+- `make run-api` serves the API. Every `/api/v1` route but sign-in answers 401 without a session: sign in at `/login` through the fake GitHub (`cmd/fakeidp`), which `make web-dev` starts (or `make run-idp` alone). `.env.example`'s provider URLs point at it, and its users (`deploy/fakeidp/dev-users.json`) include `dev@ronote.local`, so documents from before sign-in stay reachable (docs/adr/0010-sign-in-and-sessions.md).
 - `make run-worker` runs imports. Without it, imports stay `queued`.
 
 docs/adr/0005-import-pipeline.md describes the pipeline both serve.

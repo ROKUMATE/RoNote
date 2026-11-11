@@ -114,7 +114,7 @@ func TestSessions(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			sess, err := s.GetSession(ctx, hash[:], idle)
+			sess, err := s.GetSession(ctx, hash[:], idle, time.Minute)
 
 			switch {
 			case tt.found && err != nil:
@@ -147,7 +147,7 @@ func TestEndingSessions(t *testing.T) {
 		}
 	}
 	alive := func(b byte) bool {
-		_, err := s.GetSession(ctx, token(b), time.Hour)
+		_, err := s.GetSession(ctx, token(b), time.Hour, time.Minute)
 		return err == nil
 	}
 
@@ -180,21 +180,24 @@ func TestTouchSession(t *testing.T) {
 	if _, err := testDB.Pool.Exec(ctx, "UPDATE sessions SET last_seen_at = now() - interval '10 minutes'"); err != nil {
 		t.Fatal(err)
 	}
-	before, err := s.GetSession(ctx, hash[:], time.Hour)
+	before, err := s.GetSession(ctx, hash[:], time.Hour, 5*time.Minute)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if !before.Stale {
+		t.Errorf("a session last seen 10 minutes ago is not stale at 5 minutes")
 	}
 
 	if err := s.TouchSession(ctx, hash[:]); err != nil {
 		t.Fatal(err)
 	}
 
-	after, err := s.GetSession(ctx, hash[:], time.Hour)
+	after, err := s.GetSession(ctx, hash[:], time.Hour, 5*time.Minute)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !after.LastSeenAt.After(before.LastSeenAt.Add(9 * time.Minute)) {
-		t.Errorf("last seen %v after touching, was %v; want about now", after.LastSeenAt, before.LastSeenAt)
+	if !after.LastSeenAt.After(before.LastSeenAt.Add(9*time.Minute)) || after.Stale {
+		t.Errorf("after touching: last seen %v (was %v), stale %v; want about now, not stale", after.LastSeenAt, before.LastSeenAt, after.Stale)
 	}
 }
 

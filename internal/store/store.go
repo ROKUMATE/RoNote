@@ -80,16 +80,6 @@ func (s *Store) GetUserByEmail(ctx context.Context, email string) (User, error) 
 	return u, nil
 }
 
-// UpsertUserByEmail returns the user with email, ignoring case, creating it
-// with displayName first if there is none.
-func (s *Store) UpsertUserByEmail(ctx context.Context, email, displayName string) (User, error) {
-	u, err := s.q.UpsertUserByEmail(ctx, sqlcdb.UpsertUserByEmailParams{Email: email, DisplayName: displayName})
-	if err != nil {
-		return User{}, mapErr("upsert user", err)
-	}
-	return u, nil
-}
-
 // mapErr turns driver errors into ErrNotFound or ErrConflict. Anything else
 // keeps its message but not its error chain, so callers cannot depend on pgx.
 func mapErr(op string, err error) error {

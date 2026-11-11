@@ -38,10 +38,6 @@ type Config struct {
 	// SourceTTL is how long a fetched page stays fresh: imports within it
 	// reuse the stored copy without asking the site.
 	SourceTTL time.Duration
-	// DevUserEmail names the user every API request acts as until real
-	// sign-in exists. Only dev and test may set it; without it the API
-	// answers 401.
-	DevUserEmail string
 	// PublicURL is the origin people reach RoNote at, such as
 	// https://ronote.app: sign-in's callback is under it.
 	PublicURL string
@@ -99,8 +95,6 @@ func Load(getenv func(string) string) (Config, error) {
 	check("RONOTE_FETCH_ALLOW_PRIVATE", err)
 	ttl, err := parseTTL(withDefault(getenv("RONOTE_SOURCE_TTL"), defaultSourceTTL))
 	check("RONOTE_SOURCE_TTL", err)
-	devUser := strings.TrimSpace(getenv("RONOTE_DEV_USER_EMAIL"))
-	check("RONOTE_DEV_USER_EMAIL", validateDevUser(devUser, env))
 	publicURL, err := parsePublicURL(getenv("RONOTE_PUBLIC_URL"), env)
 	check("RONOTE_PUBLIC_URL", err)
 	gh := GitHub{
@@ -126,7 +120,6 @@ func Load(getenv func(string) string) (Config, error) {
 		DatabaseURL:               dbURL,
 		FetchAllowPrivateNetworks: allowPrivate,
 		SourceTTL:                 ttl,
-		DevUserEmail:              devUser,
 		PublicURL:                 publicURL,
 		GitHub:                    gh,
 	}, nil
@@ -174,20 +167,6 @@ func validateProviderURL(s, host string, env Env) error {
 func required(s string) error {
 	if s == "" {
 		return errors.New("not set")
-	}
-	return nil
-}
-
-// validateDevUser allows a dev identity only in dev and test: anywhere else
-// it would let anyone act as that user.
-func validateDevUser(email string, env Env) error {
-	switch {
-	case email == "":
-		return nil
-	case env != EnvDev && env != EnvTest:
-		return errors.New("may only be set when RONOTE_ENV is dev or test")
-	case strings.Count(email, "@") != 1 || strings.ContainsAny(email, " \t") || strings.HasPrefix(email, "@") || strings.HasSuffix(email, "@"):
-		return fmt.Errorf("%q is not an email address", email)
 	}
 	return nil
 }

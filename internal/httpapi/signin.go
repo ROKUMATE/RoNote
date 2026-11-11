@@ -21,20 +21,16 @@ import (
 // database.
 type Accounts interface {
 	SignIn(ctx context.Context, id store.Identity) (store.User, error)
+	GetAccount(ctx context.Context, user uuid.UUID, provider string) (store.Account, error)
 	CreateSession(ctx context.Context, hash []byte, user uuid.UUID, lifetime time.Duration) error
+	GetSession(ctx context.Context, hash []byte, idle, touch time.Duration) (store.Session, error)
+	TouchSession(ctx context.Context, hash []byte) error
 	DeleteSession(ctx context.Context, hash []byte) error
-}
-
-// SignIn is what the sign-in routes need.
-type SignIn struct {
-	GitHub   auth.GitHub
-	Cookies  auth.Cookies
-	Accounts Accounts
 }
 
 // signInStart sends the browser to GitHub, keeping the sign-in's state, PKCE
 // verifier and return_to in a cookie for the callback.
-func signInStart(s SignIn) http.HandlerFunc {
+func signInStart(s Options) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		flow := auth.NewFlow(r.URL.Query().Get("return_to"), time.Now())
 		http.SetCookie(w, s.Cookies.Flow(flow))
@@ -44,7 +40,8 @@ func signInStart(s SignIn) http.HandlerFunc {
 
 // signInCallback finishes a sign-in GitHub sent the browser back from, and
 // starts a session.
-func signInCallback(logger *slog.Logger, s SignIn) http.HandlerFunc {
+func signInCallback(s Options) http.HandlerFunc {
+	logger := s.Logger
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		q := r.URL.Query()
@@ -119,4 +116,16 @@ func internalError(logger *slog.Logger, w http.ResponseWriter, r *http.Request, 
 	logger.LogAttrs(r.Context(), slog.LevelError, "api error",
 		slog.String("error", err.Error()), slog.String("request_id", requestID(r.Context())))
 	writeError(w, r, http.StatusInternalServerError, gen.ErrorCodeInternalError, "internal server error")
+}
+
+func (s apiServer) GetMe(ctx context.Context, _ gen.GetMeRequestObject) (gen.GetMeResponseObject, error) {
+	a, err := s.accounts.GetAccount(ctx, userFrom(ctx), auth.Provider)
+	if errors.Is(err, store.ErrNotFound) {
+		// The user went between the session check and now.
+		return gen.GetMe401JSONResponse{UnauthenticatedJSONResponse: gen.UnauthenticatedJSONResponse(apiError(ctx, gen.ErrorCodeUnauthenticated, "sign-in required"))}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return gen.GetMe200JSONResponse{ID: a.ID, DisplayName: a.DisplayName, Email: a.Email, Login: a.Login}, nil
 }

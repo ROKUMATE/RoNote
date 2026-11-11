@@ -22,7 +22,7 @@ func TestListenDeliversStatusChanges(t *testing.T) {
 	db := pgtest.New(t)
 	ctx := t.Context()
 	s := store.New(db.Pool)
-	ada, err := s.UpsertUserByEmail(ctx, "ada@example.com", "Ada")
+	ada, err := s.CreateUser(ctx, "ada@example.com", "Ada")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -9,11 +9,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
-
-	"github.com/google/uuid"
 
 	"github.com/rokumate/ronote/internal/auth"
 	"github.com/rokumate/ronote/internal/config"
@@ -61,16 +58,6 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	var devUser uuid.UUID
-	if cfg.DevUserEmail != "" {
-		u, err := st.UpsertUserByEmail(ctx, cfg.DevUserEmail, devDisplayName(cfg.DevUserEmail))
-		if err != nil {
-			return fmt.Errorf("dev user: %w", err)
-		}
-		devUser = u.ID
-		logger.Info("dev identity on: every /api/v1 request acts as this user", "email", u.Email)
-	}
-
 	// One connection listens for import status changes; event streams share it.
 	broker := events.NewBroker()
 	listening := make(chan struct{})
@@ -86,23 +73,20 @@ func run() error {
 		return fmt.Errorf("listen: %w", err)
 	}
 	srv := httpapi.NewServer(httpapi.New(httpapi.Options{
-		Logger:  logger,
-		DB:      pool,
-		Backend: backend{Store: st, Service: importer.NewService(st, queue)},
-		Events:  broker,
-		Done:    streamsDone,
-		DevUser: devUser,
-		SignIn: httpapi.SignIn{
-			GitHub: auth.GitHub{
-				ClientID:     cfg.GitHub.ClientID,
-				ClientSecret: cfg.GitHub.ClientSecret,
-				AuthorizeURL: cfg.GitHub.AuthorizeURL,
-				TokenURL:     cfg.GitHub.TokenURL,
-				APIURL:       cfg.GitHub.APIURL,
-				RedirectURL:  cfg.PublicURL + "/api/v1/auth/github/callback",
-			},
-			Cookies:  auth.Cookies{Secure: cfg.Env.Deployed()},
-			Accounts: st,
+		Logger:   logger,
+		DB:       pool,
+		Backend:  backend{Store: st, Service: importer.NewService(st, queue)},
+		Events:   broker,
+		Done:     streamsDone,
+		Accounts: st,
+		Cookies:  auth.Cookies{Secure: cfg.Env.Deployed()},
+		GitHub: auth.GitHub{
+			ClientID:     cfg.GitHub.ClientID,
+			ClientSecret: cfg.GitHub.ClientSecret,
+			AuthorizeURL: cfg.GitHub.AuthorizeURL,
+			TokenURL:     cfg.GitHub.TokenURL,
+			APIURL:       cfg.GitHub.APIURL,
+			RedirectURL:  cfg.PublicURL + "/api/v1/auth/github/callback",
 		},
 	}), logger)
 	// Shutdown waits for open connections; ending the event streams lets it.
@@ -137,10 +121,4 @@ func run() error {
 type backend struct {
 	*store.Store
 	*importer.Service
-}
-
-// devDisplayName is the part of an email before the @.
-func devDisplayName(email string) string {
-	name, _, _ := strings.Cut(email, "@")
-	return name
 }

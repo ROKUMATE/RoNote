@@ -82,7 +82,7 @@ func (w *streamWriter) String() string {
 // closed when the handler returns.
 func stream(t *testing.T, b Backend, feed Events, done <-chan struct{}, id uuid.UUID) (*streamWriter, context.CancelFunc, chan struct{}) {
 	t.Helper()
-	ctx, disconnect := context.WithCancel(context.WithValue(t.Context(), userKey{}, devUser))
+	ctx, disconnect := context.WithCancel(context.WithValue(t.Context(), userKey{}, testUser))
 	req := httptest.NewRequestWithContext(ctx, http.MethodGet, "/api/v1/imports/"+id.String()+"/events", http.NoBody)
 	req.SetPathValue("id", id.String())
 	w := &streamWriter{header: http.Header{}}
@@ -101,7 +101,7 @@ const (
 )
 
 func queuedImport() store.Import {
-	return store.Import{ID: uuid.New(), OwnerID: devUser, Status: store.ImportQueued}
+	return store.Import{ID: uuid.New(), OwnerID: testUser, Status: store.ImportQueued}
 }
 
 func TestStreamSendsChangesInOrderUntilDone(t *testing.T) {
@@ -113,12 +113,12 @@ func TestStreamSendsChangesInOrderUntilDone(t *testing.T) {
 		synctest.Wait()
 
 		for _, ev := range []events.Event{
-			{ImportID: imp.ID, OwnerID: devUser, Status: "fetching"},
-			{ImportID: imp.ID, OwnerID: devUser, Status: "fetching"},   // repeated: not sent again
-			{ImportID: imp.ID, OwnerID: uuid.New(), Status: "failed"},  // someone else's: ignored
-			{ImportID: imp.ID, OwnerID: devUser, Status: "extracting"}, //
-			{ImportID: imp.ID, OwnerID: devUser, Status: "queued"},     // backwards: not sent
-			{ImportID: imp.ID, OwnerID: devUser, Status: "done", DocumentID: doc},
+			{ImportID: imp.ID, OwnerID: testUser, Status: "fetching"},
+			{ImportID: imp.ID, OwnerID: testUser, Status: "fetching"},   // repeated: not sent again
+			{ImportID: imp.ID, OwnerID: uuid.New(), Status: "failed"},   // someone else's: ignored
+			{ImportID: imp.ID, OwnerID: testUser, Status: "extracting"}, //
+			{ImportID: imp.ID, OwnerID: testUser, Status: "queued"},     // backwards: not sent
+			{ImportID: imp.ID, OwnerID: testUser, Status: "done", DocumentID: doc},
 		} {
 			feed.ch <- ev
 		}
@@ -211,7 +211,7 @@ func TestStreamRefusals(t *testing.T) {
 	imp := queuedImport()
 	feed := newFeed()
 	b := &fakeBackend{imports: map[uuid.UUID]store.Import{imp.ID: imp}}
-	h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, Events: feed, DevUser: devUser})
+	h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b, Events: feed})
 	for target, want := range map[string]gen.ErrorCode{
 		"/api/v1/imports/" + uuid.NewString() + "/events": "not_found",
 		"/api/v1/imports/not-a-uuid/events":               "invalid_parameter",

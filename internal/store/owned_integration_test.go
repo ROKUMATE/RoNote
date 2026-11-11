@@ -33,10 +33,10 @@ func newFixture(t *testing.T) fixture {
 	ctx := t.Context()
 	f := fixture{s: s}
 	var err error
-	if f.ada, err = s.UpsertUserByEmail(ctx, "ada@example.com", "Ada"); err != nil {
+	if f.ada, err = s.CreateUser(ctx, "ada@example.com", "Ada"); err != nil {
 		t.Fatal(err)
 	}
-	if f.grace, err = s.UpsertUserByEmail(ctx, "grace@example.com", "Grace"); err != nil {
+	if f.grace, err = s.CreateUser(ctx, "grace@example.com", "Grace"); err != nil {
 		t.Fatal(err)
 	}
 	f.source = testSource(t, s)
@@ -59,19 +59,6 @@ func (f fixture) document(t *testing.T, owner User) uuid.UUID {
 		t.Fatal(err)
 	}
 	return id
-}
-
-func TestUpsertUserByEmail(t *testing.T) {
-	testDB.Reset(t)
-	s := New(testDB.Pool)
-	first, err := s.UpsertUserByEmail(t.Context(), "dev@ronote.local", "dev")
-	if err != nil {
-		t.Fatal(err)
-	}
-	again, err := s.UpsertUserByEmail(t.Context(), "DEV@ronote.local", "other")
-	if err != nil || again.ID != first.ID || again.DisplayName != "dev" {
-		t.Errorf("second upsert = %+v, %v; want the first user unchanged", again, err)
-	}
 }
 
 func TestDocuments(t *testing.T) {

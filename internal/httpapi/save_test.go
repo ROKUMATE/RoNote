@@ -99,7 +99,7 @@ func TestSaveDocument(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			b, doc := editable()
-			h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+			h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 			target := tt.target
 			if target == "" {
 				target = "/api/v1/documents/" + doc.ID.String()
@@ -132,7 +132,7 @@ func TestSaveDocument(t *testing.T) {
 func TestSaveConflictNamesTheCurrentVersion(t *testing.T) {
 	t.Parallel()
 	b, doc := editable()
-	h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+	h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 
 	rec := apiRequest(t, h, http.MethodPatch, "/api/v1/documents/"+doc.ID.String(), saveBody(t, doc.Content, 1))
 
@@ -150,7 +150,7 @@ func TestRevertBlock(t *testing.T) {
 	changed.Blocks[0].Content = []ir.Inline{{Text: "Install it now."}}
 	changed.Blocks[0].Edited = &edited
 	b.docs[0].Content = &changed
-	h := New(Options{Logger: discardLogger, DB: dbUp, Backend: b, DevUser: devUser})
+	h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 
 	rec := apiRequest(t, h, http.MethodPost, "/api/v1/documents/"+doc.ID.String()+"/blocks/p1/revert", "")
 

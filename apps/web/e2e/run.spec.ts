@@ -1,4 +1,4 @@
-import { expect, type Page, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import {
   chooseTheme,
   expectNoAxeViolations,
@@ -6,6 +6,7 @@ import {
   fixtureURL,
   importPage,
 } from "./helpers";
+import { expect, test } from "./test";
 
 /** Imports the Python fixture page and waits for its code blocks' controls. */
 async function openPythonPage(page: Page) {

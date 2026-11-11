@@ -1,4 +1,5 @@
-import { expect, type Page, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { expect, test } from "./test";
 
 async function choose(page: Page, setting: string) {
   await page.getByRole("button", { name: "Settings" }).click();

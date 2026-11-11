@@ -1,4 +1,3 @@
-import { expect, test } from "@playwright/test";
 import {
   chooseTheme,
   expectNoAxeViolations,
@@ -8,6 +7,7 @@ import {
   openLibrary,
   startImport,
 } from "./helpers";
+import { expect, test } from "./test";
 
 // adapter-fallback is extracted with the generic rules, so its document
 // shows the warning notice.

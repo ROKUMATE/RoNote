@@ -1,4 +1,4 @@
-import { expect, type Page, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import type { Document } from "../src/api/schema";
 import {
   chooseTheme,
@@ -6,6 +6,7 @@ import {
   expectNoHorizontalScroll,
   openLinkedPage,
 } from "./helpers";
+import { expect, test } from "./test";
 
 // Paragraphs of e2e/fixtures/linked-a.html.
 const intro = "A synthetic page for RoNote's end-to-end tests.";

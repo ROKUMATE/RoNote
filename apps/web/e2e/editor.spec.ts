@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { expect, type Page, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import {
   caretHeading,
   chooseTheme,
@@ -9,6 +9,7 @@ import {
   importPage,
 } from "./helpers";
 import { stack } from "./stack";
+import { expect, test } from "./test";
 
 // A page with a paragraph, npm/Yarn tabs, a callout and a titled code block.
 const fixture = "docusaurus-v3-install";

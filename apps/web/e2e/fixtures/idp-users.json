@@ -131,5 +131,12 @@
     "name": "Unverified",
     "email": "e2e-unverified@ronote.local",
     "verified": false
+  },
+  {
+    "id": 2103,
+    "login": "e2e-expiry",
+    "name": "Expiry",
+    "email": "e2e-expiry@ronote.local",
+    "verified": true
   }
 ]

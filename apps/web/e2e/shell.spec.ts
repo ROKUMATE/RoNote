@@ -1,5 +1,5 @@
-import { expect, test } from "@playwright/test";
 import { expectNoHorizontalScroll } from "./helpers";
+import { expect, test } from "./test";
 
 test("renders the shell", async ({ page }) => {
   await page.goto("/");

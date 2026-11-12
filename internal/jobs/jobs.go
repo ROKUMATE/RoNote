@@ -15,11 +15,13 @@ import (
 )
 
 // Job is work to run later. Payload is its handler's input, as JSON. Jobs
-// with the same non-empty Key run once.
+// with the same non-empty Key run once. A job with a Delay is delivered no
+// sooner than that long after it is enqueued.
 type Job struct {
 	Kind    string
 	Key     string
 	Payload []byte
+	Delay   time.Duration
 }
 
 // Delivery is one attempt at a job. Attempt counts from 1.

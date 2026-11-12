@@ -139,7 +139,7 @@ func (q *Queue) add(js []jobs.Job) {
 			}
 			q.keys[key] = true
 		}
-		q.waiting = append(q.waiting, &pending{job: job, attempt: 1, at: q.clock.Now()})
+		q.waiting = append(q.waiting, &pending{job: job, attempt: 1, at: q.clock.Now().Add(max(job.Delay, 0))})
 	}
 	q.mu.Unlock()
 	q.poke()
@@ -164,7 +164,7 @@ func (q *Queue) Run(ctx context.Context) error {
 		next, later := q.dispatch(base)
 		var due <-chan time.Time
 		if later {
-			due = q.clock.After(next.Sub(q.clock.Now()))
+			due = q.clock.At(next)
 		}
 		select {
 		case <-ctx.Done():

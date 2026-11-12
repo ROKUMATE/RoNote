@@ -17,11 +17,13 @@ import (
 
 	"github.com/rokumate/ronote/internal/auth"
 	"github.com/rokumate/ronote/internal/doccontent"
+	"github.com/rokumate/ronote/internal/embed"
 	"github.com/rokumate/ronote/internal/fetch"
 	"github.com/rokumate/ronote/internal/importer"
 	"github.com/rokumate/ronote/internal/ir"
 	"github.com/rokumate/ronote/internal/jobs/riverjobs"
 	"github.com/rokumate/ronote/internal/pgtest"
+	"github.com/rokumate/ronote/internal/search"
 	"github.com/rokumate/ronote/internal/store"
 )
 
@@ -102,8 +104,9 @@ func TestAPIImportsEndToEnd(t *testing.T) {
 		}
 	})
 	backend := integrationBackend{Store: st, Service: importer.NewService(st, queue, importer.Quota{ImportsPerDay: 1000, Documents: 1000})}
-	adaAPI := signedInAs(t, st, Options{Logger: discardLogger, DB: db.Pool, Backend: backend}, ada.ID)
-	graceAPI := signedInAs(t, st, Options{Logger: discardLogger, DB: db.Pool, Backend: backend}, grace.ID)
+	searcher := search.NewSearcher(st, embed.Fake{}, discardLogger)
+	adaAPI := signedInAs(t, st, Options{Logger: discardLogger, DB: db.Pool, Backend: backend, Searcher: searcher}, ada.ID)
+	graceAPI := signedInAs(t, st, Options{Logger: discardLogger, DB: db.Pool, Backend: backend, Searcher: searcher}, grace.ID)
 
 	type importJSON struct {
 		ID         string `json:"id"`
@@ -158,6 +161,32 @@ func TestAPIImportsEndToEnd(t *testing.T) {
 	}
 
 	checkEditing(t, adaAPI, graceAPI, st, ada.ID, imp.DocumentID)
+	checkSearch(t, adaAPI, graceAPI, st, ada.ID, imp.DocumentID)
+}
+
+// checkSearch indexes the owner's document and searches it through the
+// API: the owner finds it; another user finds nothing, even naming it.
+func checkSearch(t *testing.T, owner, stranger http.Handler, st *store.Store, ownerID uuid.UUID, docID string) {
+	t.Helper()
+	if _, err := search.NewIndexer(st, embed.Fake{}, discardLogger).Index(t.Context(), ownerID, uuid.MustParse(docID)); err != nil {
+		t.Fatal(err)
+	}
+	type results struct {
+		Results []struct {
+			DocumentID string `json:"document_id"`
+		} `json:"results"`
+	}
+	rec := apiRequest(t, owner, http.MethodGet, "/api/v1/search?q=go+run", "")
+	found := decodeJSON[results](t, rec)
+	if rec.Code != http.StatusOK || len(found.Results) == 0 || found.Results[0].DocumentID != docID {
+		t.Errorf("owner's search = %d %+v, want their document", rec.Code, found)
+	}
+	for _, target := range []string{"/api/v1/search?q=go+run", "/api/v1/search?q=go+run&document_id=" + docID} {
+		rec := apiRequest(t, stranger, http.MethodGet, target, "")
+		if got := decodeJSON[results](t, rec); rec.Code != http.StatusOK || len(got.Results) != 0 {
+			t.Errorf("another user's %s = %d %+v, want no results", target, rec.Code, got)
+		}
+	}
 }
 
 // checkEditing edits the user's document through the API: a save, a stale

@@ -44,6 +44,10 @@ type Options struct {
 	PublicURL string
 	// Limits are the rate limits.
 	Limits Limits
+	// Searcher searches users' libraries; ShowScores puts each result's
+	// scores in the answer, in dev and test.
+	Searcher   Searcher
+	ShowScores bool
 }
 
 // New returns the API handler: /healthz, /readyz and the routes of

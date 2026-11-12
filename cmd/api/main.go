@@ -15,6 +15,7 @@ import (
 	"github.com/rokumate/ronote/internal/auth"
 	"github.com/rokumate/ronote/internal/config"
 	"github.com/rokumate/ronote/internal/db"
+	"github.com/rokumate/ronote/internal/embed"
 	"github.com/rokumate/ronote/internal/events"
 	"github.com/rokumate/ronote/internal/httpapi"
 	"github.com/rokumate/ronote/internal/importer"
@@ -87,6 +88,9 @@ func run() error {
 		Cookies:   auth.Cookies{Secure: cfg.Env.Deployed()},
 		PublicURL: cfg.PublicURL,
 		Limits:    httpapi.Limits{APIPerMinute: cfg.Limits.APIPerMinute, AuthPerMinute: cfg.Limits.AuthPerMinute},
+		// Scores help tune search in dev and test; people don't need them.
+		Searcher:   search.NewSearcher(st, embed.NewClient(cfg.Embed.URL, cfg.Embed.Model), logger),
+		ShowScores: !cfg.Env.Deployed(),
 		GitHub: auth.GitHub{
 			ClientID:     cfg.GitHub.ClientID,
 			ClientSecret: cfg.GitHub.ClientSecret,

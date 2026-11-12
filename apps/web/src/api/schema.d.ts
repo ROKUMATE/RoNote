@@ -112,6 +112,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search the user's library
+         * @description Finds the blocks of the user's documents and notes that match q, by
+         *     words and by meaning, merged by reciprocal rank fusion
+         *     (docs/adr/0011-retrieval.md). When the embedder is unavailable, the
+         *     results are word matches alone and degraded is true.
+         */
+        get: operations["search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/imports": {
         parameters: {
             query?: never;
@@ -359,6 +382,38 @@ export interface components {
         DeleteAccountRequest: {
             /** @description The user's GitHub login, typed to confirm. */
             confirm: string;
+        };
+        SearchResults: {
+            results: components["schemas"]["SearchResult"][];
+            /** @description Meaning couldn't be searched, so the results are word matches alone. */
+            degraded: boolean;
+        };
+        SearchResult: {
+            /** Format: uuid */
+            document_id: string;
+            document_title: string;
+            /** @description The top-level block the result starts at. */
+            block_id: string;
+            heading_path: string[];
+            /** @enum {string} */
+            kind: "prose" | "code" | "note";
+            /** @description The result's text in parts; marked parts are the words the query matched. */
+            snippet: components["schemas"]["SnippetPart"][];
+            score?: components["schemas"]["SearchScore"];
+        };
+        SnippetPart: {
+            text: string;
+            mark: boolean;
+        };
+        /** @description How the result scored; in dev and test only. */
+        SearchScore: {
+            fused: number;
+            /** @description Its rank by words; absent when words didn't find it. */
+            words_rank?: number;
+            /** @description Its rank by meaning; absent when meaning didn't find it. */
+            meaning_rank?: number;
+            /** @description Its cosine distance from the query. */
+            distance?: number;
         };
         /**
          * @description Why signing in failed, in /login?error=: the user or GitHub refused (denied); the sign-in's cookie was missing, expired or another (state_mismatch); the GitHub account has no primary, verified email (no_verified_email); or GitHub didn't answer (provider_unavailable).
@@ -725,6 +780,10 @@ export type ErrorBody = components['schemas']['ErrorBody'];
 export type ErrorCode = components['schemas']['ErrorCode'];
 export type Me = components['schemas']['Me'];
 export type DeleteAccountRequest = components['schemas']['DeleteAccountRequest'];
+export type SearchResults = components['schemas']['SearchResults'];
+export type SearchResult = components['schemas']['SearchResult'];
+export type SnippetPart = components['schemas']['SnippetPart'];
+export type SearchScore = components['schemas']['SearchScore'];
 export type SignInErrorCode = components['schemas']['SignInErrorCode'];
 export type CreateImportRequest = components['schemas']['CreateImportRequest'];
 export type ImportStatus = components['schemas']['ImportStatus'];
@@ -922,6 +981,35 @@ export interface operations {
             401: components["responses"]["Unauthenticated"];
             403: components["responses"]["CrossOrigin"];
             413: components["responses"]["BodyTooLarge"];
+            429: components["responses"]["RateLimited"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    search: {
+        parameters: {
+            query: {
+                q: string;
+                /** @description Search this document alone. */
+                document_id?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The results, best first. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchResults"];
+                };
+            };
+            400: components["responses"]["InvalidParameter"];
+            401: components["responses"]["Unauthenticated"];
             429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };

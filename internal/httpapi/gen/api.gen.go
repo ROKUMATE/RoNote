@@ -303,6 +303,27 @@ func (e ImportStatus) Valid() bool {
 	}
 }
 
+// Defines values for SearchResultKind.
+const (
+	Code  SearchResultKind = "code"
+	Note  SearchResultKind = "note"
+	Prose SearchResultKind = "prose"
+)
+
+// Valid indicates whether the value is a known member of the SearchResultKind enum.
+func (e SearchResultKind) Valid() bool {
+	switch e {
+	case Code:
+		return true
+	case Note:
+		return true
+	case Prose:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for SignInErrorCode.
 const (
 	Denied              SignInErrorCode = "denied"
@@ -611,8 +632,53 @@ type SavedDocument struct {
 	Version int `json:"version"`
 }
 
+// SearchResult defines model for SearchResult.
+type SearchResult struct {
+	// BlockID The top-level block the result starts at.
+	BlockID       string             `json:"block_id"`
+	DocumentID    openapi_types.UUID `json:"document_id"`
+	DocumentTitle string             `json:"document_title"`
+	HeadingPath   []string           `json:"heading_path"`
+	Kind          SearchResultKind   `json:"kind"`
+
+	// Score How the result scored; in dev and test only.
+	Score *SearchScore `json:"score,omitempty"`
+
+	// Snippet The result's text in parts; marked parts are the words the query matched.
+	Snippet []SnippetPart `json:"snippet"`
+}
+
+// SearchResultKind defines model for SearchResult.Kind.
+type SearchResultKind string
+
+// SearchResults defines model for SearchResults.
+type SearchResults struct {
+	// Degraded Meaning couldn't be searched, so the results are word matches alone.
+	Degraded bool           `json:"degraded"`
+	Results  []SearchResult `json:"results"`
+}
+
+// SearchScore How the result scored; in dev and test only.
+type SearchScore struct {
+	// Distance Its cosine distance from the query.
+	Distance *float32 `json:"distance,omitempty"`
+	Fused    float32  `json:"fused"`
+
+	// MeaningRank Its rank by meaning; absent when meaning didn't find it.
+	MeaningRank *int `json:"meaning_rank,omitempty"`
+
+	// WordsRank Its rank by words; absent when words didn't find it.
+	WordsRank *int `json:"words_rank,omitempty"`
+}
+
 // SignInErrorCode Why signing in failed, in /login?error=: the user or GitHub refused (denied); the sign-in's cookie was missing, expired or another (state_mismatch); the GitHub account has no primary, verified email (no_verified_email); or GitHub didn't answer (provider_unavailable).
 type SignInErrorCode string
+
+// SnippetPart defines model for SnippetPart.
+type SnippetPart struct {
+	Mark bool   `json:"mark"`
+	Text string `json:"text"`
+}
 
 // TextSelector A range of one block's plain text: a heading's or paragraph's runs joined, or a code block's text. Offsets count UTF-16 code units, end exclusive. exact is the text in the range when it was saved; prefix and suffix, the text just around it, tell repeats apart when the text changes.
 type TextSelector = annotation.Selector
@@ -659,6 +725,15 @@ type ListDocumentsParams struct {
 	// Cursor The next_cursor of the previous page.
 	Cursor *string `form:"cursor,omitempty" json:"cursor,omitempty"`
 	Limit  *int    `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
+// SearchParams defines parameters for Search.
+type SearchParams struct {
+	Q string `form:"q" json:"q"`
+
+	// DocumentID Search this document alone.
+	DocumentID *openapi_types.UUID `form:"document_id,omitempty" json:"document_id,omitempty"`
+	Limit      *int                `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
 // UpdateAnnotationJSONRequestBody defines body for UpdateAnnotation for application/json ContentType.
@@ -720,6 +795,9 @@ type ServerInterface interface {
 	// GetMe The signed-in user
 	// (GET /me)
 	GetMe(w http.ResponseWriter, r *http.Request)
+	// Search Search the user's library
+	// (GET /search)
+	Search(w http.ResponseWriter, r *http.Request, params SearchParams)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -1062,6 +1140,65 @@ func (siw *ServerInterfaceWrapper) GetMe(w http.ResponseWriter, r *http.Request)
 	handler.ServeHTTP(w, r)
 }
 
+// Search operation middleware
+func (siw *ServerInterfaceWrapper) Search(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SearchParams
+
+	// ------------- Required query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "document_id" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "document_id", r.URL.Query(), &params.DocumentID, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "document_id"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "document_id", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", r.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "limit"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.Search(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 type UnescapedCookieParamError struct {
 	ParamName string
 	Err       error
@@ -1183,6 +1320,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	}
 
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/me", wrapper.GetMe)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/search", wrapper.Search)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/imports", wrapper.CreateImport)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/imports/{id}", wrapper.GetImport)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/documents", wrapper.ListDocuments)
@@ -2676,6 +2814,85 @@ func (response GetMe500JSONResponse) VisitGetMeResponse(w http.ResponseWriter) e
 	return err
 }
 
+type SearchRequestObject struct {
+	Params SearchParams
+}
+
+type SearchResponseObject interface {
+	VisitSearchResponse(w http.ResponseWriter) error
+}
+
+type Search200JSONResponse SearchResults
+
+func (response Search200JSONResponse) VisitSearchResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type Search400JSONResponse struct{ InvalidParameterJSONResponse }
+
+func (response Search400JSONResponse) VisitSearchResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type Search401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response Search401JSONResponse) VisitSearchResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type Search429JSONResponse struct{ RateLimitedJSONResponse }
+
+func (response Search429JSONResponse) VisitSearchResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Retry-After", fmt.Sprint(response.Headers.RetryAfter))
+	w.WriteHeader(429)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type Search500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response Search500JSONResponse) VisitSearchResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 	// DeleteAnnotation Remove an annotation
@@ -2717,6 +2934,9 @@ type StrictServerInterface interface {
 	// GetMe The signed-in user
 	// (GET /me)
 	GetMe(ctx context.Context, request GetMeRequestObject) (GetMeResponseObject, error)
+	// Search Search the user's library
+	// (GET /search)
+	Search(ctx context.Context, request SearchRequestObject) (SearchResponseObject, error)
 }
 
 type StrictHandlerFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error)
@@ -3126,6 +3346,32 @@ func (sh *strictHandler) GetMe(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetMeResponseObject); ok {
 		if err := validResponse.VisitGetMeResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// Search operation middleware
+func (sh *strictHandler) Search(w http.ResponseWriter, r *http.Request, params SearchParams) {
+	var request SearchRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.Search(ctx, request.(SearchRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "Search")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SearchResponseObject); ok {
+		if err := validResponse.VisitSearchResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

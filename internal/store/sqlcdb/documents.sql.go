@@ -12,6 +12,26 @@ import (
 	"github.com/google/uuid"
 )
 
+const bumpIndexSeq = `-- name: BumpIndexSeq :one
+UPDATE documents
+SET index_seq = index_seq + 1
+WHERE owner_id = $1 AND id = $2
+RETURNING index_seq
+`
+
+type BumpIndexSeqParams struct {
+	OwnerID uuid.UUID
+	ID      uuid.UUID
+}
+
+// Records a change search sees; the new sequence keys the index job.
+func (q *Queries) BumpIndexSeq(ctx context.Context, arg BumpIndexSeqParams) (int64, error) {
+	row := q.db.QueryRow(ctx, bumpIndexSeq, arg.OwnerID, arg.ID)
+	var index_seq int64
+	err := row.Scan(&index_seq)
+	return index_seq, err
+}
+
 const createDocumentIfAbsent = `-- name: CreateDocumentIfAbsent :one
 INSERT INTO documents (owner_id, source_id, extraction_id, title, content)
 VALUES ($1, $2, $3, $4, $5)
@@ -81,6 +101,51 @@ func (q *Queries) DocumentVersion(ctx context.Context, arg DocumentVersionParams
 	var version int32
 	err := row.Scan(&version)
 	return version, err
+}
+
+const documentsBehind = `-- name: DocumentsBehind :many
+SELECT d.owner_id, d.id, d.index_seq
+FROM documents d
+WHERE d.indexed_seq < d.index_seq
+   OR EXISTS (
+       SELECT 1 FROM chunks c
+       WHERE c.owner_id = d.owner_id AND c.document_id = d.id AND c.model <> $1
+   )
+ORDER BY d.updated_at DESC
+LIMIT $2
+`
+
+type DocumentsBehindParams struct {
+	Model   string
+	MaxRows int32
+}
+
+type DocumentsBehindRow struct {
+	OwnerID  uuid.UUID
+	ID       uuid.UUID
+	IndexSeq int64
+}
+
+// Every user's documents whose chunks are behind their content, or were
+// embedded by another model: the worker's backfill, across owners.
+func (q *Queries) DocumentsBehind(ctx context.Context, arg DocumentsBehindParams) ([]DocumentsBehindRow, error) {
+	rows, err := q.db.Query(ctx, documentsBehind, arg.Model, arg.MaxRows)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []DocumentsBehindRow
+	for rows.Next() {
+		var i DocumentsBehindRow
+		if err := rows.Scan(&i.OwnerID, &i.ID, &i.IndexSeq); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const findOwnerDocumentForURL = `-- name: FindOwnerDocumentForURL :one
@@ -156,6 +221,36 @@ func (q *Queries) GetDocument(ctx context.Context, arg GetDocumentParams) (GetDo
 	return i, err
 }
 
+const getIndexState = `-- name: GetIndexState :one
+SELECT title, content, index_seq, indexed_seq
+FROM documents
+WHERE owner_id = $1 AND id = $2
+`
+
+type GetIndexStateParams struct {
+	OwnerID uuid.UUID
+	ID      uuid.UUID
+}
+
+type GetIndexStateRow struct {
+	Title      string
+	Content    []byte
+	IndexSeq   int64
+	IndexedSeq int64
+}
+
+func (q *Queries) GetIndexState(ctx context.Context, arg GetIndexStateParams) (GetIndexStateRow, error) {
+	row := q.db.QueryRow(ctx, getIndexState, arg.OwnerID, arg.ID)
+	var i GetIndexStateRow
+	err := row.Scan(
+		&i.Title,
+		&i.Content,
+		&i.IndexSeq,
+		&i.IndexedSeq,
+	)
+	return i, err
+}
+
 const listDocuments = `-- name: ListDocuments :many
 SELECT d.id, d.title, s.canonical_url AS source_url, d.version, d.created_at, d.updated_at
 FROM documents d
@@ -213,6 +308,23 @@ func (q *Queries) ListDocuments(ctx context.Context, arg ListDocumentsParams) ([
 		return nil, err
 	}
 	return items, nil
+}
+
+const markIndexed = `-- name: MarkIndexed :exec
+UPDATE documents
+SET indexed_seq = GREATEST(indexed_seq, $1)
+WHERE owner_id = $2 AND id = $3
+`
+
+type MarkIndexedParams struct {
+	Seq     int64
+	OwnerID uuid.UUID
+	ID      uuid.UUID
+}
+
+func (q *Queries) MarkIndexed(ctx context.Context, arg MarkIndexedParams) error {
+	_, err := q.db.Exec(ctx, markIndexed, arg.Seq, arg.OwnerID, arg.ID)
+	return err
 }
 
 const resolveDocuments = `-- name: ResolveDocuments :many

@@ -20,6 +20,7 @@ import (
 	"github.com/rokumate/ronote/internal/importer"
 	"github.com/rokumate/ronote/internal/jobs"
 	"github.com/rokumate/ronote/internal/jobs/riverjobs"
+	"github.com/rokumate/ronote/internal/search"
 	"github.com/rokumate/ronote/internal/store"
 )
 
@@ -48,16 +49,18 @@ func run() error {
 	}
 	defer pool.Close()
 
-	st := store.New(pool)
 	// The API only enqueues jobs; the worker process runs them. River keeps
-	// a job's attempt limit with it, so the kind is declared here too.
+	// a job's attempt limit with it, so the kinds are declared here too.
 	queue, err := riverjobs.New(pool, riverjobs.Options{
 		Logger: logger,
-		Kinds:  map[string]jobs.Options{importer.Kind: importer.JobOptions},
+		Kinds:  map[string]jobs.Options{importer.Kind: importer.JobOptions, search.JobKind: search.JobOptions},
 	})
 	if err != nil {
 		return err
 	}
+	// Saves, reverts and notes enqueue their document's indexing in their
+	// own transaction.
+	st := store.New(pool).OnChange(search.EnqueueOnChange(queue, cfg.Embed.Model))
 	// One connection listens for import status changes; event streams share it.
 	broker := events.NewBroker()
 	listening := make(chan struct{})

@@ -31,5 +31,6 @@ SET block_id = sqlc.arg(block_id), selector = sqlc.arg(selector), note = sqlc.na
 WHERE owner_id = sqlc.arg(owner_id) AND id = sqlc.arg(id) AND version = sqlc.arg(version)
 RETURNING *;
 
--- name: DeleteAnnotation :execrows
-DELETE FROM annotations WHERE owner_id = $1 AND id = $2;
+-- name: DeleteAnnotation :one
+DELETE FROM annotations WHERE owner_id = $1 AND id = $2
+RETURNING document_id, note;

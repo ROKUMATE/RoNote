@@ -62,17 +62,24 @@ func (s *Store) CreateDocumentIfAbsent(ctx context.Context, d NewDocument) (id u
 	if err != nil {
 		return uuid.Nil, false, fmt.Errorf("create document: %w", err)
 	}
-	row, err := s.q.CreateDocumentIfAbsent(ctx, sqlcdb.CreateDocumentIfAbsentParams{
-		OwnerID:      d.OwnerID,
-		SourceID:     d.SourceID,
-		ExtractionID: d.ExtractionID,
-		Title:        d.Content.Title,
-		Content:      content,
+	err = s.inTx(ctx, func(tx *Store) error {
+		row, err := tx.q.CreateDocumentIfAbsent(ctx, sqlcdb.CreateDocumentIfAbsentParams{
+			OwnerID:      d.OwnerID,
+			SourceID:     d.SourceID,
+			ExtractionID: d.ExtractionID,
+			Title:        d.Content.Title,
+			Content:      content,
+		})
+		if err != nil {
+			return mapErr("create document", err)
+		}
+		id, created = row.ID, row.Created
+		if !created {
+			return nil
+		}
+		return tx.changed(ctx, d.OwnerID, id)
 	})
-	if err != nil {
-		return uuid.Nil, false, mapErr("create document", err)
-	}
-	return row.ID, row.Created, nil
+	return id, created, err
 }
 
 // FindOwnerDocumentForURL returns the ID of owner's document for url: one
@@ -168,20 +175,80 @@ func (s *Store) SaveDocument(ctx context.Context, owner, id uuid.UUID, content *
 	if err != nil {
 		return 0, fmt.Errorf("save document: %w", err)
 	}
-	saved, err := s.q.SaveDocument(ctx, sqlcdb.SaveDocumentParams{
-		Content: data, OwnerID: owner, ID: id, Version: int32(min(max(version, 0), math.MaxInt32)), //nolint:gosec // clamped
+	var saved int32
+	err = s.inTx(ctx, func(tx *Store) error {
+		var err error
+		saved, err = tx.q.SaveDocument(ctx, sqlcdb.SaveDocumentParams{
+			Content: data, OwnerID: owner, ID: id, Version: int32(min(max(version, 0), math.MaxInt32)), //nolint:gosec // clamped
+		})
+		if err == nil {
+			return tx.changed(ctx, owner, id)
+		}
+		if !errors.Is(mapErr("save document", err), ErrNotFound) {
+			return mapErr("save document", err)
+		}
+		current, err := tx.q.DocumentVersion(ctx, sqlcdb.DocumentVersionParams{OwnerID: owner, ID: id})
+		if err != nil {
+			return mapErr("document version", err)
+		}
+		return &VersionConflictError{Current: int(current)}
 	})
-	if err == nil {
-		return int(saved), nil
-	}
-	if !errors.Is(mapErr("save document", err), ErrNotFound) {
-		return 0, mapErr("save document", err)
-	}
-	current, err := s.q.DocumentVersion(ctx, sqlcdb.DocumentVersionParams{OwnerID: owner, ID: id})
 	if err != nil {
-		return 0, mapErr("document version", err)
+		return 0, err
 	}
-	return 0, &VersionConflictError{Current: int(current)}
+	return int(saved), nil
+}
+
+// IndexState is what indexing a document reads: its title and content,
+// with the sequence it is at and the one its chunks were made from.
+type IndexState struct {
+	Title      string
+	Content    *doccontent.Doc
+	IndexSeq   int64
+	IndexedSeq int64
+}
+
+// GetIndexState returns owner's document's IndexState, or ErrNotFound.
+func (s *Store) GetIndexState(ctx context.Context, owner, id uuid.UUID) (IndexState, error) {
+	row, err := s.q.GetIndexState(ctx, sqlcdb.GetIndexStateParams{OwnerID: owner, ID: id})
+	if err != nil {
+		return IndexState{}, mapErr("index state", err)
+	}
+	var content doccontent.Doc
+	if err := json.Unmarshal(row.Content, &content); err != nil {
+		return IndexState{}, fmt.Errorf("index state: %w", err)
+	}
+	return IndexState{Title: row.Title, Content: &content, IndexSeq: row.IndexSeq, IndexedSeq: row.IndexedSeq}, nil
+}
+
+// MarkIndexed records that owner's document's chunks are made from seq; an
+// earlier seq never replaces a later one.
+func (s *Store) MarkIndexed(ctx context.Context, owner, id uuid.UUID, seq int64) error {
+	if err := s.q.MarkIndexed(ctx, sqlcdb.MarkIndexedParams{OwnerID: owner, ID: id, Seq: seq}); err != nil {
+		return mapErr("mark indexed", err)
+	}
+	return nil
+}
+
+// Behind is a document whose chunks need making again.
+type Behind struct {
+	OwnerID, ID uuid.UUID
+	IndexSeq    int64
+}
+
+// DocumentsBehind returns, across every user, up to limit documents whose
+// chunks are behind their content or were embedded by a model other than
+// model, most recently changed first.
+func (s *Store) DocumentsBehind(ctx context.Context, model string, limit int) ([]Behind, error) {
+	rows, err := s.q.DocumentsBehind(ctx, sqlcdb.DocumentsBehindParams{Model: model, MaxRows: int32(min(max(limit, 0), math.MaxInt32))}) //nolint:gosec // clamped
+	if err != nil {
+		return nil, mapErr("documents behind", err)
+	}
+	out := make([]Behind, len(rows))
+	for i, r := range rows {
+		out[i] = Behind{OwnerID: r.OwnerID, ID: r.ID, IndexSeq: r.IndexSeq}
+	}
+	return out, nil
 }
 
 // ResolveDocuments returns, for each of urls that has one, the id of owner's

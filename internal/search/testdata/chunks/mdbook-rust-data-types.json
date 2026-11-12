@@ -1,0 +1,292 @@
+[
+  {
+    "block_ids": [
+      "1577df1b7ea9",
+      "4361840528c1",
+      "d8efa7340254",
+      "9cd23fa3f827"
+    ],
+    "heading_path": [
+      "Data Types"
+    ],
+    "kind": "prose",
+    "chars": 903,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types\n\nEvery value in Rust is of a certain data type, which tells Rust"
+  },
+  {
+    "block_ids": [
+      "9bd81b9e00f5",
+      "9e51fc98d8d5"
+    ],
+    "heading_path": [
+      "Data Types"
+    ],
+    "kind": "prose",
+    "chars": 713,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types\n\nCode (console):\n$ cargo build\n   Compiling no_type_annotations "
+  },
+  {
+    "block_ids": [
+      "935c8cf182ce"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Scalar Types"
+    ],
+    "kind": "prose",
+    "chars": 233,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Scalar Types\n\nA scalar type represents a single value. Rust ha"
+  },
+  {
+    "block_ids": [
+      "6fb543a18067",
+      "a509f385610b",
+      "6c26c489a7a9",
+      "5f489a0af32c"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Scalar Types",
+      "Integer Types"
+    ],
+    "kind": "prose",
+    "chars": 1195,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Scalar Types > Integer Types\n\nAn integer is a number without a"
+  },
+  {
+    "block_ids": [
+      "02861aa37186",
+      "6042d5ea0398",
+      "5b146b729868",
+      "a1650370f8df",
+      "3287868418f4",
+      "8514af4cd602"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Scalar Types",
+      "Integer Types"
+    ],
+    "kind": "prose",
+    "chars": 1277,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Scalar Types > Integer Types\n\nEach signed variant can store nu"
+  },
+  {
+    "block_ids": [
+      "99a109edc1bf",
+      "54fa91df3d89",
+      "286ebb2d3329"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Scalar Types",
+      "Integer Types",
+      "Integer Overflow"
+    ],
+    "kind": "prose",
+    "chars": 1293,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Scalar Types > Integer Types > Integer Overflow\n\nLet’s say you"
+  },
+  {
+    "block_ids": [
+      "79ec655bd12d"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Scalar Types",
+      "Integer Types",
+      "Integer Overflow"
+    ],
+    "kind": "prose",
+    "chars": 333,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Scalar Types > Integer Types > Integer Overflow\n\nWrap in all c"
+  },
+  {
+    "block_ids": [
+      "8794aa432a3f",
+      "6f3f7b460c45",
+      "243649dcea17",
+      "0d917d8d3d27"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Scalar Types",
+      "Floating-Point Types"
+    ],
+    "kind": "prose",
+    "chars": 561,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Scalar Types > Floating-Point Types\n\nRust also has two primiti"
+  },
+  {
+    "block_ids": [
+      "ec90b7f02993",
+      "4bf709f17e9d",
+      "b12f060ba593"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Scalar Types",
+      "Numeric Operations"
+    ],
+    "kind": "prose",
+    "chars": 788,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Scalar Types > Numeric Operations\n\nRust supports the basic mat"
+  },
+  {
+    "block_ids": [
+      "37b6d1344c4c",
+      "bf7bb677db20",
+      "a9ae7c4c986b"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Scalar Types",
+      "The Boolean Type"
+    ],
+    "kind": "prose",
+    "chars": 451,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Scalar Types > The Boolean Type\n\nAs in most other programming "
+  },
+  {
+    "block_ids": [
+      "27b68b9838ce",
+      "79608e4fb2b1",
+      "561e2319e311"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Scalar Types",
+      "The Character Type"
+    ],
+    "kind": "prose",
+    "chars": 952,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Scalar Types > The Character Type\n\nRust’s char type is the lan"
+  },
+  {
+    "block_ids": [
+      "cc6fc794a452"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Compound Types"
+    ],
+    "kind": "prose",
+    "chars": 113,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Compound Types\n\nCompound types can group multiple values into "
+  },
+  {
+    "block_ids": [
+      "9b4e6b3366d8",
+      "b374549665a7",
+      "733af75fdd88",
+      "561e773408cb",
+      "9429e13d3aad",
+      "c2a75caad03e",
+      "debd3457aae9"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Compound Types",
+      "The Tuple Type"
+    ],
+    "kind": "prose",
+    "chars": 1276,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Compound Types > The Tuple Type\n\nA tuple is a general way of g"
+  },
+  {
+    "block_ids": [
+      "2c0ae71540ca",
+      "40e87ab69000",
+      "bb34998ca923"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Compound Types",
+      "The Tuple Type"
+    ],
+    "kind": "prose",
+    "chars": 566,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Compound Types > The Tuple Type\n\nCode (rust), Filename: src/ma"
+  },
+  {
+    "block_ids": [
+      "6c1d192d4f5d",
+      "faf1f3f8c448",
+      "2c6ceed63baf",
+      "42b10a393817",
+      "473d4b593c06",
+      "c9ba8e53ecd7"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Compound Types",
+      "The Array Type"
+    ],
+    "kind": "prose",
+    "chars": 1373,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Compound Types > The Array Type\n\nAnother way to have a collect"
+  },
+  {
+    "block_ids": [
+      "2fc64323bee1",
+      "341138520970",
+      "c519e2b27b8b",
+      "10b81d9db51d",
+      "5871cacc3370",
+      "5166eed83846"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Compound Types",
+      "The Array Type"
+    ],
+    "kind": "prose",
+    "chars": 690,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Compound Types > The Array Type\n\nYou write an array’s type usi"
+  },
+  {
+    "block_ids": [
+      "e7ef9a91adc4",
+      "43f4328221c6",
+      "eeb07c3fafda"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Compound Types",
+      "Array Element Access"
+    ],
+    "kind": "prose",
+    "chars": 441,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Compound Types > Array Element Access\n\nAn array is a single ch"
+  },
+  {
+    "block_ids": [
+      "b1016cded760",
+      "aa00a511ea1a",
+      "8b22a40b3d87",
+      "b7f83a8c6bd3"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Compound Types",
+      "Invalid Array Element Access"
+    ],
+    "kind": "prose",
+    "chars": 1104,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Compound Types > Invalid Array Element Access\n\nLet’s see what "
+  },
+  {
+    "block_ids": [
+      "21ad719d5f5b",
+      "ce6121ad3213"
+    ],
+    "heading_path": [
+      "Data Types",
+      "Compound Types",
+      "Invalid Array Element Access"
+    ],
+    "kind": "prose",
+    "chars": 1028,
+    "embed_start": "Data Types - The Rust Programming Language > Data Types > Compound Types > Invalid Array Element Access\n\nThe program res"
+  }
+]

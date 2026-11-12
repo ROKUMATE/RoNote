@@ -1,0 +1,115 @@
+[
+  {
+    "block_ids": [
+      "66d9b0cedff6"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 270,
+    "embed_start": "Code blocks\n\nCode blocks and examples are an essential part of technical project documentation. Material for MkDocs prov"
+  },
+  {
+    "block_ids": [
+      "665195593f92",
+      "bf9cd7ace71a",
+      "6c74ece0e313",
+      "71c0ac7b3755",
+      "d46defbee531"
+    ],
+    "heading_path": [
+      "Configuration"
+    ],
+    "kind": "prose",
+    "chars": 663,
+    "embed_start": "Code blocks > Configuration\n\nThis configuration enables syntax highlighting on code blocks and inline code blocks, and a"
+  },
+  {
+    "block_ids": [
+      "8c205af5661d",
+      "7fffea9dd26a",
+      "abbe6e1265f6",
+      "ee12a83228fc"
+    ],
+    "heading_path": [
+      "Configuration",
+      "Code copy button"
+    ],
+    "kind": "prose",
+    "chars": 902,
+    "embed_start": "Code blocks > Configuration > Code copy button\n\n9.0.0\n\nCode blocks can automatically render a button on the right side t"
+  },
+  {
+    "block_ids": [
+      "5ec9a6c4053e",
+      "0519a08f5877",
+      "d5a948a74c9e"
+    ],
+    "heading_path": [
+      "Configuration",
+      "Adding a title"
+    ],
+    "kind": "prose",
+    "chars": 636,
+    "embed_start": "Code blocks > Configuration > Adding a title\n\nIn order to provide additional context, a custom title can be added to a c"
+  },
+  {
+    "block_ids": [
+      "3f9641e95ee6",
+      "62586c3f558f",
+      "c35dca92eb8b",
+      "e014a4ad51b0"
+    ],
+    "heading_path": [
+      "Configuration",
+      "Adding annotations"
+    ],
+    "kind": "prose",
+    "chars": 594,
+    "embed_start": "Code blocks > Configuration > Adding annotations\n\nCode annotations can be placed anywhere in a code block where a commen"
+  },
+  {
+    "block_ids": [
+      "42f2868f92cf",
+      "52bf124d8d33",
+      "2e1622f0b2a5",
+      "8cb2f887c9c9",
+      "d366dccc048b",
+      "089f57acefdf"
+    ],
+    "heading_path": [
+      "Configuration",
+      "Adding annotations",
+      "Stripping comments"
+    ],
+    "kind": "prose",
+    "chars": 420,
+    "embed_start": "Code blocks > Configuration > Adding annotations > Stripping comments\n\n8.5.0\n\nIf you wish to strip the comment character"
+  },
+  {
+    "block_ids": [
+      "da030ae94796",
+      "a883ba485a37",
+      "7665f03d4cf8"
+    ],
+    "heading_path": [
+      "Configuration",
+      "Adding line numbers"
+    ],
+    "kind": "prose",
+    "chars": 710,
+    "embed_start": "Code blocks > Configuration > Adding line numbers\n\nLine numbers can be added to a code block by using the linenums=\"<sta"
+  },
+  {
+    "block_ids": [
+      "95b0055cb94d",
+      "be21a4704f4e"
+    ],
+    "heading_path": [
+      "Configuration",
+      "Highlighting specific lines"
+    ],
+    "kind": "prose",
+    "chars": 1127,
+    "embed_start": "Code blocks > Configuration > Highlighting specific lines\n\nSpecific lines can be highlighted by passing the line numbers"
+  }
+]

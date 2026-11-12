@@ -1,0 +1,58 @@
+[
+  {
+    "block_ids": [
+      "9e49553671dd",
+      "759ba93809b7",
+      "11d67a29888e"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 820,
+    "embed_start": "Pods\n\nPods are the smallest deployable units of computing that you can create and manage in Kubernetes.\n\nA Pod (as in a "
+  },
+  {
+    "block_ids": [
+      "0eef277766e5",
+      "3291b409e7b8",
+      "94ffeffa6e54",
+      "20adfa582dd1",
+      "fcd0e4e01317"
+    ],
+    "heading_path": [
+      "What is a Pod?"
+    ],
+    "kind": "prose",
+    "chars": 1369,
+    "embed_start": "Pods > What is a Pod?\n\nNote:\nYou need to install a container runtime into each node in the cluster so that Pods can run "
+  },
+  {
+    "block_ids": [
+      "c5aa0b2f0a43",
+      "a1e4f4cf74eb",
+      "15cb8d4af3d5",
+      "9a97e3c0e9c5",
+      "b96bed5ecb87"
+    ],
+    "heading_path": [
+      "Using Pods"
+    ],
+    "kind": "prose",
+    "chars": 537,
+    "embed_start": "Pods > Using Pods\n\nThe following is an example of a Pod which consists of a container running the image nginx:1.14.2.\n\nC"
+  },
+  {
+    "block_ids": [
+      "886769f0a774",
+      "7284ad251b4d",
+      "e2e9614db8db",
+      "44e3588426d1"
+    ],
+    "heading_path": [
+      "Using Pods",
+      "Workload resources for managing pods"
+    ],
+    "kind": "prose",
+    "chars": 883,
+    "embed_start": "Pods > Using Pods > Workload resources for managing pods\n\nUsually you don't need to create Pods directly, even singleton"
+  }
+]

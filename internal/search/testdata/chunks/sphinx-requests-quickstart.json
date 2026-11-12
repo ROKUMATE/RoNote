@@ -1,0 +1,125 @@
+[
+  {
+    "block_ids": [
+      "660046b86f9d",
+      "b79a448cb94c",
+      "64ce38c5697e",
+      "afa52a52cb4b"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 210,
+    "embed_start": "Quickstart\n\nEager to get started? This page gives a good introduction in how to get started with Requests.\n\nFirst, make "
+  },
+  {
+    "block_ids": [
+      "e271e9974e53",
+      "b0f808d19bc5",
+      "e91bdc5d81b2",
+      "cd1ced222b2f",
+      "321a210a09f2",
+      "765685595411",
+      "41a435e85418",
+      "97e44c2ade0c",
+      "73402f64c960",
+      "281c67a27d72",
+      "08b7a852a0e2"
+    ],
+    "heading_path": [
+      "Make a Request"
+    ],
+    "kind": "prose",
+    "chars": 979,
+    "embed_start": "Quickstart > Make a Request\n\nMaking a request with Requests is very simple.\n\nBegin by importing the Requests module:\n\nCo"
+  },
+  {
+    "block_ids": [
+      "ba8c918a83e9",
+      "7318a7c1ed77",
+      "0cec3e83fb7d",
+      "6b5d91df5e19",
+      "df153f2ee37b",
+      "08b1f2c28ebe",
+      "0a4734d2a157"
+    ],
+    "heading_path": [
+      "Passing Parameters In URLs"
+    ],
+    "kind": "prose",
+    "chars": 1050,
+    "embed_start": "Quickstart > Passing Parameters In URLs\n\nYou often want to send some sort of data in the URL’s query string. If you were"
+  },
+  {
+    "block_ids": [
+      "289cb8150159",
+      "feea4be3e3fc",
+      "358bbbaf9c8e",
+      "53ebcbe506e3",
+      "ff32bdac8c1d",
+      "36fb86349f1e"
+    ],
+    "heading_path": [
+      "Response Content"
+    ],
+    "kind": "prose",
+    "chars": 1151,
+    "embed_start": "Quickstart > Response Content\n\nWe can read the content of the server’s response. Consider the GitHub timeline again:\n\nCo"
+  },
+  {
+    "block_ids": [
+      "5ffde75d8265"
+    ],
+    "heading_path": [
+      "Response Content"
+    ],
+    "kind": "prose",
+    "chars": 260,
+    "embed_start": "Quickstart > Response Content\n\nRequests will also use custom encodings in the event that you need them. If you have crea"
+  },
+  {
+    "block_ids": [
+      "6f8a05f9101c",
+      "78c9a6dc6260",
+      "8249049891d2",
+      "852ab6f1945c",
+      "e216dfa2253c",
+      "4bae235269ef"
+    ],
+    "heading_path": [
+      "Binary Response Content"
+    ],
+    "kind": "prose",
+    "chars": 543,
+    "embed_start": "Quickstart > Binary Response Content\n\nYou can also access the response body as bytes, for non-text requests:\n\nCode (defa"
+  },
+  {
+    "block_ids": [
+      "d4ba3ce40716",
+      "49e051eab1ef",
+      "43361f4c6985",
+      "fa9c490f3f4f"
+    ],
+    "heading_path": [
+      "JSON Response Content"
+    ],
+    "kind": "prose",
+    "chars": 959,
+    "embed_start": "Quickstart > JSON Response Content\n\nThere’s also a builtin JSON decoder, in case you’re dealing with JSON data:\n\nCode (d"
+  },
+  {
+    "block_ids": [
+      "439f279cdd4f",
+      "30fc03906df3",
+      "0a5113be6b44",
+      "3b313b15f5fd",
+      "5f7143a03086",
+      "72ff2d23cffd"
+    ],
+    "heading_path": [
+      "Raw Response Content"
+    ],
+    "kind": "prose",
+    "chars": 1261,
+    "embed_start": "Quickstart > Raw Response Content\n\nIn the rare case that you’d like to get the raw socket response from the server, you "
+  }
+]

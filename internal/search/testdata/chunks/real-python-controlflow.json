@@ -1,0 +1,39 @@
+[
+  {
+    "block_ids": [
+      "7814955c744f"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 110,
+    "embed_start": "4. More Control Flow Tools\n\nAs well as the while statement just introduced, Python uses a few more that we will encounte"
+  },
+  {
+    "block_ids": [
+      "436594059a83",
+      "56a498047661",
+      "1e3f85087af4",
+      "6cb21ba593a5"
+    ],
+    "heading_path": [
+      "4.1. if Statements"
+    ],
+    "kind": "prose",
+    "chars": 799,
+    "embed_start": "4. More Control Flow Tools > 4.1. if Statements\n\nPerhaps the most well-known statement type is the if statement. For exa"
+  },
+  {
+    "block_ids": [
+      "714ebffae54d",
+      "fdcd449f8cdb",
+      "ec800b1845bb",
+      "d5052a25f8ff"
+    ],
+    "heading_path": [
+      "4.2. for Statements"
+    ],
+    "kind": "prose",
+    "chars": 1186,
+    "embed_start": "4. More Control Flow Tools > 4.2. for Statements\n\nThe for statement in Python differs a bit from what you may be used to"
+  }
+]

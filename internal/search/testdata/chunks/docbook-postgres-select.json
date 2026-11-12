@@ -1,0 +1,59 @@
+[
+  {
+    "block_ids": [
+      "fcf57dabc45b",
+      "a5390aebaec5",
+      "69d2dda08b28",
+      "f603fb4816df",
+      "f3b6f217fcbd",
+      "813f16ed97c1",
+      "6c4ade5c0db8",
+      "ae699907a7c6",
+      "843cda9f225d",
+      "dd7872e67c66",
+      "b335566f73e5"
+    ],
+    "heading_path": [
+      "2.5. Querying a Table"
+    ],
+    "kind": "prose",
+    "chars": 1355,
+    "embed_start": "PostgreSQL: Documentation: 18: 2.5. Querying a Table > 2.5. Querying a Table\n\nTo retrieve data from a table, the table i"
+  },
+  {
+    "block_ids": [
+      "cad356f26b5f",
+      "8dce527cf10a",
+      "0ce460aef475",
+      "f3514a3c24a9",
+      "d3ec0f15caa3",
+      "9585993209f3",
+      "46ed4a82c8e3",
+      "24593a76dd2f",
+      "eeab6756e893",
+      "2b88f6438067",
+      "aeb36fa64996"
+    ],
+    "heading_path": [
+      "2.5. Querying a Table"
+    ],
+    "kind": "prose",
+    "chars": 1355,
+    "embed_start": "PostgreSQL: Documentation: 18: 2.5. Querying a Table > 2.5. Querying a Table\n\nA query can be “qualified” by adding a WHE"
+  },
+  {
+    "block_ids": [
+      "2d10947107ea",
+      "6b345cdfe6c8",
+      "86067fdfcca5",
+      "c8e0a3a3b02c",
+      "179703c468ca"
+    ],
+    "heading_path": [
+      "2.5. Querying a Table"
+    ],
+    "kind": "prose",
+    "chars": 707,
+    "embed_start": "PostgreSQL: Documentation: 18: 2.5. Querying a Table > 2.5. Querying a Table\n\nCode:\n     city\n---------------\n Hayward\n "
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "block_ids": [
+      "c5cb2ee81c2a",
+      "ca6d48a0b320"
+    ],
+    "heading_path": [],
+    "kind": "code",
+    "chars": 69,
+    "embed_start": "Highlighted code\n\nCode (python):\nimport os\n\ndef home():\n    return os.environ[\"HOME\"]\n\nCode (shell):\n$ go test ./..."
+  }
+]

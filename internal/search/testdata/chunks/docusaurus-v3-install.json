@@ -1,0 +1,37 @@
+[
+  {
+    "block_ids": [
+      "d7d718816350",
+      "913d824d8db6",
+      "fa0ec76d22ce"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 182,
+    "embed_start": "Install the CLI\n\nThe CLI installs with any Node package manager.\n\nnpm\nCode (bash):\nnpm install --global example-kit\n\n\nYa"
+  },
+  {
+    "block_ids": [
+      "c73283a3bed5"
+    ],
+    "heading_path": [
+      "Configure"
+    ],
+    "kind": "code",
+    "lang": "js",
+    "chars": 33,
+    "embed_start": "Install the CLI > Configure\n\nCode (js), kit.config.js:\nexport default {\n\tout: \"dist\",\n};"
+  },
+  {
+    "block_ids": [
+      "e49bd4929dfc",
+      "91fd0eceb393"
+    ],
+    "heading_path": [
+      "Try it"
+    ],
+    "kind": "prose",
+    "chars": 50,
+    "embed_start": "Install the CLI > Try it\n\nCode (tsx):\nfunction Hello() {\n  return <b>Hello</b>;\n}\n\nHello"
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "block_ids": [
+      "1b5c98a6d044",
+      "fa4179d1dc61",
+      "69143f6ded98",
+      "df359619a764",
+      "a11ded8ee978",
+      "4aa5c185a2f0"
+    ],
+    "heading_path": [
+      "Overview"
+    ],
+    "kind": "prose",
+    "chars": 970,
+    "embed_start": "Getting Started > Overview\n\nVite (French word for \"quick\", pronounced /viːt/, like \"veet\") is a build tool that aims to "
+  },
+  {
+    "block_ids": [
+      "dfdc53ff5836",
+      "f85a5406be19",
+      "e56cce2ab47b",
+      "19927e159052",
+      "68a405c5ebba"
+    ],
+    "heading_path": [
+      "Scaffolding Your First Vite Project"
+    ],
+    "kind": "prose",
+    "chars": 1273,
+    "embed_start": "Getting Started > Scaffolding Your First Vite Project\n\nnpm\nCode (bash):\nnpm create vite@latest\n\nYarn\nCode (bash):\nyarn c"
+  },
+  {
+    "block_ids": [
+      "40319bef20c3",
+      "f0f55820a830",
+      "af62ba4318ee",
+      "dcfbc22c33b3"
+    ],
+    "heading_path": [
+      "Community Templates"
+    ],
+    "kind": "prose",
+    "chars": 665,
+    "embed_start": "Getting Started > Community Templates\n\ncreate-vite is a tool to quickly start a project from a basic template for popula"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "block_ids": [
+      "9fa02c592c7e",
+      "a961691e8373",
+      "9279cae6d11f"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 168,
+    "embed_start": "Trailing whitespace\n\nMarkdown line breaks need two trailing spaces, and they must survive.\n\nCode:\nfirst line with two sp"
+  }
+]

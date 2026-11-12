@@ -1,0 +1,12 @@
+[
+  {
+    "block_ids": [
+      "b546e7b6d9f6",
+      "c045b607ad54"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 110,
+    "embed_start": "Windows line endings\n\nThis file uses CRLF. The text keeps reading as one paragraph.\n\nCode (bat):\n@echo off\necho one\necho"
+  }
+]

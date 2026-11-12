@@ -1,0 +1,39 @@
+[
+  {
+    "block_ids": [
+      "8f25626f1b97",
+      "ed545f12ea56",
+      "54c233f5171b"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 244,
+    "embed_start": "Tabs\n\nTo create a tabbed interface use the <Tabs> and <TabItem> components. Tabs are useful for grouping equivalent info"
+  },
+  {
+    "block_ids": [
+      "0adffd94d101"
+    ],
+    "heading_path": [
+      "Import"
+    ],
+    "kind": "code",
+    "lang": "tsx",
+    "chars": 62,
+    "embed_start": "Tabs > Import\n\nCode (tsx):\nimport { Tabs, TabItem } from '@astrojs/starlight/components';"
+  },
+  {
+    "block_ids": [
+      "88001f4e6c5f",
+      "16ed7743397c",
+      "cd5a269122f4",
+      "725c73cbaf63"
+    ],
+    "heading_path": [
+      "Usage"
+    ],
+    "kind": "prose",
+    "chars": 557,
+    "embed_start": "Tabs > Usage\n\nDisplay a tabbed interface using the <Tabs> and <TabItem> components. Each <TabItem> must have a label to "
+  }
+]

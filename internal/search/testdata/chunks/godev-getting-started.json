@@ -1,0 +1,89 @@
+[
+  {
+    "block_ids": [
+      "af635e43360d",
+      "c4cd2380352f"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 326,
+    "embed_start": "Tutorial: Get started with Go\n\nIn this tutorial, you'll get a brief introduction to Go programming. Along the way, you w"
+  },
+  {
+    "block_ids": [
+      "a4f92a579bf4"
+    ],
+    "heading_path": [
+      "Prerequisites"
+    ],
+    "kind": "prose",
+    "chars": 394,
+    "embed_start": "Tutorial: Get started with Go > Prerequisites\n\nSome programming experience. The code here is pretty simple, but it helps"
+  },
+  {
+    "block_ids": [
+      "e82d52efa440"
+    ],
+    "heading_path": [
+      "Install Go"
+    ],
+    "kind": "prose",
+    "chars": 40,
+    "embed_start": "Tutorial: Get started with Go > Install Go\n\nJust use the Download and install steps."
+  },
+  {
+    "block_ids": [
+      "e859967ee6f9"
+    ],
+    "heading_path": [
+      "Write some code"
+    ],
+    "kind": "prose",
+    "chars": 30,
+    "embed_start": "Tutorial: Get started with Go > Write some code\n\nGet started with Hello, World."
+  },
+  {
+    "block_ids": [
+      "6d5f4959d1e3"
+    ],
+    "heading_path": [
+      "Write some code"
+    ],
+    "kind": "prose",
+    "chars": 2198,
+    "embed_start": "Tutorial: Get started with Go > Write some code\n\nOpen a command prompt and cd to your home directory.\nOn Linux or Mac:\nC"
+  },
+  {
+    "block_ids": [
+      "78d59830409b"
+    ],
+    "heading_path": [
+      "Call code in an external package"
+    ],
+    "kind": "prose",
+    "chars": 161,
+    "embed_start": "Tutorial: Get started with Go > Call code in an external package\n\nWhen you need your code to do something that might hav"
+  },
+  {
+    "block_ids": [
+      "b1d7e5f26ace"
+    ],
+    "heading_path": [
+      "Call code in an external package"
+    ],
+    "kind": "prose",
+    "chars": 1820,
+    "embed_start": "Tutorial: Get started with Go > Call code in an external package\n\nMake your printed message a little more interesting wi"
+  },
+  {
+    "block_ids": [
+      "4cdb90215c12"
+    ],
+    "heading_path": [
+      "Write more code"
+    ],
+    "kind": "prose",
+    "chars": 164,
+    "embed_start": "Tutorial: Get started with Go > Write more code\n\nWith this quick introduction, you got Go installed and learned some of "
+  }
+]

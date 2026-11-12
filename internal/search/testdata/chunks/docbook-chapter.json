@@ -1,0 +1,27 @@
+[
+  {
+    "block_ids": [
+      "d11a993033ad"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 42,
+    "embed_start": "Chapter 3. Backups\n\nA store can be copied while it is running."
+  },
+  {
+    "block_ids": [
+      "f86708cf74a4",
+      "b229704999fe",
+      "b17874dd5310",
+      "36d5ee2e78d6",
+      "f63a0c599f0e",
+      "3b074ee07299"
+    ],
+    "heading_path": [
+      "3.1. Dumping a Store"
+    ],
+    "kind": "prose",
+    "chars": 241,
+    "embed_start": "Chapter 3. Backups > 3.1. Dumping a Store\n\nWrite the whole store to one file:\n\nCode:\n$ shelfdump --all > store.dump\n\nNot"
+  }
+]

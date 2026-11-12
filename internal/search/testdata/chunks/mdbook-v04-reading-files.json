@@ -1,0 +1,27 @@
+[
+  {
+    "block_ids": [
+      "55c4ceabd7e6",
+      "a18b40176671",
+      "2ad88aef0b17",
+      "d5b7259cdf58",
+      "bd7b98b7d3cc"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 258,
+    "embed_start": "Reading Files\n\nA program reads a file in one call. The listing hides the lines that only make it compile.\n\nCode (rust), "
+  },
+  {
+    "block_ids": [
+      "c81a9e8fdead",
+      "4b4f84dc5efa"
+    ],
+    "heading_path": [
+      "Dependencies"
+    ],
+    "kind": "prose",
+    "chars": 55,
+    "embed_start": "Reading Files > Dependencies\n\nCode (toml), Filename: Cargo.toml:\n[dependencies]\nserde = \"1\"\n\nCrate | Use\nserde | Parsing"
+  }
+]

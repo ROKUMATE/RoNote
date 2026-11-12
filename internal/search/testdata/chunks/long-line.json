@@ -1,0 +1,12 @@
+[
+  {
+    "block_ids": [
+      "fbb5fc37488a",
+      "c1ce0fe88adf"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 454,
+    "embed_start": "Long lines\n\nLong lines must scroll, not wrap, and stay one line.\n\nCode (js):\nconst message = \"abcdefghijabcdefghijabcdef"
+  }
+]

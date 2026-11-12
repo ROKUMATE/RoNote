@@ -40,6 +40,9 @@ var github = GitHub{
 	AuthorizeURL: githubAuthorizeURL, TokenURL: githubTokenURL, APIURL: githubAPIURL,
 }
 
+// embedDefault is the default embedder: Ollama's, with the pinned model.
+var embedDefault = Embed{URL: "http://127.0.0.1:11434/v1", Model: "qwen3-embedding:0.6b"}
+
 // limits are the default limits.
 var limits = Limits{ImportsPerDay: 60, Documents: 500, APIPerMinute: 120, AuthPerMinute: 20}
 
@@ -69,7 +72,7 @@ func TestLoad(t *testing.T) {
 		{
 			name: "defaults",
 			env:  validEnv(nil),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
 		},
 		{
 			name: "all set",
@@ -79,12 +82,12 @@ func TestLoad(t *testing.T) {
 				"RONOTE_LOG_LEVEL":    "debug",
 				"RONOTE_DATABASE_URL": "postgresql://db/ronote",
 			}),
-			want: Config{Env: EnvProd, HTTPAddr: "0.0.0.0:9000", LogLevel: slog.LevelDebug, DatabaseURL: "postgresql://db/ronote", SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits},
+			want: Config{Env: EnvProd, HTTPAddr: "0.0.0.0:9000", LogLevel: slog.LevelDebug, DatabaseURL: "postgresql://db/ronote", SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
 		},
 		{
 			name: "empty host",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_HTTP_ADDR": ":8080", "RONOTE_LOG_LEVEL": "warn"}),
-			want: Config{Env: EnvStaging, HTTPAddr: ":8080", LogLevel: slog.LevelWarn, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits},
+			want: Config{Env: EnvStaging, HTTPAddr: ":8080", LogLevel: slog.LevelWarn, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
 		},
 		{
 			name:    "missing env",
@@ -149,17 +152,17 @@ func TestLoad(t *testing.T) {
 		{
 			name: "private fetches allowed in dev",
 			env:  validEnv(map[string]string{"RONOTE_FETCH_ALLOW_PRIVATE": "true"}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
 		},
 		{
 			name: "private fetches allowed in test",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "test", "RONOTE_FETCH_ALLOW_PRIVATE": "1"}),
-			want: Config{Env: EnvTest, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits},
+			want: Config{Env: EnvTest, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
 		},
 		{
 			name: "private fetches off in prod",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_FETCH_ALLOW_PRIVATE": "false"}),
-			want: Config{Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits},
+			want: Config{Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
 		},
 		{
 			name:    "private fetches refused in prod",
@@ -179,12 +182,12 @@ func TestLoad(t *testing.T) {
 		{
 			name: "source TTL",
 			env:  validEnv(map[string]string{"RONOTE_SOURCE_TTL": "90m"}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: 90 * time.Minute, PublicURL: "https://ronote.test", GitHub: github, Limits: limits},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: 90 * time.Minute, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
 		},
 		{
 			name: "source TTL of zero always revalidates",
 			env:  validEnv(map[string]string{"RONOTE_SOURCE_TTL": "0s"}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, PublicURL: "https://ronote.test", GitHub: github, Limits: limits},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
 		},
 		{
 			name:    "source TTL not a duration",
@@ -207,7 +210,7 @@ func TestLoad(t *testing.T) {
 					AuthorizeURL: fakeProvider["RONOTE_GITHUB_AUTHORIZE_URL"], TokenURL: fakeProvider["RONOTE_GITHUB_TOKEN_URL"],
 					APIURL: "http://127.0.0.1:8090",
 				},
-				Limits: limits,
+				Limits: limits, Embed: embedDefault,
 			},
 		},
 		{
@@ -232,7 +235,7 @@ func TestLoad(t *testing.T) {
 		{
 			name: "public URL with a trailing slash",
 			env:  validEnv(map[string]string{"RONOTE_PUBLIC_URL": "http://127.0.0.1:5173/"}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "http://127.0.0.1:5173", GitHub: github, Limits: limits},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "http://127.0.0.1:5173", GitHub: github, Limits: limits, Embed: embedDefault},
 		},
 		{
 			name:    "missing public URL",
@@ -259,6 +262,7 @@ func TestLoad(t *testing.T) {
 				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
 				PublicURL: "https://ronote.test", GitHub: github,
 				Limits: Limits{ImportsPerDay: 10, Documents: 20, APIPerMinute: 30, AuthPerMinute: 40},
+				Embed:  embedDefault,
 			},
 		},
 		{
@@ -270,6 +274,20 @@ func TestLoad(t *testing.T) {
 			name:    "a limit that isn't a number",
 			env:     validEnv(map[string]string{"RONOTE_LIMIT_API_PER_MINUTE": "lots"}),
 			wantErr: []string{`RONOTE_LIMIT_API_PER_MINUTE: "lots" is not a whole number of at least 1`},
+		},
+		{
+			name: "another embedder",
+			env:  validEnv(map[string]string{"RONOTE_EMBED_URL": "http://127.0.0.1:18093/v1/", "RONOTE_EMBED_MODEL": "fake-words"}),
+			want: Config{
+				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
+				PublicURL: "https://ronote.test", GitHub: github, Limits: limits,
+				Embed: Embed{URL: "http://127.0.0.1:18093/v1", Model: "fake-words"},
+			},
+		},
+		{
+			name:    "an embedder URL that isn't one",
+			env:     validEnv(map[string]string{"RONOTE_EMBED_URL": "127.0.0.1:11434"}),
+			wantErr: []string{`RONOTE_EMBED_URL: "127.0.0.1:11434" is not an http or https URL`},
 		},
 		{
 			name: "every bad variable reported",

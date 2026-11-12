@@ -28,10 +28,11 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the clock check and run/stop
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks and run/stop
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
 	sh scripts/test-container-clock.sh
+	sh scripts/test-embed-check.sh
 	sh scripts/test-run-stop.sh
 	sh scripts/test-doc-sizes.sh
 
@@ -95,8 +96,9 @@ fmt: ## Format Go code with gofumpt and goimports
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) fmt
 
-doctor: ## Check the local setup: the container VM's clock is within 2s of the host's
+doctor: ## Check the local setup: the container VM's clock is the host's, and the embedder serves the pinned model
 	sh scripts/container.sh clock
+	sh scripts/embed-check.sh
 
 dev-up: ## Start the dev stack (Postgres) and wait until it is healthy
 	@[ -f .env.dev ] || { cp .env.example .env.dev; echo "make dev-up: created .env.dev from .env.example"; }
@@ -197,7 +199,7 @@ web-build: ## Build the web app and the runner; fails if dev-only code ships or 
 web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromium); locally needs make dev-up
 	@$(node_required)
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" sh scripts/e2e-db.sh
-	go build -o bin/e2e/ ./cmd/api ./cmd/worker ./cmd/fakeidp
+	go build -o bin/e2e/ ./cmd/api ./cmd/worker ./cmd/fakeidp ./cmd/fakeembed
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" $(WEB) e2e
 
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp extract lint lint-go lint-web fmt

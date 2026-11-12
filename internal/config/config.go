@@ -45,6 +45,16 @@ type Config struct {
 	GitHub GitHub
 	// Limits bound what one user, or one IP, may do.
 	Limits Limits
+	// Embed is the embedder search uses.
+	Embed Embed
+}
+
+// Embed is an OpenAI-compatible embeddings API and the model to ask it for
+// (docs/adr/0011-retrieval.md).
+type Embed struct {
+	// URL is the API root, such as http://127.0.0.1:11434/v1 for Ollama.
+	URL   string
+	Model string
 }
 
 // Limits are RoNote's quotas and rate limits
@@ -122,6 +132,11 @@ func Load(getenv func(string) string) (Config, error) {
 	check("RONOTE_GITHUB_AUTHORIZE_URL", validateProviderURL(gh.AuthorizeURL, "github.com", env))
 	check("RONOTE_GITHUB_TOKEN_URL", validateProviderURL(gh.TokenURL, "github.com", env))
 	check("RONOTE_GITHUB_API_URL", validateProviderURL(gh.APIURL, "api.github.com", env))
+	embed := Embed{
+		URL:   strings.TrimSuffix(withDefault(getenv("RONOTE_EMBED_URL"), "http://127.0.0.1:11434/v1"), "/"),
+		Model: withDefault(getenv("RONOTE_EMBED_MODEL"), "qwen3-embedding:0.6b"),
+	}
+	check("RONOTE_EMBED_URL", validateHTTPURL(embed.URL))
 	var limits Limits
 	for _, l := range []struct {
 		name     string
@@ -151,7 +166,16 @@ func Load(getenv func(string) string) (Config, error) {
 		PublicURL:                 publicURL,
 		GitHub:                    gh,
 		Limits:                    limits,
+		Embed:                     embed,
 	}, nil
+}
+
+func validateHTTPURL(s string) error {
+	u, err := url.Parse(s)
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
+		return fmt.Errorf("%q is not an http or https URL", s)
+	}
+	return nil
 }
 
 // parseLimit reads a positive whole number, fallback when unset.
@@ -194,11 +218,10 @@ func parsePublicURL(s string, env Env) (string, error) {
 // validateProviderURL allows any http(s) URL in dev and test, where the fake
 // provider stands in, and only https on host in staging and prod.
 func validateProviderURL(s, host string, env Env) error {
-	u, err := url.Parse(s)
-	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
-		return fmt.Errorf("%q is not an http or https URL", s)
+	if err := validateHTTPURL(s); err != nil {
+		return err
 	}
-	if env.Deployed() && (u.Scheme != "https" || u.Host != host) {
+	if u, _ := url.Parse(s); env.Deployed() && (u.Scheme != "https" || u.Host != host) {
 		return fmt.Errorf("%q must be https://%s when RONOTE_ENV is staging or prod", s, host)
 	}
 	return nil

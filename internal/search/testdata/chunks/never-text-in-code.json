@@ -1,0 +1,16 @@
+[
+  {
+    "block_ids": [
+      "54525aad1faa",
+      "123c79354571",
+      "bf30385ef826",
+      "e3022655c97c",
+      "a917c4f33168",
+      "a5e18a1bf5d4"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 291,
+    "embed_start": "Never text in code\n\nA shell prompt drawn as a separate, unselectable element is not part of the command.\n\nCode (bash):\nn"
+  }
+]

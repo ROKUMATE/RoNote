@@ -1,0 +1,29 @@
+[
+  {
+    "block_ids": [
+      "3dac0fbf8497",
+      "70c38f60a175",
+      "1ca2f5e745da",
+      "50aba5b18937"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 183,
+    "embed_start": "Configure the Runner\n\nOne file sets every option.\n\nThe runner reads its settings from one file, in any of three formats."
+  },
+  {
+    "block_ids": [
+      "98189f836e29",
+      "a52fda442461",
+      "b097562aebcd",
+      "5134fd7e8ce0",
+      "d703d405771e"
+    ],
+    "heading_path": [
+      "Line numbers"
+    ],
+    "kind": "prose",
+    "chars": 198,
+    "embed_start": "Configure the Runner > Line numbers\n\nLong examples show line numbers in a column of their own:\n\nCode (sh):\nrunner check\n"
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "block_ids": [
+      "c992fb96805a"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 104,
+    "embed_start": "Release notes\n\nThis page uses a custom layout, so Starlight's content container is missing and the generic rules apply."
+  },
+  {
+    "block_ids": [
+      "098c7a222945",
+      "1db3db5afc22"
+    ],
+    "heading_path": [
+      "Version 2.0"
+    ],
+    "kind": "prose",
+    "chars": 58,
+    "embed_start": "Release notes > Version 2.0\n\nFaster imports.\nSmaller downloads.\n\nCode (sh):\nnotes upgrade --to 2.0"
+  }
+]

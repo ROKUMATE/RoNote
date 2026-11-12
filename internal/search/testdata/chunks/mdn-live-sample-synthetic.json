@@ -1,0 +1,47 @@
+[
+  {
+    "block_ids": [
+      "73e0c6949b12"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 47,
+    "embed_start": "Greeting button\n\nThis example wires a button to a click handler."
+  },
+  {
+    "block_ids": [
+      "d63323e56ed3",
+      "9fc6c95c865f"
+    ],
+    "heading_path": [
+      "Markup"
+    ],
+    "kind": "prose",
+    "chars": 96,
+    "embed_start": "Greeting button > Markup\n\nThe page has one button and one output line:\n\nCode (html):\n<button id=\"greet\">Greet</button>\n<"
+  },
+  {
+    "block_ids": [
+      "c33626704106"
+    ],
+    "heading_path": [
+      "Style"
+    ],
+    "kind": "code",
+    "lang": "css",
+    "chars": 32,
+    "embed_start": "Greeting button > Style\n\nCode (css):\n#out {\n  font: 1rem monospace;\n}"
+  },
+  {
+    "block_ids": [
+      "0d03992835cd"
+    ],
+    "heading_path": [
+      "Script"
+    ],
+    "kind": "code",
+    "lang": "js",
+    "chars": 144,
+    "embed_start": "Greeting button > Script\n\nCode (js):\nconst out = document.getElementById(\"out\");\ndocument.getElementById(\"greet\").addEve"
+  }
+]

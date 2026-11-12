@@ -1,0 +1,49 @@
+[
+  {
+    "block_ids": [
+      "0e4c6ccea9a8",
+      "4ec51e5d164d",
+      "f9c5b0f20892",
+      "2cf68536e6f9",
+      "198c6393060e"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 513,
+    "embed_start": "First Steps\n\nThe simplest FastAPI file could look like this:\n\nPython 3.10+\nCode:\nfrom fastapi import FastAPI\n\napp = Fast"
+  },
+  {
+    "block_ids": [
+      "1ca810853b46"
+    ],
+    "heading_path": [],
+    "kind": "code",
+    "lang": "console",
+    "chars": 1439,
+    "embed_start": "First Steps\n\nCode (console):\n$ uv run fastapi dev\n\n   FastAPI   Starting development server 🚀\n\n             Searching fo"
+  },
+  {
+    "block_ids": [
+      "7d61d11adf39",
+      "a10d0d814a98",
+      "696019044ccf"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 204,
+    "embed_start": "First Steps\n\nIn the output, there's a line with something like:\n\nCode:\nINFO:     Uvicorn running on http://127.0.0.1:800"
+  },
+  {
+    "block_ids": [
+      "f657dbe3db7f",
+      "227337208be9",
+      "16ce9bbfe5bd"
+    ],
+    "heading_path": [
+      "Check it"
+    ],
+    "kind": "prose",
+    "chars": 107,
+    "embed_start": "First Steps > Check it\n\nOpen your browser at http://127.0.0.1:8000.\n\nYou will see the JSON response as:\n\nCode:\n{\"message"
+  }
+]

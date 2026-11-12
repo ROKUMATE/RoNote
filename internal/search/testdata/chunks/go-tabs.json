@@ -1,0 +1,12 @@
+[
+  {
+    "block_ids": [
+      "d096ce5ad5f3",
+      "5dc14c218b7c"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 170,
+    "embed_start": "Formatting\n\ngofmt indents with tabs, and so does this example.\n\nCode (go):\npackage main\n\nimport \"fmt\"\n\nfunc main() {\n\tfo"
+  }
+]

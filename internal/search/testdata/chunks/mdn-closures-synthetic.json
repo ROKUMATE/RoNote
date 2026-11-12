@@ -1,0 +1,37 @@
+[
+  {
+    "block_ids": [
+      "f36ab62cfa6b"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 48,
+    "embed_start": "Tally functions\n\nA tally function counts how often it was called."
+  },
+  {
+    "block_ids": [
+      "7ccee36f98cf",
+      "e645a8eade57",
+      "2f8476ac4be9"
+    ],
+    "heading_path": [
+      "Counting with a closure"
+    ],
+    "kind": "prose",
+    "chars": 297,
+    "embed_start": "Tally functions > Counting with a closure\n\nA function made inside another function keeps the variables of the outer one "
+  },
+  {
+    "block_ids": [
+      "10296cc553a1",
+      "d3b9ba544cda",
+      "65741c856c77"
+    ],
+    "heading_path": [
+      "Closures in loops"
+    ],
+    "kind": "prose",
+    "chars": 188,
+    "embed_start": "Tally functions > Closures in loops\n\nWith let, every pass of the loop gets its own binding:\n\nCode (js):\nfor (let step = "
+  }
+]

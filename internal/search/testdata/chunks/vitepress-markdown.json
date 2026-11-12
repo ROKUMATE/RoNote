@@ -1,0 +1,220 @@
+[
+  {
+    "block_ids": [
+      "c81aa5be7899"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 50,
+    "embed_start": "Markdown Extensions\n\nVitePress comes with built in Markdown Extensions."
+  },
+  {
+    "block_ids": [
+      "a4d54956ab30"
+    ],
+    "heading_path": [
+      "Custom Containers"
+    ],
+    "kind": "prose",
+    "chars": 70,
+    "embed_start": "Markdown Extensions > Custom Containers\n\nCustom containers can be defined by their types, titles, and contents."
+  },
+  {
+    "block_ids": [
+      "bbf850e8337c",
+      "8834e9c87807",
+      "7c32e7c43fea",
+      "7f652f236757",
+      "0b363fbebe64",
+      "9f6528403424",
+      "a68686c9e2c2",
+      "b3bedb7400c9"
+    ],
+    "heading_path": [
+      "Custom Containers",
+      "Default Title"
+    ],
+    "kind": "prose",
+    "chars": 345,
+    "embed_start": "Markdown Extensions > Custom Containers > Default Title\n\nInput\n\nCode (md):\n::: info\nThis is an info box.\n:::\n\n::: tip\nTh"
+  },
+  {
+    "block_ids": [
+      "a6671e639195",
+      "add1df29eec8",
+      "7cd9554ee200",
+      "18a5e53cb03d",
+      "506927ed8418",
+      "749355f12ed5",
+      "37b258cdd292",
+      "c3ece72bf99f",
+      "1df448567d78"
+    ],
+    "heading_path": [
+      "Custom Containers",
+      "Custom Title"
+    ],
+    "kind": "prose",
+    "chars": 796,
+    "embed_start": "Markdown Extensions > Custom Containers > Custom Title\n\nYou may set custom title by appending the text right after the \""
+  },
+  {
+    "block_ids": [
+      "c5d3f13dd62d",
+      "07a00ec8b178",
+      "0c9e32325559",
+      "5d3ec00d54da",
+      "46f85a963311",
+      "9912629d0f54"
+    ],
+    "heading_path": [
+      "Custom Containers",
+      "Registering New Containers"
+    ],
+    "kind": "prose",
+    "chars": 860,
+    "embed_start": "Markdown Extensions > Custom Containers > Registering New Containers\n\nBeyond the built-in types, you can register additi"
+  },
+  {
+    "block_ids": [
+      "425deb69c4a6",
+      "32b47c15f438",
+      "63fa3866a4d2",
+      "a8dd16876ac1",
+      "2fde118c2cbb"
+    ],
+    "heading_path": [
+      "Custom Containers",
+      "Nesting"
+    ],
+    "kind": "prose",
+    "chars": 531,
+    "embed_start": "Markdown Extensions > Custom Containers > Nesting\n\nThe ::: markers follow the same rules as fenced code blocks (```): a "
+  },
+  {
+    "block_ids": [
+      "a5a1801aab98",
+      "1128957519f8",
+      "4cd2012a8331",
+      "d85604a4f9c0",
+      "754e3e20941b",
+      "36cf234b9e3f",
+      "1128957519f8-2",
+      "76e60dfdbdf9",
+      "d85604a4f9c0-2",
+      "1185f7e511d0"
+    ],
+    "heading_path": [
+      "Custom Containers",
+      "Additional Attributes"
+    ],
+    "kind": "prose",
+    "chars": 714,
+    "embed_start": "Markdown Extensions > Custom Containers > Additional Attributes\n\nYou can add additional attributes to the custom contain"
+  },
+  {
+    "block_ids": [
+      "ff7469effdd1",
+      "cc60201d38a1",
+      "3579bc7f0f63",
+      "73d76f9d3c35",
+      "bb89d660a02c"
+    ],
+    "heading_path": [
+      "Custom Containers",
+      "raw"
+    ],
+    "kind": "prose",
+    "chars": 696,
+    "embed_start": "Markdown Extensions > Custom Containers > raw\n\nThis is a special container that can be used to prevent style and router "
+  },
+  {
+    "block_ids": [
+      "5c3519d4dcf0",
+      "3d00a80dd0e4",
+      "4ba57d84fd7b",
+      "e40367deeb25",
+      "d6b583b90e77",
+      "0651e508970e",
+      "62913f3d64e4",
+      "78af3559c613"
+    ],
+    "heading_path": [
+      "GitHub-flavored Alerts"
+    ],
+    "kind": "prose",
+    "chars": 1332,
+    "embed_start": "Markdown Extensions > GitHub-flavored Alerts\n\nVitePress also supports GitHub-flavored alerts to render as callouts. They"
+  },
+  {
+    "block_ids": [
+      "fd3a1127c18d",
+      "d4ed721f597a",
+      "a0e643060a81",
+      "d633ddbe5010",
+      "a6e6472336ed"
+    ],
+    "heading_path": [
+      "Colored Diffs in Code Blocks"
+    ],
+    "kind": "prose",
+    "chars": 379,
+    "embed_start": "Markdown Extensions > Colored Diffs in Code Blocks\n\nAdding the // [!code --] or // [!code ++] comments on a line will cr"
+  },
+  {
+    "block_ids": [
+      "1b1c61d1583c",
+      "0322625da56f",
+      "675641e04fab",
+      "e278cbc3cbaa",
+      "19e66a865321"
+    ],
+    "heading_path": [
+      "Errors and Warnings in Code Blocks"
+    ],
+    "kind": "prose",
+    "chars": 348,
+    "embed_start": "Markdown Extensions > Errors and Warnings in Code Blocks\n\nAdding the // [!code warning] or // [!code error] comments on "
+  },
+  {
+    "block_ids": [
+      "b0566df67e90",
+      "e19677d98a52",
+      "d8cae05feb87",
+      "1974f3b8849e",
+      "d0541f09aeac",
+      "05accb8e821d",
+      "c68e6179ae29",
+      "c82c99d3e451",
+      "2de96b903ac2",
+      "8c3a397ce1df",
+      "49a9e693e413"
+    ],
+    "heading_path": [
+      "Line Numbers"
+    ],
+    "kind": "prose",
+    "chars": 1133,
+    "embed_start": "Markdown Extensions > Line Numbers\n\nYou can enable line numbers for each code blocks via config:\n\nCode (js):\nexport defa"
+  },
+  {
+    "block_ids": [
+      "bb1d872eb236",
+      "c4e9dab7cf67",
+      "0cbdc9518a78",
+      "9d9d4762d52c",
+      "21f4c9c5edcd",
+      "78ea25d1d7d8",
+      "c4e9dab7cf67-2",
+      "77993faadeb7",
+      "9d9d4762d52c-2",
+      "3f0c62d4e61e"
+    ],
+    "heading_path": [
+      "Code Groups"
+    ],
+    "kind": "prose",
+    "chars": 957,
+    "embed_start": "Markdown Extensions > Code Groups\n\nYou can group multiple code blocks like this:\n\nInput\n\nCode (md):\n::: code-group\n\n```j"
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "block_ids": [
+      "2b42836a69e7",
+      "fb25ceb8dc6b",
+      "41be35e58b36",
+      "691be7acaf4e",
+      "d902f11bad3f",
+      "6ba9606bdc65"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 414,
+    "embed_start": "Expressive Code frames\n\nAn editor frame with a file name. Each line is its own element, with no newline between lines.\n\n"
+  }
+]

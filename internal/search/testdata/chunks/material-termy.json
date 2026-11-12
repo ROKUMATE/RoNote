@@ -1,0 +1,14 @@
+[
+  {
+    "block_ids": [
+      "c519cc75c07c",
+      "b82f4013c162",
+      "5ae70e4eb798",
+      "f0b77ad2be6f"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 278,
+    "embed_start": "Run the Server\n\nStart the development server from your project folder:\n\nCode (console):\n$ kit serve --reload\n\n   KIT   S"
+  }
+]

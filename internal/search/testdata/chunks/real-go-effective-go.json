@@ -1,0 +1,76 @@
+[
+  {
+    "block_ids": [
+      "e6d4017757ce"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 341,
+    "embed_start": "Effective Go\n\nNote: This document was written for Go's release in 2009 and is not actively updated. While it remains a g"
+  },
+  {
+    "block_ids": [
+      "6ad8658261d7",
+      "9e078c1c615d"
+    ],
+    "heading_path": [
+      "Introduction"
+    ],
+    "kind": "prose",
+    "chars": 1103,
+    "embed_start": "Effective Go > Introduction\n\nGo is an open-source programming language that focuses on simplicity, reliability, and effi"
+  },
+  {
+    "block_ids": [
+      "8c898302e4b9"
+    ],
+    "heading_path": [
+      "Introduction",
+      "Examples"
+    ],
+    "kind": "prose",
+    "chars": 517,
+    "embed_start": "Effective Go > Introduction > Examples\n\nThe Go package sources are intended to serve not only as the core library but al"
+  },
+  {
+    "block_ids": [
+      "212159be9439",
+      "69f2ba418e9a",
+      "7e898d49ff0c",
+      "3a626984835e",
+      "fe4478ce0107",
+      "336aedd548ed",
+      "179fe5d2aafd",
+      "2f7780bb1a4c"
+    ],
+    "heading_path": [
+      "Formatting"
+    ],
+    "kind": "prose",
+    "chars": 1328,
+    "embed_start": "Effective Go > Formatting\n\nFormatting issues are the most contentious but the least consequential. People can adapt to d"
+  },
+  {
+    "block_ids": [
+      "eb1d3bca4ef8"
+    ],
+    "heading_path": [
+      "Formatting"
+    ],
+    "kind": "prose",
+    "chars": 530,
+    "embed_start": "Effective Go > Formatting\n\nIndentation\nWe use tabs for indentation and gofmt emits them by default. Use spaces only if y"
+  },
+  {
+    "block_ids": [
+      "51316e6d955c",
+      "e19fa4a2fe6b"
+    ],
+    "heading_path": [
+      "Commentary"
+    ],
+    "kind": "prose",
+    "chars": 494,
+    "embed_start": "Effective Go > Commentary\n\nGo provides C-style /* */ block comments and C++-style // line comments. Line comments are th"
+  }
+]

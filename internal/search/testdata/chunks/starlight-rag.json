@@ -1,0 +1,50 @@
+[
+  {
+    "block_ids": [
+      "1f2ee648e796",
+      "43f32579e684"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 146,
+    "embed_start": "Build a Note Splitter in Python\n\nThis walkthrough splits a long page into notes, one function per step.\n\nLast updated: M"
+  },
+  {
+    "block_ids": [
+      "5ec81cb9257b",
+      "6f50283b7bfd",
+      "109020c388bc"
+    ],
+    "heading_path": [
+      "1. The Steps"
+    ],
+    "kind": "prose",
+    "chars": 195,
+    "embed_start": "Build a Note Splitter in Python > 1. The Steps\n\nThe pipeline has three steps:\n\nCode (plaintext):\n1. Fetch Page     → Dow"
+  },
+  {
+    "block_ids": [
+      "d78b096719b8",
+      "de85fd242308"
+    ],
+    "heading_path": [
+      "2. Set Up"
+    ],
+    "kind": "prose",
+    "chars": 84,
+    "embed_start": "Build a Note Splitter in Python > 2. Set Up\n\nCode (bash):\npip install notesplit\n\nCaution\nUse a virtual environment so th"
+  },
+  {
+    "block_ids": [
+      "619631af64b7",
+      "7df05a1073d6"
+    ],
+    "heading_path": [
+      "2. Set Up",
+      "Split Sections"
+    ],
+    "kind": "prose",
+    "chars": 162,
+    "embed_start": "Build a Note Splitter in Python > 2. Set Up > Split Sections\n\nCode (python), split.py:\ndef split(html: str) -> list[str]"
+  }
+]

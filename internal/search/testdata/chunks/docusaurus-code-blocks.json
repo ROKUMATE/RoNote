@@ -1,0 +1,88 @@
+[
+  {
+    "block_ids": [
+      "d25ae2b65a97"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 53,
+    "embed_start": "Code blocks\n\nCode blocks within documentation are super-powered 💪."
+  },
+  {
+    "block_ids": [
+      "54f8d3e44466",
+      "8bcfeb987552",
+      "1be9993469bd"
+    ],
+    "heading_path": [
+      "Code title"
+    ],
+    "kind": "prose",
+    "chars": 311,
+    "embed_start": "Code blocks > Code title\n\nYou can add a title to the code block by adding a title key after the language (leave a space "
+  },
+  {
+    "block_ids": [
+      "8a8921beb0f3",
+      "b1c0f698bdcd",
+      "a78f722271c5",
+      "55daab6d38c9"
+    ],
+    "heading_path": [
+      "Syntax highlighting"
+    ],
+    "kind": "prose",
+    "chars": 405,
+    "embed_start": "Code blocks > Syntax highlighting\n\nCode blocks are text blocks wrapped around by strings of 3 backticks. You may check o"
+  },
+  {
+    "block_ids": [
+      "78faf4448eef",
+      "1b2d7d130a31",
+      "7ec771d9da10",
+      "96fd0285bebb"
+    ],
+    "heading_path": [
+      "Syntax highlighting",
+      "Theming"
+    ],
+    "kind": "prose",
+    "chars": 686,
+    "embed_start": "Code blocks > Syntax highlighting > Theming\n\nBy default, the Prism syntax highlighting theme we use is Palenight. You ca"
+  },
+  {
+    "block_ids": [
+      "2977b32cb219",
+      "15c77eafb490",
+      "26daa4483141",
+      "80318bc40ce7",
+      "3d2cda59161a",
+      "864f5de16b5b",
+      "873ab64452cc",
+      "e10c9100d800",
+      "e3814175e2e1"
+    ],
+    "heading_path": [
+      "Syntax highlighting",
+      "Supported Languages"
+    ],
+    "kind": "prose",
+    "chars": 1258,
+    "embed_start": "Code blocks > Syntax highlighting > Supported Languages\n\nBy default, Docusaurus comes with a subset of commonly used lan"
+  },
+  {
+    "block_ids": [
+      "fb04d6d1442d",
+      "7bd8ee79fe79",
+      "652f555e900f",
+      "0c93f3c16542"
+    ],
+    "heading_path": [
+      "Syntax highlighting",
+      "Supported Languages"
+    ],
+    "kind": "prose",
+    "chars": 777,
+    "embed_start": "Code blocks > Syntax highlighting > Supported Languages\n\nIt will produce prism-include-languages.js in your src/theme fo"
+  }
+]

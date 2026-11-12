@@ -1,0 +1,14 @@
+[
+  {
+    "block_ids": [
+      "bfe8c8eadcb2",
+      "dc4b80ac1132",
+      "e28e92e28a88",
+      "e25042a6ff36"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 133,
+    "embed_start": "Leading newlines\n\nCode:\none newline dropped\n\nCode:\n\none of two newlines dropped\n\nCode:\n\nkept, because it follows code, n"
+  }
+]

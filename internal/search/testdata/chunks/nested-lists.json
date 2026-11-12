@@ -1,0 +1,11 @@
+[
+  {
+    "block_ids": [
+      "84ae99fc9a98"
+    ],
+    "heading_path": [],
+    "kind": "prose",
+    "chars": 155,
+    "embed_start": "Setup\n\nInstall Go.\nmacOS: use the package installer.\nLinux:\nDownload the archive.\nExtract it:\nCode (shell):\ntar -C /usr/"
+  }
+]

@@ -79,3 +79,33 @@ JOIN LATERAL (
     ORDER BY d.created_at, d.id
     LIMIT 1
 ) d ON true;
+
+-- name: BumpIndexSeq :one
+-- Records a change search sees; the new sequence keys the index job.
+UPDATE documents
+SET index_seq = index_seq + 1
+WHERE owner_id = $1 AND id = $2
+RETURNING index_seq;
+
+-- name: GetIndexState :one
+SELECT title, content, index_seq, indexed_seq
+FROM documents
+WHERE owner_id = $1 AND id = $2;
+
+-- name: MarkIndexed :exec
+UPDATE documents
+SET indexed_seq = GREATEST(indexed_seq, sqlc.arg(seq))
+WHERE owner_id = sqlc.arg(owner_id) AND id = sqlc.arg(id);
+
+-- name: DocumentsBehind :many
+-- Every user's documents whose chunks are behind their content, or were
+-- embedded by another model: the worker's backfill, across owners.
+SELECT d.owner_id, d.id, d.index_seq
+FROM documents d
+WHERE d.indexed_seq < d.index_seq
+   OR EXISTS (
+       SELECT 1 FROM chunks c
+       WHERE c.owner_id = d.owner_id AND c.document_id = d.id AND c.model <> sqlc.arg(model)
+   )
+ORDER BY d.updated_at DESC
+LIMIT sqlc.arg(max_rows);

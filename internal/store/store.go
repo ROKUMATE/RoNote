@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -31,7 +32,24 @@ type User = sqlcdb.User
 // Store runs queries against the database.
 type Store struct {
 	pool *pgxpool.Pool // nil for a Store bound to a transaction
+	tx   pgx.Tx        // the transaction a Store is bound to, else nil
 	q    *sqlcdb.Queries
+	// onChange runs in the transaction of every change search sees.
+	onChange ChangeHook
+}
+
+// ChangeHook runs in the transaction of every change search sees: a
+// document's content, or a note on it. seq is the document's new index
+// sequence. cmd/api and cmd/worker set it to enqueue the document's
+// indexing in that transaction (docs/adr/0011-retrieval.md).
+type ChangeHook func(ctx context.Context, tx pgx.Tx, owner, document uuid.UUID, seq int64) error
+
+// OnChange returns a Store like s that calls hook on every change search
+// sees.
+func (s *Store) OnChange(hook ChangeHook) *Store {
+	c := *s
+	c.onChange = hook
+	return &c
 }
 
 // New returns a Store that uses pool.
@@ -49,7 +67,7 @@ func (s *Store) InTx(ctx context.Context, fn func(tx *Store, raw pgx.Tx) error) 
 	}
 	var fnErr error
 	err := pgx.BeginFunc(ctx, s.pool, func(tx pgx.Tx) error {
-		fnErr = fn(&Store{q: s.q.WithTx(tx)}, tx)
+		fnErr = fn(&Store{q: s.q.WithTx(tx), tx: tx, onChange: s.onChange}, tx)
 		return fnErr
 	})
 	if fnErr != nil {
@@ -59,6 +77,27 @@ func (s *Store) InTx(ctx context.Context, fn func(tx *Store, raw pgx.Tx) error) 
 		return mapErr("transaction", err)
 	}
 	return nil
+}
+
+// inTx runs fn in s's transaction, or in a new one when s has none.
+func (s *Store) inTx(ctx context.Context, fn func(tx *Store) error) error {
+	if s.tx != nil {
+		return fn(s)
+	}
+	return s.InTx(ctx, func(tx *Store, _ pgx.Tx) error { return fn(tx) })
+}
+
+// changed records a change search sees to owner's document: it bumps the
+// document's index sequence and calls the change hook, in s's transaction.
+func (s *Store) changed(ctx context.Context, owner, document uuid.UUID) error {
+	seq, err := s.q.BumpIndexSeq(ctx, sqlcdb.BumpIndexSeqParams{OwnerID: owner, ID: document})
+	if err != nil {
+		return mapErr("bump index sequence", err)
+	}
+	if s.onChange == nil {
+		return nil
+	}
+	return s.onChange(ctx, s.tx, owner, document, seq)
 }
 
 // CreateUser inserts a user. It returns ErrConflict when another user has

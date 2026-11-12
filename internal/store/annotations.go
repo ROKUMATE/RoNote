@@ -107,8 +107,13 @@ func (s *Store) CreateAnnotation(ctx context.Context, owner, document uuid.UUID,
 		if err != nil {
 			return mapErr("create annotation", err)
 		}
-		created, err = fromRow(row)
-		return err
+		if created, err = fromRow(row); err != nil {
+			return err
+		}
+		if created.Note == "" {
+			return nil
+		}
+		return tx.changed(ctx, owner, document)
 	})
 	return created, err
 }
@@ -139,8 +144,15 @@ func (s *Store) UpdateAnnotation(ctx context.Context, owner, id uuid.UUID, chang
 			}
 			next.BlockID, next.Selector = *change.BlockID, *change.Selector
 		}
-		updated, err = tx.saveAnnotation(ctx, owner, next, change.Version)
-		return err
+		if updated, err = tx.saveAnnotation(ctx, owner, next, change.Version); err != nil {
+			return err
+		}
+		// Search sees a note, and the block it sits under.
+		noteMoved := current.Note != "" && current.BlockID != next.BlockID
+		if current.Note == next.Note && !noteMoved {
+			return nil
+		}
+		return tx.changed(ctx, owner, current.DocumentID)
 	})
 	return updated, err
 }
@@ -158,6 +170,7 @@ func (s *Store) ReanchorAnnotations(ctx context.Context, owner, document uuid.UU
 			return err
 		}
 		saved = make([]Annotation, 0, len(moves))
+		noteMoved := false
 		for _, m := range moves {
 			current, err := tx.getAnnotation(ctx, owner, m.ID)
 			if err != nil {
@@ -175,22 +188,28 @@ func (s *Store) ReanchorAnnotations(ctx context.Context, owner, document uuid.UU
 				return err
 			}
 			saved = append(saved, a)
+			noteMoved = noteMoved || a.Note != ""
 		}
-		return nil
+		if !noteMoved {
+			return nil
+		}
+		return tx.changed(ctx, owner, document)
 	})
 	return saved, err
 }
 
 // DeleteAnnotation removes owner's annotation id, or returns ErrNotFound.
 func (s *Store) DeleteAnnotation(ctx context.Context, owner, id uuid.UUID) error {
-	n, err := s.q.DeleteAnnotation(ctx, sqlcdb.DeleteAnnotationParams{OwnerID: owner, ID: id})
-	if err != nil {
-		return mapErr("delete annotation", err)
-	}
-	if n == 0 {
-		return ErrNotFound
-	}
-	return nil
+	return s.inTx(ctx, func(tx *Store) error {
+		gone, err := tx.q.DeleteAnnotation(ctx, sqlcdb.DeleteAnnotationParams{OwnerID: owner, ID: id})
+		if err != nil {
+			return mapErr("delete annotation", err)
+		}
+		if gone.Note.String == "" {
+			return nil
+		}
+		return tx.changed(ctx, owner, gone.DocumentID)
+	})
 }
 
 // lockContent returns owner's document's content, locked until the

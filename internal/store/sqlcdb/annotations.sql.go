@@ -68,8 +68,9 @@ func (q *Queries) CreateAnnotation(ctx context.Context, arg CreateAnnotationPara
 	return i, err
 }
 
-const deleteAnnotation = `-- name: DeleteAnnotation :execrows
+const deleteAnnotation = `-- name: DeleteAnnotation :one
 DELETE FROM annotations WHERE owner_id = $1 AND id = $2
+RETURNING document_id, note
 `
 
 type DeleteAnnotationParams struct {
@@ -77,12 +78,16 @@ type DeleteAnnotationParams struct {
 	ID      uuid.UUID
 }
 
-func (q *Queries) DeleteAnnotation(ctx context.Context, arg DeleteAnnotationParams) (int64, error) {
-	result, err := q.db.Exec(ctx, deleteAnnotation, arg.OwnerID, arg.ID)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected(), nil
+type DeleteAnnotationRow struct {
+	DocumentID uuid.UUID
+	Note       pgtype.Text
+}
+
+func (q *Queries) DeleteAnnotation(ctx context.Context, arg DeleteAnnotationParams) (DeleteAnnotationRow, error) {
+	row := q.db.QueryRow(ctx, deleteAnnotation, arg.OwnerID, arg.ID)
+	var i DeleteAnnotationRow
+	err := row.Scan(&i.DocumentID, &i.Note)
+	return i, err
 }
 
 const getAnnotation = `-- name: GetAnnotation :one

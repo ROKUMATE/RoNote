@@ -49,6 +49,13 @@ type Config struct {
 	Embed Embed
 }
 
+// The embedder by default: Ollama on this machine, with the pinned model
+// (docs/adr/0011-retrieval.md).
+const (
+	DefaultEmbedURL   = "http://127.0.0.1:11434/v1"
+	DefaultEmbedModel = "qwen3-embedding:0.6b"
+)
+
 // Embed is an OpenAI-compatible embeddings API and the model to ask it for
 // (docs/adr/0011-retrieval.md).
 type Embed struct {
@@ -133,8 +140,8 @@ func Load(getenv func(string) string) (Config, error) {
 	check("RONOTE_GITHUB_TOKEN_URL", validateProviderURL(gh.TokenURL, "github.com", env))
 	check("RONOTE_GITHUB_API_URL", validateProviderURL(gh.APIURL, "api.github.com", env))
 	embed := Embed{
-		URL:   strings.TrimSuffix(withDefault(getenv("RONOTE_EMBED_URL"), "http://127.0.0.1:11434/v1"), "/"),
-		Model: withDefault(getenv("RONOTE_EMBED_MODEL"), "qwen3-embedding:0.6b"),
+		URL:   strings.TrimSuffix(withDefault(getenv("RONOTE_EMBED_URL"), DefaultEmbedURL), "/"),
+		Model: withDefault(getenv("RONOTE_EMBED_MODEL"), DefaultEmbedModel),
 	}
 	check("RONOTE_EMBED_URL", validateHTTPURL(embed.URL))
 	var limits Limits

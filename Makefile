@@ -82,6 +82,8 @@ lint-go: ## Lint Go code and CI workflows (golangci-lint, deadcode, go mod tidy,
 	@dead=$$(go tool deadcode -test -tags integration,live,perf ./...) || { echo "make lint-go: deadcode failed" >&2; exit 1; }; \
 		dead=$$(printf '%s\n' "$$dead" | grep -v '^internal/httpapi/gen/' || true); \
 		[ -z "$$dead" ] || { printf '%s\n' "$$dead" >&2; echo "make lint-go: deadcode found unreachable functions" >&2; exit 1; }
+	@! go list -deps ./cmd/api ./cmd/worker | grep -q testcontainers || \
+		{ echo "make lint-go: cmd/api or cmd/worker links testcontainers; only tests and cmd/eval may" >&2; exit 1; }
 	go mod tidy -diff
 	go tool actionlint
 
@@ -169,6 +171,12 @@ test-live: ## Extract real pages over the network, print a report, and check the
 	go test -tags live -run TestLive -count=1 -v ./internal/extract
 	$(WEB) live
 
+eval: ## Measure search on the retrieval eval with recorded vectors; fails below baseline.json (no model needed)
+	sh scripts/container.sh test go run ./cmd/eval
+
+eval-record: ## Embed the eval's corpus and queries through RONOTE_EMBED_URL and record the vectors (needs the model)
+	sh scripts/container.sh test go run ./cmd/eval -record
+
 test-perf-search: ## Time search over 5k-25k chunks for one user, among 200,000 others (local only: minutes, and a container)
 	sh scripts/container.sh test go test -tags perf,integration -p 1 -count=1 -timeout 30m -run '^TestPerfSearch' -v ./internal/search
 
@@ -208,5 +216,5 @@ web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromiu
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp extract lint lint-go lint-web fmt
 .PHONY: doctor stop dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
-.PHONY: test-integration test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
+.PHONY: test-integration eval eval-record test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
 .PHONY: web-dev web-build web-e2e

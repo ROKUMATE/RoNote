@@ -1,0 +1,4072 @@
+{
+  "ir_version": 1,
+  "title": "4. More Control Flow Tools",
+  "source": {
+    "url": "https://docs.python.org/3/tutorial/controlflow.html",
+    "final_url": "https://docs.python.org/3/tutorial/controlflow.html",
+    "canonical_url": "https://docs.python.org/3/tutorial/controlflow.html",
+    "fetched_at": "2026-11-12T17:09:42.81835Z",
+    "body_sha256": "c306886564fcf0cf8ff9dc26ea84f95cfba7f5fe1add1334090557a5d4758c66",
+    "etag": "\"6af5f090-22392\"",
+    "last_modified": "Thu, 12 Nov 2026 17:00:00 GMT"
+  },
+  "extractor": {
+    "name": "sphinx",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "3bd5603b9a5b",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "more-control-flow-tools",
+      "content": [
+        {
+          "text": "4. More Control Flow Tools"
+        }
+      ]
+    },
+    {
+      "id": "7814955c744f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "As well as the "
+        },
+        {
+          "text": "while",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#while",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " statement just introduced, Python uses a few more that we will encounter in this chapter."
+        }
+      ]
+    },
+    {
+      "id": "c203c238e702",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "if-statements",
+      "content": [
+        {
+          "text": "4.1. "
+        },
+        {
+          "text": "if",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " Statements"
+        }
+      ]
+    },
+    {
+      "id": "436594059a83",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Perhaps the most well-known statement type is the "
+        },
+        {
+          "text": "if",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#if",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " statement. For example:"
+        }
+      ]
+    },
+    {
+      "id": "56a498047661",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> x = int(input(\"Please enter an integer: \"))\nPlease enter an integer: 42\n>>> if x < 0:\n...     x = 0\n...     print('Negative changed to zero')\n... elif x == 0:\n...     print('Zero')\n... elif x == 1:\n...     print('Single')\n... else:\n...     print('More')\n...\nMore\n"
+    },
+    {
+      "id": "1e3f85087af4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "There can be zero or more "
+        },
+        {
+          "text": "elif",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#elif",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " parts, and the "
+        },
+        {
+          "text": "else",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#else",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " part is optional. The keyword ‘"
+        },
+        {
+          "text": "elif",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "’ is short for ‘else if’, and is useful to avoid excessive indentation. An "
+        },
+        {
+          "text": "if",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " … "
+        },
+        {
+          "text": "elif",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " … "
+        },
+        {
+          "text": "elif",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " … sequence is a substitute for the "
+        },
+        {
+          "text": "switch",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " or "
+        },
+        {
+          "text": "case",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " statements found in other languages."
+        }
+      ]
+    },
+    {
+      "id": "6cb21ba593a5",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you’re comparing the same value to several constants, or checking for specific types or attributes, you may also find the "
+        },
+        {
+          "text": "match",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " statement useful. For more details see "
+        },
+        {
+          "text": "match Statements",
+          "link": {
+            "href": "#tut-match",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "afe4f5c6b585",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "for-statements",
+      "content": [
+        {
+          "text": "4.2. "
+        },
+        {
+          "text": "for",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " Statements"
+        }
+      ]
+    },
+    {
+      "id": "714ebffae54d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The "
+        },
+        {
+          "text": "for",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#for",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " statement in Python differs a bit from what you may be used to in C or Pascal. Rather than always iterating over an arithmetic progression of numbers (like in Pascal), or giving the user the ability to define both the iteration step and halting condition (as C), Python’s "
+        },
+        {
+          "text": "for",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " statement iterates over the items of any sequence (a list or a string), in the order that they appear in the sequence. For example (no pun intended):"
+        }
+      ]
+    },
+    {
+      "id": "fdcd449f8cdb",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> # Measure some strings:\n>>> words = ['cat', 'window', 'defenestrate']\n>>> for w in words:\n...     print(w, len(w))\n...\ncat 3\nwindow 6\ndefenestrate 12\n"
+    },
+    {
+      "id": "ec800b1845bb",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Code that modifies a collection while iterating over that same collection can be tricky to get right. Instead, it is usually more straight-forward to loop over a copy of the collection or to create a new collection:"
+        }
+      ]
+    },
+    {
+      "id": "d5052a25f8ff",
+      "kind": "code",
+      "lang": "python3",
+      "text": "# Create a sample collection\nusers = {'Hans': 'active', 'Éléonore': 'inactive', '景太郎': 'active'}\n\n# Strategy:  Iterate over a copy\nfor user, status in users.copy().items():\n    if status == 'inactive':\n        del users[user]\n\n# Strategy:  Create a new collection\nactive_users = {}\nfor user, status in users.items():\n    if status == 'active':\n        active_users[user] = status\n"
+    },
+    {
+      "id": "7e179d7f9d30",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "the-range-function",
+      "content": [
+        {
+          "text": "4.3. The "
+        },
+        {
+          "text": "range()",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/builtins/stdtypes.html#range",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " Function"
+        }
+      ]
+    },
+    {
+      "id": "33fc7bf7fb48",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you do need to iterate over a sequence of numbers, the built-in function "
+        },
+        {
+          "text": "range()",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/builtins/stdtypes.html#range",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " comes in handy. It generates arithmetic progressions:"
+        }
+      ]
+    },
+    {
+      "id": "ce7bfd88c50a",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> for i in range(5):\n...     print(i)\n...\n0\n1\n2\n3\n4\n"
+    },
+    {
+      "id": "f23d10a06333",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The given end point is never part of the generated sequence; "
+        },
+        {
+          "text": "range(10)",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " generates 10 values, the legal indices for items of a sequence of length 10. It is possible to let the range start at another number, or to specify a different increment (even negative; sometimes this is called the ‘step’):"
+        }
+      ]
+    },
+    {
+      "id": "8f860ea19a4d",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> list(range(5, 10))\n[5, 6, 7, 8, 9]\n\n>>> list(range(0, 10, 3))\n[0, 3, 6, 9]\n\n>>> list(range(-10, -100, -30))\n[-10, -40, -70]\n"
+    },
+    {
+      "id": "4215ea9c2af7",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "To iterate over the indices of a sequence, you can combine "
+        },
+        {
+          "text": "range()",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/builtins/stdtypes.html#range",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "len()",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/builtins/functions.html#len",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " as follows:"
+        }
+      ]
+    },
+    {
+      "id": "3bb895a5a241",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> a = ['Mary', 'had', 'a', 'little', 'lamb']\n>>> for i in range(len(a)):\n...     print(i, a[i])\n...\n0 Mary\n1 had\n2 a\n3 little\n4 lamb\n"
+    },
+    {
+      "id": "ce1ebfd11cbc",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In most such cases, however, it is convenient to use the "
+        },
+        {
+          "text": "enumerate()",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/builtins/functions.html#enumerate",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " function, see "
+        },
+        {
+          "text": "Looping Techniques",
+          "link": {
+            "href": "https://docs.python.org/3/tutorial/datastructures.html#tut-loopidioms",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "8d4fd4797f19",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A strange thing happens if you just print a range:"
+        }
+      ]
+    },
+    {
+      "id": "4e88bb04ce9a",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> range(10)\nrange(0, 10)\n"
+    },
+    {
+      "id": "4404aa52b089",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In many ways the object returned by "
+        },
+        {
+          "text": "range()",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/builtins/stdtypes.html#range",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " behaves as if it is a list, but in fact it isn’t. It is an object which returns the successive items of the desired sequence when you iterate over it, but it doesn’t really make the list, thus saving space."
+        }
+      ]
+    },
+    {
+      "id": "2539404f7e9f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "We say such an object is "
+        },
+        {
+          "text": "iterable",
+          "link": {
+            "href": "https://docs.python.org/3/glossary.html#term-iterable",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", that is, suitable as a target for functions and constructs that expect something from which they can obtain successive items until the supply is "
+        },
+        {
+          "text": "exhausted",
+          "link": {
+            "href": "https://docs.python.org/3/glossary.html#term-exhausted",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ". We have seen that the "
+        },
+        {
+          "text": "for",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#for",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " statement is such a construct, while an example of a function that takes an iterable is "
+        },
+        {
+          "text": "sum()",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/builtins/functions.html#sum",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "id": "1bff1c1cbb16",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> sum(range(4))  # 0 + 1 + 2 + 3\n6\n"
+    },
+    {
+      "id": "56f927ba5f0c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Later we will see more functions that return iterables and take iterables as arguments. In chapter "
+        },
+        {
+          "text": "Data Structures",
+          "link": {
+            "href": "https://docs.python.org/3/tutorial/datastructures.html#tut-structures",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", we will discuss "
+        },
+        {
+          "text": "list()",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/builtins/stdtypes.html#list",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " in more detail."
+        }
+      ]
+    },
+    {
+      "id": "93cb2fefefb1",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "break-and-continue-statements",
+      "content": [
+        {
+          "text": "4.4. "
+        },
+        {
+          "text": "break",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "continue",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " Statements"
+        }
+      ]
+    },
+    {
+      "id": "4f0c35deb830",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The "
+        },
+        {
+          "text": "break",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/simple_stmts.html#break",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " statement breaks out of the innermost enclosing "
+        },
+        {
+          "text": "for",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#for",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " or "
+        },
+        {
+          "text": "while",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#while",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " loop:"
+        }
+      ]
+    },
+    {
+      "id": "bf93e2b5143e",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> for n in range(2, 10):\n...     for x in range(2, n):\n...         if n % x == 0:\n...             print(f\"{n} equals {x} * {n//x}\")\n...             break\n...\n4 equals 2 * 2\n6 equals 2 * 3\n8 equals 2 * 4\n9 equals 3 * 3\n"
+    },
+    {
+      "id": "d9bfa3a7ad58",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The "
+        },
+        {
+          "text": "continue",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/simple_stmts.html#continue",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " statement continues with the next iteration of the loop:"
+        }
+      ]
+    },
+    {
+      "id": "23b1f01456a0",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> for num in range(2, 10):\n...     if num % 2 == 0:\n...         print(f\"Found an even number {num}\")\n...         continue\n...     print(f\"Found an odd number {num}\")\n...\nFound an even number 2\nFound an odd number 3\nFound an even number 4\nFound an odd number 5\nFound an even number 6\nFound an odd number 7\nFound an even number 8\nFound an odd number 9\n"
+    },
+    {
+      "id": "ae92b4752d20",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "else-clauses-on-loops",
+      "content": [
+        {
+          "text": "4.5. "
+        },
+        {
+          "text": "else",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " Clauses on Loops"
+        }
+      ]
+    },
+    {
+      "id": "216b39dd0fd4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In a "
+        },
+        {
+          "text": "for",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " or "
+        },
+        {
+          "text": "while",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " loop the "
+        },
+        {
+          "text": "break",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " statement may be paired with an "
+        },
+        {
+          "text": "else",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause. If the loop finishes without executing the "
+        },
+        {
+          "text": "break",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", the "
+        },
+        {
+          "text": "else",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause executes."
+        }
+      ]
+    },
+    {
+      "id": "9ec38d94fb49",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In a "
+        },
+        {
+          "text": "for",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#for",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " loop, the "
+        },
+        {
+          "text": "else",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause is executed after the loop finishes its final iteration, that is, if no break occurred."
+        }
+      ]
+    },
+    {
+      "id": "bf7fcefb1faf",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In a "
+        },
+        {
+          "text": "while",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#while",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " loop, it’s executed after the loop’s condition becomes false."
+        }
+      ]
+    },
+    {
+      "id": "56c49b2569d4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In either kind of loop, the "
+        },
+        {
+          "text": "else",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause is "
+        },
+        {
+          "text": "not",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " executed if the loop was terminated by a "
+        },
+        {
+          "text": "break",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/simple_stmts.html#break",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ". Of course, other ways of ending the loop early, such as a "
+        },
+        {
+          "text": "return",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/simple_stmts.html#return",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " or a raised exception, will also skip execution of the "
+        },
+        {
+          "text": "else",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#else",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " clause."
+        }
+      ]
+    },
+    {
+      "id": "b659d1271735",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This is exemplified in the following "
+        },
+        {
+          "text": "for",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " loop, which searches for prime numbers:"
+        }
+      ]
+    },
+    {
+      "id": "f2e1dd8aae02",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> for n in range(2, 10):\n...     for x in range(2, n):\n...         if n % x == 0:\n...             print(n, 'equals', x, '*', n//x)\n...             break\n...     else:\n...         # loop fell through without finding a factor\n...         print(n, 'is a prime number')\n...\n2 is a prime number\n3 is a prime number\n4 equals 2 * 2\n5 is a prime number\n6 equals 2 * 3\n7 is a prime number\n8 equals 2 * 4\n9 equals 3 * 3\n"
+    },
+    {
+      "id": "75d7355301a4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "(Yes, this is the correct code. Look closely: the "
+        },
+        {
+          "text": "else",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause belongs to the "
+        },
+        {
+          "text": "for",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " loop, "
+        },
+        {
+          "text": "not",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " the "
+        },
+        {
+          "text": "if",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " statement.)"
+        }
+      ]
+    },
+    {
+      "id": "2e4bf6c1388b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "One way to think of the else clause is to imagine it paired with the "
+        },
+        {
+          "text": "if",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " inside the loop. As the loop executes, it will run a sequence like if/if/if/else. The "
+        },
+        {
+          "text": "if",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is inside the loop, encountered a number of times. If the condition is ever true, a "
+        },
+        {
+          "text": "break",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " will happen. If the condition is never true, the "
+        },
+        {
+          "text": "else",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause outside the loop will execute."
+        }
+      ]
+    },
+    {
+      "id": "0eb94bd442e8",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "When used with a loop, the "
+        },
+        {
+          "text": "else",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause has more in common with the "
+        },
+        {
+          "text": "else",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause of a "
+        },
+        {
+          "text": "try",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#try",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " statement than it does with that of "
+        },
+        {
+          "text": "if",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " statements: a "
+        },
+        {
+          "text": "try",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " statement’s "
+        },
+        {
+          "text": "else",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause runs when no exception occurs, and a loop’s "
+        },
+        {
+          "text": "else",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause runs when no "
+        },
+        {
+          "text": "break",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " occurs. For more on the "
+        },
+        {
+          "text": "try",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " statement and exceptions, see "
+        },
+        {
+          "text": "Handling Exceptions",
+          "link": {
+            "href": "https://docs.python.org/3/tutorial/errors.html#tut-handling",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "fdab78bbbbd9",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "pass-statements",
+      "content": [
+        {
+          "text": "4.6. "
+        },
+        {
+          "text": "pass",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " Statements"
+        }
+      ]
+    },
+    {
+      "id": "c1bbc096f6e1",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The "
+        },
+        {
+          "text": "pass",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/simple_stmts.html#pass",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " statement does nothing. It can be used when a statement is required syntactically but the program requires no action. For example:"
+        }
+      ]
+    },
+    {
+      "id": "c7a152f0b517",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> while True:\n...     pass  # Busy-wait for keyboard interrupt (Ctrl+C)\n...\n"
+    },
+    {
+      "id": "043c3340a9dc",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This is commonly used for creating minimal classes:"
+        }
+      ]
+    },
+    {
+      "id": "8904014a8610",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> class MyEmptyClass:\n...     pass\n...\n"
+    },
+    {
+      "id": "e92daeb62581",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Another place "
+        },
+        {
+          "text": "pass",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/simple_stmts.html#pass",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " can be used is as a place-holder for a function or conditional body when you are working on new code, allowing you to keep thinking at a more abstract level. The "
+        },
+        {
+          "text": "pass",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is silently ignored:"
+        }
+      ]
+    },
+    {
+      "id": "ffd2d9427784",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> def initlog(*args):\n...     pass   # Remember to implement this!\n...\n"
+    },
+    {
+      "id": "9bd2e7d81584",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "For this last case, many people use the ellipsis literal "
+        },
+        {
+          "text": "...",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " instead of "
+        },
+        {
+          "text": "pass",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". This use has no special meaning to Python, and is not part of the language definition (you could use any constant expression here), but "
+        },
+        {
+          "text": "...",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is used conventionally as a placeholder body as well. See "
+        },
+        {
+          "text": "The Ellipsis Object",
+          "link": {
+            "href": "https://docs.python.org/3/builtins/stdtypes.html#bltin-ellipsis-object",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "f5f21bb29205",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "match-statements",
+      "content": [
+        {
+          "text": "4.7. "
+        },
+        {
+          "text": "match",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " Statements"
+        }
+      ]
+    },
+    {
+      "id": "6d0a5a1ee8b4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A "
+        },
+        {
+          "text": "match",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#match",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " statement takes an expression and compares its value to successive patterns given as one or more case blocks. This is superficially similar to a switch statement in C, Java or JavaScript (and many other languages), but it’s more similar to pattern matching in languages like Rust or Haskell. Only the first pattern that matches gets executed and it can also extract components (sequence elements or object attributes) from the value into variables. If no case matches, none of the branches is executed."
+        }
+      ]
+    },
+    {
+      "id": "475b01a1febf",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The simplest form compares a subject value against one or more literals:"
+        }
+      ]
+    },
+    {
+      "id": "279ed7601ad6",
+      "kind": "code",
+      "lang": "python3",
+      "text": "def http_error(status):\n    match status:\n        case 400:\n            return \"Bad request\"\n        case 404:\n            return \"Not found\"\n        case 418:\n            return \"I'm a teapot\"\n        case _:\n            return \"Something's wrong with the internet\"\n"
+    },
+    {
+      "id": "36f04c04db8d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Note the last block: the “variable name” "
+        },
+        {
+          "text": "_",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " acts as a "
+        },
+        {
+          "text": "wildcard",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " and never fails to match."
+        }
+      ]
+    },
+    {
+      "id": "dda18a6e4d36",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can combine several literals in a single pattern using "
+        },
+        {
+          "text": "|",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " (“or”):"
+        }
+      ]
+    },
+    {
+      "id": "d3758dd2f7d6",
+      "kind": "code",
+      "lang": "python3",
+      "text": "case 401 | 403 | 404:\n    return \"Not allowed\"\n"
+    },
+    {
+      "id": "53053991a678",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Patterns can look like unpacking assignments, and can be used to bind variables:"
+        }
+      ]
+    },
+    {
+      "id": "81693fc66a86",
+      "kind": "code",
+      "lang": "python3",
+      "text": "# point is an (x, y) tuple\nmatch point:\n    case (0, 0):\n        print(\"Origin\")\n    case (0, y):\n        print(f\"Y={y}\")\n    case (x, 0):\n        print(f\"X={x}\")\n    case (x, y):\n        print(f\"X={x}, Y={y}\")\n    case _:\n        raise ValueError(\"Not a point\")\n"
+    },
+    {
+      "id": "19c5fa67cd0c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Study that one carefully! The first pattern has two literals, and can be thought of as an extension of the literal pattern shown above. But the next two patterns combine a literal and a variable, and the variable "
+        },
+        {
+          "text": "binds",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " a value from the subject ("
+        },
+        {
+          "text": "point",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "). The fourth pattern captures two values, which makes it conceptually similar to the unpacking assignment "
+        },
+        {
+          "text": "(x, y) = point",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "164ff6357e8c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you are using classes to structure your data you can use the class name followed by an argument list resembling a constructor, but with the ability to capture attributes into variables:"
+        }
+      ]
+    },
+    {
+      "id": "3cac006aaf5e",
+      "kind": "code",
+      "lang": "python3",
+      "text": "class Point:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n\ndef where_is(point):\n    match point:\n        case Point(x=0, y=0):\n            print(\"Origin\")\n        case Point(x=0, y=y):\n            print(f\"Y={y}\")\n        case Point(x=x, y=0):\n            print(f\"X={x}\")\n        case Point():\n            print(\"Somewhere else\")\n        case _:\n            print(\"Not a point\")\n"
+    },
+    {
+      "id": "280e03b19e1c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can use positional parameters with some builtin classes that provide an ordering for their attributes (e.g. dataclasses). You can also define a specific position for attributes in patterns by setting the "
+        },
+        {
+          "text": "__match_args__",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " special attribute in your classes. If it’s set to (“x”, “y”), the following patterns are all equivalent (and all bind the "
+        },
+        {
+          "text": "y",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " attribute to the "
+        },
+        {
+          "text": "var",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " variable):"
+        }
+      ]
+    },
+    {
+      "id": "341f051a84e1",
+      "kind": "code",
+      "lang": "python3",
+      "text": "Point(1, var)\nPoint(1, y=var)\nPoint(x=1, y=var)\nPoint(y=var, x=1)\n"
+    },
+    {
+      "id": "8f3f620f7468",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A recommended way to read patterns is to look at them as an extended form of what you would put on the left of an assignment, to understand which variables would be set to what. Only the standalone names (like "
+        },
+        {
+          "text": "var",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " above) are assigned to by a match statement. Dotted names (like "
+        },
+        {
+          "text": "foo.bar",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "), attribute names (the "
+        },
+        {
+          "text": "x=",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "y=",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " above) or class names (recognized by the “(…)” next to them like "
+        },
+        {
+          "text": "Point",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " above) are never assigned to."
+        }
+      ]
+    },
+    {
+      "id": "f175a6d705ca",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Patterns can be arbitrarily nested. For example, if we have a short list of Points, with "
+        },
+        {
+          "text": "__match_args__",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " added, we could match it like this:"
+        }
+      ]
+    },
+    {
+      "id": "58a547732106",
+      "kind": "code",
+      "lang": "python3",
+      "text": "class Point:\n    __match_args__ = ('x', 'y')\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n\nmatch points:\n    case []:\n        print(\"No points\")\n    case [Point(0, 0)]:\n        print(\"The origin\")\n    case [Point(x, y)]:\n        print(f\"Single point {x}, {y}\")\n    case [Point(0, y1), Point(0, y2)]:\n        print(f\"Two on the Y axis at {y1}, {y2}\")\n    case _:\n        print(\"Something else\")\n"
+    },
+    {
+      "id": "e2af5cfba2a6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "We can add an "
+        },
+        {
+          "text": "if",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " clause to a pattern, known as a “guard”. If the guard is false, "
+        },
+        {
+          "text": "match",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " goes on to try the next case block. Note that value capture happens before the guard is evaluated:"
+        }
+      ]
+    },
+    {
+      "id": "38aaf5272756",
+      "kind": "code",
+      "lang": "python3",
+      "text": "match point:\n    case Point(x, y) if x == y:\n        print(f\"Y=X at {x}\")\n    case Point(x, y):\n        print(f\"Not on the diagonal\")\n"
+    },
+    {
+      "id": "2047ad2e4d24",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Several other key features of this statement:"
+        }
+      ]
+    },
+    {
+      "id": "e293e2432f1f",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "9336dd4e28e7",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Like unpacking assignments, tuple and list patterns have exactly the same meaning and actually match arbitrary sequences. An important exception is that they don’t match iterators or strings."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "e0ca5dbd3b5d",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Sequence patterns support extended unpacking: "
+                },
+                {
+                  "text": "[x, y, *rest]",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " and "
+                },
+                {
+                  "text": "(x, y, *rest)",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " work similar to unpacking assignments. The name after "
+                },
+                {
+                  "text": "*",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " may also be "
+                },
+                {
+                  "text": "_",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ", so "
+                },
+                {
+                  "text": "(x, y, *_)",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " matches a sequence of at least two items without binding the remaining items."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "1d10fbeff96f",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Mapping patterns: "
+                },
+                {
+                  "text": "{\"bandwidth\": b, \"latency\": l}",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " captures the "
+                },
+                {
+                  "text": "\"bandwidth\"",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " and "
+                },
+                {
+                  "text": "\"latency\"",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " values from a dictionary. Unlike sequence patterns, extra keys are ignored. An unpacking like "
+                },
+                {
+                  "text": "**rest",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " is also supported. (But "
+                },
+                {
+                  "text": "**_",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " would be redundant, so it is not allowed.)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "df3eaab0a5ae",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Subpatterns may be captured using the "
+                },
+                {
+                  "text": "as",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " keyword:"
+                }
+              ]
+            },
+            {
+              "id": "a98b4e56ae7e",
+              "kind": "code",
+              "lang": "python3",
+              "text": "case (Point(x1, y1), Point(x2, y2) as p2): ...\n"
+            },
+            {
+              "id": "f639406f4069",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "will capture the second element of the input as "
+                },
+                {
+                  "text": "p2",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " (as long as the input is a sequence of two points)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "df33ffc14a84",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Most literals are compared by equality, however the singletons "
+                },
+                {
+                  "text": "True",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ", "
+                },
+                {
+                  "text": "False",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " and "
+                },
+                {
+                  "text": "None",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " are compared by identity."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "615b4b2de4ce",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Patterns may use named constants. These must be dotted names to prevent them from being interpreted as capture variables:"
+                }
+              ]
+            },
+            {
+              "id": "cb167e2387c5",
+              "kind": "code",
+              "lang": "python3",
+              "text": "from enum import Enum\nclass Color(Enum):\n    RED = 'red'\n    GREEN = 'green'\n    BLUE = 'blue'\n\ncolor = Color(input(\"Enter your choice of 'red', 'blue' or 'green': \"))\n\nmatch color:\n    case Color.RED:\n        print(\"I see red!\")\n    case Color.GREEN:\n        print(\"Grass is green\")\n    case Color.BLUE:\n        print(\"I'm feeling the blues :(\")\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ad9e17f9b1fa",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "For a more detailed explanation and additional examples, you can look into "
+        },
+        {
+          "text": "PEP 636",
+          "marks": [
+            "bold"
+          ],
+          "link": {
+            "href": "https://peps.python.org/pep-0636/",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " which is written in a tutorial format."
+        }
+      ]
+    },
+    {
+      "id": "3e5199b46e1f",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "defining-functions",
+      "content": [
+        {
+          "text": "4.8. Defining Functions"
+        }
+      ]
+    },
+    {
+      "id": "e4c1274b9fcc",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "We can create a function that writes the Fibonacci series to an arbitrary boundary:"
+        }
+      ]
+    },
+    {
+      "id": "1409b5dbcc9d",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> def fib(n):    # write Fibonacci series less than n\n...     \"\"\"Print a Fibonacci series less than n.\"\"\"\n...     a, b = 0, 1\n...     while a < n:\n...         print(a, end=' ')\n...         a, b = b, a+b\n...     print()\n...\n>>> # Now call the function we just defined:\n>>> fib(2000)\n0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597\n"
+    },
+    {
+      "id": "c92379f064b9",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The keyword "
+        },
+        {
+          "text": "def",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#def",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " introduces a function "
+        },
+        {
+          "text": "definition",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ". It must be followed by the function name and the parenthesized list of formal parameters. The statements that form the body of the function start at the next line, and must be indented."
+        }
+      ]
+    },
+    {
+      "id": "0fbe2b94e0c7",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The first statement of the function body can optionally be a string literal; this string literal is the function’s documentation string, or "
+        },
+        {
+          "text": "docstring",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ". (More about docstrings can be found in the section "
+        },
+        {
+          "text": "Documentation Strings",
+          "link": {
+            "href": "#tut-docstrings",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": ".) There are tools which use docstrings to automatically produce online or printed documentation, or to let the user interactively browse through code; it’s good practice to include docstrings in code that you write, so make a habit of it."
+        }
+      ]
+    },
+    {
+      "id": "615bbacbeb52",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The "
+        },
+        {
+          "text": "execution",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " of a function introduces a new symbol table used for the local variables of the function. More precisely, all variable assignments in a function store the value in the local symbol table; whereas variable references first look in the local symbol table, then in the local symbol tables of enclosing functions, then in the global symbol table, and finally in the table of built-in names. Thus, global variables and variables of enclosing functions cannot be directly assigned a value within a function (unless, for global variables, named in a "
+        },
+        {
+          "text": "global",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/simple_stmts.html#global",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " statement, or, for variables of enclosing functions, named in a "
+        },
+        {
+          "text": "nonlocal",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/simple_stmts.html#nonlocal",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " statement), although they may be referenced."
+        }
+      ]
+    },
+    {
+      "id": "403d13511179",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The actual parameters (arguments) to a function call are introduced in the local symbol table of the called function when it is called; thus, arguments are passed using "
+        },
+        {
+          "text": "call by value",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " (where the "
+        },
+        {
+          "text": "value",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " is always an object "
+        },
+        {
+          "text": "reference",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ", not the value of the object). "
+        },
+        {
+          "text": "[1]",
+          "link": {
+            "href": "#id2",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": " When a function calls another function, or calls itself recursively, a new local symbol table is created for that call."
+        }
+      ]
+    },
+    {
+      "id": "b99650163b90",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A function definition associates the function name with the function object in the current symbol table. The interpreter recognizes the object pointed to by that name as a user-defined function. Other names can also point to that same function object and can also be used to access the function:"
+        }
+      ]
+    },
+    {
+      "id": "41d1680b07b1",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> fib\n<function fib at 10042ed0>\n>>> f = fib\n>>> f(100)\n0 1 1 2 3 5 8 13 21 34 55 89\n"
+    },
+    {
+      "id": "ba5d444cd7ae",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Coming from other languages, you might object that "
+        },
+        {
+          "text": "fib",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is not a function but a procedure since it doesn’t return a value. In fact, even functions without a "
+        },
+        {
+          "text": "return",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/simple_stmts.html#return",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " statement do return a value, albeit a rather boring one. This value is called "
+        },
+        {
+          "text": "None",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " (it’s a built-in name). Writing the value "
+        },
+        {
+          "text": "None",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is normally suppressed by the interpreter if it would be the only value written. You can see it if you really want to using "
+        },
+        {
+          "text": "print()",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/builtins/functions.html#print",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "id": "8c7694ecaf0a",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> fib(0)\n>>> print(fib(0))\nNone\n"
+    },
+    {
+      "id": "25787a551f3a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "It is simple to write a function that returns a list of the numbers of the Fibonacci series, instead of printing it:"
+        }
+      ]
+    },
+    {
+      "id": "03ceffb5567b",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> def fib2(n):  # return Fibonacci series up to n\n...     \"\"\"Return a list containing the Fibonacci series up to n.\"\"\"\n...     result = []\n...     a, b = 0, 1\n...     while a < n:\n...         result.append(a)    # see below\n...         a, b = b, a+b\n...     return result\n...\n>>> f100 = fib2(100)    # call it\n>>> f100                # write the result\n[0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]\n"
+    },
+    {
+      "id": "2a53422239a3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This example, as usual, demonstrates some new Python features:"
+        }
+      ]
+    },
+    {
+      "id": "947d9380a540",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "18bbc3cf70ec",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "The "
+                },
+                {
+                  "text": "return",
+                  "marks": [
+                    "code"
+                  ],
+                  "link": {
+                    "href": "https://docs.python.org/3/reference/simple_stmts.html#return",
+                    "kind": "same_domain"
+                  }
+                },
+                {
+                  "text": " statement returns with a value from a function. "
+                },
+                {
+                  "text": "return",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " without an expression argument returns "
+                },
+                {
+                  "text": "None",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ". Falling off the end of a function also returns "
+                },
+                {
+                  "text": "None",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "8e7b91a6e87f",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "The statement "
+                },
+                {
+                  "text": "result.append(a)",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " calls a "
+                },
+                {
+                  "text": "method",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                {
+                  "text": " of the list object "
+                },
+                {
+                  "text": "result",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ". A method is a function that ‘belongs’ to an object and is named "
+                },
+                {
+                  "text": "obj.methodname",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ", where "
+                },
+                {
+                  "text": "obj",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " is some object (this may be an expression), and "
+                },
+                {
+                  "text": "methodname",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " is the name of a method that is defined by the object’s type. Different types define different methods. Methods of different types may have the same name without causing ambiguity. (It is possible to define your own object types and methods, using "
+                },
+                {
+                  "text": "classes",
+                  "marks": [
+                    "italic"
+                  ]
+                },
+                {
+                  "text": ", see "
+                },
+                {
+                  "text": "Classes",
+                  "link": {
+                    "href": "https://docs.python.org/3/tutorial/classes.html#tut-classes",
+                    "kind": "same_domain"
+                  }
+                },
+                {
+                  "text": ") The method "
+                },
+                {
+                  "text": "append()",
+                  "marks": [
+                    "code"
+                  ],
+                  "link": {
+                    "href": "https://docs.python.org/3/builtins/stdtypes.html#list.append",
+                    "kind": "same_domain"
+                  }
+                },
+                {
+                  "text": " shown in the example is defined for list objects; it adds a new element at the end of the list. In this example it is equivalent to "
+                },
+                {
+                  "text": "result = result + [a]",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ", but more efficient."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "48989132911a",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "more-on-defining-functions",
+      "content": [
+        {
+          "text": "4.9. More on Defining Functions"
+        }
+      ]
+    },
+    {
+      "id": "50dbd13728d5",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "It is also possible to define functions with a variable number of arguments. There are three forms, which can be combined."
+        }
+      ]
+    },
+    {
+      "id": "b17f952da2f7",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "default-argument-values",
+      "content": [
+        {
+          "text": "4.9.1. Default Argument Values"
+        }
+      ]
+    },
+    {
+      "id": "676a770023bf",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The most useful form is to specify a default value for one or more arguments. This creates a function that can be called with fewer arguments than it is defined to allow. For example:"
+        }
+      ]
+    },
+    {
+      "id": "95d319c01bdb",
+      "kind": "code",
+      "lang": "python3",
+      "text": "def ask_ok(prompt, retries=4, reminder='Please try again!'):\n    while True:\n        reply = input(prompt)\n        if reply in {'y', 'ye', 'yes'}:\n            return True\n        if reply in {'n', 'no', 'nop', 'nope'}:\n            return False\n        retries = retries - 1\n        if retries < 0:\n            raise ValueError('invalid user response')\n        print(reminder)\n"
+    },
+    {
+      "id": "7d83683a9c77",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This function can be called in several ways:"
+        }
+      ]
+    },
+    {
+      "id": "e0e80a35fb07",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "ec23339326fb",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "giving only the mandatory argument: "
+                },
+                {
+                  "text": "ask_ok('Do you really want to quit?')",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "fe323f304529",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "giving one of the optional arguments: "
+                },
+                {
+                  "text": "ask_ok('OK to overwrite the file?', 2)",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "210cb6db0df0",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "or even giving all arguments: "
+                },
+                {
+                  "text": "ask_ok('OK to overwrite the file?', 2, 'Come on, only yes or no!')",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a6757679b7b6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This example also introduces the "
+        },
+        {
+          "text": "in",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/expressions.html#in",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " keyword. This tests whether or not a sequence contains a certain value."
+        }
+      ]
+    },
+    {
+      "id": "d616e6e4cbf4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The default values are evaluated at the point of function definition in the "
+        },
+        {
+          "text": "defining",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " scope, so that"
+        }
+      ]
+    },
+    {
+      "id": "6a95f7192af1",
+      "kind": "code",
+      "lang": "python3",
+      "text": "i = 5\n\ndef f(arg=i):\n    print(arg)\n\ni = 6\nf()\n"
+    },
+    {
+      "id": "26ac3d398a62",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "will print "
+        },
+        {
+          "text": "5",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "de1f0421acd8",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Important warning:",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " The default value is evaluated only once. This makes a difference when the default is a mutable object such as a list, dictionary, or instances of most classes. For example, the following function accumulates the arguments passed to it on subsequent calls:"
+        }
+      ]
+    },
+    {
+      "id": "47b19b9808c4",
+      "kind": "code",
+      "lang": "python3",
+      "text": "def f(a, L=[]):\n    L.append(a)\n    return L\n\nprint(f(1))\nprint(f(2))\nprint(f(3))\n"
+    },
+    {
+      "id": "471b4f1dc66e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This will print"
+        }
+      ]
+    },
+    {
+      "id": "8e79f0f24285",
+      "kind": "code",
+      "lang": "python3",
+      "text": "[1]\n[1, 2]\n[1, 2, 3]\n"
+    },
+    {
+      "id": "120b30b84fe1",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you don’t want the default to be shared between subsequent calls, you can write the function like this instead:"
+        }
+      ]
+    },
+    {
+      "id": "90c3ca08a7a8",
+      "kind": "code",
+      "lang": "python3",
+      "text": "def f(a, L=None):\n    if L is None:\n        L = []\n    L.append(a)\n    return L\n"
+    },
+    {
+      "id": "901c0e7748fa",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "keyword-arguments",
+      "content": [
+        {
+          "text": "4.9.2. Keyword Arguments"
+        }
+      ]
+    },
+    {
+      "id": "cbb52f094a42",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Functions can also be called using "
+        },
+        {
+          "text": "keyword arguments",
+          "link": {
+            "href": "https://docs.python.org/3/glossary.html#term-keyword-argument",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " of the form "
+        },
+        {
+          "text": "kwarg=value",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". For instance, the following function:"
+        }
+      ]
+    },
+    {
+      "id": "e1bb8822c28b",
+      "kind": "code",
+      "lang": "python3",
+      "text": "def parrot(voltage, state='a stiff', action='voom', type='Norwegian Blue'):\n    print(\"-- This parrot wouldn't\", action, end=' ')\n    print(\"if you put\", voltage, \"volts through it.\")\n    print(\"-- Lovely plumage, the\", type)\n    print(\"-- It's\", state, \"!\")\n"
+    },
+    {
+      "id": "2c6a609aa176",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "accepts one required argument ("
+        },
+        {
+          "text": "voltage",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ") and three optional arguments ("
+        },
+        {
+          "text": "state",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "action",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", and "
+        },
+        {
+          "text": "type",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "). This function can be called in any of the following ways:"
+        }
+      ]
+    },
+    {
+      "id": "97b9c89d2db8",
+      "kind": "code",
+      "lang": "python3",
+      "text": "parrot(1000)                                          # 1 positional argument\nparrot(voltage=1000)                                  # 1 keyword argument\nparrot(voltage=1000000, action='VOOOOOM')             # 2 keyword arguments\nparrot(action='VOOOOOM', voltage=1000000)             # 2 keyword arguments\nparrot('a million', 'bereft of life', 'jump')         # 3 positional arguments\nparrot('a thousand', state='pushing up the daisies')  # 1 positional, 1 keyword\n"
+    },
+    {
+      "id": "7d3617f0d997",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "but all the following calls would be invalid:"
+        }
+      ]
+    },
+    {
+      "id": "ce03d4cc38a6",
+      "kind": "code",
+      "lang": "python3",
+      "text": "parrot()                     # required argument missing\nparrot(voltage=5.0, 'dead')  # non-keyword argument after a keyword argument\nparrot(110, voltage=220)     # duplicate value for the same argument\nparrot(actor='John Cleese')  # unknown keyword argument\n"
+    },
+    {
+      "id": "2f3c3474793d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In a function call, keyword arguments must follow positional arguments. All the keyword arguments passed must match one of the arguments accepted by the function (e.g. "
+        },
+        {
+          "text": "actor",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is not a valid argument for the "
+        },
+        {
+          "text": "parrot",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " function), and their order is not important. This also includes non-optional arguments (e.g. "
+        },
+        {
+          "text": "parrot(voltage=1000)",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is valid too). No argument may receive a value more than once. Here’s an example that fails due to this restriction:"
+        }
+      ]
+    },
+    {
+      "id": "d62dd32b44d5",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> def function(a):\n...     pass\n...\n>>> function(0, a=0)\nTraceback (most recent call last):\n  File \"<stdin>\", line 1, in <module>\nTypeError: function() got multiple values for argument 'a'\n"
+    },
+    {
+      "id": "d3374b45fbeb",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "When a final formal parameter of the form "
+        },
+        {
+          "text": "**name",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is present, it receives a dictionary (see "
+        },
+        {
+          "text": "Mapping types — dict, frozendict",
+          "link": {
+            "href": "https://docs.python.org/3/builtins/stdtypes.html#typesmapping",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ") containing all keyword arguments except for those corresponding to a formal parameter. This may be combined with a formal parameter of the form "
+        },
+        {
+          "text": "*name",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " (described in the next subsection) which receives a "
+        },
+        {
+          "text": "tuple",
+          "link": {
+            "href": "https://docs.python.org/3/tutorial/datastructures.html#tut-tuples",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " containing the positional arguments beyond the formal parameter list. ("
+        },
+        {
+          "text": "*name",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " must occur before "
+        },
+        {
+          "text": "**name",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ".) For example, if we define a function like this:"
+        }
+      ]
+    },
+    {
+      "id": "cab2d1a7cf47",
+      "kind": "code",
+      "lang": "python3",
+      "text": "def cheeseshop(kind, *arguments, **keywords):\n    print(\"-- Do you have any\", kind, \"?\")\n    print(\"-- I'm sorry, we're all out of\", kind)\n    for arg in arguments:\n        print(arg)\n    print(\"-\" * 40)\n    for kw in keywords:\n        print(kw, \":\", keywords[kw])\n"
+    },
+    {
+      "id": "6562c68d42b5",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "It could be called like this:"
+        }
+      ]
+    },
+    {
+      "id": "ff4f9a3883c2",
+      "kind": "code",
+      "lang": "python3",
+      "text": "cheeseshop(\"Limburger\", \"It's very runny, sir.\",\n           \"It's really very, VERY runny, sir.\",\n           shopkeeper=\"Michael Palin\",\n           client=\"John Cleese\",\n           sketch=\"Cheese Shop Sketch\")\n"
+    },
+    {
+      "id": "38f793c5a4b6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "and of course it would print:"
+        }
+      ]
+    },
+    {
+      "id": "e06235864bf1",
+      "kind": "code",
+      "lang": "none",
+      "text": "-- Do you have any Limburger ?\n-- I'm sorry, we're all out of Limburger\nIt's very runny, sir.\nIt's really very, VERY runny, sir.\n----------------------------------------\nshopkeeper : Michael Palin\nclient : John Cleese\nsketch : Cheese Shop Sketch\n"
+    },
+    {
+      "id": "ace57cad67e3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Note that the order in which the keyword arguments are printed is guaranteed to match the order in which they were provided in the function call."
+        }
+      ]
+    },
+    {
+      "id": "07b983eee046",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "special-parameters",
+      "content": [
+        {
+          "text": "4.9.3. Special parameters"
+        }
+      ]
+    },
+    {
+      "id": "670ed40bd8ed",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "By default, arguments may be passed to a Python function either by position or explicitly by keyword. For readability and performance, it makes sense to restrict the way arguments can be passed so that a developer need only look at the function definition to determine if items are passed by position, by position or keyword, or by keyword."
+        }
+      ]
+    },
+    {
+      "id": "3a9fdef075cc",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A function definition may look like:"
+        }
+      ]
+    },
+    {
+      "id": "ca672d6256c9",
+      "kind": "code",
+      "lang": "none",
+      "text": "def f(pos1, pos2, /, pos_or_kwd, *, kwd1, kwd2):\n      -----------    ----------     ----------\n        |             |                  |\n        |        Positional or keyword   |\n        |                                - Keyword only\n         -- Positional only\n"
+    },
+    {
+      "id": "cd2e043c70d6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "where "
+        },
+        {
+          "text": "/",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "*",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " are optional. If used, these symbols indicate the kind of parameter by how the arguments may be passed to the function: positional-only, positional-or-keyword, and keyword-only. Keyword parameters are also referred to as named parameters."
+        }
+      ]
+    },
+    {
+      "id": "6fcc537e3523",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "positional-or-keyword-arguments",
+      "content": [
+        {
+          "text": "4.9.3.1. Positional-or-Keyword Arguments"
+        }
+      ]
+    },
+    {
+      "id": "473f888c0492",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If "
+        },
+        {
+          "text": "/",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "*",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " are not present in the function definition, arguments may be passed to a function by position or by keyword."
+        }
+      ]
+    },
+    {
+      "id": "41e66caa5759",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "positional-only-parameters",
+      "content": [
+        {
+          "text": "4.9.3.2. Positional-Only Parameters"
+        }
+      ]
+    },
+    {
+      "id": "85640b87ccdc",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Looking at this in a bit more detail, it is possible to mark certain parameters as "
+        },
+        {
+          "text": "positional-only",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ". If "
+        },
+        {
+          "text": "positional-only",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ", the parameters’ order matters, and the parameters cannot be passed by keyword. Positional-only parameters are placed before a "
+        },
+        {
+          "text": "/",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " (forward-slash). The "
+        },
+        {
+          "text": "/",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is used to logically separate the positional-only parameters from the rest of the parameters. If there is no "
+        },
+        {
+          "text": "/",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in the function definition, there are no positional-only parameters."
+        }
+      ]
+    },
+    {
+      "id": "0981e6dcb7ab",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Parameters following the "
+        },
+        {
+          "text": "/",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " may be "
+        },
+        {
+          "text": "positional-or-keyword",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " or "
+        },
+        {
+          "text": "keyword-only",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "951a56302f07",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "keyword-only-arguments",
+      "content": [
+        {
+          "text": "4.9.3.3. Keyword-Only Arguments"
+        }
+      ]
+    },
+    {
+      "id": "a59840cc7f47",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "To mark parameters as "
+        },
+        {
+          "text": "keyword-only",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ", indicating the parameters must be passed by keyword argument, place an "
+        },
+        {
+          "text": "*",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in the arguments list just before the first "
+        },
+        {
+          "text": "keyword-only",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " parameter."
+        }
+      ]
+    },
+    {
+      "id": "d09b9fb26930",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "function-examples",
+      "content": [
+        {
+          "text": "4.9.3.4. Function Examples"
+        }
+      ]
+    },
+    {
+      "id": "ac574e3fe2f3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Consider the following example function definitions paying close attention to the markers "
+        },
+        {
+          "text": "/",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "*",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "id": "81fffffea651",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> def standard_arg(arg):\n...     print(arg)\n...\n>>> def pos_only_arg(arg, /):\n...     print(arg)\n...\n>>> def kwd_only_arg(*, arg):\n...     print(arg)\n...\n>>> def combined_example(pos_only, /, standard, *, kwd_only):\n...     print(pos_only, standard, kwd_only)\n"
+    },
+    {
+      "id": "421bab211fe4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The first function definition, "
+        },
+        {
+          "text": "standard_arg",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", the most familiar form, places no restrictions on the calling convention and arguments may be passed by position or keyword:"
+        }
+      ]
+    },
+    {
+      "id": "f5168c7f9241",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> standard_arg(2)\n2\n\n>>> standard_arg(arg=2)\n2\n"
+    },
+    {
+      "id": "f03c0d60e8a5",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The second function "
+        },
+        {
+          "text": "pos_only_arg",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is restricted to only use positional parameters as there is a "
+        },
+        {
+          "text": "/",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in the function definition:"
+        }
+      ]
+    },
+    {
+      "id": "3ed1069a17a2",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> pos_only_arg(1)\n1\n\n>>> pos_only_arg(arg=1)\nTraceback (most recent call last):\n  File \"<stdin>\", line 1, in <module>\nTypeError: pos_only_arg() got some positional-only arguments passed as keyword arguments: 'arg'\n"
+    },
+    {
+      "id": "705f52e92b29",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The third function "
+        },
+        {
+          "text": "kwd_only_arg",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " only allows keyword arguments as indicated by a "
+        },
+        {
+          "text": "*",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in the function definition:"
+        }
+      ]
+    },
+    {
+      "id": "4341eb82ac5f",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> kwd_only_arg(3)\nTraceback (most recent call last):\n  File \"<stdin>\", line 1, in <module>\nTypeError: kwd_only_arg() takes 0 positional arguments but 1 was given\n\n>>> kwd_only_arg(arg=3)\n3\n"
+    },
+    {
+      "id": "9d3358dbd518",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "And the last uses all three calling conventions in the same function definition:"
+        }
+      ]
+    },
+    {
+      "id": "cbc49062b56e",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> combined_example(1, 2, 3)\nTraceback (most recent call last):\n  File \"<stdin>\", line 1, in <module>\nTypeError: combined_example() takes 2 positional arguments but 3 were given\n\n>>> combined_example(1, 2, kwd_only=3)\n1 2 3\n\n>>> combined_example(1, standard=2, kwd_only=3)\n1 2 3\n\n>>> combined_example(pos_only=1, standard=2, kwd_only=3)\nTraceback (most recent call last):\n  File \"<stdin>\", line 1, in <module>\nTypeError: combined_example() got some positional-only arguments passed as keyword arguments: 'pos_only'\n"
+    },
+    {
+      "id": "6271686182bb",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Finally, consider this function definition which has a potential collision between the positional argument "
+        },
+        {
+          "text": "name",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "**kwds",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " which has "
+        },
+        {
+          "text": "name",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " as a key:"
+        }
+      ]
+    },
+    {
+      "id": "fbebd68c23c1",
+      "kind": "code",
+      "lang": "python3",
+      "text": "def foo(name, **kwds):\n    return 'name' in kwds\n"
+    },
+    {
+      "id": "209332974d67",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "There is no possible call that will make it return "
+        },
+        {
+          "text": "True",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " as the keyword "
+        },
+        {
+          "text": "'name'",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " will always bind to the first parameter. For example:"
+        }
+      ]
+    },
+    {
+      "id": "816466c14922",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> foo(1, **{'name': 2})\nTraceback (most recent call last):\n  File \"<stdin>\", line 1, in <module>\nTypeError: foo() got multiple values for argument 'name'\n>>>\n"
+    },
+    {
+      "id": "780f8dce2190",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "But using "
+        },
+        {
+          "text": "/",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " (positional only arguments), it is possible since it allows "
+        },
+        {
+          "text": "name",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " as a positional argument and "
+        },
+        {
+          "text": "'name'",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " as a key in the keyword arguments:"
+        }
+      ]
+    },
+    {
+      "id": "4394030d7975",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> def foo(name, /, **kwds):\n...     return 'name' in kwds\n...\n>>> foo(1, **{'name': 2})\nTrue\n"
+    },
+    {
+      "id": "79a2fd4355ec",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In other words, the names of positional-only parameters can be used in "
+        },
+        {
+          "text": "**kwds",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " without ambiguity."
+        }
+      ]
+    },
+    {
+      "id": "67952455a558",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "recap",
+      "content": [
+        {
+          "text": "4.9.3.5. Recap"
+        }
+      ]
+    },
+    {
+      "id": "377b81a0e186",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The use case will determine which parameters to use in the function definition:"
+        }
+      ]
+    },
+    {
+      "id": "411a28afc9e3",
+      "kind": "code",
+      "lang": "python3",
+      "text": "def f(pos1, pos2, /, pos_or_kwd, *, kwd1, kwd2):\n"
+    },
+    {
+      "id": "64196b91477a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "As guidance:"
+        }
+      ]
+    },
+    {
+      "id": "b1e785e2c82f",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "09b326ae0821",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Use positional-only if you want the name of the parameters to not be available to the user. This is useful when parameter names have no real meaning, if you want to enforce the order of the arguments when the function is called or if you need to take some positional parameters and arbitrary keywords."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "f1c1f90ed99f",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Use keyword-only when names have meaning and the function definition is more understandable by being explicit with names or you want to prevent users relying on the position of the argument being passed."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "6dbb1835246e",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "For an API, use positional-only to prevent breaking API changes if the parameter’s name is modified in the future."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "9b199748063a",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "arbitrary-argument-lists",
+      "content": [
+        {
+          "text": "4.9.4. Arbitrary Argument Lists"
+        }
+      ]
+    },
+    {
+      "id": "c8ec6b5d2518",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Finally, the least frequently used option is to specify that a function can be called with an arbitrary number of arguments. These arguments will be wrapped up in a tuple (see "
+        },
+        {
+          "text": "Tuples and Sequences",
+          "link": {
+            "href": "https://docs.python.org/3/tutorial/datastructures.html#tut-tuples",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "). Before the variable number of arguments, zero or more normal arguments may occur."
+        }
+      ]
+    },
+    {
+      "id": "44d975f66c1c",
+      "kind": "code",
+      "lang": "python3",
+      "text": "def write_multiple_items(file, separator, *args):\n    file.write(separator.join(args))\n"
+    },
+    {
+      "id": "c587cc0ffeeb",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Normally, these "
+        },
+        {
+          "text": "variadic",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " arguments will be last in the list of formal parameters, because they scoop up all remaining input arguments that are passed to the function. Any formal parameters which occur after the "
+        },
+        {
+          "text": "*args",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " parameter are ‘keyword-only’ arguments, meaning that they can only be used as keywords rather than positional arguments."
+        }
+      ]
+    },
+    {
+      "id": "9fe8faf1aa65",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> def concat(*args, sep=\"/\"):\n...     return sep.join(args)\n...\n>>> concat(\"earth\", \"mars\", \"venus\")\n'earth/mars/venus'\n>>> concat(\"earth\", \"mars\", \"venus\", sep=\".\")\n'earth.mars.venus'\n"
+    },
+    {
+      "id": "1319630fc94d",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "unpacking-argument-lists",
+      "content": [
+        {
+          "text": "4.9.5. Unpacking Argument Lists"
+        }
+      ]
+    },
+    {
+      "id": "8648885b29a6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The reverse situation occurs when the arguments are already in a list or tuple but need to be unpacked for a function call requiring separate positional arguments. For instance, the built-in "
+        },
+        {
+          "text": "range()",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/builtins/stdtypes.html#range",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " function expects separate "
+        },
+        {
+          "text": "start",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "stop",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " arguments. If they are not available separately, write the function call with the "
+        },
+        {
+          "text": "*",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "-operator to unpack the arguments out of a list or tuple:"
+        }
+      ]
+    },
+    {
+      "id": "2626a167fcbe",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> list(range(3, 6))            # normal call with separate arguments\n[3, 4, 5]\n>>> args = [3, 6]\n>>> list(range(*args))            # call with arguments unpacked from a list\n[3, 4, 5]\n"
+    },
+    {
+      "id": "5bafcdcde016",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In the same fashion, dictionaries can deliver keyword arguments with the "
+        },
+        {
+          "text": "**",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "-operator:"
+        }
+      ]
+    },
+    {
+      "id": "8e991e71f299",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> def parrot(voltage, state='a stiff', action='voom'):\n...     print(\"-- This parrot wouldn't\", action, end=' ')\n...     print(\"if you put\", voltage, \"volts through it.\", end=' ')\n...     print(\"E's\", state, \"!\")\n...\n>>> d = {\"voltage\": \"four million\", \"state\": \"bleedin' demised\", \"action\": \"VOOM\"}\n>>> parrot(**d)\n-- This parrot wouldn't VOOM if you put four million volts through it. E's bleedin' demised !\n"
+    },
+    {
+      "id": "17315ab99cdd",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "lambda-expressions",
+      "content": [
+        {
+          "text": "4.9.6. Lambda Expressions"
+        }
+      ]
+    },
+    {
+      "id": "8fbc4529ed9c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Small anonymous functions can be created with the "
+        },
+        {
+          "text": "lambda",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/expressions.html#lambda",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " keyword. This function returns the sum of its two arguments: "
+        },
+        {
+          "text": "lambda a, b: a+b",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". Lambda functions can be used wherever function objects are required. They are syntactically restricted to a single expression. Semantically, they are just syntactic sugar for a normal function definition. Like nested function definitions, lambda functions can reference variables from the containing scope:"
+        }
+      ]
+    },
+    {
+      "id": "4d59d06bc300",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> def make_incrementor(n):\n...     return lambda x: x + n\n...\n>>> f = make_incrementor(42)\n>>> f(0)\n42\n>>> f(1)\n43\n"
+    },
+    {
+      "id": "0b8eec51df41",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The above example uses a lambda expression to return a function. Another use is to pass a small function as an argument. For instance, "
+        },
+        {
+          "text": "list.sort()",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/builtins/stdtypes.html#list.sort",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " takes a sorting key function "
+        },
+        {
+          "text": "key",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " which can be a lambda function:"
+        }
+      ]
+    },
+    {
+      "id": "c5ec3bb5c8cd",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> pairs = [(1, 'one'), (2, 'two'), (3, 'three'), (4, 'four')]\n>>> pairs.sort(key=lambda pair: pair[1])\n>>> pairs\n[(4, 'four'), (1, 'one'), (3, 'three'), (2, 'two')]\n"
+    },
+    {
+      "id": "f221c43d153a",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "documentation-strings",
+      "content": [
+        {
+          "text": "4.9.7. Documentation Strings"
+        }
+      ]
+    },
+    {
+      "id": "cb845b2c5e85",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Here are some conventions about the content and formatting of documentation strings."
+        }
+      ]
+    },
+    {
+      "id": "16ded8802090",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The first line should always be a short, concise summary of the object’s purpose. For brevity, it should not explicitly state the object’s name or type, since these are available by other means (except if the name happens to be a verb describing a function’s operation). This line should begin with a capital letter and end with a period."
+        }
+      ]
+    },
+    {
+      "id": "f0adf21895ad",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If there are more lines in the documentation string, the second line should be blank, visually separating the summary from the rest of the description. The following lines should be one or more paragraphs describing the object’s calling conventions, its side effects, etc."
+        }
+      ]
+    },
+    {
+      "id": "96d9cb3447df",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The Python parser strips indentation from multi-line string literals when they serve as module, class, or function docstrings."
+        }
+      ]
+    },
+    {
+      "id": "b50aa3836e75",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Here is an example of a multi-line docstring:"
+        }
+      ]
+    },
+    {
+      "id": "e576309b2a28",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> def my_function():\n...     \"\"\"Do nothing, but document it.\n...\n...     No, really, it doesn't do anything:\n...\n...         >>> my_function()\n...         >>>\n...     \"\"\"\n...     pass\n...\n>>> print(my_function.__doc__)\nDo nothing, but document it.\n\nNo, really, it doesn't do anything:\n\n    >>> my_function()\n    >>>\n"
+    },
+    {
+      "id": "155531661633",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "function-annotations",
+      "content": [
+        {
+          "text": "4.9.8. Function Annotations"
+        }
+      ]
+    },
+    {
+      "id": "f0e98256609c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Function annotations",
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#function",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " are completely optional metadata information about the types used by user-defined functions (see "
+        },
+        {
+          "text": "PEP 3107",
+          "marks": [
+            "bold"
+          ],
+          "link": {
+            "href": "https://peps.python.org/pep-3107/",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "PEP 484",
+          "marks": [
+            "bold"
+          ],
+          "link": {
+            "href": "https://peps.python.org/pep-0484/",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " for more information)."
+        }
+      ]
+    },
+    {
+      "id": "426c1ead0e18",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Annotations",
+          "link": {
+            "href": "https://docs.python.org/3/glossary.html#term-function-annotation",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " are stored in the "
+        },
+        {
+          "text": "__annotations__",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/datamodel.html#object.__annotations__",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " attribute of the function as a dictionary and have no effect on any other part of the function. Parameter annotations are defined by a colon after the parameter name, followed by an expression evaluating to the value of the annotation. Return annotations are defined by a literal "
+        },
+        {
+          "text": "->",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", followed by an expression, between the parameter list and the colon denoting the end of the "
+        },
+        {
+          "text": "def",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docs.python.org/3/reference/compound_stmts.html#def",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " statement. The following example has a required argument, an optional argument, and the return value annotated:"
+        }
+      ]
+    },
+    {
+      "id": "4a5bbbb77ba4",
+      "kind": "code",
+      "lang": "python3",
+      "text": ">>> def f(ham: str, eggs: str = 'eggs') -> str:\n...     print(\"Annotations:\", f.__annotations__)\n...     print(\"Arguments:\", ham, eggs)\n...     return ham + ' and ' + eggs\n...\n>>> f('spam')\nAnnotations: {'ham': <class 'str'>, 'return': <class 'str'>, 'eggs': <class 'str'>}\nArguments: spam eggs\n'spam and eggs'\n"
+    },
+    {
+      "id": "cb84c779b85a",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "intermezzo-coding-style",
+      "content": [
+        {
+          "text": "4.10. Intermezzo: Coding Style"
+        }
+      ]
+    },
+    {
+      "id": "f9a723a0f727",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Now that you are about to write longer, more complex pieces of Python, it is a good time to talk about "
+        },
+        {
+          "text": "coding style",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ". Most languages can be written (or more concisely, "
+        },
+        {
+          "text": "formatted",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ") in different styles; some are more readable than others. Making it easy for others to read your code is always a good idea, and adopting a nice coding style helps tremendously for that."
+        }
+      ]
+    },
+    {
+      "id": "e7941deddba7",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "For Python, "
+        },
+        {
+          "text": "PEP 8",
+          "marks": [
+            "bold"
+          ],
+          "link": {
+            "href": "https://peps.python.org/pep-0008/",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " has emerged as the style guide that most projects adhere to; it promotes a very readable and eye-pleasing coding style. Every Python developer should read it at some point; here are the most important points extracted for you:"
+        }
+      ]
+    },
+    {
+      "id": "670b61f1c6eb",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "3356d2d9d221",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Use 4-space indentation, and no tabs."
+                }
+              ]
+            },
+            {
+              "id": "c26fb94fbee4",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "4 spaces are a good compromise between small indentation (allows greater nesting depth) and large indentation (easier to read). Tabs introduce confusion, and are best left out."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "d931bb5bf8c1",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Wrap lines so that they don’t exceed 79 characters."
+                }
+              ]
+            },
+            {
+              "id": "14060e82674f",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "This helps users with small displays and makes it possible to have several code files side-by-side on larger displays."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "c633ecc4487d",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Use blank lines to separate functions and classes, and larger blocks of code inside functions."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "be14d55740e8",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "When possible, put comments on a line of their own."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "edc955abe7be",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Use docstrings."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "a0ee6ca87357",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Use spaces around operators and after commas, but not directly inside bracketing constructs: "
+                },
+                {
+                  "text": "a = f(1, 2) + g(3, 4)",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "4c4131dcb2f2",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Name your classes and functions consistently; the convention is to use "
+                },
+                {
+                  "text": "UpperCamelCase",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " for classes and "
+                },
+                {
+                  "text": "lowercase_with_underscores",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " for functions and methods. Always use "
+                },
+                {
+                  "text": "self",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " as the name for the first method argument (see "
+                },
+                {
+                  "text": "A First Look at Classes",
+                  "link": {
+                    "href": "https://docs.python.org/3/tutorial/classes.html#tut-firstclasses",
+                    "kind": "same_domain"
+                  }
+                },
+                {
+                  "text": " for more on classes and methods)."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "7ed425a31952",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Don’t use fancy encodings if your code is meant to be used in international environments. Python’s default, UTF-8, or even plain ASCII work best in any case."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "4781b5d4c76f",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Likewise, don’t use non-ASCII characters in identifiers if there is only the slightest chance people speaking a different language will read or maintain the code."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5438b49b590d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Footnotes"
+        }
+      ]
+    }
+  ]
+}

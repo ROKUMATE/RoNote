@@ -2,6 +2,8 @@ package store
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -264,4 +266,35 @@ func (s *Store) ResolveDocuments(ctx context.Context, owner uuid.UUID, urls []st
 		found[r.URL] = r.DocumentID
 	}
 	return found, nil
+}
+
+// AddDocument stores doc as fetched from url and makes it owner's document,
+// in one transaction: what an import does once it has the page, without
+// fetching. The eval and tests seed libraries with it.
+func (s *Store) AddDocument(ctx context.Context, owner uuid.UUID, url string, doc *ir.Doc) (uuid.UUID, error) {
+	body, err := json.Marshal(doc)
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("add document: %w", err)
+	}
+	sum := sha256.Sum256(body)
+	var id uuid.UUID
+	err = s.inTx(ctx, func(tx *Store) error {
+		src, err := tx.UpsertSource(ctx, Source{CanonicalURL: url, FinalURL: url, LastFetchedAt: doc.Source.FetchedAt})
+		if err != nil {
+			return err
+		}
+		snap, err := tx.SaveSnapshot(ctx, Snapshot{
+			SourceID: src.ID, BodySHA256: hex.EncodeToString(sum[:]), Body: body, ContentType: "application/json", FetchedAt: doc.Source.FetchedAt,
+		})
+		if err != nil {
+			return err
+		}
+		ext, err := tx.SaveExtraction(ctx, snap, doc)
+		if err != nil {
+			return err
+		}
+		id, _, err = tx.CreateDocumentIfAbsent(ctx, NewDocument{OwnerID: owner, SourceID: src.ID, ExtractionID: ext.ID, Content: ext.Doc})
+		return err
+	})
+	return id, err
 }

@@ -1,0 +1,1894 @@
+{
+  "ir_version": 1,
+  "title": "Getting Started",
+  "source": {
+    "url": "https://vite.dev/guide/",
+    "final_url": "https://vite.dev/guide/",
+    "canonical_url": "https://vite.dev/guide/",
+    "fetched_at": "2026-11-12T17:09:45.770305Z",
+    "body_sha256": "7f9bcab405933bc7ad9bb62fb7f4b607c3f3844879eeecb0e3d75a0c88a58d3c",
+    "etag": "W/\"73dbf22d440ed31586e429b11335b93b-ssl\""
+  },
+  "extractor": {
+    "name": "vitepress",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "1f499387e295",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "getting-started",
+      "content": [
+        {
+          "text": "Getting Started"
+        }
+      ]
+    },
+    {
+      "id": "0389f7cb2944",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "overview",
+      "content": [
+        {
+          "text": "Overview"
+        }
+      ]
+    },
+    {
+      "id": "1b5c98a6d044",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Vite (French word for \"quick\", pronounced "
+        },
+        {
+          "text": "/viːt/",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", like \"veet\") is a build tool that aims to provide a faster and leaner development experience for modern web projects. It consists of two major parts:"
+        }
+      ]
+    },
+    {
+      "id": "fa4179d1dc61",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "5bc0d58c5150",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "A dev server that provides "
+                },
+                {
+                  "text": "rich feature enhancements",
+                  "link": {
+                    "href": "https://vite.dev/guide/features",
+                    "kind": "same_domain"
+                  }
+                },
+                {
+                  "text": " over "
+                },
+                {
+                  "text": "native ES modules",
+                  "link": {
+                    "href": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules",
+                    "kind": "external"
+                  }
+                },
+                {
+                  "text": ", for example extremely fast "
+                },
+                {
+                  "text": "Hot Module Replacement (HMR)",
+                  "link": {
+                    "href": "https://vite.dev/guide/features#hot-module-replacement",
+                    "kind": "same_domain"
+                  }
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "3567d3f93ee7",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "A build command that bundles your code with "
+                },
+                {
+                  "text": "Rolldown",
+                  "link": {
+                    "href": "https://rolldown.rs",
+                    "kind": "external"
+                  }
+                },
+                {
+                  "text": ", pre-configured to output highly optimized static assets for production."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "69143f6ded98",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Vite is opinionated and comes with sensible defaults out of the box. Read about what's possible in the "
+        },
+        {
+          "text": "Features Guide",
+          "link": {
+            "href": "https://vite.dev/guide/features",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ". Support for frameworks or integration with other tools is possible through "
+        },
+        {
+          "text": "Plugins",
+          "link": {
+            "href": "https://vite.dev/guide/using-plugins",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ". The "
+        },
+        {
+          "text": "Config Section",
+          "link": {
+            "href": "https://vite.dev/config/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " explains how to adapt Vite to your project if needed."
+        }
+      ]
+    },
+    {
+      "id": "df359619a764",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Vite is also highly extensible via its "
+        },
+        {
+          "text": "Plugin API",
+          "link": {
+            "href": "https://vite.dev/guide/api-plugin",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "JavaScript API",
+          "link": {
+            "href": "https://vite.dev/guide/api-javascript",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " with full typing support."
+        }
+      ]
+    },
+    {
+      "id": "a11ded8ee978",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can learn more about the rationale behind the project in the "
+        },
+        {
+          "text": "Why Vite",
+          "link": {
+            "href": "https://vite.dev/guide/why",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " section."
+        }
+      ]
+    },
+    {
+      "id": "4aa5c185a2f0",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Learn Vite through interactive tutorials on Scrimba",
+          "link": {
+            "href": "https://scrimba.com/intro-to-vite-c03p6pbbdq?via=vite",
+            "kind": "external"
+          }
+        }
+      ]
+    },
+    {
+      "id": "b4a1d3aa1b6f",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "browser-support",
+      "content": [
+        {
+          "text": "Browser Support"
+        }
+      ]
+    },
+    {
+      "id": "5efe5873e9f1",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "During development, Vite assumes that a modern browser is used. This means the browser supports most of the latest JavaScript and CSS features. For that reason, Vite sets "
+        },
+        {
+          "text": "esnext",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://oxc.rs/docs/guide/usage/transformer/lowering.html#target",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " as the transform target",
+          "link": {
+            "href": "https://oxc.rs/docs/guide/usage/transformer/lowering.html#target",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ". This prevents syntax lowering, letting Vite serve modules as close as possible to the original source code. Vite injects some runtime code to make the development server work. This code uses features included in "
+        },
+        {
+          "text": "Baseline",
+          "link": {
+            "href": "https://web-platform-dx.github.io/baseline/",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " Newly Available at the time of each major release (2026-01-01 for this major)."
+        }
+      ]
+    },
+    {
+      "id": "8e34a2b0c937",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "For production builds, Vite by default targets "
+        },
+        {
+          "text": "Baseline",
+          "link": {
+            "href": "https://web-platform-dx.github.io/baseline/",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " Widely Available browser versions as of a date fixed for each major release. For this major, that corresponds to "
+        },
+        {
+          "text": "browser versions released around mid-2023",
+          "link": {
+            "href": "https://web-platform-dx.github.io/supported-browsers/?widelyAvailableOnDate=2026-01-01",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ". The target can be lowered via configuration. Additionally, legacy browsers can be supported via the official "
+        },
+        {
+          "text": "@vitejs/plugin-legacy",
+          "link": {
+            "href": "https://github.com/vitejs/vite/tree/main/packages/plugin-legacy",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ". See the "
+        },
+        {
+          "text": "Building for Production",
+          "link": {
+            "href": "https://vite.dev/guide/build",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " section for more details."
+        }
+      ]
+    },
+    {
+      "id": "f78ef16ff37a",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "trying-vite-online",
+      "content": [
+        {
+          "text": "Trying Vite Online"
+        }
+      ]
+    },
+    {
+      "id": "55f86dbca1b2",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can try Vite online on "
+        },
+        {
+          "text": "StackBlitz",
+          "link": {
+            "href": "https://vite.new/",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ". It runs the Vite-based build setup directly in the browser, so it is almost identical to the local setup but doesn't require installing anything on your machine. You can navigate to "
+        },
+        {
+          "text": "vite.new/{template}",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " to select which framework to use."
+        }
+      ]
+    },
+    {
+      "id": "d71695f7576a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The supported template presets are:"
+        }
+      ]
+    },
+    {
+      "id": "812905b84060",
+      "kind": "table",
+      "head": [
+        [
+          [
+            {
+              "text": "JavaScript"
+            }
+          ],
+          [
+            {
+              "text": "TypeScript"
+            }
+          ]
+        ]
+      ],
+      "rows": [
+        [
+          [
+            {
+              "text": "vanilla",
+              "link": {
+                "href": "https://vite.new/vanilla",
+                "kind": "external"
+              }
+            }
+          ],
+          [
+            {
+              "text": "vanilla-ts",
+              "link": {
+                "href": "https://vite.new/vanilla-ts",
+                "kind": "external"
+              }
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "vue",
+              "link": {
+                "href": "https://vite.new/vue",
+                "kind": "external"
+              }
+            }
+          ],
+          [
+            {
+              "text": "vue-ts",
+              "link": {
+                "href": "https://vite.new/vue-ts",
+                "kind": "external"
+              }
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "react",
+              "link": {
+                "href": "https://vite.new/react",
+                "kind": "external"
+              }
+            }
+          ],
+          [
+            {
+              "text": "react-ts",
+              "link": {
+                "href": "https://vite.new/react-ts",
+                "kind": "external"
+              }
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "preact",
+              "link": {
+                "href": "https://vite.new/preact",
+                "kind": "external"
+              }
+            }
+          ],
+          [
+            {
+              "text": "preact-ts",
+              "link": {
+                "href": "https://vite.new/preact-ts",
+                "kind": "external"
+              }
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "lit",
+              "link": {
+                "href": "https://vite.new/lit",
+                "kind": "external"
+              }
+            }
+          ],
+          [
+            {
+              "text": "lit-ts",
+              "link": {
+                "href": "https://vite.new/lit-ts",
+                "kind": "external"
+              }
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "svelte",
+              "link": {
+                "href": "https://vite.new/svelte",
+                "kind": "external"
+              }
+            }
+          ],
+          [
+            {
+              "text": "svelte-ts",
+              "link": {
+                "href": "https://vite.new/svelte-ts",
+                "kind": "external"
+              }
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "solid",
+              "link": {
+                "href": "https://vite.new/solid",
+                "kind": "external"
+              }
+            }
+          ],
+          [
+            {
+              "text": "solid-ts",
+              "link": {
+                "href": "https://vite.new/solid-ts",
+                "kind": "external"
+              }
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "qwik",
+              "link": {
+                "href": "https://vite.new/qwik",
+                "kind": "external"
+              }
+            }
+          ],
+          [
+            {
+              "text": "qwik-ts",
+              "link": {
+                "href": "https://vite.new/qwik-ts",
+                "kind": "external"
+              }
+            }
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "b52ad3224e46",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "scaffolding-your-first-vite-project",
+      "content": [
+        {
+          "text": "Scaffolding Your First Vite Project"
+        }
+      ]
+    },
+    {
+      "id": "dfdc53ff5836",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "npm",
+          "children": [
+            {
+              "id": "22198dd7607f",
+              "kind": "code",
+              "lang": "bash",
+              "text": "npm create vite@latest"
+            }
+          ]
+        },
+        {
+          "label": "Yarn",
+          "children": [
+            {
+              "id": "105259345ecf",
+              "kind": "code",
+              "lang": "bash",
+              "text": "yarn create vite"
+            }
+          ]
+        },
+        {
+          "label": "pnpm",
+          "children": [
+            {
+              "id": "13a5d9c230ad",
+              "kind": "code",
+              "lang": "bash",
+              "text": "pnpm create vite"
+            }
+          ]
+        },
+        {
+          "label": "Bun",
+          "children": [
+            {
+              "id": "05d4181e8931",
+              "kind": "code",
+              "lang": "bash",
+              "text": "bun create vite"
+            }
+          ]
+        },
+        {
+          "label": "Deno",
+          "children": [
+            {
+              "id": "27294eb53499",
+              "kind": "code",
+              "lang": "bash",
+              "text": "deno init --npm vite"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f85a5406be19",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Then follow the prompts!"
+        }
+      ]
+    },
+    {
+      "id": "e56cce2ab47b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Watch an interactive lesson on Scrimba",
+          "link": {
+            "href": "https://scrimba.com/intro-to-vite-c03p6pbbdq/~0yhj?via=vite",
+            "kind": "external"
+          }
+        }
+      ]
+    },
+    {
+      "id": "19927e159052",
+      "kind": "callout",
+      "variant": "tip",
+      "title": "Compatibility Note",
+      "children": [
+        {
+          "id": "b374c00d15b9",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Vite requires "
+            },
+            {
+              "text": "Node.js",
+              "link": {
+                "href": "https://nodejs.org/en/",
+                "kind": "external"
+              }
+            },
+            {
+              "text": " version 20.19+, 22.12+. However, some templates require a higher Node.js version to work, please upgrade if your package manager warns about it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "68a405c5ebba",
+      "kind": "callout",
+      "variant": "note",
+      "title": "Using create vite with command line options",
+      "children": [
+        {
+          "id": "199663cded13",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "You can also directly specify the project name and the template you want to use via additional command line options. For example, to scaffold a Vite + Vue project, run:"
+            }
+          ]
+        },
+        {
+          "id": "a016ccafcafd",
+          "kind": "tabs",
+          "items": [
+            {
+              "label": "npm",
+              "children": [
+                {
+                  "id": "e314ed0c3b5c",
+                  "kind": "code",
+                  "lang": "bash",
+                  "text": "# npm 7+, extra double-dash is needed:\nnpm create vite@latest my-vue-app -- --template vue"
+                }
+              ]
+            },
+            {
+              "label": "Yarn",
+              "children": [
+                {
+                  "id": "c03082c8a3ba",
+                  "kind": "code",
+                  "lang": "bash",
+                  "text": "yarn create vite my-vue-app --template vue"
+                }
+              ]
+            },
+            {
+              "label": "pnpm",
+              "children": [
+                {
+                  "id": "466035e695d9",
+                  "kind": "code",
+                  "lang": "bash",
+                  "text": "pnpm create vite my-vue-app --template vue"
+                }
+              ]
+            },
+            {
+              "label": "Bun",
+              "children": [
+                {
+                  "id": "e811b814afc2",
+                  "kind": "code",
+                  "lang": "bash",
+                  "text": "bun create vite my-vue-app --template vue"
+                }
+              ]
+            },
+            {
+              "label": "Deno",
+              "children": [
+                {
+                  "id": "300b2c68d65f",
+                  "kind": "code",
+                  "lang": "bash",
+                  "text": "deno init --npm vite my-vue-app --template vue"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "846005205235",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "See "
+            },
+            {
+              "text": "create-vite",
+              "link": {
+                "href": "https://github.com/vitejs/vite/tree/main/packages/create-vite",
+                "kind": "external"
+              }
+            },
+            {
+              "text": " for more details on each supported template: "
+            },
+            {
+              "text": "vanilla",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "vanilla-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "vue",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "vue-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "react",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "react-compiler",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "react-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "react-compiler-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "preact",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "preact-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "lit",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "lit-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "svelte",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "svelte-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "solid",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "solid-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "qwik",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "qwik-ts",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": "."
+            }
+          ]
+        },
+        {
+          "id": "87a2e0b9d590",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "You can use "
+            },
+            {
+              "text": ".",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " for the project name to scaffold in the current directory."
+            }
+          ]
+        },
+        {
+          "id": "9a0102244d76",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "To create a project without interactive prompts, you can use the "
+            },
+            {
+              "text": "--no-interactive",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " flag."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6b2d3d868f39",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "community-templates",
+      "content": [
+        {
+          "text": "Community Templates"
+        }
+      ]
+    },
+    {
+      "id": "40319bef20c3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "create-vite is a tool to quickly start a project from a basic template for popular frameworks. Check out Awesome Vite for "
+        },
+        {
+          "text": "community maintained templates",
+          "link": {
+            "href": "https://github.com/vitejs/awesome-vite#templates",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " that include other tools or target different frameworks."
+        }
+      ]
+    },
+    {
+      "id": "f0f55820a830",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "For a template at "
+        },
+        {
+          "text": "https://github.com/user/project",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", you can try it out online using "
+        },
+        {
+          "text": "https://github.stackblitz.com/user/project",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " (adding "
+        },
+        {
+          "text": ".stackblitz",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " after "
+        },
+        {
+          "text": "github",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " to the URL of the project)."
+        }
+      ]
+    },
+    {
+      "id": "af62ba4318ee",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can also use a tool like "
+        },
+        {
+          "text": "tiged",
+          "link": {
+            "href": "https://github.com/tiged/tiged",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " to scaffold your project with one of the templates. Assuming the project is on GitHub and uses "
+        },
+        {
+          "text": "main",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " as the default branch, you can create a local copy using:"
+        }
+      ]
+    },
+    {
+      "id": "dcfbc22c33b3",
+      "kind": "code",
+      "lang": "bash",
+      "text": "npx tiged user/project my-project\ncd my-project\n\nnpm install\nnpm run dev"
+    },
+    {
+      "id": "ad61e47641be",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "manual-installation",
+      "content": [
+        {
+          "text": "Manual Installation"
+        }
+      ]
+    },
+    {
+      "id": "5c46f5c7ebe2",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In your project, you can install the "
+        },
+        {
+          "text": "vite",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " CLI using:"
+        }
+      ]
+    },
+    {
+      "id": "3091cf0a3971",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "npm",
+          "children": [
+            {
+              "id": "2fa721e63f55",
+              "kind": "code",
+              "lang": "bash",
+              "text": "npm install -D vite"
+            }
+          ]
+        },
+        {
+          "label": "Yarn",
+          "children": [
+            {
+              "id": "3a6b7cc02b0d",
+              "kind": "code",
+              "lang": "bash",
+              "text": "yarn add -D vite"
+            }
+          ]
+        },
+        {
+          "label": "pnpm",
+          "children": [
+            {
+              "id": "230266132634",
+              "kind": "code",
+              "lang": "bash",
+              "text": "pnpm add -D vite"
+            }
+          ]
+        },
+        {
+          "label": "Bun",
+          "children": [
+            {
+              "id": "2370d41d1a1e",
+              "kind": "code",
+              "lang": "bash",
+              "text": "bun add -D vite"
+            }
+          ]
+        },
+        {
+          "label": "Deno",
+          "children": [
+            {
+              "id": "b9d14c50f69f",
+              "kind": "code",
+              "lang": "bash",
+              "text": "deno add -D npm:vite"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a5ed709a378e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "And create an "
+        },
+        {
+          "text": "index.html",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " file like this:"
+        }
+      ]
+    },
+    {
+      "id": "50ac6f2730fe",
+      "kind": "code",
+      "lang": "html",
+      "text": "<p>Hello Vite!</p>"
+    },
+    {
+      "id": "44bfa3efdb9b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Then run the appropriate CLI command in your terminal:"
+        }
+      ]
+    },
+    {
+      "id": "d3e171e6d272",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "npm",
+          "children": [
+            {
+              "id": "3b3a7f7a05bf",
+              "kind": "code",
+              "lang": "bash",
+              "text": "npx vite"
+            }
+          ]
+        },
+        {
+          "label": "Yarn",
+          "children": [
+            {
+              "id": "79c5e6fc27bf",
+              "kind": "code",
+              "lang": "bash",
+              "text": "yarn vite"
+            }
+          ]
+        },
+        {
+          "label": "pnpm",
+          "children": [
+            {
+              "id": "5e5b87e2e43c",
+              "kind": "code",
+              "lang": "bash",
+              "text": "pnpm vite"
+            }
+          ]
+        },
+        {
+          "label": "Bun",
+          "children": [
+            {
+              "id": "2e4d7f94a80b",
+              "kind": "code",
+              "lang": "bash",
+              "text": "bunx vite"
+            }
+          ]
+        },
+        {
+          "label": "Deno",
+          "children": [
+            {
+              "id": "016eea03f1fd",
+              "kind": "code",
+              "lang": "bash",
+              "text": "deno run -A npm:vite"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eb3861e38518",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The "
+        },
+        {
+          "text": "index.html",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " will be served on "
+        },
+        {
+          "text": "http://localhost:5173",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "5a3b9458427d",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "index-html-and-project-root",
+      "content": [
+        {
+          "text": "index.html",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and Project Root"
+        }
+      ]
+    },
+    {
+      "id": "25cdb4e441aa",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "One thing you may have noticed is that in a Vite project, "
+        },
+        {
+          "text": "index.html",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is front-and-central instead of being tucked away inside "
+        },
+        {
+          "text": "public",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". This is intentional: during development Vite is a server, and "
+        },
+        {
+          "text": "index.html",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is the entry point to your application."
+        }
+      ]
+    },
+    {
+      "id": "250edfaa86ff",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Vite treats "
+        },
+        {
+          "text": "index.html",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " as source code and part of the module graph. It resolves "
+        },
+        {
+          "text": "<script type=\"module\" src=\"...\">",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " that references your JavaScript source code. Even inline "
+        },
+        {
+          "text": "<script type=\"module\">",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and CSS referenced via "
+        },
+        {
+          "text": "<link href>",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " also enjoy Vite-specific features. In addition, URLs inside "
+        },
+        {
+          "text": "index.html",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " are automatically rebased so there's no need for special "
+        },
+        {
+          "text": "%PUBLIC_URL%",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " placeholders."
+        }
+      ]
+    },
+    {
+      "id": "834a60d813e0",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Similar to static http servers, Vite has the concept of a \"root directory\" which your files are served from. You will see it referenced as "
+        },
+        {
+          "text": "<root>",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " throughout the rest of the docs. Absolute URLs in your source code will be resolved using the project root as base, so you can write code as if you are working with a normal static file server (except way more powerful!). Vite is also capable of handling dependencies that resolve to out-of-root file system locations, which makes it usable even in a monorepo-based setup."
+        }
+      ]
+    },
+    {
+      "id": "55842fc5c141",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Vite also supports "
+        },
+        {
+          "text": "multi-page apps",
+          "link": {
+            "href": "https://vite.dev/guide/build#multi-page-app",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " with multiple "
+        },
+        {
+          "text": ".html",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " entry points."
+        }
+      ]
+    },
+    {
+      "id": "4404da458ab5",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "specifying-alternative-root",
+      "content": [
+        {
+          "text": "Specifying Alternative Root"
+        }
+      ]
+    },
+    {
+      "id": "a0c1e9a263d8",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Running "
+        },
+        {
+          "text": "vite",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " starts the dev server using the current working directory as root. You can specify an alternative root with "
+        },
+        {
+          "text": "vite serve some/sub/dir",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". Note that Vite will also resolve "
+        },
+        {
+          "text": "its config file (i.e. ",
+          "link": {
+            "href": "https://vite.dev/config/#configuring-vite",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "vite.config.js",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://vite.dev/config/#configuring-vite",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ")",
+          "link": {
+            "href": "https://vite.dev/config/#configuring-vite",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " inside the project root, so you'll need to move it if the root is changed."
+        }
+      ]
+    },
+    {
+      "id": "46d6169feaa2",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "command-line-interface",
+      "content": [
+        {
+          "text": "Command Line Interface"
+        }
+      ]
+    },
+    {
+      "id": "87fa5327242c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In a project where Vite is installed, you can use the "
+        },
+        {
+          "text": "vite",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " binary in your npm scripts, or run it directly with "
+        },
+        {
+          "text": "npx vite",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". Here are the default npm scripts in a scaffolded Vite project:"
+        }
+      ]
+    },
+    {
+      "id": "e37d1c276174",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "package.json"
+        }
+      ]
+    },
+    {
+      "id": "07cf49124794",
+      "kind": "code",
+      "lang": "json",
+      "text": "{\n  \"scripts\": {\n    \"dev\": \"vite\", // start dev server, aliases: `vite dev`, `vite serve`\n    \"build\": \"vite build\", // build for production\n    \"preview\": \"vite preview\" // locally preview production build\n  }\n}"
+    },
+    {
+      "id": "6ea23d8d4641",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can specify additional CLI options like "
+        },
+        {
+          "text": "--port",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " or "
+        },
+        {
+          "text": "--open",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". For a full list of CLI options, run "
+        },
+        {
+          "text": "npx vite --help",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in your project."
+        }
+      ]
+    },
+    {
+      "id": "c701e58e87ce",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Learn more about the "
+        },
+        {
+          "text": "Command Line Interface",
+          "link": {
+            "href": "https://vite.dev/guide/cli",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "5667e3f0216e",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "using-unreleased-commits",
+      "content": [
+        {
+          "text": "Using Unreleased Commits"
+        }
+      ]
+    },
+    {
+      "id": "b3b4a48c6459",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you can't wait for a new release to test the latest features, you can install a specific commit of Vite with "
+        },
+        {
+          "text": "https://pkg.pr.new",
+          "link": {
+            "href": "https://pkg.pr.new",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "id": "e7f8ad9746ca",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "npm",
+          "children": [
+            {
+              "id": "3a8610bf064c",
+              "kind": "code",
+              "lang": "bash",
+              "text": "npm install -D https://pkg.pr.new/vite@SHA"
+            }
+          ]
+        },
+        {
+          "label": "Yarn",
+          "children": [
+            {
+              "id": "ea7051e06e30",
+              "kind": "code",
+              "lang": "bash",
+              "text": "yarn add -D https://pkg.pr.new/vite@SHA"
+            }
+          ]
+        },
+        {
+          "label": "pnpm",
+          "children": [
+            {
+              "id": "d37f996f9e9c",
+              "kind": "code",
+              "lang": "bash",
+              "text": "pnpm add -D https://pkg.pr.new/vite@SHA"
+            }
+          ]
+        },
+        {
+          "label": "Bun",
+          "children": [
+            {
+              "id": "4ca4b18afc6a",
+              "kind": "code",
+              "lang": "bash",
+              "text": "bun add -D https://pkg.pr.new/vite@SHA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3256d4637c64",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Replace "
+        },
+        {
+          "text": "SHA",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " with any of "
+        },
+        {
+          "text": "Vite's commit SHAs",
+          "link": {
+            "href": "https://github.com/vitejs/vite/commits/main/",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ". Note that only commits within the last month will work, as older commit releases are purged."
+        }
+      ]
+    },
+    {
+      "id": "f0294353a684",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Alternatively, you can also clone the "
+        },
+        {
+          "text": "vite repo",
+          "link": {
+            "href": "https://github.com/vitejs/vite",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " to your local machine and then build and link it yourself ("
+        },
+        {
+          "text": "pnpm",
+          "link": {
+            "href": "https://pnpm.io/",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " is required):"
+        }
+      ]
+    },
+    {
+      "id": "01572bd2ca8a",
+      "kind": "code",
+      "lang": "bash",
+      "text": "git clone https://github.com/vitejs/vite.git\ncd vite\npnpm install\ncd packages/vite\npnpm run build\npnpm link # use your preferred package manager for this step"
+    },
+    {
+      "id": "f407f8befe23",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Then go to your Vite based project and run "
+        },
+        {
+          "text": "pnpm link vite",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " (or the package manager that you used to link "
+        },
+        {
+          "text": "vite",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " globally). Now restart the development server to ride on the bleeding edge!"
+        }
+      ]
+    },
+    {
+      "id": "4fddb438c42f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "To learn more about how and when Vite does releases, check out the "
+        },
+        {
+          "text": "Releases",
+          "link": {
+            "href": "https://vite.dev/releases",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " documentation."
+        }
+      ]
+    },
+    {
+      "id": "90ea004ba202",
+      "kind": "callout",
+      "variant": "tip",
+      "title": "Dependencies using Vite",
+      "children": [
+        {
+          "id": "3ae9def39386",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "To replace the Vite version used by dependencies transitively, you should use "
+            },
+            {
+              "text": "npm overrides",
+              "link": {
+                "href": "https://docs.npmjs.com/cli/v11/configuring-npm/package-json#overrides",
+                "kind": "external"
+              }
+            },
+            {
+              "text": " or "
+            },
+            {
+              "text": "pnpm overrides",
+              "link": {
+                "href": "https://pnpm.io/settings#overrides",
+                "kind": "external"
+              }
+            },
+            {
+              "text": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "706551fe99ce",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "community",
+      "content": [
+        {
+          "text": "Community"
+        }
+      ]
+    },
+    {
+      "id": "604354b27bd7",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you have questions or need help, reach out to the community at "
+        },
+        {
+          "text": "Discord",
+          "link": {
+            "href": "https://chat.vite.dev",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "GitHub Discussions",
+          "link": {
+            "href": "https://github.com/vitejs/vite/discussions",
+            "kind": "external"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    }
+  ]
+}

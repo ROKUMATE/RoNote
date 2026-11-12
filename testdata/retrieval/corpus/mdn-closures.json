@@ -1,0 +1,1860 @@
+{
+  "ir_version": 1,
+  "title": "Closures",
+  "source": {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures",
+    "final_url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures",
+    "canonical_url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures",
+    "fetched_at": "2026-11-12T17:09:51.061148Z",
+    "body_sha256": "76ce4f4c78690cab8a5df373122727a6bbdc4b2dde8a6ebef6b3a85b1b186a48",
+    "etag": "\"1c49542319c9e102465c52a9ef06b052\"",
+    "last_modified": "Thu, 12 Nov 2026 00:55:04 GMT"
+  },
+  "extractor": {
+    "name": "mdn",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "a64f8d778831",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "closures",
+      "content": [
+        {
+          "text": "Closures"
+        }
+      ]
+    },
+    {
+      "id": "faaf1f0c55a7",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A "
+        },
+        {
+          "text": "closure",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " is the combination of a function bundled together (enclosed) with references to its surrounding state (the "
+        },
+        {
+          "text": "lexical environment",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": "). In other words, a closure gives a function access to its outer scope. In JavaScript, closures are created every time a function is created, at function creation time."
+        }
+      ]
+    },
+    {
+      "id": "e29cda952be1",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "lexical_scoping",
+      "content": [
+        {
+          "text": "Lexical scoping",
+          "link": {
+            "href": "#lexical_scoping",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "17862c6564a3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Consider the following example code:"
+        }
+      ]
+    },
+    {
+      "id": "9e17b24173bb",
+      "kind": "code",
+      "lang": "js",
+      "text": "function init() {\n  var name = \"Mozilla\"; // name is a local variable created by init\n  function displayName() {\n    // displayName() is the inner function, that forms a closure\n    console.log(name); // use variable declared in the parent function\n  }\n  displayName();\n}\ninit();\n"
+    },
+    {
+      "id": "a9117fb07961",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "init()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " creates a local variable called "
+        },
+        {
+          "text": "name",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and a function called "
+        },
+        {
+          "text": "displayName()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". The "
+        },
+        {
+          "text": "displayName()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " function is an inner function that is defined inside "
+        },
+        {
+          "text": "init()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and is available only within the body of the "
+        },
+        {
+          "text": "init()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " function. Note that the "
+        },
+        {
+          "text": "displayName()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " function has no local variables of its own. However, since inner functions have access to the variables of outer scopes, "
+        },
+        {
+          "text": "displayName()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " can access the variable "
+        },
+        {
+          "text": "name",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " declared in the parent function, "
+        },
+        {
+          "text": "init()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "69e8ce138a35",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you run this code in your console, you can see that the "
+        },
+        {
+          "text": "console.log()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " statement within the "
+        },
+        {
+          "text": "displayName()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " function successfully displays the value of the "
+        },
+        {
+          "text": "name",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " variable, which is declared in its parent function. This is an example of "
+        },
+        {
+          "text": "lexical scoping",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ", which describes how a parser resolves variable names when functions are nested. The word "
+        },
+        {
+          "text": "lexical",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " refers to the fact that lexical scoping uses the location where a variable is declared within the source code to determine where that variable is available. Nested functions have access to variables declared in their outer scope."
+        }
+      ]
+    },
+    {
+      "id": "8ad8f64697bb",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "scoping_with_let_and_const",
+      "content": [
+        {
+          "text": "Scoping with let and const",
+          "link": {
+            "href": "#scoping_with_let_and_const",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ae266c6f9326",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Traditionally (before ES6), JavaScript variables only had two kinds of scopes: "
+        },
+        {
+          "text": "function scope",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "global scope",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": ". Variables declared with "
+        },
+        {
+          "text": "var",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " are either function-scoped or global-scoped, depending on whether they are declared within a function or outside a function. This can be tricky, because blocks with curly braces do not create scopes:"
+        }
+      ]
+    },
+    {
+      "id": "ae191bde4a97",
+      "kind": "code",
+      "lang": "js",
+      "text": "if (Math.random() > 0.5) {\n  var x = 1;\n} else {\n  var x = 2;\n}\nconsole.log(x);\n"
+    },
+    {
+      "id": "a1a33f135489",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "For people from other languages (e.g., C, Java) where blocks create scopes, the above code should throw an error on the "
+        },
+        {
+          "text": "console.log",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " line, because we are outside the scope of "
+        },
+        {
+          "text": "x",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in either block. However, because blocks don't create scopes for "
+        },
+        {
+          "text": "var",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", the "
+        },
+        {
+          "text": "var",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " statements here actually create a global variable. There is also "
+        },
+        {
+          "text": "a practical example",
+          "link": {
+            "href": "#creating_closures_in_loops_a_common_mistake",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": " introduced below that illustrates how this can cause actual bugs when combined with closures."
+        }
+      ]
+    },
+    {
+      "id": "cfa7ef5a6696",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In ES6, JavaScript introduced the "
+        },
+        {
+          "text": "let",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "const",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " declarations, which, among other things like "
+        },
+        {
+          "text": "temporal dead zones",
+          "link": {
+            "href": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let#temporal_dead_zone_tdz",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", allow you to create block-scoped variables."
+        }
+      ]
+    },
+    {
+      "id": "c816f6fa64eb",
+      "kind": "code",
+      "lang": "js",
+      "text": "if (Math.random() > 0.5) {\n  const x = 1;\n} else {\n  const x = 2;\n}\nconsole.log(x); // ReferenceError: x is not defined\n"
+    },
+    {
+      "id": "40341ef47eb1",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In essence, blocks are finally treated as scopes in ES6, but only if you declare variables with "
+        },
+        {
+          "text": "let",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " or "
+        },
+        {
+          "text": "const",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". In addition, ES6 introduced "
+        },
+        {
+          "text": "modules",
+          "link": {
+            "href": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", which introduced another kind of scope. Closures are able to capture variables in all these scopes, which we will introduce later."
+        }
+      ]
+    },
+    {
+      "id": "7625abed68bd",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "closure",
+      "content": [
+        {
+          "text": "Closure",
+          "link": {
+            "href": "#closure",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "4a8a751d9e35",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Consider the following code example:"
+        }
+      ]
+    },
+    {
+      "id": "5e83976aaa01",
+      "kind": "code",
+      "lang": "js",
+      "text": "function makeFunc() {\n  const name = \"Mozilla\";\n  function displayName() {\n    console.log(name);\n  }\n  return displayName;\n}\n\nconst myFunc = makeFunc();\nmyFunc();\n"
+    },
+    {
+      "id": "61929c609030",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Running this code has exactly the same effect as the previous example of the "
+        },
+        {
+          "text": "init()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " function above. What's different (and interesting) is that the "
+        },
+        {
+          "text": "displayName()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " inner function is returned from the outer function "
+        },
+        {
+          "text": "before being executed",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "6820587f57f3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "At first glance, it might seem unintuitive that this code still works. In some programming languages, the local variables within a function exist for just the duration of that function's execution. Once "
+        },
+        {
+          "text": "makeFunc()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " finishes executing, you might expect that the "
+        },
+        {
+          "text": "name",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " variable would no longer be accessible. However, because the code still works, this is obviously not the case in JavaScript."
+        }
+      ]
+    },
+    {
+      "id": "1c467c7a553c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The reason is that functions in JavaScript form closures. A "
+        },
+        {
+          "text": "closure",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " is the combination of a function and the lexical environment within which that function was declared. This environment consists of any variables that were in-scope at the time the closure was created. In this case, "
+        },
+        {
+          "text": "myFunc",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is a reference to the instance of the function "
+        },
+        {
+          "text": "displayName",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " that is created when "
+        },
+        {
+          "text": "makeFunc",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is run. The instance of "
+        },
+        {
+          "text": "displayName",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " maintains a reference to its lexical environment, within which the variable "
+        },
+        {
+          "text": "name",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " exists. For this reason, when "
+        },
+        {
+          "text": "myFunc",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is invoked, the variable "
+        },
+        {
+          "text": "name",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " remains available for use, and \"Mozilla\" is passed to "
+        },
+        {
+          "text": "console.log",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "3c4a62e1bb18",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Here's a slightly more interesting example—a "
+        },
+        {
+          "text": "makeAdder",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " function:"
+        }
+      ]
+    },
+    {
+      "id": "1671f00c7914",
+      "kind": "code",
+      "lang": "js",
+      "text": "function makeAdder(x) {\n  return function (y) {\n    return x + y;\n  };\n}\n\nconst add5 = makeAdder(5);\nconst add10 = makeAdder(10);\n\nconsole.log(add5(2)); // 7\nconsole.log(add10(2)); // 12\n"
+    },
+    {
+      "id": "96655e5f100e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In this example, we have defined a function "
+        },
+        {
+          "text": "makeAdder(x)",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", that takes a single argument "
+        },
+        {
+          "text": "x",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", and returns a new function. The function it returns takes a single argument "
+        },
+        {
+          "text": "y",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", and returns the sum of "
+        },
+        {
+          "text": "x",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "y",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "068109b256e4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In essence, "
+        },
+        {
+          "text": "makeAdder",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is a function factory. It creates functions that can add a specific value to their argument. In the above example, the function factory creates two new functions—one that adds five to its argument, and one that adds 10."
+        }
+      ]
+    },
+    {
+      "id": "cd657e098e8c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "add5",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "add10",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " both form closures. They share the same function body definition, but store different lexical environments. In "
+        },
+        {
+          "text": "add5",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "'s lexical environment, "
+        },
+        {
+          "text": "x",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is 5, while in the lexical environment for "
+        },
+        {
+          "text": "add10",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "x",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is 10."
+        }
+      ]
+    },
+    {
+      "id": "a6b6ac53150f",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "practical_closures",
+      "content": [
+        {
+          "text": "Practical closures",
+          "link": {
+            "href": "#practical_closures",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "a40824881008",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Closures are useful because they let you associate data (the lexical environment) with a function that operates on that data. This has obvious parallels to object-oriented programming, where objects allow you to associate data (the object's properties) with one or more methods."
+        }
+      ]
+    },
+    {
+      "id": "4cf542b975d8",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Consequently, you can use a closure anywhere that you might normally use an object with only a single method."
+        }
+      ]
+    },
+    {
+      "id": "414da2371729",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Situations where you might want to do this are particularly common on the web. Much of the code written in front-end JavaScript is event-based. You define some behavior, and then attach it to an event that is triggered by the user (such as a click or a keypress). The code is attached as a callback (a single function that is executed in response to the event)."
+        }
+      ]
+    },
+    {
+      "id": "9f5ac68a5641",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "For instance, suppose we want to add buttons to a page to adjust the text size. One way of doing this is to specify the font-size of the "
+        },
+        {
+          "text": "body",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " element (in pixels), and then set the size of the other elements on the page (such as headers) using the relative "
+        },
+        {
+          "text": "em",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " unit:"
+        }
+      ]
+    },
+    {
+      "id": "c8413caf24b0",
+      "kind": "code",
+      "lang": "css",
+      "text": "body {\n  font-family: \"Helvetica\", \"Arial\", sans-serif;\n  font-size: 12px;\n}\n\nh1 {\n  font-size: 1.5em;\n}\n\nh2 {\n  font-size: 1.2em;\n}\n"
+    },
+    {
+      "id": "f05ec85c363a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Such interactive text size buttons can change the "
+        },
+        {
+          "text": "font-size",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " property of the "
+        },
+        {
+          "text": "body",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " element, and the adjustments are picked up by other elements on the page thanks to the relative units."
+        }
+      ]
+    },
+    {
+      "id": "c2f634abf803",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Here's the JavaScript:"
+        }
+      ]
+    },
+    {
+      "id": "cee2ddd25f43",
+      "kind": "code",
+      "lang": "js",
+      "text": "function makeSizer(size) {\n  return () => {\n    document.body.style.fontSize = `${size}px`;\n  };\n}\n\nconst size12 = makeSizer(12);\nconst size14 = makeSizer(14);\nconst size16 = makeSizer(16);\n"
+    },
+    {
+      "id": "f6eeb7e99960",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "size12",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "size14",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", and "
+        },
+        {
+          "text": "size16",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " are now functions that resize the body text to 12, 14, and 16 pixels, respectively. You can attach them to buttons as demonstrated in the following code example."
+        }
+      ]
+    },
+    {
+      "id": "5e440548732c",
+      "kind": "code",
+      "lang": "js",
+      "text": "document.getElementById(\"size-12\").onclick = size12;\ndocument.getElementById(\"size-14\").onclick = size14;\ndocument.getElementById(\"size-16\").onclick = size16;\n"
+    },
+    {
+      "id": "60d7a0657460",
+      "kind": "code",
+      "lang": "html",
+      "text": "<button id=\"size-12\">12</button>\n<button id=\"size-14\">14</button>\n<button id=\"size-16\">16</button>\n<p>This is some text that will change size when you click the buttons above.</p>\n"
+    },
+    {
+      "id": "f5fbc27d3392",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "emulating_private_methods_with_closures",
+      "content": [
+        {
+          "text": "Emulating private methods with closures",
+          "link": {
+            "href": "#emulating_private_methods_with_closures",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "21b752da8f0b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Languages such as Java allow you to declare methods as private, meaning that they can be called only by other methods in the same class."
+        }
+      ]
+    },
+    {
+      "id": "fefa3129b5e3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "JavaScript, prior to "
+        },
+        {
+          "text": "classes",
+          "link": {
+            "href": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", didn't have a native way of declaring "
+        },
+        {
+          "text": "private methods",
+          "link": {
+            "href": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_elements#private_methods",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", but it was possible to emulate private methods using closures. Private methods aren't just useful for restricting access to code. They also provide a powerful way of managing your global namespace."
+        }
+      ]
+    },
+    {
+      "id": "cf44ee85e460",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The following code illustrates how to use closures to define public functions that can access private functions and variables. Note that these closures follow the "
+        },
+        {
+          "text": "Module Design Pattern",
+          "link": {
+            "href": "https://www.google.com/search?q=javascript+module+pattern",
+            "kind": "external"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "e72fd4968a23",
+      "kind": "code",
+      "lang": "js",
+      "text": "const counter = (function () {\n  let privateCounter = 0;\n  function changeBy(val) {\n    privateCounter += val;\n  }\n\n  return {\n    increment() {\n      changeBy(1);\n    },\n\n    decrement() {\n      changeBy(-1);\n    },\n\n    value() {\n      return privateCounter;\n    },\n  };\n})();\n\nconsole.log(counter.value()); // 0.\n\ncounter.increment();\ncounter.increment();\nconsole.log(counter.value()); // 2.\n\ncounter.decrement();\nconsole.log(counter.value()); // 1.\n"
+    },
+    {
+      "id": "ba9216103cce",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In previous examples, each closure had its own lexical environment. Here though, there is a single lexical environment that is shared by the three functions: "
+        },
+        {
+          "text": "counter.increment",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "counter.decrement",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", and "
+        },
+        {
+          "text": "counter.value",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "fcc0df317ad5",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The shared lexical environment is created in the body of an anonymous function, "
+        },
+        {
+          "text": "which is executed as soon as it has been defined",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " (also known as an "
+        },
+        {
+          "text": "IIFE",
+          "link": {
+            "href": "https://developer.mozilla.org/en-US/docs/Glossary/IIFE",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "). The lexical environment contains two private items: a variable called "
+        },
+        {
+          "text": "privateCounter",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", and a function called "
+        },
+        {
+          "text": "changeBy",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". You can't access either of these private members from outside the anonymous function. Instead, you indirectly access them using the three public functions that are returned from the anonymous wrapper."
+        }
+      ]
+    },
+    {
+      "id": "44cb5f2752ce",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Those three public functions form closures that share the same lexical environment. Thanks to JavaScript's lexical scoping, they each have access to the "
+        },
+        {
+          "text": "privateCounter",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " variable and the "
+        },
+        {
+          "text": "changeBy",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " function."
+        }
+      ]
+    },
+    {
+      "id": "43a3aec802e4",
+      "kind": "code",
+      "lang": "js",
+      "text": "function makeCounter() {\n  let privateCounter = 0;\n  function changeBy(val) {\n    privateCounter += val;\n  }\n  return {\n    increment() {\n      changeBy(1);\n    },\n\n    decrement() {\n      changeBy(-1);\n    },\n\n    value() {\n      return privateCounter;\n    },\n  };\n}\n\nconst counter1 = makeCounter();\nconst counter2 = makeCounter();\n\nconsole.log(counter1.value()); // 0.\n\ncounter1.increment();\ncounter1.increment();\nconsole.log(counter1.value()); // 2.\n\ncounter1.decrement();\nconsole.log(counter1.value()); // 1.\nconsole.log(counter2.value()); // 0.\n"
+    },
+    {
+      "id": "3da6551ea37c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Notice how the two counters maintain their independence from one another. Each closure references a different version of the "
+        },
+        {
+          "text": "privateCounter",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " variable through its own closure. Each time one of the counters is called, its lexical environment changes by changing the value of this variable. Changes to the variable value in one closure don't affect the value in the other closure."
+        }
+      ]
+    },
+    {
+      "id": "d3a37ca912f1",
+      "kind": "callout",
+      "variant": "note",
+      "children": [
+        {
+          "id": "3997e3a6499c",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Note:",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "text": " Using closures in this way provides benefits that are normally associated with object-oriented programming. In particular, "
+            },
+            {
+              "text": "data hiding",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "text": " and "
+            },
+            {
+              "text": "encapsulation",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "text": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6f257bd2e607",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "closure_scope_chain",
+      "content": [
+        {
+          "text": "Closure scope chain",
+          "link": {
+            "href": "#closure_scope_chain",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "7bdef0d9213c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A nested function's access to the outer function's scope includes the enclosing scope of the outer function—effectively creating a chain of function scopes. To demonstrate, consider the following example code."
+        }
+      ]
+    },
+    {
+      "id": "86c002749226",
+      "kind": "code",
+      "lang": "js",
+      "text": "// global scope\nconst e = 10;\nfunction sum(a) {\n  return function (b) {\n    return function (c) {\n      // outer functions scope\n      return function (d) {\n        // local scope\n        return a + b + c + d + e;\n      };\n    };\n  };\n}\n\nconsole.log(sum(1)(2)(3)(4)); // 20\n"
+    },
+    {
+      "id": "21840bfad3e4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can also write without anonymous functions:"
+        }
+      ]
+    },
+    {
+      "id": "2e917de7e57d",
+      "kind": "code",
+      "lang": "js",
+      "text": "// global scope\nconst e = 10;\nfunction sum(a) {\n  return function sum2(b) {\n    return function sum3(c) {\n      // outer functions scope\n      return function sum4(d) {\n        // local scope\n        return a + b + c + d + e;\n      };\n    };\n  };\n}\n\nconst sum2 = sum(1);\nconst sum3 = sum2(2);\nconst sum4 = sum3(3);\nconst result = sum4(4);\nconsole.log(result); // 20\n"
+    },
+    {
+      "id": "95b6a108d8f1",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In the example above, there's a series of nested functions, all of which have access to the outer functions' scope. In this context, we can say that closures have access to "
+        },
+        {
+          "text": "all",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " outer scopes."
+        }
+      ]
+    },
+    {
+      "id": "a7bd6d0c8494",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Closures can capture variables in block scopes and module scopes as well. For example, the following creates a closure over the block-scoped variable "
+        },
+        {
+          "text": "y",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "id": "783d2c815d54",
+      "kind": "code",
+      "lang": "js",
+      "text": "function outer() {\n  let getY;\n  {\n    const y = 6;\n    getY = () => y;\n  }\n  console.log(typeof y); // undefined\n  console.log(getY()); // 6\n}\n\nouter();\n"
+    },
+    {
+      "id": "e01465dd2df5",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Closures over modules can be more interesting."
+        }
+      ]
+    },
+    {
+      "id": "ae6882b45a87",
+      "kind": "code",
+      "lang": "js",
+      "text": "// myModule.js\nlet x = 5;\nexport const getX = () => x;\nexport const setX = (val) => {\n  x = val;\n};\n"
+    },
+    {
+      "id": "7fd85631fbf4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Here, the module exports a pair of getter-setter functions, which close over the module-scoped variable "
+        },
+        {
+          "text": "x",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". Even when "
+        },
+        {
+          "text": "x",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is not directly accessible from other modules, it can be read and written with the functions."
+        }
+      ]
+    },
+    {
+      "id": "2593e8e48d58",
+      "kind": "code",
+      "lang": "js",
+      "text": "import { getX, setX } from \"./myModule.js\";\n\nconsole.log(getX()); // 5\nsetX(6);\nconsole.log(getX()); // 6\n"
+    },
+    {
+      "id": "f4c4e35b1c0c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Closures can close over imported values as well, which are regarded as "
+        },
+        {
+          "text": "live ",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": "bindings",
+          "marks": [
+            "italic"
+          ],
+          "link": {
+            "href": "https://developer.mozilla.org/en-US/docs/Glossary/Binding",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ", because when the original value changes, the imported one changes accordingly."
+        }
+      ]
+    },
+    {
+      "id": "ff6a5c338491",
+      "kind": "code",
+      "lang": "js",
+      "text": "// myModule.js\nexport let x = 1;\nexport const setX = (val) => {\n  x = val;\n};\n"
+    },
+    {
+      "id": "2214cde93589",
+      "kind": "code",
+      "lang": "js",
+      "text": "// closureCreator.js\nimport { x } from \"./myModule.js\";\n\nexport const getX = () => x; // Close over an imported live binding\n"
+    },
+    {
+      "id": "4e2380862289",
+      "kind": "code",
+      "lang": "js",
+      "text": "import { getX } from \"./closureCreator.js\";\nimport { setX } from \"./myModule.js\";\n\nconsole.log(getX()); // 1\nsetX(2);\nconsole.log(getX()); // 2\n"
+    },
+    {
+      "id": "069eb92bd253",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "creating_closures_in_loops_a_common_mistake",
+      "content": [
+        {
+          "text": "Creating closures in loops: A common mistake",
+          "link": {
+            "href": "#creating_closures_in_loops_a_common_mistake",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "869acbb1c451",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Prior to the introduction of the "
+        },
+        {
+          "text": "let",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " keyword, a common problem with closures occurred when you created them inside a loop. To demonstrate, consider the following example code."
+        }
+      ]
+    },
+    {
+      "id": "33b513f29b37",
+      "kind": "code",
+      "lang": "html",
+      "text": "<p id=\"help\">Helpful notes will appear here</p>\n<p>Email: <input type=\"text\" id=\"email\" name=\"email\" /></p>\n<p>Name: <input type=\"text\" id=\"name\" name=\"name\" /></p>\n<p>Age: <input type=\"text\" id=\"age\" name=\"age\" /></p>\n"
+    },
+    {
+      "id": "bd26950b53fb",
+      "kind": "code",
+      "lang": "js",
+      "text": "function showHelp(help) {\n  document.getElementById(\"help\").textContent = help;\n}\n\nfunction setupHelp() {\n  var helpText = [\n    { id: \"email\", help: \"Your email address\" },\n    { id: \"name\", help: \"Your full name\" },\n    { id: \"age\", help: \"Your age (you must be over 16)\" },\n  ];\n\n  for (var i = 0; i < helpText.length; i++) {\n    // Culprit is the use of `var` on this line\n    var item = helpText[i];\n    document.getElementById(item.id).onfocus = function () {\n      showHelp(item.help);\n    };\n  }\n}\n\nsetupHelp();\n"
+    },
+    {
+      "id": "dc4d0a940a3f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The "
+        },
+        {
+          "text": "helpText",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " array defines three helpful hints, each associated with the ID of an input field in the document. The loop cycles through these definitions, hooking up an "
+        },
+        {
+          "text": "onfocus",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " event to each one that shows the associated help method."
+        }
+      ]
+    },
+    {
+      "id": "f7e390202c41",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you try this code out, you'll see that it doesn't work as expected. No matter what field you focus on, the message about your age will be displayed."
+        }
+      ]
+    },
+    {
+      "id": "f129d494d02d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The reason for this is that the functions assigned to "
+        },
+        {
+          "text": "onfocus",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " form closures; they consist of the function definition and the captured environment from the "
+        },
+        {
+          "text": "setupHelp",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " function's scope. Three closures have been created by the loop, but each one shares the same single lexical environment, which has a variable with changing values ("
+        },
+        {
+          "text": "item",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "). This is because the variable "
+        },
+        {
+          "text": "item",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is declared with "
+        },
+        {
+          "text": "var",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and thus has function scope due to hoisting. The value of "
+        },
+        {
+          "text": "item.help",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is determined when the "
+        },
+        {
+          "text": "onfocus",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " callbacks are executed. Because the loop has already run its course by that time, the "
+        },
+        {
+          "text": "item",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " variable object (shared by all three closures) has been left pointing to the last entry in the "
+        },
+        {
+          "text": "helpText",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " list."
+        }
+      ]
+    },
+    {
+      "id": "2b45da807f29",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "One solution in this case is to use more closures: in particular, to use a function factory as described earlier:"
+        }
+      ]
+    },
+    {
+      "id": "33b513f29b37-2",
+      "kind": "code",
+      "lang": "html",
+      "text": "<p id=\"help\">Helpful notes will appear here</p>\n<p>Email: <input type=\"text\" id=\"email\" name=\"email\" /></p>\n<p>Name: <input type=\"text\" id=\"name\" name=\"name\" /></p>\n<p>Age: <input type=\"text\" id=\"age\" name=\"age\" /></p>\n"
+    },
+    {
+      "id": "31762f96d2bb",
+      "kind": "code",
+      "lang": "js",
+      "text": "function showHelp(help) {\n  document.getElementById(\"help\").textContent = help;\n}\n\nfunction makeHelpCallback(help) {\n  return function () {\n    showHelp(help);\n  };\n}\n\nfunction setupHelp() {\n  var helpText = [\n    { id: \"email\", help: \"Your email address\" },\n    { id: \"name\", help: \"Your full name\" },\n    { id: \"age\", help: \"Your age (you must be over 16)\" },\n  ];\n\n  for (var i = 0; i < helpText.length; i++) {\n    var item = helpText[i];\n    document.getElementById(item.id).onfocus = makeHelpCallback(item.help);\n  }\n}\n\nsetupHelp();\n"
+    },
+    {
+      "id": "052fec72dbed",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This works as expected. Rather than the callbacks all sharing a single lexical environment, the "
+        },
+        {
+          "text": "makeHelpCallback",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " function creates "
+        },
+        {
+          "text": "a new lexical environment",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " for each callback, in which "
+        },
+        {
+          "text": "help",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " refers to the corresponding string from the "
+        },
+        {
+          "text": "helpText",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " array."
+        }
+      ]
+    },
+    {
+      "id": "7c491aa3f366",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "One other way to write the above using anonymous closures is:"
+        }
+      ]
+    },
+    {
+      "id": "5eb25b35165e",
+      "kind": "code",
+      "lang": "js",
+      "text": "function showHelp(help) {\n  document.getElementById(\"help\").textContent = help;\n}\n\nfunction setupHelp() {\n  var helpText = [\n    { id: \"email\", help: \"Your email address\" },\n    { id: \"name\", help: \"Your full name\" },\n    { id: \"age\", help: \"Your age (you must be over 16)\" },\n  ];\n\n  for (var i = 0; i < helpText.length; i++) {\n    (function () {\n      var item = helpText[i];\n      document.getElementById(item.id).onfocus = function () {\n        showHelp(item.help);\n      };\n    })(); // Immediate event listener attachment with the current value of item (preserved until iteration).\n  }\n}\n\nsetupHelp();\n"
+    },
+    {
+      "id": "1732c9cb9156",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you don't want to use more closures, you can use the "
+        },
+        {
+          "text": "let",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " or "
+        },
+        {
+          "text": "const",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " keyword:"
+        }
+      ]
+    },
+    {
+      "id": "195ca701a5bb",
+      "kind": "code",
+      "lang": "js",
+      "text": "function showHelp(help) {\n  document.getElementById(\"help\").textContent = help;\n}\n\nfunction setupHelp() {\n  const helpText = [\n    { id: \"email\", help: \"Your email address\" },\n    { id: \"name\", help: \"Your full name\" },\n    { id: \"age\", help: \"Your age (you must be over 16)\" },\n  ];\n\n  for (let i = 0; i < helpText.length; i++) {\n    const item = helpText[i];\n    document.getElementById(item.id).onfocus = () => {\n      showHelp(item.help);\n    };\n  }\n}\n\nsetupHelp();\n"
+    },
+    {
+      "id": "cbe0ac388319",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This example uses "
+        },
+        {
+          "text": "const",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " instead of "
+        },
+        {
+          "text": "var",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", so every closure binds the block-scoped variable, meaning that no additional closures are required."
+        }
+      ]
+    },
+    {
+      "id": "d53f5a1f6ef7",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you are writing modern JavaScript anyway, you can consider more alternatives to the plain "
+        },
+        {
+          "text": "for",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " loop, such as using "
+        },
+        {
+          "text": "for...of",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " loop and declaring "
+        },
+        {
+          "text": "item",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " as "
+        },
+        {
+          "text": "let",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " or "
+        },
+        {
+          "text": "const",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", or using the "
+        },
+        {
+          "text": "forEach()",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " method, which both avoid the closure problem."
+        }
+      ]
+    },
+    {
+      "id": "4cb18dde798a",
+      "kind": "code",
+      "lang": "js",
+      "text": "for (const item of helpText) {\n  document.getElementById(item.id).onfocus = () => {\n    document.getElementById(\"help\").textContent = item.help;\n  };\n}\n\nhelpText.forEach((item) => {\n  document.getElementById(item.id).onfocus = () => {\n    showHelp(item.help);\n  };\n});\n"
+    },
+    {
+      "id": "669f1a6a84d9",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "performance_considerations",
+      "content": [
+        {
+          "text": "Performance considerations",
+          "link": {
+            "href": "#performance_considerations",
+            "kind": "anchor"
+          }
+        }
+      ]
+    },
+    {
+      "id": "193136667139",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "As mentioned previously, each function instance manages its own scope and closure. Therefore, it is unwise to unnecessarily create functions within other functions if closures are not needed for a particular task, as it will negatively affect script performance both in terms of processing speed and memory consumption."
+        }
+      ]
+    },
+    {
+      "id": "e2fb6a8a4319",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "For instance, when creating a new object/class, methods should normally be associated to the object's prototype rather than defined into the object constructor. The reason is that whenever the constructor is called, the methods would get reassigned (that is, for every object creation)."
+        }
+      ]
+    },
+    {
+      "id": "659f39b0494a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Consider the following case:"
+        }
+      ]
+    },
+    {
+      "id": "db8aad0ba44b",
+      "kind": "code",
+      "lang": "js",
+      "text": "function MyObject(name, message) {\n  this.name = name.toString();\n  this.message = message.toString();\n  this.getName = function () {\n    return this.name;\n  };\n\n  this.getMessage = function () {\n    return this.message;\n  };\n}\n"
+    },
+    {
+      "id": "ac47938d2f42",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Because the previous code does not take advantage of the benefits of using closures in this particular instance, we could instead rewrite it to avoid using closures as follows:"
+        }
+      ]
+    },
+    {
+      "id": "d440d390d45a",
+      "kind": "code",
+      "lang": "js",
+      "text": "function MyObject(name, message) {\n  this.name = name.toString();\n  this.message = message.toString();\n}\nMyObject.prototype = {\n  getName() {\n    return this.name;\n  },\n  getMessage() {\n    return this.message;\n  },\n};\n"
+    },
+    {
+      "id": "3bcb0436a26b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "However, redefining the prototype is not recommended. The following example instead appends to the existing prototype:"
+        }
+      ]
+    },
+    {
+      "id": "4d7c7b97552e",
+      "kind": "code",
+      "lang": "js",
+      "text": "function MyObject(name, message) {\n  this.name = name.toString();\n  this.message = message.toString();\n}\nMyObject.prototype.getName = function () {\n  return this.name;\n};\nMyObject.prototype.getMessage = function () {\n  return this.message;\n};\n"
+    },
+    {
+      "id": "862cc517a98a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In the two previous examples, the inherited prototype can be shared by all objects and the method definitions need not occur at every object creation. See "
+        },
+        {
+          "text": "Inheritance and the prototype chain",
+          "link": {
+            "href": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " for more."
+        }
+      ]
+    }
+  ]
+}

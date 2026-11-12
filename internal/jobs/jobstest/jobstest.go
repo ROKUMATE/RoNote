@@ -27,6 +27,9 @@ type Adapter struct {
 	Now func() time.Time
 	// RetryDelay is how long the adapter waits after a plain error.
 	RetryDelay time.Duration
+	// Poll is how long after a job is due the adapter may take to deliver
+	// it: its poll interval, or zero when it delivers at once.
+	Poll time.Duration
 	// Settle is how long, on the wall clock, the suite waits before it
 	// concludes that nothing more will be delivered.
 	Settle time.Duration
@@ -49,6 +52,7 @@ func Run(t *testing.T, newAdapter func(t *testing.T) Adapter) {
 		{"a handler error redelivers", redelivers},
 		{"Permanent stops retries", permanentStops},
 		{"RetryAfter is honoured", retryAfterHonoured},
+		{"a delayed job waits", delayHonoured},
 		{"retries stop at the attempt limit", attemptsLimited},
 		{"a rolled-back transaction leaves no job", rollbackLeavesNone},
 		{"the same Key enqueued twice runs once", keyRunsOnce},
@@ -195,6 +199,33 @@ func retryAfterHonoured(t *testing.T, a Adapter) {
 	second := next(t, got)
 	if gap := second.at.Sub(first.at); second.attempt != 2 || gap < retryAfter {
 		t.Errorf("second delivery = attempt %d, %v after the first; want attempt 2 at least %v after", second.attempt, gap, retryAfter)
+	}
+}
+
+// delayHonoured enqueues a job with a delay 20 polls long, so a delivery on
+// time can't be mistaken for an early one. Nothing may arrive by half the
+// delay, and what arrives is timed by the handler itself, so a slow machine
+// can't make a correct adapter look early.
+func delayHonoured(t *testing.T, a Adapter) {
+	delay := max(20*a.Poll, 500*time.Millisecond)
+	h, got := recorder(a, func(jobs.Delivery) error { return nil })
+	a.Runner.Handle("delayed", h, options(1, 1))
+	start(t, a)
+	before := a.Now()
+	j := job("delayed", "", "x")
+	j.Delay = delay
+	enqueue(t, a, j)
+
+	a.Wait(delay / 2)
+	select {
+	case d := <-got:
+		t.Fatalf("delivered %v after enqueueing, before its %v delay", d.at.Sub(before), delay)
+	default:
+	}
+	a.Wait(delay - delay/2)
+	d := next(t, got)
+	if early := d.at.Sub(before); early < delay {
+		t.Errorf("delivered %v after enqueueing, want at least %v", early, delay)
 	}
 }
 

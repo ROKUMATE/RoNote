@@ -119,6 +119,11 @@ func (q *Queue) EnqueueTx(ctx context.Context, tx pgx.Tx, job jobs.Job) error {
 		payload = json.RawMessage("null")
 	}
 	insert := &river.InsertOpts{Queue: job.Kind, MaxAttempts: o.MaxAttempts}
+	if job.Delay > 0 {
+		// On the app's clock; migration 00006's trigger moves it onto the
+		// database's, keeping the delay.
+		insert.ScheduledAt = time.Now().Add(job.Delay)
+	}
 	if job.Key != "" {
 		insert.UniqueOpts = river.UniqueOpts{ByArgs: true}
 	}

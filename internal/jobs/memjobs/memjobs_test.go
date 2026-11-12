@@ -56,11 +56,11 @@ func TestFakeClock(t *testing.T) {
 	t.Parallel()
 	start := time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
 	c := NewFakeClock(start)
-	soon, later, now := c.After(time.Second), c.After(time.Minute), c.After(0)
+	soon, later, now := c.At(start.Add(time.Second)), c.At(start.Add(time.Minute)), c.At(start)
 	select {
 	case <-now:
 	default:
-		t.Error("After(0) did not fire at once")
+		t.Error("At(now) did not fire at once")
 	}
 	c.Advance(time.Second)
 	select {
@@ -69,11 +69,11 @@ func TestFakeClock(t *testing.T) {
 			t.Errorf("fired at %v", at)
 		}
 	default:
-		t.Error("After(1s) did not fire after Advance(1s)")
+		t.Error("At(+1s) did not fire after Advance(1s)")
 	}
 	select {
 	case <-later:
-		t.Error("After(1m) fired after Advance(1s)")
+		t.Error("At(+1m) fired after Advance(1s)")
 	default:
 	}
 }

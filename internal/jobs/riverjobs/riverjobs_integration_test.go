@@ -20,7 +20,10 @@ func TestMain(m *testing.M) {
 	pgtest.Main(m, &testDB)
 }
 
-const retryDelay = 100 * time.Millisecond
+const (
+	retryDelay   = 100 * time.Millisecond
+	pollInterval = 50 * time.Millisecond
+)
 
 func TestConformance(t *testing.T) {
 	jobstest.Run(t, func(t *testing.T) jobstest.Adapter {
@@ -29,7 +32,7 @@ func TestConformance(t *testing.T) {
 			Logger:            slog.New(slog.DiscardHandler),
 			RetryDelay:        func(int) time.Duration { return retryDelay },
 			FetchCooldown:     20 * time.Millisecond,
-			FetchPollInterval: 50 * time.Millisecond,
+			FetchPollInterval: pollInterval,
 		})
 		if err != nil {
 			t.Fatal(err)
@@ -41,6 +44,7 @@ func TestConformance(t *testing.T) {
 			Wait:       time.Sleep,
 			Now:        time.Now,
 			RetryDelay: retryDelay,
+			Poll:       pollInterval,
 			Settle:     time.Second,
 		}
 	})

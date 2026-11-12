@@ -20,7 +20,20 @@ sql:
           body_sha256: BodySHA256
           ir: IR
           ir_version: IRVersion
+          block_ids: BlockIDs
         overrides:
+          - db_type: halfvec
+            go_type:
+              import: github.com/pgvector/pgvector-go
+              package: pgvector
+              type: HalfVector
+          - db_type: halfvec
+            nullable: true
+            go_type:
+              import: github.com/pgvector/pgvector-go
+              package: pgvector
+              type: HalfVector
+              pointer: true
           - db_type: uuid
             go_type: github.com/google/uuid.UUID
           - db_type: timestamptz

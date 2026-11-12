@@ -10,7 +10,7 @@ import (
 
 var (
 	queryName   = regexp.MustCompile(`(?m)^-- name: (\w+)`)
-	ownedTables = regexp.MustCompile(`(?i)\b(documents|imports|annotations)\b`)
+	ownedTables = regexp.MustCompile(`(?i)\b(documents|imports|annotations|chunks)\b`)
 	sqlComment  = regexp.MustCompile(`--[^\n]*`)
 )
 

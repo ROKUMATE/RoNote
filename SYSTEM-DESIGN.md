@@ -20,11 +20,12 @@
 - Run safe, supported code blocks in an isolated runner origin.
 - Import same-domain links on click; keep external links as ordinary links.
 - Provide progress for asynchronous imports through Server-Sent Events (SSE).
+- Search across a user's library by words and by meaning; chat over it (P17), with answers cited to blocks and never written into documents.
 
 ### Explicitly out of scope for v1
 
 - Site crawling or recursive import.
-- AI summaries, chat, or AI-added content.
+- AI summaries, or AI-added content: nothing generated ever enters DocContent.
 - Handwritten OCR.
 - Pseudocode conversion.
 - Arbitrary package installation, PyPI/npm access, shell execution, secrets, or network access from document code.

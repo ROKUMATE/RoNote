@@ -4,11 +4,11 @@ Rules for any coding agent working in this repo. Read CONTEXT.md before you star
 
 ## Product
 
-RoNote turns ONE documentation page (a URL) or a printed PDF into an editable study doc for IT and CS students. Source content is reproduced verbatim; nothing is AI-added. Students highlight, annotate and run code blocks. Same-domain links inside a page import on click; other-domain links stay plain links.
+RoNote turns ONE documentation page (a URL) or a printed PDF into an editable study doc for IT and CS students. Source content is reproduced verbatim; nothing is AI-added. Students highlight, annotate and run code blocks. Same-domain links inside a page import on click; other-domain links stay plain links. Students search their library, and (P17) chat over it: answers cite blocks and are never written into documents (docs/adr/0011-retrieval.md).
 
 Stack: Go backend, React + TypeScript + Tailwind v4 frontend, Postgres + pgvector, one monorepo. Repo: github.com/ROKUMATE/RoNote.
 
-Out of scope for v1: site crawling, AI summaries, chat, handwritten OCR, pseudocode conversion. Do not build them or leave hooks for them.
+Out of scope for v1: site crawling, AI summaries, handwritten OCR, pseudocode conversion. Do not build them or leave hooks for them. Nothing generated ever enters DocContent.
 
 ## Repo layout
 

@@ -86,3 +86,41 @@ func (s *Store) CacheEmbedding(ctx context.Context, model string, hash []byte, e
 	}
 	return nil
 }
+
+// SearchQuery is one search of one user's chunks.
+type SearchQuery struct {
+	Owner uuid.UUID
+	// Document limits the search to one document; uuid.Nil means all.
+	Document uuid.UUID
+	// Text is the query; IdentQuery its identifiers as a tsquery, or "".
+	Text, IdentQuery string
+	// Words searches by words; a Vector, by meaning, among chunks Model
+	// embedded. Either may be left out.
+	Words  bool
+	Vector []float32
+	Model  string
+	// K is reciprocal rank fusion's constant.
+	K, Limit int
+}
+
+// SearchHit is a chunk a search found, with what it scored.
+type SearchHit = sqlcdb.SearchChunksRow
+
+// SearchChunks runs q against q.Owner's chunks alone.
+func (s *Store) SearchChunks(ctx context.Context, q SearchQuery) ([]SearchHit, error) {
+	var vector *pgvector.HalfVector
+	if q.Vector != nil {
+		v := pgvector.NewHalfVector(q.Vector)
+		vector = &v
+	}
+	hits, err := s.q.SearchChunks(ctx, sqlcdb.SearchChunksParams{
+		OwnerID: q.Owner, Q: q.Text, IdentQuery: q.IdentQuery, UseWords: q.Words,
+		DocumentID:  uuid.NullUUID{UUID: q.Document, Valid: q.Document != uuid.Nil},
+		QueryVector: vector, Model: q.Model,
+		K: int32(min(max(q.K, 1), 1000)), MaxResults: int32(min(max(q.Limit, 1), 1000)), //nolint:gosec // clamped
+	})
+	if err != nil {
+		return nil, mapErr("search chunks", err)
+	}
+	return hits, nil
+}

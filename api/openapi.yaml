@@ -165,6 +165,51 @@ paths:
           $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
+  /search:
+    get:
+      operationId: search
+      summary: Search the user's library
+      description: |
+        Finds the blocks of the user's documents and notes that match q, by
+        words and by meaning, merged by reciprocal rank fusion
+        (docs/adr/0011-retrieval.md). When the embedder is unavailable, the
+        results are word matches alone and degraded is true.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 500
+        - name: document_id
+          in: query
+          description: Search this document alone.
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        "200":
+          description: The results, best first.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResults"
+        "400":
+          $ref: "#/components/responses/InvalidParameter"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /imports:
     post:
       operationId: createImport
@@ -809,6 +854,67 @@ components:
           type: string
           maxLength: 100
           description: The user's GitHub login, typed to confirm.
+    SearchResults:
+      type: object
+      required: [results, degraded]
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchResult"
+        degraded:
+          type: boolean
+          description: Meaning couldn't be searched, so the results are word matches alone.
+    SearchResult:
+      type: object
+      required: [document_id, document_title, block_id, heading_path, kind, snippet]
+      properties:
+        document_id:
+          type: string
+          format: uuid
+        document_title:
+          type: string
+        block_id:
+          type: string
+          description: The top-level block the result starts at.
+        heading_path:
+          type: array
+          items:
+            type: string
+        kind:
+          type: string
+          enum: [prose, code, note]
+        snippet:
+          type: array
+          description: The result's text in parts; marked parts are the words the query matched.
+          items:
+            $ref: "#/components/schemas/SnippetPart"
+        score:
+          $ref: "#/components/schemas/SearchScore"
+    SnippetPart:
+      type: object
+      required: [text, mark]
+      properties:
+        text:
+          type: string
+        mark:
+          type: boolean
+    SearchScore:
+      type: object
+      description: How the result scored; in dev and test only.
+      required: [fused]
+      properties:
+        fused:
+          type: number
+        words_rank:
+          type: integer
+          description: Its rank by words; absent when words didn't find it.
+        meaning_rank:
+          type: integer
+          description: Its rank by meaning; absent when meaning didn't find it.
+        distance:
+          type: number
+          description: Its cosine distance from the query.
     SignInErrorCode:
       type: string
       description: >-

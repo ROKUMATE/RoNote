@@ -48,7 +48,7 @@ func apiRoutes(o Options, lim limiters) *http.ServeMux {
 	mux.Handle("POST /api/v1/auth/logout", lim.byIP(logout(o)))
 	mux.Handle("POST /api/v1/auth/logout-all", lim.byIP(logoutAll(o)))
 	mux.Handle("DELETE /api/v1/me", deleteMe(o))
-	strict := gen.NewStrictHandlerWithOptions(apiServer{backend: o.Backend, accounts: o.Accounts}, nil, gen.StrictHTTPServerOptions{
+	strict := gen.NewStrictHandlerWithOptions(apiServer{backend: o.Backend, accounts: o.Accounts, searcher: o.Searcher, showScores: o.ShowScores}, nil, gen.StrictHTTPServerOptions{
 		RequestErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {
 			badBody(w, r, err, "the request body is not valid JSON for this operation")
 		},
@@ -68,8 +68,10 @@ func apiRoutes(o Options, lim limiters) *http.ServeMux {
 
 // apiServer implements the operations of api/openapi.yaml.
 type apiServer struct {
-	backend  Backend
-	accounts Accounts
+	backend    Backend
+	accounts   Accounts
+	searcher   Searcher
+	showScores bool
 }
 
 func apiError(ctx context.Context, code gen.ErrorCode, message string) gen.Error {

@@ -169,6 +169,9 @@ test-live: ## Extract real pages over the network, print a report, and check the
 	go test -tags live -run TestLive -count=1 -v ./internal/extract
 	$(WEB) live
 
+test-perf-search: ## Time search over 5k-25k chunks for one user, among 200,000 others (local only: minutes, and a container)
+	sh scripts/container.sh test go test -tags perf,integration -p 1 -count=1 -timeout 30m -run '^TestPerfSearch' -v ./internal/search
+
 test-clean: ## Remove leftover testcontainers containers
 	sh scripts/container.sh clean
 
@@ -205,5 +208,5 @@ web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromiu
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp extract lint lint-go lint-web fmt
 .PHONY: doctor stop dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
-.PHONY: test-integration test-live test-clean web-install web-deps web-browsers check-node-version
+.PHONY: test-integration test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
 .PHONY: web-dev web-build web-e2e

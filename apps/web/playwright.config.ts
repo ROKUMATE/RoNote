@@ -36,6 +36,9 @@ const backend = env({
   RONOTE_GITHUB_AUTHORIZE_URL: `${stack.idp}/login/oauth/authorize`,
   RONOTE_GITHUB_TOKEN_URL: `${stack.idp}/login/oauth/access_token`,
   RONOTE_GITHUB_API_URL: stack.idp,
+  // The real HTTP client, against a fake model.
+  RONOTE_EMBED_URL: `${stack.embed}/v1`,
+  RONOTE_EMBED_MODEL: "fake-words",
   // The suite imports and signs in far more than a person does; Go tests
   // check the limits.
   RONOTE_LIMIT_IMPORTS_PER_DAY: "100000",
@@ -72,6 +75,15 @@ export default defineConfig({
         RONOTE_FAKEIDP_USERS: "apps/web/e2e/fixtures/idp-users.json",
       }),
       url: `${stack.idp}/healthz`,
+      reuseExistingServer: false,
+      gracefulShutdown: stop,
+    },
+    {
+      name: "embed",
+      command: "bin/e2e/fakeembed",
+      cwd: "../..",
+      env: env({ RONOTE_FAKEEMBED_ADDR: new URL(stack.embed).host }),
+      url: `${stack.embed}/healthz`,
       reuseExistingServer: false,
       gracefulShutdown: stop,
     },

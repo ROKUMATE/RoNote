@@ -8,4 +8,6 @@ export const stack = {
   fixtures: "http://localhost:18090",
   // The fake GitHub sign-in (cmd/fakeidp).
   idp: "http://127.0.0.1:18091",
+  // The fake embedder (cmd/fakeembed).
+  embed: "http://127.0.0.1:18093",
 } as const;

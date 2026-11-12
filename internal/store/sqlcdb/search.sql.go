@@ -15,26 +15,35 @@ import (
 const searchChunks = `-- name: SearchChunks :many
 
 WITH q AS (
-    SELECT websearch_to_tsquery('english', $3::text)
-        || websearch_to_tsquery('simple', $3::text)
-        || CASE WHEN $4::text = '' THEN ''::tsquery ELSE $4::text::tsquery END AS query
+    -- Words alone OR the English terms, so a question in a student's words
+    -- still finds chunks with some of them, ranked by how many and how
+    -- close. Beside meaning they must all match: there the words half is
+    -- for precision, and the eval scores hybrid higher that way
+    -- (docs/adr/0011-retrieval.md). The query as typed, and its
+    -- identifiers, always match whole.
+    SELECT CASE WHEN $3::halfvec IS NULL
+            THEN replace(websearch_to_tsquery('english', $4::text)::text, ' & ', ' | ')::tsquery
+            ELSE websearch_to_tsquery('english', $4::text)
+        END
+        || websearch_to_tsquery('simple', $4::text)
+        || CASE WHEN $5::text = '' THEN ''::tsquery ELSE $5::text::tsquery END AS query
 ),
 words AS (
     SELECT c.id, ts_rank_cd(c.tsv, q.query) AS rank
     FROM chunks c, q
-    WHERE $5::boolean
+    WHERE $6::boolean
       AND c.owner_id = $1
-      AND ($6::uuid IS NULL OR c.document_id = $6::uuid)
+      AND ($7::uuid IS NULL OR c.document_id = $7::uuid)
       AND c.tsv @@ q.query
     ORDER BY rank DESC, c.id
     LIMIT 50
 ),
 meaning AS (
-    SELECT c.id, c.embedding <=> $7::halfvec AS distance
+    SELECT c.id, c.embedding <=> $3::halfvec AS distance
     FROM chunks c
-    WHERE $7::halfvec IS NOT NULL
+    WHERE $3::halfvec IS NOT NULL
       AND c.owner_id = $1
-      AND ($6::uuid IS NULL OR c.document_id = $6::uuid)
+      AND ($7::uuid IS NULL OR c.document_id = $7::uuid)
       AND c.model = $8
       AND c.embedding IS NOT NULL
     ORDER BY distance, c.id
@@ -46,7 +55,7 @@ fused AS (
     FROM (SELECT id, row_number() OVER (ORDER BY rank DESC, id) AS r FROM words) w
     FULL JOIN (SELECT id, distance, row_number() OVER (ORDER BY distance, id) AS r FROM meaning) m ON w.id = m.id
 )
-SELECT c.document_id, d.title, c.block_ids[1]::text AS block_id, c.heading_path, c.kind,
+SELECT c.document_id, d.title, c.block_ids, c.heading_path, c.kind,
     -- 0 and -1 mean the half didn't find the chunk.
     f.score::double precision AS score, coalesce(f.words_rank, 0)::int AS words_rank,
     coalesce(f.meaning_rank, 0)::int AS meaning_rank, coalesce(f.distance, -1)::double precision AS distance,
@@ -66,11 +75,11 @@ LIMIT $2
 type SearchChunksParams struct {
 	OwnerID     uuid.UUID
 	MaxResults  int32
+	QueryVector *pgvector.HalfVector
 	Q           string
 	IdentQuery  string
 	UseWords    bool
 	DocumentID  uuid.NullUUID
-	QueryVector *pgvector.HalfVector
 	Model       string
 	K           int32
 }
@@ -78,7 +87,7 @@ type SearchChunksParams struct {
 type SearchChunksRow struct {
 	DocumentID  uuid.UUID
 	Title       string
-	BlockID     string
+	BlockIDs    []string
 	HeadingPath []string
 	Kind        string
 	Score       float64
@@ -97,11 +106,11 @@ func (q *Queries) SearchChunks(ctx context.Context, arg SearchChunksParams) ([]S
 	rows, err := q.db.Query(ctx, searchChunks,
 		arg.OwnerID,
 		arg.MaxResults,
+		arg.QueryVector,
 		arg.Q,
 		arg.IdentQuery,
 		arg.UseWords,
 		arg.DocumentID,
-		arg.QueryVector,
 		arg.Model,
 		arg.K,
 	)
@@ -115,7 +124,7 @@ func (q *Queries) SearchChunks(ctx context.Context, arg SearchChunksParams) ([]S
 		if err := rows.Scan(
 			&i.DocumentID,
 			&i.Title,
-			&i.BlockID,
+			&i.BlockIDs,
 			&i.HeadingPath,
 			&i.Kind,
 			&i.Score,

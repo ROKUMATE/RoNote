@@ -101,6 +101,10 @@ jobs:
       # settings for a running podman machine, so Ryuk stays on here.
       - name: Run integration tests
         run: make test-integration
+      # Replays recorded vectors, so no model is needed; fails when hybrid
+      # search falls below testdata/retrieval/baseline.json.
+      - name: Run the retrieval eval
+        run: make eval
 
   web:
     name: Web lint, tests and build

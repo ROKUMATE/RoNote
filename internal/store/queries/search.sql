@@ -6,7 +6,16 @@
 -- rows alone, merged by reciprocal rank fusion. A null query vector leaves
 -- the meaning half out; use_words false leaves the words half out.
 WITH q AS (
-    SELECT websearch_to_tsquery('english', sqlc.arg(q)::text)
+    -- Words alone OR the English terms, so a question in a student's words
+    -- still finds chunks with some of them, ranked by how many and how
+    -- close. Beside meaning they must all match: there the words half is
+    -- for precision, and the eval scores hybrid higher that way
+    -- (docs/adr/0011-retrieval.md). The query as typed, and its
+    -- identifiers, always match whole.
+    SELECT CASE WHEN sqlc.narg(query_vector)::halfvec IS NULL
+            THEN replace(websearch_to_tsquery('english', sqlc.arg(q)::text)::text, ' & ', ' | ')::tsquery
+            ELSE websearch_to_tsquery('english', sqlc.arg(q)::text)
+        END
         || websearch_to_tsquery('simple', sqlc.arg(q)::text)
         || CASE WHEN sqlc.arg(ident_query)::text = '' THEN ''::tsquery ELSE sqlc.arg(ident_query)::text::tsquery END AS query
 ),
@@ -37,7 +46,7 @@ fused AS (
     FROM (SELECT id, row_number() OVER (ORDER BY rank DESC, id) AS r FROM words) w
     FULL JOIN (SELECT id, distance, row_number() OVER (ORDER BY distance, id) AS r FROM meaning) m ON w.id = m.id
 )
-SELECT c.document_id, d.title, c.block_ids[1]::text AS block_id, c.heading_path, c.kind,
+SELECT c.document_id, d.title, c.block_ids, c.heading_path, c.kind,
     -- 0 and -1 mean the half didn't find the chunk.
     f.score::double precision AS score, coalesce(f.words_rank, 0)::int AS words_rank,
     coalesce(f.meaning_rank, 0)::int AS meaning_rank, coalesce(f.distance, -1)::double precision AS distance,

@@ -1,0 +1,38 @@
+{
+  "all": {
+    "recall@5": 0.8796,
+    "recall@10": 0.9444,
+    "mrr@10": 0.7945,
+    "ndcg@10": 0.819
+  },
+  "error": {
+    "recall@5": 1,
+    "recall@10": 1,
+    "mrr@10": 1,
+    "ndcg@10": 1
+  },
+  "howto": {
+    "recall@5": 0.8824,
+    "recall@10": 1,
+    "mrr@10": 0.7152,
+    "ndcg@10": 0.7836
+  },
+  "identifier": {
+    "recall@5": 1,
+    "recall@10": 1,
+    "mrr@10": 0.9667,
+    "ndcg@10": 0.9754
+  },
+  "multidoc": {
+    "recall@5": 0.7333,
+    "recall@10": 0.9,
+    "mrr@10": 0.82,
+    "ndcg@10": 0.7538
+  },
+  "paraphrase": {
+    "recall@5": 0.8,
+    "recall@10": 0.85,
+    "mrr@10": 0.6171,
+    "ndcg@10": 0.6741
+  }
+}

@@ -44,7 +44,7 @@ func (s apiServer) Search(ctx context.Context, req gen.SearchRequestObject) (gen
 			snippet[j] = gen.SnippetPart{Text: seg.Text, Mark: seg.Mark}
 		}
 		result := gen.SearchResult{
-			DocumentID: h.DocumentID, DocumentTitle: h.Title, BlockID: h.BlockID, HeadingPath: h.HeadingPath,
+			DocumentID: h.DocumentID, DocumentTitle: h.Title, BlockID: h.BlockIDs[0], HeadingPath: h.HeadingPath,
 			Kind: gen.SearchResultKind(h.Kind), Snippet: snippet,
 		}
 		if result.HeadingPath == nil {

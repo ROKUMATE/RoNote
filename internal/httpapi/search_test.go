@@ -25,7 +25,7 @@ func (f *fakeSearcher) Search(_ context.Context, r search.Request) (search.Resul
 }
 
 var aHit = search.Hit{
-	DocumentID: uuid.MustParse("0192f1c4-0000-7000-8000-000000000010"), Title: "Effective Go", BlockID: "b1",
+	DocumentID: uuid.MustParse("0192f1c4-0000-7000-8000-000000000010"), Title: "Effective Go", BlockIDs: []string{"b1", "b2"},
 	HeadingPath: []string{"Concurrency", "Goroutines"}, Kind: search.KindProse,
 	Snippet: []search.Segment{{Text: "They're called "}, {Text: "goroutines", Mark: true}},
 	Score:   0.03, WordsRank: 1, MeaningRank: 0, Distance: -1,

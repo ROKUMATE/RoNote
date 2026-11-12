@@ -1,0 +1,2376 @@
+{
+  "ir_version": 1,
+  "title": "Code blocks",
+  "source": {
+    "url": "https://docusaurus.io/docs/markdown-features/code-blocks",
+    "final_url": "https://docusaurus.io/docs/markdown-features/code-blocks",
+    "canonical_url": "https://docusaurus.io/docs/markdown-features/code-blocks",
+    "fetched_at": "2026-11-12T17:09:39.849088Z",
+    "body_sha256": "d47439afdc0846fcfa5430998450340bf312592c91bd1871913205578e139267"
+  },
+  "extractor": {
+    "name": "docusaurus",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "9e97a750e8ea",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "code-blocks",
+      "content": [
+        {
+          "text": "Code blocks"
+        }
+      ]
+    },
+    {
+      "id": "d25ae2b65a97",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Code blocks within documentation are super-powered 💪."
+        }
+      ]
+    },
+    {
+      "id": "155d2208a535",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "code-title",
+      "content": [
+        {
+          "text": "Code title"
+        }
+      ]
+    },
+    {
+      "id": "54f8d3e44466",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can add a title to the code block by adding a "
+        },
+        {
+          "text": "title",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " key after the language (leave a space between them)."
+        }
+      ]
+    },
+    {
+      "id": "8bcfeb987552",
+      "kind": "code",
+      "lang": "md",
+      "text": "```jsx title=\"/src/components/HelloCodeTitle.js\"\nfunction HelloCodeTitle(props) {\n  return <h1>Hello, {props.name}</h1>;\n}\n```\n"
+    },
+    {
+      "id": "1be9993469bd",
+      "kind": "code",
+      "lang": "jsx",
+      "text": "function HelloCodeTitle(props) {\n  return <h1>Hello, {props.name}</h1>;\n}\n",
+      "title": "/src/components/HelloCodeTitle.js"
+    },
+    {
+      "id": "1f24f16490a2",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "syntax-highlighting",
+      "content": [
+        {
+          "text": "Syntax highlighting"
+        }
+      ]
+    },
+    {
+      "id": "8a8921beb0f3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Code blocks are text blocks wrapped around by strings of 3 backticks. You may check out "
+        },
+        {
+          "text": "this reference",
+          "link": {
+            "href": "https://mdxjs.com/docs/",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " for the specifications of MDX."
+        }
+      ]
+    },
+    {
+      "id": "b1c0f698bdcd",
+      "kind": "code",
+      "lang": "md",
+      "text": "```js\nconsole.log('Every repo must come with a mascot.');\n```\n"
+    },
+    {
+      "id": "a78f722271c5",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Use the matching language meta string for your code block, and Docusaurus will pick up syntax highlighting automatically, powered by "
+        },
+        {
+          "text": "Prism React Renderer",
+          "link": {
+            "href": "https://github.com/FormidableLabs/prism-react-renderer",
+            "kind": "external"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "55daab6d38c9",
+      "kind": "code",
+      "lang": "js",
+      "text": "console.log('Every repo must come with a mascot.');\n"
+    },
+    {
+      "id": "63a819b836ea",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "theming",
+      "content": [
+        {
+          "text": "Theming"
+        }
+      ]
+    },
+    {
+      "id": "78faf4448eef",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "By default, the Prism "
+        },
+        {
+          "text": "syntax highlighting theme",
+          "link": {
+            "href": "https://github.com/FormidableLabs/prism-react-renderer#theming",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " we use is "
+        },
+        {
+          "text": "Palenight",
+          "link": {
+            "href": "https://github.com/FormidableLabs/prism-react-renderer/blob/master/packages/prism-react-renderer/src/themes/palenight.ts",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ". You can change this to another theme by passing "
+        },
+        {
+          "text": "theme",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " field in "
+        },
+        {
+          "text": "prism",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " as "
+        },
+        {
+          "text": "themeConfig",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in your docusaurus.config.js."
+        }
+      ]
+    },
+    {
+      "id": "1b2d7d130a31",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "For example, if you prefer to use the "
+        },
+        {
+          "text": "dracula",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " highlighting theme:"
+        }
+      ]
+    },
+    {
+      "id": "7ec771d9da10",
+      "kind": "code",
+      "lang": "js",
+      "text": "import {themes as prismThemes} from 'prism-react-renderer';\n\nexport default {\n  themeConfig: {\n    prism: {\n      theme: prismThemes.dracula,\n    },\n  },\n};\n",
+      "title": "docusaurus.config.js"
+    },
+    {
+      "id": "96fd0285bebb",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Because a Prism theme is just a JS object, you can also write your own theme if you are not satisfied with the default. Docusaurus enhances the "
+        },
+        {
+          "text": "github",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "vsDark",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " themes to provide richer highlight, and you can check our implementations for the "
+        },
+        {
+          "text": "light",
+          "link": {
+            "href": "https://github.com/facebook/docusaurus/blob/main/website/src/utils/prismLight.ts",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "dark",
+          "link": {
+            "href": "https://github.com/facebook/docusaurus/blob/main/website/src/utils/prismDark.ts",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " code block themes."
+        }
+      ]
+    },
+    {
+      "id": "e666d9bc2f0e",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "supported-languages",
+      "content": [
+        {
+          "text": "Supported Languages"
+        }
+      ]
+    },
+    {
+      "id": "2977b32cb219",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "By default, Docusaurus comes with a subset of "
+        },
+        {
+          "text": "commonly used languages",
+          "link": {
+            "href": "https://github.com/FormidableLabs/prism-react-renderer/blob/master/packages/generate-prism-languages/index.ts#L10-L25",
+            "kind": "external"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "15c77eafb490",
+      "kind": "callout",
+      "variant": "warning",
+      "title": "warning",
+      "children": [
+        {
+          "id": "6c5de01640c1",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Some popular languages like Java, C#, or PHP are not enabled by default."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "26daa4483141",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "To add syntax highlighting for any of the other "
+        },
+        {
+          "text": "Prism-supported languages",
+          "link": {
+            "href": "https://prismjs.com/#supported-languages",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ", define it in an array of additional languages."
+        }
+      ]
+    },
+    {
+      "id": "80318bc40ce7",
+      "kind": "callout",
+      "variant": "note",
+      "title": "note",
+      "children": [
+        {
+          "id": "77785de40ce7",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Each additional language has to be a valid Prism component name. For example, Prism would map the "
+            },
+            {
+              "text": "language",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "text": " "
+            },
+            {
+              "text": "cs",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " to "
+            },
+            {
+              "text": "csharp",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", but only "
+            },
+            {
+              "text": "prism-csharp.js",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " exists as a "
+            },
+            {
+              "text": "component",
+              "marks": [
+                "italic"
+              ]
+            },
+            {
+              "text": ", so you need to use "
+            },
+            {
+              "text": "additionalLanguages: ['csharp']",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ". You can look into "
+            },
+            {
+              "text": "node_modules/prismjs/components",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " to find all components (languages) available."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3d2cda59161a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "For example, if you want to add highlighting for the PowerShell language:"
+        }
+      ]
+    },
+    {
+      "id": "864f5de16b5b",
+      "kind": "code",
+      "lang": "js",
+      "text": "export default {\n  // ...\n  themeConfig: {\n    prism: {\n      additionalLanguages: ['powershell'],\n    },\n    // ...\n  },\n};\n",
+      "title": "docusaurus.config.js"
+    },
+    {
+      "id": "873ab64452cc",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "After adding "
+        },
+        {
+          "text": "additionalLanguages",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", restart Docusaurus."
+        }
+      ]
+    },
+    {
+      "id": "e10c9100d800",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you want to add highlighting for languages not yet supported by Prism, you can swizzle "
+        },
+        {
+          "text": "prism-include-languages",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "id": "e3814175e2e1",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "npm",
+          "children": [
+            {
+              "id": "2ea1ae5b7126",
+              "kind": "code",
+              "lang": "bash",
+              "text": "npm run swizzle @docusaurus/theme-classic prism-include-languages\n"
+            }
+          ]
+        },
+        {
+          "label": "Yarn",
+          "children": [
+            {
+              "id": "13b5175a903a",
+              "kind": "code",
+              "lang": "bash",
+              "text": "yarn swizzle @docusaurus/theme-classic prism-include-languages\n"
+            }
+          ]
+        },
+        {
+          "label": "pnpm",
+          "children": [
+            {
+              "id": "b4d6d752756a",
+              "kind": "code",
+              "lang": "bash",
+              "text": "pnpm run swizzle @docusaurus/theme-classic prism-include-languages\n"
+            }
+          ]
+        },
+        {
+          "label": "Bun",
+          "children": [
+            {
+              "id": "88b9fccbeae1",
+              "kind": "code",
+              "lang": "bash",
+              "text": "bun run swizzle @docusaurus/theme-classic prism-include-languages\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fb04d6d1442d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "It will produce "
+        },
+        {
+          "text": "prism-include-languages.js",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in your "
+        },
+        {
+          "text": "src/theme",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " folder. You can add highlighting support for custom languages by editing "
+        },
+        {
+          "text": "prism-include-languages.js",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "id": "7bd8ee79fe79",
+      "kind": "code",
+      "lang": "js",
+      "text": "const prismIncludeLanguages = (Prism) => {\n  // ...\n\n  additionalLanguages.forEach((lang) => {\n    require(`prismjs/components/prism-${lang}`);\n  });\n\n  require('/path/to/your/prism-language-definition');\n\n  // ...\n};\n",
+      "title": "src/theme/prism-include-languages.js"
+    },
+    {
+      "id": "652f555e900f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can refer to "
+        },
+        {
+          "text": "Prism's official language definitions",
+          "link": {
+            "href": "https://github.com/PrismJS/prism/tree/master/components",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " when you are writing your own language definitions."
+        }
+      ]
+    },
+    {
+      "id": "0c93f3c16542",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "When adding a custom language definition, you do not need to add the language to the "
+        },
+        {
+          "text": "additionalLanguages",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " config array, since Docusaurus only looks up the "
+        },
+        {
+          "text": "additionalLanguages",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " strings in languages that Prism provides. Adding the language import in "
+        },
+        {
+          "text": "prism-include-languages.js",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is sufficient."
+        }
+      ]
+    },
+    {
+      "id": "5e0ff0726c50",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "line-highlighting",
+      "content": [
+        {
+          "text": "Line highlighting"
+        }
+      ]
+    },
+    {
+      "id": "5c1c0460e471",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "highlighting-with-comments",
+      "content": [
+        {
+          "text": "Highlighting with comments"
+        }
+      ]
+    },
+    {
+      "id": "79191f1649d9",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can use comments with "
+        },
+        {
+          "text": "highlight-next-line",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "highlight-start",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", and "
+        },
+        {
+          "text": "highlight-end",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " to select which lines are highlighted."
+        }
+      ]
+    },
+    {
+      "id": "895a49da2101",
+      "kind": "code",
+      "lang": "md",
+      "text": "```js\nfunction HighlightSomeText(highlight) {\n  if (highlight) {\n    // highlight-next-line\n    return 'This text is highlighted!';\n  }\n\n  return 'Nothing highlighted';\n}\n\nfunction HighlightMoreText(highlight) {\n  // highlight-start\n  if (highlight) {\n    return 'This range is highlighted!';\n  }\n  // highlight-end\n\n  return 'Nothing highlighted';\n}\n```\n"
+    },
+    {
+      "id": "bf09075fcddb",
+      "kind": "code",
+      "lang": "js",
+      "text": "function HighlightSomeText(highlight) {\n  if (highlight) {\n    return 'This text is highlighted!';\n  }\n\n  return 'Nothing highlighted';\n}\n\nfunction HighlightMoreText(highlight) {\n  if (highlight) {\n    return 'This range is highlighted!';\n  }\n\n  return 'Nothing highlighted';\n}\n"
+    },
+    {
+      "id": "01884fe42dcf",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Supported commenting syntax:"
+        }
+      ]
+    },
+    {
+      "id": "8e5ac54416f1",
+      "kind": "table",
+      "head": [
+        [
+          [
+            {
+              "text": "Style"
+            }
+          ],
+          [
+            {
+              "text": "Syntax"
+            }
+          ]
+        ]
+      ],
+      "rows": [
+        [
+          [
+            {
+              "text": "C-style"
+            }
+          ],
+          [
+            {
+              "text": "/* ... */",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " and "
+            },
+            {
+              "text": "// ...",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "JSX-style"
+            }
+          ],
+          [
+            {
+              "text": "{/* ... */}",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "Bash-style"
+            }
+          ],
+          [
+            {
+              "text": "# ...",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "HTML-style"
+            }
+          ],
+          [
+            {
+              "text": "<!-- ... -->",
+              "marks": [
+                "code"
+              ]
+            }
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "e994259b0baf",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "We will do our best to infer which set of comment styles to use based on the language, and default to allowing "
+        },
+        {
+          "text": "all",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " comment styles. If there's a comment style that is not currently supported, we are open to adding them! Pull requests welcome. Note that different comment styles have no semantic difference, only their content does."
+        }
+      ]
+    },
+    {
+      "id": "8c97d90d7d2c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can set your own background color for highlighted code line in your "
+        },
+        {
+          "text": "src/css/custom.css",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " which will better fit to your selected syntax highlighting theme. The color given below works for the default highlighting theme (Palenight), so if you are using another theme, you will have to tweak the color accordingly."
+        }
+      ]
+    },
+    {
+      "id": "6d243db8daae",
+      "kind": "code",
+      "lang": "css",
+      "text": ":root {\n  --docusaurus-highlighted-code-line-bg: rgb(72, 77, 91);\n}\n\n/* If you have a different syntax highlighting theme for dark mode. */\n[data-theme='dark'] {\n  /* Color which works with dark mode syntax highlighting theme */\n  --docusaurus-highlighted-code-line-bg: rgb(100, 100, 100);\n}\n",
+      "title": "/src/css/custom.css"
+    },
+    {
+      "id": "8e1008d01327",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you also need to style the highlighted code line in some other way, you can target on "
+        },
+        {
+          "text": "theme-code-block-highlighted-line",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " CSS class."
+        }
+      ]
+    },
+    {
+      "id": "b428ee14709e",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "highlighting-with-metadata-string",
+      "content": [
+        {
+          "text": "Highlighting with metadata string"
+        }
+      ]
+    },
+    {
+      "id": "8fb222b89f9d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can also specify highlighted line ranges within the language meta string (leave a space after the language). To highlight multiple lines, separate the line numbers by commas or use the range syntax to select a chunk of lines. This feature uses the "
+        },
+        {
+          "text": "parse-number-range",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " library and you can find "
+        },
+        {
+          "text": "more syntax",
+          "link": {
+            "href": "https://www.npmjs.com/package/parse-numeric-range",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " on their project details."
+        }
+      ]
+    },
+    {
+      "id": "5dabf72681c1",
+      "kind": "code",
+      "lang": "md",
+      "text": "```jsx {1,4-6,11}\nimport React from 'react';\n\nfunction MyComponent(props) {\n  if (props.isBar) {\n    return <div>Bar</div>;\n  }\n\n  return <div>Foo</div>;\n}\n\nexport default MyComponent;\n```\n"
+    },
+    {
+      "id": "2f2fef7a7e37",
+      "kind": "code",
+      "lang": "jsx",
+      "text": "import React from 'react';\n\nfunction MyComponent(props) {\n  if (props.isBar) {\n    return <div>Bar</div>;\n  }\n\n  return <div>Foo</div>;\n}\n\nexport default MyComponent;\n"
+    },
+    {
+      "id": "2a83e5f638a9",
+      "kind": "callout",
+      "variant": "tip",
+      "title": "prefer comments",
+      "children": [
+        {
+          "id": "9984d9ee4547",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Prefer highlighting with comments where you can. By inlining highlight in the code, you don't have to manually count the lines if your code block becomes long. If you add/remove lines, you also don't have to offset your line ranges."
+            }
+          ]
+        },
+        {
+          "id": "4ef7ea14a75f",
+          "kind": "code",
+          "lang": "diff",
+          "text": "- ```jsx {3}\n+ ```jsx {4}\n  function HighlightSomeText(highlight) {\n    if (highlight) {\n+     console.log('Highlighted text found');\n      return 'This text is highlighted!';\n    }\n\n    return 'Nothing highlighted';\n  }\n  ```\n"
+        },
+        {
+          "id": "a43bc552d18b",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Below, we will introduce how the magic comment system can be extended to define custom directives and their functionalities. The magic comments would only be parsed if a highlight metastring is not present."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7167e7ddc9be",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "custom-magic-comments",
+      "content": [
+        {
+          "text": "Custom magic comments"
+        }
+      ]
+    },
+    {
+      "id": "8ed36029d134",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "// highlight-next-line",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "// highlight-start",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " etc. are called \"magic comments\", because they will be parsed and removed, and their purposes are to add metadata to the next line, or the section that the pair of start- and end-comments enclose."
+        }
+      ]
+    },
+    {
+      "id": "a62d135038cc",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can declare custom magic comments through theme config. For example, you can register another magic comment that adds a "
+        },
+        {
+          "text": "code-block-error-line",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " class name:"
+        }
+      ]
+    },
+    {
+      "id": "904942ae3261",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "docusaurus.config.js",
+          "children": [
+            {
+              "id": "39a50fe75094",
+              "kind": "code",
+              "lang": "js",
+              "text": "export default {\n  themeConfig: {\n    prism: {\n      magicComments: [\n        // Remember to extend the default highlight class name as well!\n        {\n          className: 'theme-code-block-highlighted-line',\n          line: 'highlight-next-line',\n          block: {start: 'highlight-start', end: 'highlight-end'},\n        },\n        {\n          className: 'code-block-error-line',\n          line: 'This will error',\n        },\n      ],\n    },\n  },\n};\n"
+            }
+          ]
+        },
+        {
+          "label": "src/css/custom.css",
+          "children": [
+            {
+              "id": "bb641c2232d0",
+              "kind": "code",
+              "lang": "css",
+              "text": ".code-block-error-line {\n  background-color: #ff000020;\n  display: block;\n  margin: 0 calc(-1 * var(--ifm-pre-padding));\n  padding: 0 var(--ifm-pre-padding);\n  border-left: 3px solid #ff000080;\n}\n"
+            }
+          ]
+        },
+        {
+          "label": "myDoc.md",
+          "children": [
+            {
+              "id": "37480f24abe6",
+              "kind": "code",
+              "lang": "md",
+              "text": "In JavaScript, trying to access properties on `null` will error.\n\n```js\nconst name = null;\n// This will error\nconsole.log(name.toUpperCase());\n// Uncaught TypeError: Cannot read properties of null (reading 'toUpperCase')\n```\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "acab7ebba9cb",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In JavaScript, trying to access properties on "
+        },
+        {
+          "text": "null",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " will error."
+        }
+      ]
+    },
+    {
+      "id": "fd6917b77ce1",
+      "kind": "code",
+      "lang": "js",
+      "text": "const name = null;\nconsole.log(name.toUpperCase());\n// Uncaught TypeError: Cannot read properties of null (reading 'toUpperCase')\n"
+    },
+    {
+      "id": "072ebda02b22",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you use number ranges in metastring (the "
+        },
+        {
+          "text": "{1,3-4}",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " syntax), Docusaurus will apply the "
+        },
+        {
+          "text": "first ",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": "magicComments",
+          "marks": [
+            "bold",
+            "code"
+          ]
+        },
+        {
+          "text": " entry",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": "'s class name. This, by default, is "
+        },
+        {
+          "text": "theme-code-block-highlighted-line",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", but if you change the "
+        },
+        {
+          "text": "magicComments",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " config and use a different entry as the first one, the meaning of the metastring range will change as well."
+        }
+      ]
+    },
+    {
+      "id": "f865b3acb8b4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can disable the default line highlighting comments with "
+        },
+        {
+          "text": "magicComments: []",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". If there's no magic comment config, but Docusaurus encounters a code block containing a metastring range, it will error because there will be no class name to apply—the highlighting class name, after all, is just a magic comment entry."
+        }
+      ]
+    },
+    {
+      "id": "0b945c3da746",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Every magic comment entry will contain three keys: "
+        },
+        {
+          "text": "className",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " (required), "
+        },
+        {
+          "text": "line",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", which applies to the directly next line, or "
+        },
+        {
+          "text": "block",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " (containing "
+        },
+        {
+          "text": "start",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "end",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "), which applies to the entire block enclosed by the two comments."
+        }
+      ]
+    },
+    {
+      "id": "1eec17819727",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Using CSS to target the class can already do a lot, but you can unlock the full potential of this feature through "
+        },
+        {
+          "text": "swizzling",
+          "link": {
+            "href": "https://docusaurus.io/docs/swizzling",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "f7559ab6d174",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "npm",
+          "children": [
+            {
+              "id": "d13d3fc03ffb",
+              "kind": "code",
+              "lang": "bash",
+              "text": "npm run swizzle @docusaurus/theme-classic CodeBlock/Line\n"
+            }
+          ]
+        },
+        {
+          "label": "Yarn",
+          "children": [
+            {
+              "id": "2ca4d7da87e5",
+              "kind": "code",
+              "lang": "bash",
+              "text": "yarn swizzle @docusaurus/theme-classic CodeBlock/Line\n"
+            }
+          ]
+        },
+        {
+          "label": "pnpm",
+          "children": [
+            {
+              "id": "1471b00be92a",
+              "kind": "code",
+              "lang": "bash",
+              "text": "pnpm run swizzle @docusaurus/theme-classic CodeBlock/Line\n"
+            }
+          ]
+        },
+        {
+          "label": "Bun",
+          "children": [
+            {
+              "id": "c2d761caee3a",
+              "kind": "code",
+              "lang": "bash",
+              "text": "bun run swizzle @docusaurus/theme-classic CodeBlock/Line\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "618b6cb346cf",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The "
+        },
+        {
+          "text": "Line",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " component will receive the list of class names, based on which you can conditionally render different markup."
+        }
+      ]
+    },
+    {
+      "id": "785b1ce8a832",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "line-numbering",
+      "content": [
+        {
+          "text": "Line numbering"
+        }
+      ]
+    },
+    {
+      "id": "688c86f8a09f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can enable line numbering for your code block by using "
+        },
+        {
+          "text": "showLineNumbers",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " key within the language meta string (don't forget to add space directly before the key)."
+        }
+      ]
+    },
+    {
+      "id": "e2955d10a01b",
+      "kind": "code",
+      "lang": "md",
+      "text": "```jsx showLineNumbers\nimport React from 'react';\n\nexport default function MyComponent(props) {\n  return <div>Foo</div>;\n}\n```\n"
+    },
+    {
+      "id": "2fae02952753",
+      "kind": "code",
+      "lang": "jsx",
+      "text": "import React from 'react';\n\nexport default function MyComponent(props) {\n  return <div>Foo</div>;\n}\n"
+    },
+    {
+      "id": "ff22fa5f2030",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "By default, the counter starts at line number 1. It's possible to pass a custom counter start value to split large code blocks for readability:"
+        }
+      ]
+    },
+    {
+      "id": "512c8b36491a",
+      "kind": "code",
+      "lang": "md",
+      "text": "```jsx showLineNumbers=3\nexport default function MyComponent(props) {\n  return <div>Foo</div>;\n}\n```\n"
+    },
+    {
+      "id": "78b6741d8bf2",
+      "kind": "code",
+      "lang": "jsx",
+      "text": "export default function MyComponent(props) {\n  return <div>Foo</div>;\n}\n"
+    },
+    {
+      "id": "fabd02419946",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "interactive-code-editor",
+      "content": [
+        {
+          "text": "Interactive code editor"
+        }
+      ]
+    },
+    {
+      "id": "c99ad2a559ce",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "(Powered by "
+        },
+        {
+          "text": "React Live",
+          "link": {
+            "href": "https://github.com/FormidableLabs/react-live",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ")"
+        }
+      ]
+    },
+    {
+      "id": "7410314f3117",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can create an interactive coding editor with the "
+        },
+        {
+          "text": "@docusaurus/theme-live-codeblock",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " plugin. First, add the plugin to your package."
+        }
+      ]
+    },
+    {
+      "id": "d34959fb9b84",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "npm",
+          "children": [
+            {
+              "id": "24f9093a8956",
+              "kind": "code",
+              "lang": "bash",
+              "text": "npm install --save @docusaurus/theme-live-codeblock\n"
+            }
+          ]
+        },
+        {
+          "label": "Yarn",
+          "children": [
+            {
+              "id": "4aa23dc2305d",
+              "kind": "code",
+              "lang": "bash",
+              "text": "yarn add @docusaurus/theme-live-codeblock\n"
+            }
+          ]
+        },
+        {
+          "label": "pnpm",
+          "children": [
+            {
+              "id": "0b6522177f89",
+              "kind": "code",
+              "lang": "bash",
+              "text": "pnpm add @docusaurus/theme-live-codeblock\n"
+            }
+          ]
+        },
+        {
+          "label": "Bun",
+          "children": [
+            {
+              "id": "d1a87ab99bed",
+              "kind": "code",
+              "lang": "bash",
+              "text": "bun add @docusaurus/theme-live-codeblock\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0c68903ba8fe",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You will also need to add the plugin to your "
+        },
+        {
+          "text": "docusaurus.config.js",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "c6e1b5dd4f82",
+      "kind": "code",
+      "lang": "js",
+      "text": "export default {\n  // ...\n  themes: ['@docusaurus/theme-live-codeblock'],\n  // ...\n};\n"
+    },
+    {
+      "id": "b7651101128c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "To use the plugin, create a code block with "
+        },
+        {
+          "text": "live",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " attached to the language meta string."
+        }
+      ]
+    },
+    {
+      "id": "428fb634992b",
+      "kind": "code",
+      "lang": "md",
+      "text": "```jsx live\nfunction Clock(props) {\n  const [date, setDate] = useState(new Date());\n\n  useEffect(() => {\n    const id = setInterval(() => {\n      setDate(new Date());\n    }, 1000);\n    return () => clearInterval(id);\n  }, []);\n\n  return <h2>It is {date.toLocaleTimeString()}.</h2>;\n}\n```\n"
+    },
+    {
+      "id": "c9c7ab59c284",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The code block will be rendered as an interactive editor. Changes to the code will reflect on the result panel live."
+        }
+      ]
+    },
+    {
+      "id": "90f8154dbede",
+      "kind": "code",
+      "lang": "tsx",
+      "text": "function Clock(props) {\n  const [date, setDate] = useState(new Date());\n\n  useEffect(() => {\n    const id = setInterval(() => {\n      setDate(new Date());\n    }, 1000);\n    return () => clearInterval(id);\n  }, []);\n\n  return <h2>It is {date.toLocaleTimeString()}.</h2>;\n}\n"
+    },
+    {
+      "id": "6fdc0052c4fc",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Loading..."
+        }
+      ]
+    },
+    {
+      "id": "0f57a60bb919",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "imports",
+      "content": [
+        {
+          "text": "Imports"
+        }
+      ]
+    },
+    {
+      "id": "de9a74647941",
+      "kind": "callout",
+      "variant": "warning",
+      "title": "react-live and imports",
+      "children": [
+        {
+          "id": "b9679c9020bf",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "It is not possible to import components directly from the react-live code editor, you have to define available imports upfront."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "18db3ea0d4d6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "By default, all React imports are available. If you need more imports available, swizzle the react-live scope:"
+        }
+      ]
+    },
+    {
+      "id": "c4d39ac8b932",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "npm",
+          "children": [
+            {
+              "id": "11bd68e011f3",
+              "kind": "code",
+              "lang": "bash",
+              "text": "npm run swizzle @docusaurus/theme-live-codeblock ReactLiveScope -- --eject\n"
+            }
+          ]
+        },
+        {
+          "label": "Yarn",
+          "children": [
+            {
+              "id": "15c215a5b61d",
+              "kind": "code",
+              "lang": "bash",
+              "text": "yarn swizzle @docusaurus/theme-live-codeblock ReactLiveScope --eject\n"
+            }
+          ]
+        },
+        {
+          "label": "pnpm",
+          "children": [
+            {
+              "id": "11855811803e",
+              "kind": "code",
+              "lang": "bash",
+              "text": "pnpm run swizzle @docusaurus/theme-live-codeblock ReactLiveScope --eject\n"
+            }
+          ]
+        },
+        {
+          "label": "Bun",
+          "children": [
+            {
+              "id": "8c392dcb12ae",
+              "kind": "code",
+              "lang": "bash",
+              "text": "bun run swizzle @docusaurus/theme-live-codeblock ReactLiveScope --eject\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b2efc940f512",
+      "kind": "code",
+      "lang": "jsx",
+      "text": "import React from 'react';\n\nconst ButtonExample = (props) => (\n  <button\n    {...props}\n    style={{\n      backgroundColor: 'white',\n      color: 'black',\n      border: 'solid red',\n      borderRadius: 20,\n      padding: 10,\n      cursor: 'pointer',\n      ...props.style,\n    }}\n  />\n);\n\n// Add react-live imports you need here\nconst ReactLiveScope = {\n  React,\n  ...React,\n  ButtonExample,\n};\n\nexport default ReactLiveScope;\n",
+      "title": "src/theme/ReactLiveScope/index.js"
+    },
+    {
+      "id": "a77e56eb207c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The "
+        },
+        {
+          "text": "ButtonExample",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " component is now available to use:"
+        }
+      ]
+    },
+    {
+      "id": "9abab00beb6d",
+      "kind": "code",
+      "lang": "tsx",
+      "text": "function MyPlayground(props) {\n  return (\n    <div>\n      <ButtonExample onClick={() => alert('hey!')}>Click me</ButtonExample>\n    </div>\n  );\n}\n"
+    },
+    {
+      "id": "c5f3a86234a4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Loading..."
+        }
+      ]
+    },
+    {
+      "id": "f101ca9e869a",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "imperative-rendering-noinline",
+      "content": [
+        {
+          "text": "Imperative Rendering (noInline)"
+        }
+      ]
+    },
+    {
+      "id": "7b64bd153c2b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The "
+        },
+        {
+          "text": "noInline",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " option should be used to avoid errors when your code spans multiple components or variables."
+        }
+      ]
+    },
+    {
+      "id": "b63d60924639",
+      "kind": "code",
+      "lang": "md",
+      "text": "```jsx live noInline\nconst project = 'Docusaurus';\n\nconst Greeting = () => <p>Hello {project}!</p>;\n\nrender(<Greeting />);\n```\n"
+    },
+    {
+      "id": "83bcc6c8604d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Unlike an ordinary interactive code block, when using "
+        },
+        {
+          "text": "noInline",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " React Live won't wrap your code in an inline function to render it."
+        }
+      ]
+    },
+    {
+      "id": "3cbccc671db0",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You will need to explicitly call "
+        },
+        {
+          "text": "render()",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " at the end of your code to display the output."
+        }
+      ]
+    },
+    {
+      "id": "754e0996edbb",
+      "kind": "code",
+      "lang": "tsx",
+      "text": "const project = \"Docusaurus\";\n\nconst Greeting = () => (\n  <p>Hello {project}!</p>\n);\n\nrender(\n  <Greeting />\n);\n"
+    },
+    {
+      "id": "0ec15ad772fc",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Loading..."
+        }
+      ]
+    },
+    {
+      "id": "f94689933734",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "using-jsx-markup",
+      "content": [
+        {
+          "text": "Using JSX markup in code blocks"
+        }
+      ]
+    },
+    {
+      "id": "206a314e6e6a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Code block in Markdown always preserves its content as plain text, meaning you can't do something like:"
+        }
+      ]
+    },
+    {
+      "id": "986aca525727",
+      "kind": "code",
+      "lang": "ts",
+      "text": "type EditUrlFunction = (params: {\n  // This doesn't turn into a link (for good reason!)\n  version: <a href=\"/docs/versioning\">Version</a>;\n  versionDocsDirPath: string;\n  docPath: string;\n  permalink: string;\n  locale: string;\n}) => string | undefined;\n"
+    },
+    {
+      "id": "0da44c1c2edd",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you want to embed HTML markup such as anchor links or bold type, you can use the "
+        },
+        {
+          "text": "<pre>",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " tag, "
+        },
+        {
+          "text": "<code>",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " tag, or "
+        },
+        {
+          "text": "<CodeBlock>",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " component."
+        }
+      ]
+    },
+    {
+      "id": "596e48b41c38",
+      "kind": "code",
+      "lang": "jsx",
+      "text": "<pre>\n  <b>Input: </b>1 2 3 4{'\\n'}\n  <b>Output: </b>\"366300745\"{'\\n'}\n</pre>\n"
+    },
+    {
+      "id": "c98ad6bf274b",
+      "kind": "code",
+      "text": "Input: 1 2 3 4\nOutput: \"366300745\"\n"
+    },
+    {
+      "id": "156f72e36208",
+      "kind": "callout",
+      "variant": "warning",
+      "title": "MDX is whitespace insensitive",
+      "children": [
+        {
+          "id": "39630d065aec",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "MDX is in line with JSX behavior: line break characters, even when inside "
+            },
+            {
+              "text": "<pre>",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", are turned into spaces. You have to explicitly write the new line character for it to be printed out."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "982b460b8c46",
+      "kind": "callout",
+      "variant": "warning",
+      "title": "warning",
+      "children": [
+        {
+          "id": "7c659a01e333",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "Syntax highlighting only works on plain strings. Docusaurus will not attempt to parse code block content containing JSX children."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5aec07240d53",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "multi-language-support-code-blocks",
+      "content": [
+        {
+          "text": "Multi-language support code blocks"
+        }
+      ]
+    },
+    {
+      "id": "2706de20533b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "With MDX, you can easily create interactive components within your documentation, for example, to display code in multiple programming languages and switch between them using a tabs component."
+        }
+      ]
+    },
+    {
+      "id": "fa53d4f52d2e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Instead of implementing a dedicated component for multi-language support code blocks, we've implemented a general-purpose "
+        },
+        {
+          "text": "<Tabs>",
+          "marks": [
+            "code"
+          ],
+          "link": {
+            "href": "https://docusaurus.io/docs/markdown-features/tabs",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " component in the classic theme so that you can use it for other non-code scenarios as well."
+        }
+      ]
+    },
+    {
+      "id": "a87445f61ea7",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The following example is how you can have multi-language code tabs in your docs. Note that the empty lines above and below each language block are "
+        },
+        {
+          "text": "intentional",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": ". This is a "
+        },
+        {
+          "text": "current limitation of MDX",
+          "link": {
+            "href": "https://docusaurus.io/docs/markdown-features/react#markdown-and-jsx-interoperability",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": ": you have to leave empty lines around Markdown syntax for the MDX parser to know that it's Markdown syntax and not JSX."
+        }
+      ]
+    },
+    {
+      "id": "7f5de92413c4",
+      "kind": "code",
+      "lang": "jsx",
+      "text": "import Tabs from '@theme/Tabs';\nimport TabItem from '@theme/TabItem';\n\n<Tabs>\n<TabItem value=\"js\" label=\"JavaScript\">\n\n```js\nfunction helloWorld() {\n  console.log('Hello, world!');\n}\n```\n\n</TabItem>\n<TabItem value=\"py\" label=\"Python\">\n\n```py\ndef hello_world():\n  print(\"Hello, world!\")\n```\n\n</TabItem>\n<TabItem value=\"java\" label=\"Java\">\n\n```java\nclass HelloWorld {\n  public static void main(String args[]) {\n    System.out.println(\"Hello, World\");\n  }\n}\n```\n\n</TabItem>\n</Tabs>\n"
+    },
+    {
+      "id": "ab4d2f478150",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "And you will get the following:"
+        }
+      ]
+    },
+    {
+      "id": "ea1bc3eb4d45",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "JavaScript",
+          "children": [
+            {
+              "id": "933f6073cc2d",
+              "kind": "code",
+              "lang": "js",
+              "text": "function helloWorld() {\n  console.log('Hello, world!');\n}\n"
+            }
+          ]
+        },
+        {
+          "label": "Python",
+          "children": [
+            {
+              "id": "898717be51ab",
+              "kind": "code",
+              "lang": "py",
+              "text": "def hello_world():\n  print(\"Hello, world!\")\n"
+            }
+          ]
+        },
+        {
+          "label": "Java",
+          "children": [
+            {
+              "id": "34c6e275a8bf",
+              "kind": "code",
+              "lang": "java",
+              "text": "class HelloWorld {\n  public static void main(String args[]) {\n    System.out.println(\"Hello, World\");\n  }\n}\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cdec978f6f01",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you have multiple of these multi-language code tabs, and you want to sync the selection across the tab instances, refer to the "
+        },
+        {
+          "text": "Syncing tab choices section",
+          "link": {
+            "href": "https://docusaurus.io/docs/markdown-features/tabs#syncing-tab-choices",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "30465d6ddfab",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "npm2yarn-remark-plugin",
+      "content": [
+        {
+          "text": "Docusaurus npm2yarn remark plugin"
+        }
+      ]
+    },
+    {
+      "id": "53293ac51d69",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Displaying CLI commands in both npm and Yarn is a very common need, for example:"
+        }
+      ]
+    },
+    {
+      "id": "536091468787",
+      "kind": "tabs",
+      "items": [
+        {
+          "label": "npm",
+          "children": [
+            {
+              "id": "7e9f513b3c5d",
+              "kind": "code",
+              "lang": "bash",
+              "text": "npm install @docusaurus/remark-plugin-npm2yarn\n"
+            }
+          ]
+        },
+        {
+          "label": "Yarn",
+          "children": [
+            {
+              "id": "037f6cd087ab",
+              "kind": "code",
+              "lang": "bash",
+              "text": "yarn add @docusaurus/remark-plugin-npm2yarn\n"
+            }
+          ]
+        },
+        {
+          "label": "pnpm",
+          "children": [
+            {
+              "id": "94284cf61ab1",
+              "kind": "code",
+              "lang": "bash",
+              "text": "pnpm add @docusaurus/remark-plugin-npm2yarn\n"
+            }
+          ]
+        },
+        {
+          "label": "Bun",
+          "children": [
+            {
+              "id": "a733e2879ad7",
+              "kind": "code",
+              "lang": "bash",
+              "text": "bun add @docusaurus/remark-plugin-npm2yarn\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e970ffadeef5",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Docusaurus provides such a utility out of the box, freeing you from using the "
+        },
+        {
+          "text": "Tabs",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " component every time. To enable this feature, first install the "
+        },
+        {
+          "text": "@docusaurus/remark-plugin-npm2yarn",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " package as above, and then in "
+        },
+        {
+          "text": "docusaurus.config.js",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", for the plugins where you need this feature (doc, blog, pages, etc.), register it in the "
+        },
+        {
+          "text": "remarkPlugins",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " option. (See "
+        },
+        {
+          "text": "Docs configuration",
+          "link": {
+            "href": "https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-docs#ex-config",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " for more details on configuration format)"
+        }
+      ]
+    },
+    {
+      "id": "f5f93f77a3a7",
+      "kind": "code",
+      "lang": "js",
+      "text": "export default {\n  // ...\n  presets: [\n    [\n      '@docusaurus/preset-classic',\n      {\n        docs: {\n          remarkPlugins: [\n            [require('@docusaurus/remark-plugin-npm2yarn'), {sync: true}],\n          ],\n        },\n        pages: {\n          remarkPlugins: [require('@docusaurus/remark-plugin-npm2yarn')],\n        },\n        blog: {\n          remarkPlugins: [\n            [\n              require('@docusaurus/remark-plugin-npm2yarn'),\n              {converters: ['pnpm']},\n            ],\n          ],\n          // ...\n        },\n      },\n    ],\n  ],\n};\n",
+      "title": "docusaurus.config.js"
+    },
+    {
+      "id": "c0f1b9d300ba",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "And then use it by adding the "
+        },
+        {
+          "text": "npm2yarn",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " key to the code block:"
+        }
+      ]
+    },
+    {
+      "id": "5312638a8940",
+      "kind": "code",
+      "lang": "md",
+      "text": "```bash npm2yarn\nnpm install @docusaurus/remark-plugin-npm2yarn\n```\n"
+    },
+    {
+      "id": "816a42c21258",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "npm2yarn-remark-plugin-configuration",
+      "content": [
+        {
+          "text": "Configuration"
+        }
+      ]
+    },
+    {
+      "id": "373fb028daad",
+      "kind": "table",
+      "head": [
+        [
+          [
+            {
+              "text": "Option"
+            }
+          ],
+          [
+            {
+              "text": "Type"
+            }
+          ],
+          [
+            {
+              "text": "Default"
+            }
+          ],
+          [
+            {
+              "text": "Description"
+            }
+          ]
+        ]
+      ],
+      "rows": [
+        [
+          [
+            {
+              "text": "sync",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "boolean",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "false",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "Whether to sync the selected converter across all code blocks."
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "converters",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "array",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "'yarn'",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": ", "
+            },
+            {
+              "text": "'pnpm'",
+              "marks": [
+                "code"
+              ]
+            }
+          ],
+          [
+            {
+              "text": "The list of converters to use. The order of the converters is important, as the first converter will be used as the default choice."
+            }
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "c47bea556b2e",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "usage-in-jsx",
+      "content": [
+        {
+          "text": "Usage in JSX"
+        }
+      ]
+    },
+    {
+      "id": "a547a668da5a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Outside of Markdown, you can use the "
+        },
+        {
+          "text": "@theme/CodeBlock",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " component to get the same output."
+        }
+      ]
+    },
+    {
+      "id": "0a05787d6cda",
+      "kind": "code",
+      "lang": "jsx",
+      "text": "import CodeBlock from '@theme/CodeBlock';\n\nexport default function MyReactPage() {\n  return (\n    <div>\n      <CodeBlock\n        language=\"jsx\"\n        title=\"/src/components/HelloCodeTitle.js\"\n        showLineNumbers>\n        {`function HelloCodeTitle(props) {\n  return <h1>Hello, {props.name}</h1>;\n}`}\n      </CodeBlock>\n    </div>\n  );\n}\n"
+    },
+    {
+      "id": "1024a784345f",
+      "kind": "code",
+      "lang": "jsx",
+      "text": "function HelloCodeTitle(props) {\nreturn <h1>Hello, {props.name}</h1>;\n}\n",
+      "title": "/src/components/HelloCodeTitle.js"
+    },
+    {
+      "id": "9bb032340d48",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The props accepted are "
+        },
+        {
+          "text": "language",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "title",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " and "
+        },
+        {
+          "text": "showLineNumbers",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", in the same way as you write Markdown code blocks."
+        }
+      ]
+    },
+    {
+      "id": "f729797f8f04",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Although discouraged, you can also pass in a "
+        },
+        {
+          "text": "metastring",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " prop like "
+        },
+        {
+          "text": "metastring='{1-2} title=\"/src/components/HelloCodeTitle.js\" showLineNumbers'",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", which is how Markdown code blocks are handled under the hood. However, we recommend you "
+        },
+        {
+          "text": "use comments for highlighting lines",
+          "link": {
+            "href": "#highlighting-with-comments",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "c4dcba9f3c03",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "As "
+        },
+        {
+          "text": "previously stated",
+          "link": {
+            "href": "#using-jsx-markup",
+            "kind": "anchor"
+          }
+        },
+        {
+          "text": ", syntax highlighting is only applied when the children is a simple string."
+        }
+      ]
+    }
+  ]
+}

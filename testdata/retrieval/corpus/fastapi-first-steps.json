@@ -1,0 +1,2612 @@
+{
+  "ir_version": 1,
+  "title": "First Steps",
+  "source": {
+    "url": "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "final_url": "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "canonical_url": "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "fetched_at": "2026-11-12T17:09:41.46726Z",
+    "body_sha256": "e2ae1e14e3b43f2050411927aafd34bfb73abb5dfb044f1595493688cd865893"
+  },
+  "extractor": {
+    "name": "material",
+    "version": "1"
+  },
+  "blocks": [
+    {
+      "id": "2aa78a0b349f",
+      "kind": "heading",
+      "level": 1,
+      "anchor": "first-steps",
+      "content": [
+        {
+          "text": "First Steps"
+        }
+      ]
+    },
+    {
+      "id": "dc11d0ff662b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "AI coding agents",
+          "marks": [
+            "bold"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "250a3005b8c2",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Use the official FastAPI skill for your installed version. Install it from your project directory:"
+        }
+      ]
+    },
+    {
+      "id": "65fcb22e8b64",
+      "kind": "code",
+      "text": "uvx library-skills\n"
+    },
+    {
+      "id": "283c0636c226",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "See "
+        },
+        {
+          "text": "Develop with AI",
+          "link": {
+            "href": "https://fastapi.tiangolo.com/ai-development/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "0e4c6ccea9a8",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The simplest FastAPI file could look like this:"
+        }
+      ]
+    },
+    {
+      "id": "f50d99758491",
+      "kind": "code",
+      "text": "from fastapi import FastAPI\n\napp = FastAPI()\n\n\n@app.get(\"/\")\nasync def root():\n    return {\"message\": \"Hello World\"}\n"
+    },
+    {
+      "id": "f9c5b0f20892",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Copy that to a file "
+        },
+        {
+          "text": "main.py",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "2cf68536e6f9",
+      "kind": "callout",
+      "variant": "tip",
+      "title": "Tip",
+      "children": [
+        {
+          "id": "8cfe56695e0a",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "FastAPI has an "
+            },
+            {
+              "text": "official extension for VS Code",
+              "link": {
+                "href": "https://marketplace.visualstudio.com/items?itemName=FastAPILabs.fastapi-vscode",
+                "kind": "external"
+              }
+            },
+            {
+              "text": " (and Cursor), which provides a lot of features, including a path operation explorer, path operation search, CodeLens navigation in tests (jump to definition from tests), and FastAPI Cloud deployment and logs, all from your editor."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "198c6393060e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Run the live server:"
+        }
+      ]
+    },
+    {
+      "id": "1ca810853b46",
+      "kind": "code",
+      "lang": "console",
+      "text": "$ uv run fastapi dev\n\n   FastAPI   Starting development server 🚀\n\n             Searching for package file structure from directories\n             with __init__.py files\n             Importing from /home/user/code/awesomeapp\n\n    module   🐍 main.py\n\n      code   Importing the FastAPI app object from the module with\n             the following code:\n\n             <u style=\"text-decoration-style:solid\">from </u><u style=\"text-decoration-style:solid\"><b>main</b></u><u style=\"text-decoration-style:solid\"> import </u><u style=\"text-decoration-style:solid\"><b>app</b></u>\n\n       app   Using import string: main:app\n\n    server   Server started at <u style=\"text-decoration-style:solid\">http://127.0.0.1:8000</u>\n    server   Documentation at <u style=\"text-decoration-style:solid\">http://127.0.0.1:8000/docs</u>\n\n       tip   Running in development mode, for production use:\n             <b>fastapi run</b>\n\n             Logs:\n\n      INFO   Will watch for changes in these directories:\n             <b>[</b>&apos;/home/user/code/awesomeapp&apos;<b>]</b>\n      INFO   Uvicorn running on <u style=\"text-decoration-style:solid\">http://127.0.0.1:8000</u> <b>(</b>Press CTRL+C\n             to quit<b>)</b>\n      INFO   Started reloader process <b>[</b><b>383138</b><b>]</b> using WatchFiles\n      INFO   Started server process <b>[</b><b>383153</b><b>]</b>\n      INFO   Waiting for application startup.\n      INFO   Application startup complete.\n"
+    },
+    {
+      "id": "7d61d11adf39",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In the output, there's a line with something like:"
+        }
+      ]
+    },
+    {
+      "id": "a10d0d814a98",
+      "kind": "code",
+      "text": "INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)\n"
+    },
+    {
+      "id": "696019044ccf",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "That line shows the URL where your app is being served on your local machine."
+        }
+      ]
+    },
+    {
+      "id": "06048d4c95da",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "check-it",
+      "content": [
+        {
+          "text": "Check it"
+        }
+      ]
+    },
+    {
+      "id": "f657dbe3db7f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Open your browser at "
+        },
+        {
+          "text": "http://127.0.0.1:8000",
+          "link": {
+            "href": "http://127.0.0.1:8000",
+            "kind": "external"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "227337208be9",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You will see the JSON response as:"
+        }
+      ]
+    },
+    {
+      "id": "16ce9bbfe5bd",
+      "kind": "code",
+      "text": "{\"message\": \"Hello World\"}\n"
+    },
+    {
+      "id": "a40032255fb5",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "interactive-api-docs",
+      "content": [
+        {
+          "text": "Interactive API docs"
+        }
+      ]
+    },
+    {
+      "id": "6dc4236531cf",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Now go to "
+        },
+        {
+          "text": "http://127.0.0.1:8000/docs",
+          "link": {
+            "href": "http://127.0.0.1:8000/docs",
+            "kind": "external"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "1b06d87a0362",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You will see the automatic interactive API documentation (provided by "
+        },
+        {
+          "text": "Swagger UI",
+          "link": {
+            "href": "https://github.com/swagger-api/swagger-ui",
+            "kind": "external"
+          }
+        },
+        {
+          "text": "):"
+        }
+      ]
+    },
+    {
+      "id": "3d49e5191ce8",
+      "kind": "image",
+      "src": "https://fastapi.tiangolo.com/img/index/index-01-swagger-ui-simple.png",
+      "alt": "Swagger UI"
+    },
+    {
+      "id": "23e20a64063a",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "alternative-api-docs",
+      "content": [
+        {
+          "text": "Alternative API docs"
+        }
+      ]
+    },
+    {
+      "id": "526a7c0b8f75",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "And now, go to "
+        },
+        {
+          "text": "http://127.0.0.1:8000/redoc",
+          "link": {
+            "href": "http://127.0.0.1:8000/redoc",
+            "kind": "external"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "93a0e69cd0da",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You will see the alternative automatic documentation (provided by "
+        },
+        {
+          "text": "ReDoc",
+          "link": {
+            "href": "https://github.com/Redocly/redoc",
+            "kind": "external"
+          }
+        },
+        {
+          "text": "):"
+        }
+      ]
+    },
+    {
+      "id": "bbfeffc835e3",
+      "kind": "image",
+      "src": "https://fastapi.tiangolo.com/img/index/index-02-redoc-simple.png",
+      "alt": "ReDoc"
+    },
+    {
+      "id": "3a3be27a98aa",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "openapi",
+      "content": [
+        {
+          "text": "OpenAPI"
+        }
+      ]
+    },
+    {
+      "id": "180dbbd8e87d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "FastAPI",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " generates a \"schema\" with all your API using the "
+        },
+        {
+          "text": "OpenAPI",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " standard for defining APIs."
+        }
+      ]
+    },
+    {
+      "id": "54d709f1d9ae",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "schema",
+      "content": [
+        {
+          "text": "\"Schema\""
+        }
+      ]
+    },
+    {
+      "id": "26618cf2c0c6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "A \"schema\" is a definition or description of something. Not the code that implements it, but just an abstract description."
+        }
+      ]
+    },
+    {
+      "id": "16ce17739e26",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "api-schema",
+      "content": [
+        {
+          "text": "API \"schema\""
+        }
+      ]
+    },
+    {
+      "id": "e02dbae4ec56",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In this case, "
+        },
+        {
+          "text": "OpenAPI",
+          "link": {
+            "href": "https://github.com/OAI/OpenAPI-Specification",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " is a specification that dictates how to define a schema of your API."
+        }
+      ]
+    },
+    {
+      "id": "a0d8de8ce8b3",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This schema definition includes your API paths, the possible parameters they take, etc."
+        }
+      ]
+    },
+    {
+      "id": "742e90bfba21",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "data-schema",
+      "content": [
+        {
+          "text": "Data \"schema\""
+        }
+      ]
+    },
+    {
+      "id": "d26b5f65065b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The term \"schema\" might also refer to the shape of some data, like a JSON content."
+        }
+      ]
+    },
+    {
+      "id": "00c07477d3bb",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In that case, it would mean the JSON attributes, and data types they have, etc."
+        }
+      ]
+    },
+    {
+      "id": "5a044dc18adb",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "openapi-and-json-schema",
+      "content": [
+        {
+          "text": "OpenAPI and JSON Schema"
+        }
+      ]
+    },
+    {
+      "id": "3225f38809d1",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "OpenAPI defines an API schema for your API. And that schema includes definitions (or \"schemas\") of the data sent and received by your API using "
+        },
+        {
+          "text": "JSON Schema",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": ", the standard for JSON data schemas."
+        }
+      ]
+    },
+    {
+      "id": "0016243542cf",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "check-the-openapi-json",
+      "content": [
+        {
+          "text": "Check the "
+        },
+        {
+          "text": "openapi.json",
+          "marks": [
+            "code"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c74146bcc4c1",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If you are curious about what the raw OpenAPI schema looks like, FastAPI automatically generates a JSON (schema) with the descriptions of all your API."
+        }
+      ]
+    },
+    {
+      "id": "0a2e1a27113e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can see it directly at: "
+        },
+        {
+          "text": "http://127.0.0.1:8000/openapi.json",
+          "link": {
+            "href": "http://127.0.0.1:8000/openapi.json",
+            "kind": "external"
+          }
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "ce95e1b51809",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "It will show a JSON starting with something like:"
+        }
+      ]
+    },
+    {
+      "id": "7b5936df49b1",
+      "kind": "code",
+      "text": "{\n    \"openapi\": \"3.1.0\",\n    \"info\": {\n        \"title\": \"FastAPI\",\n        \"version\": \"0.1.0\"\n    },\n    \"paths\": {\n        \"/items/\": {\n            \"get\": {\n                \"responses\": {\n                    \"200\": {\n                        \"description\": \"Successful Response\",\n                        \"content\": {\n                            \"application/json\": {\n\n\n\n...\n"
+    },
+    {
+      "id": "d6d75ecc571c",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "what-is-openapi-for",
+      "content": [
+        {
+          "text": "What is OpenAPI for"
+        }
+      ]
+    },
+    {
+      "id": "b952f204409f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The OpenAPI schema is what powers the two interactive documentation systems included."
+        }
+      ]
+    },
+    {
+      "id": "f5bd146211e5",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "And there are dozens of alternatives, all based on OpenAPI. You could easily add any of those alternatives to your application built with "
+        },
+        {
+          "text": "FastAPI",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "ca4a419b27b1",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You could also use it to generate code automatically, for clients that communicate with your API. For example, frontend, mobile or IoT applications."
+        }
+      ]
+    },
+    {
+      "id": "c3aa0a0f4ce6",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "configure-the-app-entrypoint-in-pyproject-toml",
+      "content": [
+        {
+          "text": "Configure the app "
+        },
+        {
+          "text": "entrypoint",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in "
+        },
+        {
+          "text": "pyproject.toml",
+          "marks": [
+            "code"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bc9473db424c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can configure where your app is located in a "
+        },
+        {
+          "text": "pyproject.toml",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " file like:"
+        }
+      ]
+    },
+    {
+      "id": "528a066b6dee",
+      "kind": "code",
+      "text": "[tool.fastapi]\nentrypoint = \"main:app\"\n"
+    },
+    {
+      "id": "4f3966b781f7",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "That "
+        },
+        {
+          "text": "entrypoint",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " will tell the "
+        },
+        {
+          "text": "fastapi",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " command that it should import the app like:"
+        }
+      ]
+    },
+    {
+      "id": "2102c7967ea4",
+      "kind": "code",
+      "text": "from main import app\n"
+    },
+    {
+      "id": "c63b83a6abd8",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "If your code was structured like:"
+        }
+      ]
+    },
+    {
+      "id": "38aa86dae261",
+      "kind": "code",
+      "text": ".\n├── backend\n│   ├── main.py\n│   ├── __init__.py\n"
+    },
+    {
+      "id": "561fc1474159",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Then you would set the "
+        },
+        {
+          "text": "entrypoint",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " as:"
+        }
+      ]
+    },
+    {
+      "id": "86ea1917db58",
+      "kind": "code",
+      "text": "[tool.fastapi]\nentrypoint = \"backend.main:app\"\n"
+    },
+    {
+      "id": "1f267a68d97e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "which would be equivalent to:"
+        }
+      ]
+    },
+    {
+      "id": "c58f6daee235",
+      "kind": "code",
+      "text": "from backend.main import app\n"
+    },
+    {
+      "id": "374f96495a0a",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "fastapi-dev-with-path-or-with-entrypoint-cli-option",
+      "content": [
+        {
+          "text": "fastapi dev",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " with path or with "
+        },
+        {
+          "text": "--entrypoint",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " CLI option"
+        }
+      ]
+    },
+    {
+      "id": "699c705fe011",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can also pass the file path to the "
+        },
+        {
+          "text": "fastapi dev",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " command, and it will guess the FastAPI app object to use:"
+        }
+      ]
+    },
+    {
+      "id": "908c553cca88",
+      "kind": "code",
+      "text": "$ uv run fastapi dev main.py\n"
+    },
+    {
+      "id": "aefca94c9eb7",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Or, you can also pass the "
+        },
+        {
+          "text": "--entrypoint",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " option to the "
+        },
+        {
+          "text": "fastapi dev",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " command:"
+        }
+      ]
+    },
+    {
+      "id": "8de0107fce25",
+      "kind": "code",
+      "text": "$ uv run fastapi dev --entrypoint main:app\n"
+    },
+    {
+      "id": "bcd39c5cd69b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "But you would have to remember to pass the correct path\\entrypoint every time you call the "
+        },
+        {
+          "text": "fastapi",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " command."
+        }
+      ]
+    },
+    {
+      "id": "7aaa17f58ed4",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Additionally, other tools might not be able to find it, for example the "
+        },
+        {
+          "text": "VS Code Extension",
+          "link": {
+            "href": "https://fastapi.tiangolo.com/editor-support/",
+            "kind": "same_domain"
+          }
+        },
+        {
+          "text": " or "
+        },
+        {
+          "text": "FastAPI Cloud",
+          "link": {
+            "href": "https://fastapicloud.com",
+            "kind": "external"
+          }
+        },
+        {
+          "text": ", so it is recommended to use the "
+        },
+        {
+          "text": "entrypoint",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " in "
+        },
+        {
+          "text": "pyproject.toml",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "11e83881e1af",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "deploy-your-app-optional",
+      "content": [
+        {
+          "text": "Deploy your app (optional)"
+        }
+      ]
+    },
+    {
+      "id": "21fc2fee45e6",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can optionally deploy your FastAPI app to "
+        },
+        {
+          "text": "FastAPI Cloud",
+          "link": {
+            "href": "https://fastapicloud.com",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " with a single command. 🚀"
+        }
+      ]
+    },
+    {
+      "id": "db6732ef23c0",
+      "kind": "code",
+      "lang": "console",
+      "text": "$ uv run fastapi deploy\n\nDeploying to FastAPI Cloud...\n\n✅ Deployment successful!\n\n🐔 Ready the chicken! Your app is ready at https://myapp.fastapicloud.dev\n"
+    },
+    {
+      "id": "6600b9b7db98",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The CLI will automatically detect your FastAPI application and deploy it to the cloud. If you are not logged in, your browser will open to complete the authentication process."
+        }
+      ]
+    },
+    {
+      "id": "44b69d6637a2",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "That's it! Now you can access your app at that URL. ✨"
+        }
+      ]
+    },
+    {
+      "id": "d5e9ac4fc02a",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "recap-step-by-step",
+      "content": [
+        {
+          "text": "Recap, step by step"
+        }
+      ]
+    },
+    {
+      "id": "24602cdd55e4",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "step-1-import-fastapi",
+      "content": [
+        {
+          "text": "Step 1: import "
+        },
+        {
+          "text": "FastAPI",
+          "marks": [
+            "code"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "97312b795d28",
+      "kind": "code",
+      "text": "from fastapi import FastAPI\n\napp = FastAPI()\n\n\n@app.get(\"/\")\nasync def root():\n    return {\"message\": \"Hello World\"}\n"
+    },
+    {
+      "id": "3f13697b9c6e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "FastAPI",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " is a Python class that provides all the functionality for your API."
+        }
+      ]
+    },
+    {
+      "id": "ba39eabf2bb9",
+      "kind": "callout",
+      "variant": "note",
+      "title": "Technical Details",
+      "children": [
+        {
+          "id": "ca910b886eed",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "FastAPI",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " is a class that inherits directly from "
+            },
+            {
+              "text": "Starlette",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": "."
+            }
+          ]
+        },
+        {
+          "id": "65182efc38dc",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "You can use all the "
+            },
+            {
+              "text": "Starlette",
+              "link": {
+                "href": "https://starlette.dev/",
+                "kind": "external"
+              }
+            },
+            {
+              "text": " functionality with "
+            },
+            {
+              "text": "FastAPI",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " too."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "78ffde5a8737",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "step-2-create-a-fastapi-instance",
+      "content": [
+        {
+          "text": "Step 2: create a "
+        },
+        {
+          "text": "FastAPI",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " \"instance\""
+        }
+      ]
+    },
+    {
+      "id": "c72a68bb65fa",
+      "kind": "code",
+      "text": "from fastapi import FastAPI\n\napp = FastAPI()\n\n\n@app.get(\"/\")\nasync def root():\n    return {\"message\": \"Hello World\"}\n"
+    },
+    {
+      "id": "5e18f2f9c7bc",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Here the "
+        },
+        {
+          "text": "app",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " variable will be an \"instance\" of the class "
+        },
+        {
+          "text": "FastAPI",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "293da3ef332f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This will be the main point of interaction to create all your API."
+        }
+      ]
+    },
+    {
+      "id": "1d054b6b0408",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "step-3-create-a-path-operation",
+      "content": [
+        {
+          "text": "Step 3: create a "
+        },
+        {
+          "text": "path operation",
+          "marks": [
+            "italic"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1b4b2510a80c",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "path",
+      "content": [
+        {
+          "text": "Path"
+        }
+      ]
+    },
+    {
+      "id": "de7443fe1c1f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "\"Path\" here refers to the last part of the URL starting from the first "
+        },
+        {
+          "text": "/",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "797776f0440f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "So, in a URL like:"
+        }
+      ]
+    },
+    {
+      "id": "2c1d4b7ae4c1",
+      "kind": "code",
+      "text": "https://example.com/items/foo\n"
+    },
+    {
+      "id": "aa709328a05d",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "...the path would be:"
+        }
+      ]
+    },
+    {
+      "id": "014842762407",
+      "kind": "code",
+      "text": "/items/foo\n"
+    },
+    {
+      "id": "e8b23b5fe671",
+      "kind": "callout",
+      "variant": "note",
+      "title": "Note",
+      "children": [
+        {
+          "id": "800cbd4d6dd4",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "A \"path\" is also commonly called an \"endpoint\" or a \"route\"."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "98e927089d51",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "While building an API, the \"path\" is the main way to separate \"concerns\" and \"resources\"."
+        }
+      ]
+    },
+    {
+      "id": "fa99a623954b",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "operation",
+      "content": [
+        {
+          "text": "Operation"
+        }
+      ]
+    },
+    {
+      "id": "cbd4b2f65dec",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "\"Operation\" here refers to one of the HTTP \"methods\"."
+        }
+      ]
+    },
+    {
+      "id": "9608f1080646",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "One of:"
+        }
+      ]
+    },
+    {
+      "id": "9b43d571070b",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "4a00aa8b1d47",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "POST",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "4e43f021bf49",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "GET",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "a799802cfad1",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "PUT",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "fc384fab7fbe",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "DELETE",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d769adfbf8ce",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "...and the more exotic ones:"
+        }
+      ]
+    },
+    {
+      "id": "91388cb9e713",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "0f17affc4b21",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "OPTIONS",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "7388a2531a44",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "HEAD",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "2561e302caf8",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "PATCH",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "fc881e54d24d",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "TRACE",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "9ec8ce08492f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In the HTTP protocol, you can communicate to each path using one (or more) of these \"methods\"."
+        }
+      ]
+    },
+    {
+      "id": "6b2762d6ee74",
+      "kind": "divider"
+    },
+    {
+      "id": "3333fec35439",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "When building APIs, you normally use these specific HTTP methods to perform a specific action."
+        }
+      ]
+    },
+    {
+      "id": "86aedf91da09",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Normally you use:"
+        }
+      ]
+    },
+    {
+      "id": "6c6ef3a0ed50",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "7bc2bb7a52d9",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "POST",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ": to create data."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "f79d5a5e2c16",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "GET",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ": to read data."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "0deb947a2164",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "PUT",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ": to update data."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "306ccc3777b5",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "DELETE",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ": to delete data."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e752b485c783",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "So, in OpenAPI, each of the HTTP methods is called an \"operation\"."
+        }
+      ]
+    },
+    {
+      "id": "3dbcb773aa3a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "We are going to call them \""
+        },
+        {
+          "text": "operations",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": "\" too."
+        }
+      ]
+    },
+    {
+      "id": "f075b8aeadd9",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "define-a-path-operation-decorator",
+      "content": [
+        {
+          "text": "Define a "
+        },
+        {
+          "text": "path operation decorator",
+          "marks": [
+            "italic"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c55314a42b21",
+      "kind": "code",
+      "text": "from fastapi import FastAPI\n\napp = FastAPI()\n\n\n@app.get(\"/\")\nasync def root():\n    return {\"message\": \"Hello World\"}\n"
+    },
+    {
+      "id": "a0d00a3224c2",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "The "
+        },
+        {
+          "text": "@app.get(\"/\")",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " tells "
+        },
+        {
+          "text": "FastAPI",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " that the function right below is in charge of handling requests that go to:"
+        }
+      ]
+    },
+    {
+      "id": "826a293b5b36",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "f9ace758895e",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "the path "
+                },
+                {
+                  "text": "/",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "81dbf7344a50",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "using a "
+                },
+                {
+                  "text": "get",
+                  "marks": [
+                    "italic",
+                    "code"
+                  ]
+                },
+                {
+                  "text": " operation",
+                  "marks": [
+                    "italic"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c6a870cef8e5",
+      "kind": "callout",
+      "variant": "note",
+      "title": "@decorator Info",
+      "children": [
+        {
+          "id": "9d125f4b68f1",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "That "
+            },
+            {
+              "text": "@something",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " syntax in Python is called a \"decorator\"."
+            }
+          ]
+        },
+        {
+          "id": "81bc10754d2e",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "You put it on top of a function. Like a pretty decorative hat (I guess that's where the term came from)."
+            }
+          ]
+        },
+        {
+          "id": "aa264a660c23",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "A \"decorator\" takes the function below and does something with it."
+            }
+          ]
+        },
+        {
+          "id": "1fe82800267f",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "In our case, this decorator tells "
+            },
+            {
+              "text": "FastAPI",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "text": " that the function below corresponds to the "
+            },
+            {
+              "text": "path",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "text": " "
+            },
+            {
+              "text": "/",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " with an "
+            },
+            {
+              "text": "operation",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "text": " "
+            },
+            {
+              "text": "get",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": "."
+            }
+          ]
+        },
+        {
+          "id": "b7bc6fd03d71",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "It is the \""
+            },
+            {
+              "text": "path operation decorator",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "text": "\"."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "33ecdad7529c",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can also use the other operations:"
+        }
+      ]
+    },
+    {
+      "id": "16121e19fde5",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "0ffa25cfbf89",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "@app.post()",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "24cc74dbea16",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "@app.put()",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "b9ab41f441a3",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "@app.delete()",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "20758501481e",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "And the more exotic ones:"
+        }
+      ]
+    },
+    {
+      "id": "e74dd8debac3",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "8cccaee75a3c",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "@app.options()",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "a336f0a79562",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "@app.head()",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "e7eb8c861736",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "@app.patch()",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "62bce9a87b3f",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "@app.trace()",
+                  "marks": [
+                    "code"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "237fd1cbd401",
+      "kind": "callout",
+      "variant": "tip",
+      "title": "Tip",
+      "children": [
+        {
+          "id": "1418a91d001a",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "You are free to use each operation (HTTP method) as you wish."
+            }
+          ]
+        },
+        {
+          "id": "e3c55602be87",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "FastAPI",
+              "marks": [
+                "bold"
+              ]
+            },
+            {
+              "text": " doesn't enforce any specific meaning."
+            }
+          ]
+        },
+        {
+          "id": "8a32ed364d17",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "The information here is presented as a guideline, not a requirement."
+            }
+          ]
+        },
+        {
+          "id": "687779ec4d08",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "For example, when using GraphQL you normally perform all the actions using only "
+            },
+            {
+              "text": "POST",
+              "marks": [
+                "code"
+              ]
+            },
+            {
+              "text": " operations."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a52cded8613a",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "step-4-define-the-path-operation-function",
+      "content": [
+        {
+          "text": "Step 4: define the "
+        },
+        {
+          "text": "path operation function",
+          "marks": [
+            "bold"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6da0c829567f",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This is our \""
+        },
+        {
+          "text": "path operation function",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": "\":"
+        }
+      ]
+    },
+    {
+      "id": "a204d30b7f2e",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "fa8f61d6711b",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "path",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                {
+                  "text": ": is "
+                },
+                {
+                  "text": "/",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "08e13c43620b",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "operation",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                {
+                  "text": ": is "
+                },
+                {
+                  "text": "get",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "109207c178f9",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "function",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                {
+                  "text": ": is the function below the \"decorator\" (below "
+                },
+                {
+                  "text": "@app.get(\"/\")",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": ")."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "9f39eba8e864",
+      "kind": "code",
+      "text": "from fastapi import FastAPI\n\napp = FastAPI()\n\n\n@app.get(\"/\")\nasync def root():\n    return {\"message\": \"Hello World\"}\n"
+    },
+    {
+      "id": "b69647607c23",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "This is a Python function."
+        }
+      ]
+    },
+    {
+      "id": "507759f673dd",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "It will be called by "
+        },
+        {
+          "text": "FastAPI",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " whenever it receives a request to the URL \""
+        },
+        {
+          "text": "/",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": "\" using a "
+        },
+        {
+          "text": "GET",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " operation."
+        }
+      ]
+    },
+    {
+      "id": "7ea5ca91dd95",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "In this case, it is an "
+        },
+        {
+          "text": "async",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": " function."
+        }
+      ]
+    },
+    {
+      "id": "041a573a760b",
+      "kind": "divider"
+    },
+    {
+      "id": "2f3de3535a96",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You could also define it as a normal function instead of "
+        },
+        {
+          "text": "async def",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ":"
+        }
+      ]
+    },
+    {
+      "id": "bc62c75734bd",
+      "kind": "code",
+      "text": "from fastapi import FastAPI\n\napp = FastAPI()\n\n\n@app.get(\"/\")\ndef root():\n    return {\"message\": \"Hello World\"}\n"
+    },
+    {
+      "id": "b74aed436a14",
+      "kind": "callout",
+      "variant": "note",
+      "title": "Note",
+      "children": [
+        {
+          "id": "ed182eae7b13",
+          "kind": "paragraph",
+          "content": [
+            {
+              "text": "If you don't know the difference, check the "
+            },
+            {
+              "text": "Async: ",
+              "link": {
+                "href": "https://fastapi.tiangolo.com/async/#in-a-hurry",
+                "kind": "same_domain"
+              }
+            },
+            {
+              "text": "\"In a hurry?\"",
+              "marks": [
+                "italic"
+              ],
+              "link": {
+                "href": "https://fastapi.tiangolo.com/async/#in-a-hurry",
+                "kind": "same_domain"
+              }
+            },
+            {
+              "text": "."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d9d5dc9a83db",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "step-5-return-the-content",
+      "content": [
+        {
+          "text": "Step 5: return the content"
+        }
+      ]
+    },
+    {
+      "id": "ae50a16a252e",
+      "kind": "code",
+      "text": "from fastapi import FastAPI\n\napp = FastAPI()\n\n\n@app.get(\"/\")\nasync def root():\n    return {\"message\": \"Hello World\"}\n"
+    },
+    {
+      "id": "0c38ac4e8f19",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can return a "
+        },
+        {
+          "text": "dict",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "list",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", singular values as "
+        },
+        {
+          "text": "str",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "int",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ", etc."
+        }
+      ]
+    },
+    {
+      "id": "4e57ef338e7b",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "You can also return Pydantic models (you'll see more about that later)."
+        }
+      ]
+    },
+    {
+      "id": "88c310161609",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "There are many other objects and models that will be automatically converted to JSON (including ORMs, etc). Try using your favorite ones, it's highly probable that they are already supported."
+        }
+      ]
+    },
+    {
+      "id": "9befca9ccfad",
+      "kind": "heading",
+      "level": 3,
+      "anchor": "step-6-deploy-it",
+      "content": [
+        {
+          "text": "Step 6: Deploy it"
+        }
+      ]
+    },
+    {
+      "id": "f4082da64355",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Deploy your app to "
+        },
+        {
+          "text": "FastAPI Cloud",
+          "marks": [
+            "bold"
+          ],
+          "link": {
+            "href": "https://fastapicloud.com",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " with one command: "
+        },
+        {
+          "text": "fastapi deploy",
+          "marks": [
+            "code"
+          ]
+        },
+        {
+          "text": ". 🎉"
+        }
+      ]
+    },
+    {
+      "id": "5717e51dd860",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "about-fastapi-cloud",
+      "content": [
+        {
+          "text": "About FastAPI Cloud"
+        }
+      ]
+    },
+    {
+      "id": "02ddf6b68276",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "FastAPI Cloud",
+          "marks": [
+            "bold"
+          ],
+          "link": {
+            "href": "https://fastapicloud.com",
+            "kind": "external"
+          }
+        },
+        {
+          "text": " is built by the same author and team behind "
+        },
+        {
+          "text": "FastAPI",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": "."
+        }
+      ]
+    },
+    {
+      "id": "3ea91028b7f8",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "It streamlines the process of "
+        },
+        {
+          "text": "building",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": ", "
+        },
+        {
+          "text": "deploying",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": ", and "
+        },
+        {
+          "text": "accessing",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " an API with minimal effort."
+        }
+      ]
+    },
+    {
+      "id": "85a4e1d986ac",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "It brings the same "
+        },
+        {
+          "text": "developer experience",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " of building apps with FastAPI to "
+        },
+        {
+          "text": "deploying",
+          "marks": [
+            "bold"
+          ]
+        },
+        {
+          "text": " them to the cloud. 🎉"
+        }
+      ]
+    },
+    {
+      "id": "3de7d0a68991",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "FastAPI Cloud is the primary sponsor and funding provider for the "
+        },
+        {
+          "text": "FastAPI and friends",
+          "marks": [
+            "italic"
+          ]
+        },
+        {
+          "text": " open source projects. ✨"
+        }
+      ]
+    },
+    {
+      "id": "fbeab6dfb180",
+      "kind": "heading",
+      "level": 4,
+      "anchor": "deploy-to-other-cloud-providers",
+      "content": [
+        {
+          "text": "Deploy to other cloud providers"
+        }
+      ]
+    },
+    {
+      "id": "2aac5ddded7a",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "FastAPI is open source and based on standards. You can deploy FastAPI apps to any cloud provider you choose."
+        }
+      ]
+    },
+    {
+      "id": "97ee1e8dfc90",
+      "kind": "paragraph",
+      "content": [
+        {
+          "text": "Follow your cloud provider's guides to deploy FastAPI apps with them. 🤓"
+        }
+      ]
+    },
+    {
+      "id": "3800bff42384",
+      "kind": "heading",
+      "level": 2,
+      "anchor": "recap",
+      "content": [
+        {
+          "text": "Recap"
+        }
+      ]
+    },
+    {
+      "id": "7bef5c67f693",
+      "kind": "list",
+      "items": [
+        {
+          "children": [
+            {
+              "id": "7ace4688667f",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Import "
+                },
+                {
+                  "text": "FastAPI",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "61e7327b511a",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Create an "
+                },
+                {
+                  "text": "app",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": " instance."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "60733e44027e",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Write a "
+                },
+                {
+                  "text": "path operation decorator",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                {
+                  "text": " using decorators like "
+                },
+                {
+                  "text": "@app.get(\"/\")",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "65e80e2eea8c",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Define a "
+                },
+                {
+                  "text": "path operation function",
+                  "marks": [
+                    "bold"
+                  ]
+                },
+                {
+                  "text": "; for example, "
+                },
+                {
+                  "text": "def root(): ...",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "27ceef8e3b80",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Run the development server using the command "
+                },
+                {
+                  "text": "fastapi dev",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "a31858e10f54",
+              "kind": "paragraph",
+              "content": [
+                {
+                  "text": "Optionally deploy your app with "
+                },
+                {
+                  "text": "fastapi deploy",
+                  "marks": [
+                    "code"
+                  ]
+                },
+                {
+                  "text": "."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

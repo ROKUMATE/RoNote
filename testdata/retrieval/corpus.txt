@@ -1,0 +1,27 @@
+# The eval's corpus, one extraction per line, from the repository root:
+# whole pages (corpus/) and the golden fixtures cut from real pages.
+# testdata/retrieval/SOURCES.md has each one's source and licence.
+testdata/retrieval/corpus/docusaurus-code-blocks.json
+testdata/retrieval/corpus/effective-go.json
+testdata/retrieval/corpus/fastapi-first-steps.json
+testdata/retrieval/corpus/kubernetes-pods.json
+testdata/retrieval/corpus/mdn-closures.json
+testdata/retrieval/corpus/postgres-select.json
+testdata/retrieval/corpus/python-controlflow.json
+testdata/retrieval/corpus/requests-quickstart.json
+testdata/retrieval/corpus/rust-data-types.json
+testdata/retrieval/corpus/vite-guide.json
+testdata/golden/docbook-postgres-select/expected.json
+testdata/golden/docsy-k8s-pods/expected.json
+testdata/golden/docusaurus-code-blocks/expected.json
+testdata/golden/godev-getting-started/expected.json
+testdata/golden/material-code-blocks/expected.json
+testdata/golden/material-fastapi-first-steps/expected.json
+testdata/golden/mdbook-rust-data-types/expected.json
+testdata/golden/real-go-effective-go/expected.json
+testdata/golden/real-kubernetes-pods/expected.json
+testdata/golden/real-python-controlflow/expected.json
+testdata/golden/sphinx-requests-quickstart/expected.json
+testdata/golden/starlight-tabs/expected.json
+testdata/golden/vitepress-markdown/expected.json
+testdata/golden/vitepress-vite-guide/expected.json

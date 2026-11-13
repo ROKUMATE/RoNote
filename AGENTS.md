@@ -14,7 +14,7 @@ Out of scope for v1: site crawling, AI summaries, handwritten OCR, pseudocode co
 
 | Path | Holds |
 |---|---|
-| `cmd/` | `api`, `worker`, and `extract` (a dev tool) |
+| `cmd/` | `api`, `worker`; dev tools `extract`, `eval`, `fakeidp`, `fakeembed` |
 | `internal/<pkg>/` | Go packages, one concern each |
 | `internal/jobs/` | the jobs port (docs/adr/0009-jobs-port.md); only `riverjobs` may import River |
 | `migrations/` | goose migrations; goose owns all schema, River's included |
@@ -37,6 +37,8 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make test` | `test-go` (with `-race`) and `test-web` (Vitest) |
 | `make test-perf` | timing tests alone (`perf` tag, one package at a time) |
 | `make test-integration` | unit and integration tests on testcontainers |
+| `make eval` / `eval-record` | the retrieval eval on recorded vectors, gated on `baseline.json` / re-record them through the model |
+| `make test-perf-search` | search timing over large libraries; local only |
 | `make test-live` | extract the live pages and check the RAG tutorial; network, never CI |
 | `make hooks-test` | test the commit hook and the scripts |
 | `make check-commits RANGE=main..HEAD` | check each commit message in strict mode |
@@ -47,7 +49,7 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make run-idp` | the fake GitHub sign-in on `127.0.0.1:8090` (`web-dev` starts it too) |
 | `make stop` | end what `run-api`, `run-worker`, `run-idp` and `web-dev` started |
 | `make dev-up` / `dev-down` | start / stop the dev stack (Postgres) |
-| `make doctor` | check the container VM's clock against the host's |
+| `make doctor` | check the container VM's clock, and that the pinned embedding model answers |
 | `make generate` / `check-generated` | regenerate sqlc and OpenAPI output / fail if stale |
 | `make migrate-up` / `migrate-new name=...` | apply / create goose migrations |
 | `make extract url=...` | print one page's IR |

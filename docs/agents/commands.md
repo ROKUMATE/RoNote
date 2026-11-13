@@ -20,6 +20,9 @@ Every make target and what it runs, in detail. AGENTS.md keeps one line each.
 | `make test-perf` | timing tests alone: files tagged `perf`, tests named `TestPerf...`, run with `go test -tags perf -p 1` (one package at a time) and without the race detector. A timing test checks growth (time for 2n against n), never an absolute duration, and lives only here: `make test` and `make test-integration` never build it |
 | `make test-web` | web unit tests (Vitest, jsdom) |
 | `make test-integration` | unit and integration tests (`integration` build tag, testcontainers); fails if a test container is left behind |
+| `make test-perf-search` | search timing over 5k to 25k chunks for one user among 200,000 others (`perf` and `integration` tags); local only, minutes, and a container. Checks growth; logs p50 and p95 |
+| `make eval` | the retrieval eval (`cmd/eval`): loads `testdata/retrieval` into a throwaway Postgres, replays the recorded vectors (no model), prints recall, MRR and nDCG per category by words, meaning and hybrid, and fails when hybrid falls more than 0.02 below `baseline.json` or meaning stops beating words on paraphrases. CI runs it in the integration job |
+| `make eval-record` | embeds the eval's corpus and queries through `RONOTE_EMBED_URL` and records the vectors; run it when chunking, the corpus, the queries or the model change, then `go run ./cmd/eval -update-baseline` to accept the new numbers |
 | `make test-live` | extract the real pages listed in `internal/extract/live_test.go` over the network and print a table: adapter, blocks, code found vs an independent count, verbatim check, warnings, junk; then `apps/web/live/rag.test.ts` extracts the RAG tutorial and fails if any of its code blocks would offer Run. Needs the network, so it never runs in CI |
 | `make test-clean` | remove leftover testcontainers containers |
 | `make web-install` | `web-deps` and `web-browsers` |
@@ -34,7 +37,7 @@ Every make target and what it runs, in detail. AGENTS.md keeps one line each.
 | `make run-idp` | run the fake GitHub sign-in alone (`cmd/fakeidp`, `127.0.0.1:8090`), offering the users in `RONOTE_FAKEIDP_USERS` (default `deploy/fakeidp/dev-users.json`); dev only (docs/adr/0010-sign-in-and-sessions.md) |
 | `make extract url=... [format=text]` | fetch one page with the production fetcher rules and print its IR as JSON, or as readable text |
 | `make dev` (P0x) | run API, worker and web locally |
-| `make doctor` | check the local setup: the container VM's clock is within 2s of the host's (podman machine, or Docker's VM). On failure it prints the offset and the fix, such as `podman machine ssh sudo chronyc makestep` |
+| `make doctor` | check the local setup: the container VM's clock is within 2s of the host's (podman machine, or Docker's VM), and the embedder at `RONOTE_EMBED_URL` serves `RONOTE_EMBED_MODEL`, the pinned Ollama build (`scripts/embed-check.sh`). On failure each prints the fix, such as `podman machine ssh sudo chronyc makestep` or `ollama pull qwen3-embedding:0.6b` |
 | `make dev-up` | start the dev stack (`deploy/compose.dev.yml`) and wait until healthy; creates `.env.dev` if missing |
 | `make stop` | end what `make run-api`, `make run-worker`, `make run-idp` and `make web-dev` started, with everything they started (such as the binary `go run` builds): each runs through `scripts/run.sh`, which records its process group in `.run/`; `scripts/stop.sh` sends TERM to each group, then KILL after 5s |
 | `make dev-down` | `make stop`, then stop the dev stack; the data volume is kept |

@@ -35,3 +35,9 @@ entry when a phase settles it; add one when a phase leaves something open.
 - A rate-limited sign-in (`/api/v1/auth/github/*`) answers the JSON envelope to a browser navigation; a person sees raw JSON. Rare at 20 a minute per IP.
 - An import job already queued when its user deletes the account ends as permanent (its import is gone) and logs at error level.
 - The e2e users file holds 16 worker users; more Playwright workers than that fail at sign-in with a message saying so.
+- Search: queries with no answer score a best cosine similarity of up to 0.60, and answerable ones as low as 0.29, so P17 needs more than a similarity threshold to say "I don't know". RRF's fused score carries no signal for it.
+- Search: identifiers, errors and how-to questions are at recall@10 1.0 on the eval; paraphrases (0.85) and questions across two documents (0.90) are where it misses. The eval's 80 queries were written by the agent; 20 are marked for review.
+- The fake embedder (`cmd/fakeembed`) matches by shared words, so end-to-end tests check the plumbing of search by meaning, not its quality; `make eval` checks that.
+- A search result lands on its chunk's first block; a result whose words are further into the chunk lands a little above them.
+- Effective Go never names `ServeMux`: searching it finds `ServeHTTP` and `HandlerFunc` code by meaning, not an exact match.
+

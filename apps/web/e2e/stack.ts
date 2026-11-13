@@ -2,6 +2,8 @@
 export const stack = {
   web: "http://127.0.0.1:5180",
   api: "http://127.0.0.1:18080",
+  // A second API whose embedder is down, for degraded search.
+  apiDegraded: "http://127.0.0.1:18082",
   // localhost, not the web app's 127.0.0.1: cookies ignore ports.
   runner: "http://localhost:5181",
   // A name, not an IP: the API refuses IP-literal hosts.

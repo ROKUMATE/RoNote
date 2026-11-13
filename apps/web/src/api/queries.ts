@@ -84,6 +84,28 @@ export function linkTargets(id: string, hrefs: readonly string[]) {
   });
 }
 
+/** How many results the search palette shows. */
+const searchLimit = 20;
+
+/**
+ * The user's library searched for q, or one document of it. Under the
+ * documents key, so a finished import or a save refreshes it.
+ */
+export function searchQuery(q: string, documentId?: string) {
+  return queryOptions({
+    queryKey: [...documentsKey, "search", q, documentId ?? ""],
+    enabled: q.trim() !== "",
+    queryFn: async () =>
+      dataOrThrow(
+        await api.GET("/search", {
+          params: {
+            query: { q, limit: searchLimit, ...(documentId ? { document_id: documentId } : {}) },
+          },
+        }),
+      ),
+  });
+}
+
 /** One document with its content. */
 export function documentQuery(id: string) {
   return queryOptions({

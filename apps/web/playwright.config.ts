@@ -97,6 +97,20 @@ export default defineConfig({
       gracefulShutdown: stop,
     },
     {
+      name: "api, embedder down",
+      command: "bin/e2e/api",
+      cwd: "../..",
+      // Port 9 is discard: nothing listens, so every embedding is refused.
+      env: {
+        ...backend,
+        RONOTE_HTTP_ADDR: new URL(stack.apiDegraded).host,
+        RONOTE_EMBED_URL: "http://127.0.0.1:9/v1",
+      },
+      url: `${stack.apiDegraded}/readyz`,
+      reuseExistingServer: false,
+      gracefulShutdown: stop,
+    },
+    {
       name: "worker",
       command: "bin/e2e/worker",
       cwd: "../..",

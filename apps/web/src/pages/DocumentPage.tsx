@@ -1,15 +1,16 @@
 import { ArrowSquareOutIcon } from "@phosphor-icons/react/ArrowSquareOut";
 import { InfoIcon } from "@phosphor-icons/react/Info";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useParams, useRouterState } from "@tanstack/react-router";
+import { Link, useParams, useRouterState, useSearch } from "@tanstack/react-router";
 import type { Editor } from "@tiptap/core";
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { ApiError } from "../api/client";
 import { requestErrorMessages } from "../api/messages";
 import { documentQuery, linkTargets } from "../api/queries";
 import type { Document, IrWarning } from "../api/schema";
 import { CodeLangsContext } from "../document/codeLangs";
 import { blockCounts } from "../document/counts";
+import { landOn } from "../document/landOn";
 import { sameDomainHrefs } from "../document/links";
 import { Outline } from "../document/Outline";
 import { Reader } from "../document/Reader";
@@ -95,6 +96,11 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
   const targets = useQuery(linkTargets(doc.id, hrefs)).data;
   const { follow, following } = useFollow(targets);
   useScrollAnchor(editor?.view);
+  // A search result lands on its block.
+  const { block } = useSearch({ from: "/shell/doc/$id" });
+  useEffect(() => {
+    if (editor && block) landOn(editor.view, block);
+  }, [editor, block]);
   return (
     <CodeLangsContext value={codeLangs}>
       <RunScopeProvider documentId={doc.id} blocks={doc.content.blocks}>

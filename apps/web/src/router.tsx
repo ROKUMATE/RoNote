@@ -42,9 +42,14 @@ const libraryRoute = createRoute({
 });
 
 /** The document reader and editor, with everything it needs, is its own chunk. */
+/** What /doc/$id reads from its query: the block to land on, from a search. */
+export type DocumentSearch = { block?: string };
+
 const documentRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: "/doc/$id",
+  validateSearch: (search: Record<string, unknown>): DocumentSearch =>
+    typeof search.block === "string" && search.block !== "" ? { block: search.block } : {},
   component: lazyRouteComponent(() => import("./pages/DocumentPage"), "DocumentPage"),
 });
 

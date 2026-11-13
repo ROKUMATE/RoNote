@@ -37,6 +37,6 @@ Each file is `go run ./cmd/extract --format=json <url>`, fetched on 2026-11-12, 
 - `multidoc` (10): an answer that needs a block from each of two documents; all of `expect` counts;
 - `none` (8): no answer in the corpus.
 
-For every category but `multidoc`, any one expected block answers the query. Queries marked `review` are the ones whose expected blocks are most open to judgement.
+For every category but `multidoc`, any one expected block answers the query. Queries marked `review` are the ones whose expected blocks are most open to judgement; `make eval-review` lists each with its expected blocks and hybrid's top 5.
 
 `vectors-qwen3-embedding-0.6b.bin` holds every chunk's and query's embedding, recorded by `make eval-record`, keyed by the SHA-256 of the text embedded, in half precision.

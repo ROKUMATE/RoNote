@@ -284,6 +284,11 @@ func (c *chunker) render(b *ir.Block) part {
 	return p
 }
 
+// BlockText is a top-level block's text as a chunk holds it.
+func BlockText(b *ir.Block) string {
+	return (&chunker{}).render(b).text()
+}
+
 // lang is a code block's language: the user's choice over the page's.
 func (c *chunker) lang(b *ir.Block) string {
 	if l, ok := c.langs[b.ID]; ok && l != "plaintext" {

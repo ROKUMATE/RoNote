@@ -9,11 +9,12 @@
 // below baseline.json, or when meaning no longer beats words on paraphrases
 // (as broken vectors would make it).
 //
-//	go run ./cmd/eval [-record] [-update-baseline]
+//	go run ./cmd/eval [-record] [-update-baseline] [-review]
 //
 // -record embeds everything through RONOTE_EMBED_URL and RONOTE_EMBED_MODEL
 // (make eval-record) and writes the vectors; -update-baseline writes this
-// run's hybrid metrics as the baseline.
+// run's hybrid metrics as the baseline. -review (make eval-review) prints the
+// queries marked for review instead of measuring, and writes nothing.
 package main
 
 import (
@@ -57,9 +58,14 @@ const (
 func main() {
 	record := flag.Bool("record", false, "embed the corpus and queries with the configured model and record the vectors")
 	updateBaseline := flag.Bool("update-baseline", false, "write this run's hybrid metrics as the baseline")
+	reviewOnly := flag.Bool("review", false, "print the queries marked for review with their expected blocks and hybrid's top 5, and write nothing")
 	flag.Parse()
+	if *reviewOnly && (*record || *updateBaseline) {
+		fmt.Fprintln(os.Stderr, "eval: -review writes nothing, so it can't go with -record or -update-baseline")
+		os.Exit(2)
+	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	err := run(ctx, *record, *updateBaseline)
+	err := run(ctx, options{record: *record, updateBaseline: *updateBaseline, review: *reviewOnly})
 	stop()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "eval:", err)
@@ -90,7 +96,11 @@ func (m metrics) values() []float64 { return []float64{m.Recall5, m.Recall10, m.
 
 var metricNames = []string{"recall@5", "recall@10", "mrr@10", "ndcg@10"}
 
-func run(ctx context.Context, record, updateBaseline bool) error {
+type options struct {
+	record, updateBaseline, review bool
+}
+
+func run(ctx context.Context, opts options) error {
 	docs, err := loadCorpus(filepath.Join(dir, "corpus.txt"))
 	if err != nil {
 		return err
@@ -119,7 +129,7 @@ func run(ctx context.Context, record, updateBaseline bool) error {
 
 	var embedder embed.Embedder
 	var recorded *embed.Vectors
-	if record {
+	if opts.record {
 		recorded = embed.NewVectors(model)
 		embedder = recorder{Embedder: embed.NewClient(envOr("RONOTE_EMBED_URL", config.DefaultEmbedURL), model), vectors: recorded}
 	} else {
@@ -138,7 +148,8 @@ func run(ctx context.Context, record, updateBaseline bool) error {
 	discard := slog.New(slog.DiscardHandler)
 	indexer := search.NewIndexer(st, embedder, discard)
 	chunks := 0
-	for _, d := range docs {
+	ids := make([]uuid.UUID, len(docs))
+	for i, d := range docs {
 		id, err := st.AddDocument(ctx, user.ID, d.url, d.doc)
 		if err != nil {
 			return fmt.Errorf("%s: %w", d.path, err)
@@ -148,10 +159,14 @@ func run(ctx context.Context, record, updateBaseline bool) error {
 			return fmt.Errorf("%s: %w", d.path, err)
 		}
 		chunks += r.Chunks
+		ids[i] = id
 	}
 	fmt.Printf("Corpus: %d documents, %d chunks; %d queries; model %s\n\n", len(docs), chunks, len(queries), model)
 
-	if record {
+	if opts.review {
+		return review(ctx, st, search.NewSearcher(st, embedder, discard), user.ID, docs, ids, queries)
+	}
+	if opts.record {
 		inputs := make([]string, len(queries))
 		for i, q := range queries {
 			inputs[i] = search.QueryPrefix + q.Query
@@ -196,7 +211,7 @@ func run(ctx context.Context, record, updateBaseline bool) error {
 			"meaning beats words on paraphrases' recall@10 by %.2f, want at least %.2f: are the vectors pooled right, and do queries carry their prefix?", p, paraphraseMargin))
 	}
 	baselinePath := filepath.Join(dir, "baseline.json")
-	if updateBaseline {
+	if opts.updateBaseline {
 		rounded := map[string]metrics{}
 		for cat, m := range results["hybrid"] {
 			r := func(x float64) float64 { return math.Round(x*1e4) / 1e4 }
@@ -224,6 +239,14 @@ func run(ctx context.Context, record, updateBaseline bool) error {
 type document struct {
 	path, url string
 	doc       *ir.Doc
+}
+
+// name is the document's file, or its golden fixture's.
+func (d document) name() string {
+	if filepath.Base(d.path) == "expected.json" {
+		return "golden " + filepath.Base(filepath.Dir(d.path))
+	}
+	return strings.TrimSuffix(filepath.Base(d.path), ".json")
 }
 
 func loadCorpus(manifest string) ([]document, error) {

@@ -92,7 +92,7 @@ func TestChunkGoldens(t *testing.T) {
 // TestChunkRules checks every fixture against the rules: each top-level
 // block in exactly one chunk, in order; each code block's text whole in one
 // chunk; chunks within the limit unless one block is larger; breadcrumbs
-// from the title.
+// from the title; a chunk of one block holding its BlockText.
 func TestChunkRules(t *testing.T) {
 	t.Parallel()
 	for name, doc := range fixtures(t) {
@@ -112,12 +112,19 @@ func TestChunkRules(t *testing.T) {
 			}
 		}
 		var want []string
+		texts := map[string]string{}
 		for _, b := range content.Blocks {
 			if b.Kind == ir.KindHeading || b.Kind == ir.KindDivider {
 				continue
 			}
-			if r := (&chunker{}).render(&b.Block); r.size > 0 {
+			if text := BlockText(&b.Block); text != "" {
 				want = append(want, b.ID)
+				texts[b.ID] = text
+			}
+		}
+		for _, c := range chunks {
+			if len(c.BlockIDs) == 1 && c.Text != texts[c.BlockIDs[0]] {
+				t.Errorf("%s: chunk %v holds %q, want its block's text %q", name, c.BlockIDs, cut(c.Text, 40), cut(texts[c.BlockIDs[0]], 40))
 			}
 		}
 		if !slices.Equal(order, want) {

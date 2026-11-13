@@ -177,6 +177,9 @@ eval: ## Measure search on the retrieval eval with recorded vectors; fails below
 eval-record: ## Embed the eval's corpus and queries through RONOTE_EMBED_URL and record the vectors (needs the model)
 	sh scripts/container.sh test go run ./cmd/eval -record
 
+eval-review: ## List the eval's queries marked for review: expected blocks and hybrid's top 5 (writes nothing)
+	sh scripts/container.sh test go run ./cmd/eval -review
+
 test-perf-search: ## Time search over 5k-25k chunks for one user, among 200,000 others (local only: minutes, and a container)
 	sh scripts/container.sh test go test -tags perf,integration -p 1 -count=1 -timeout 30m -run '^TestPerfSearch' -v ./internal/search
 
@@ -216,5 +219,5 @@ web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromiu
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp extract lint lint-go lint-web fmt
 .PHONY: doctor stop dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
-.PHONY: test-integration eval eval-record test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
+.PHONY: test-integration eval eval-record eval-review test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
 .PHONY: web-dev web-build web-e2e

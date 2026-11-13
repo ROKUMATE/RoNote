@@ -38,6 +38,7 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make test-perf` | timing tests alone (`perf` tag, one package at a time) |
 | `make test-integration` | unit and integration tests on testcontainers |
 | `make eval` / `eval-record` | the retrieval eval on recorded vectors, gated on `baseline.json` / re-record them through the model |
+| `make eval-review` | the eval's queries marked for review, with their expected blocks and hybrid's top 5 |
 | `make test-perf-search` | search timing over large libraries; local only |
 | `make test-live` | extract the live pages and check the RAG tutorial; network, never CI |
 | `make hooks-test` | test the commit hook and the scripts |

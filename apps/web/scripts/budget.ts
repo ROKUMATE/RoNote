@@ -20,6 +20,8 @@ const budgets = {
   annotations: 15_000,
   /** Running code: classifier, controls, output and runner client, loaded with code (ADR 0008). */
   run: 20_000,
+  /** The search palette, loaded the first time it opens (ADR 0011). */
+  search: 6_000,
   /** All stylesheets. */
   css: 20_000,
 };
@@ -67,6 +69,7 @@ const groups = {
   highlighter: closure(entry("src/document/highlighter.ts"), seen),
   annotations: closure(entry("src/document/annotations/ui.tsx"), seen),
   run: closure(entry("src/document/run/ui.tsx"), seen),
+  search: closure(entry("src/search/SearchPalette.tsx"), seen),
 };
 const languages = Object.keys(manifest).filter(
   (k) => !seen.has(k) && manifest[k]?.file.endsWith(".js"),

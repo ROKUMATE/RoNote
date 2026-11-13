@@ -40,3 +40,6 @@ globalThis.ResizeObserver ??= class {
   unobserve() {}
   disconnect() {}
 } as unknown as typeof ResizeObserver;
+
+// jsdom doesn't scroll; keeping a list's active option in view does nothing.
+Element.prototype.scrollIntoView ??= () => {};

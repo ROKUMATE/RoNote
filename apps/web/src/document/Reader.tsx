@@ -10,6 +10,7 @@ import { linkAction, openOriginal } from "./follow";
 import { Highlights, placements } from "./highlights";
 import { BlockIdentityPlugin, revertMeta } from "./identity";
 import { type InsertAt, insertUserBlock, SlashMenu, topLevelBlockAt } from "./insert";
+import { Landing } from "./landOn";
 import { LinkStatus, setLinkTargets } from "./linkStatus";
 import { followHelpId, type LinkTargets } from "./links";
 import { toEditor, topLevelNode } from "./mapping";
@@ -65,6 +66,7 @@ export function Reader({
       BlockIdentityPlugin.configure({ onRevert: setReverting }),
       LinkStatus,
       Highlights,
+      Landing,
     ],
     content: toEditor(content),
     immediatelyRender: true,

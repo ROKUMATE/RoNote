@@ -582,3 +582,38 @@
 .reader .ProseMirror pre {
   white-space: pre;
 }
+
+/* A search result's block flashes once where it lands (src/document/landOn.ts,
+   which clears the mark after the 900 ms): a layer of the highlight colour
+   behind it fades out. Opacity only, and nothing at all under reduced motion. */
+.reader .landed {
+  position: relative;
+  isolation: isolate;
+}
+
+.reader .landed::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  z-index: -1;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-mark);
+  opacity: 0;
+  pointer-events: none;
+  animation: landed 900ms ease-out 1;
+}
+
+@keyframes landed {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reader .landed::after {
+    animation: none;
+  }
+}

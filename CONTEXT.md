@@ -4,45 +4,36 @@ The project's state, in at most 80 lines and 6 KB (`make lint` checks). Rewrite 
 
 ## Current milestone
 
-P15, sign-in, sessions, quotas and account deletion: done (ADR 0010).
-- **Sign-in:**
-  - GitHub OAuth with state and PKCE, the same path in every environment;
-  - dev and test point it at `cmd/fakeidp` (`make run-idp`; `web-dev` and `web-e2e` start it), and config refuses anything but github.com in staging and prod;
-  - a user is a `(provider, provider_user_id)` identity; a verified email links an existing user, so `dev@ronote.local`'s documents stay reachable.
-- **Sessions:**
-  - in Postgres, SHA-256 of the token only, 30 days idle and 90 in all;
-  - the cookie is host-only and HttpOnly, `Secure` and `__Host-` in staging and prod;
-  - sign out, sign out everywhere, and account deletion that cascades and keeps shared sources.
-- **CSRF:** `http.CrossOriginProtection` on every `/api` route.
-- **Limits:**
-  - quotas of 60 imports a day and 500 documents, in Postgres under a per-user lock;
-  - 120 requests a minute per user and 20 sign-ins a minute per IP, in memory per process;
-  - a body limit on every route.
-- **Web:** `/login`, with a sentence per error; any 401, and a refused event stream, go there once and come back; the account menu and the delete dialog sit in the sidebar footer.
-- **Tests:**
-  - each e2e worker signs in as its own user; `auth.spec.ts` covers the flows;
-  - three deliberate breaks were each caught: the state check, `expires_at`, and `//host` in `return_to`.
-- **Checks:** `make check` exits 0; `make test-integration` exits 0; `make web-e2e` passed 107, skipped 1 (quarantined).
-- **#13** with `fixme` lifted: 9 of 10 runs passed locally; one landed 112px off. It stays quarantined.
+P16, retrieval: done (ADR 0011). Search and P17's chat are in scope; nothing generated enters DocContent.
+- **Chunks** (`internal/search`): blocks under one heading path up to 1,400 characters, code never split, notes their own chunks; goldens for every fixture.
+- **Embeddings** (`internal/embed`): Qwen3-Embedding-0.6B through Ollama's OpenAI-compatible API (`RONOTE_EMBED_URL`, `RONOTE_EMBED_MODEL`, `make doctor` checks the pinned build); a cache shared across users; `cmd/fakeembed` for e2e; recorded vectors for the eval.
+- **Indexing** on the jobs port, which gained delayed jobs: each change search sees enqueues `index_document` in its transaction, 5 s later; the worker backfills. One edit re-embedded 1 chunk of 6.
+- **Search:** `GET /api/v1/search`, words and meaning merged by RRF, owner-scoped, word matches alone (`degraded`) without the embedder. Exact scan, PLAIN storage: hybrid p50 13 ms, p95 21 ms at 25,000 chunks of one user among 200,000 (`make test-perf-search`).
+- **Web:** Mod+K or Search opens the palette (its own 1.75 kB chunk): results by document, arrow keys, "This document", landing on the block with one flash.
+- **Eval** (`make eval`, in CI): 24 documents, 381 chunks, 80 queries; hybrid recall@10 0.944, MRR@10 0.794 (meaning alone 0.938, 0.783; words alone 0.808, 0.520).
+- **In the browser,** "how do I run things concurrently" answers from Effective Go's Concurrency chapter (top 5), Goroutines 4th; Effective Go never names `ServeMux`, so that search finds no code of it.
+- **Deliberate break:** dropping the owner filter from the vector half was caught by the EXPLAIN test; results never leaked, as the last join re-checks the owner.
+- **Checks:** `make check`, `make test-integration`, `make eval` and `make web-e2e` (113 passed, 1 skipped) pass.
 
 ## What exists
 
-- **Go** (`cmd/api`, `cmd/worker`, `cmd/fakeidp`, `internal/*`): a spec-first API (`api/openapi.yaml`) behind GitHub sign-in, and an import pipeline on the jobs port (fetch with SSRF guard and robots.txt, extract to IR with framework adapters, documents per owner). Event streams come from Postgres LISTEN/NOTIFY; editing keeps source blocks locked; highlights and notes.
+- **Go** (`cmd/api`, `cmd/worker`, dev tools in `cmd/`, `internal/*`): a spec-first API (`api/openapi.yaml`) behind GitHub sign-in, hybrid search over each library, and an import pipeline on the jobs port (fetch with SSRF guard and robots.txt, extract to IR with framework adapters, documents per owner). Event streams come from Postgres LISTEN/NOTIFY; editing keeps source blocks locked; highlights and notes.
 - **Web** (`apps/web`):
   - the library, and an import dialog with live progress;
   - the document reader and editor (Tiptap), with same-domain links that import on click;
-  - code highlighting and language choice, highlights and notes, and code that runs in the browser.
+  - code highlighting and language choice, highlights and notes, and code that runs in the browser;
+  - the search palette.
 - **Runner** (`apps/web/runner`): its own origin, Pyodide and JavaScript workers, a versioned message protocol.
 - **Quality:** golden fixtures and live checks for the extractor, integration tests on testcontainers, Playwright and axe end to end, CI on every push and pull request.
 - **ADRs:**
   - 0001 stack, 0002 verbatim source, 0003 commits;
   - 0004 IR and links, 0005 import pipeline, 0006 editor and DocContent;
   - 0007 annotations, 0008 in-browser code execution, 0009 the jobs port;
-  - 0010 sign-in and sessions.
+  - 0010 sign-in and sessions, 0011 retrieval.
 
 ## Next step
 
-The next phase, per its brief. v1 still lacks printed-PDF import; the runner's deployment is P18, proxy headers P19.
+P17, chat over the library, per its brief; it needs more than a similarity threshold to say "I don't know" (`docs/open-questions.md`). v1 still lacks printed-PDF import; the runner's deployment is P18, proxy headers P19.
 
 ## Quarantined tests
 

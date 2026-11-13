@@ -348,3 +348,15 @@ Recorded in [ADR 0009](adr/0009-jobs-port.md).
   - `FinishImport` succeeds again with the same document, so without the "already done" check a redelivery still completes; the new test watches the import's `updated_at`;
   - a fake clock moved right after a delivery runs ahead of the retry the handler's return schedules, hence `memjobs.Queue.Idle`;
   - the code wrap: Tiptap injects `.ProseMirror pre { white-space: pre-wrap }` outside any cascade layer, which beats every layered rule. The fix is an unlayered, more specific rule.
+
+## Retrieval (since P16, ADR 0011)
+
+- **Chunks** (`internal/search`): consecutive top-level blocks under one heading path, up to 1,400 characters; code never split; a note a chunk of its own, under its highlight's block. Goldens of every fixture's chunks: `internal/search/testdata/chunks`.
+- **Indexing:** `documents.index_seq` moves in the transaction of every change search sees, through the store's change hook, which enqueues `index_document` keyed `<document>:<seq>:<model>` and delayed 5 s (`jobs.Job.Delay`, new in P16). A stale job does nothing; the worker backfills documents behind or of another model at start. Re-indexing after one edit reused 5 of 6 chunks' embeddings from the cache.
+- **Search:** one SQL query (`internal/store/queries/search.sql`): the words half (English OR'ed alone, AND'ed beside meaning; `simple` for code; identifier tokens split on punctuation and camelCase) and the meaning half (cosine over the owner's rows through `chunks_owner_idx`), each top 50, merged by RRF k = 60. The embedder has 2 s; without it, search answers word matches and `degraded: true`.
+- **Storage:** the embedding column is PLAIN (migration 00011), about 3x faster than pgvector's EXTERNAL default at 25,000 chunks.
+- **The eval** (`cmd/eval`, `make eval` in CI): 24 documents, 381 chunks, 80 queries, recorded Qwen3 vectors replayed; baseline hybrid recall@10 0.944, MRR@10 0.794. A query vector swapped for another made meaning-only paraphrase recall 0.00, which the sanity check catches.
+- **Tests that catch regressions:** dropping the owner filter from the vector half was caught by `TestVectorSearchReadsOnlyTheOwnersRows`, whose EXPLAIN then shows a Seq Scan of every user's chunks. `TestOwnerIsolation` still passed: the query's last join checks the owner again, so no other user's chunk reaches a result either way.
+- **Landing:** a result opens `/doc/$id?block=<id>`; the page moves to the block, flashes it once (a node decoration: ProseMirror redraws a node whose class is set from outside) and holds it in view while the page settles, until it stays put for 2 s or the reader scrolls, types or clicks. In Effective Go a landing first missed by 2,000 px: the document's serif font arrives after the scroll and re-wraps every paragraph above, and code coming into view renders taller than its 6em placeholder.
+- **Found while building:** memjobs read its clock twice when scheduling, so a fake clock moved in between left a delayed job waiting forever.
+

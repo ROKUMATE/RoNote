@@ -7,6 +7,8 @@ Where things live, in full. AGENTS.md keeps the short version.
 | `cmd/api/` | HTTP API server |
 | `cmd/worker/` | background job runner |
 | `cmd/extract/` | dev tool: fetch one page and print its IR (`make extract`) |
+| `cmd/fakeidp/`, `cmd/fakeembed/` | dev and test stand-ins for GitHub sign-in and the embedder |
+| `cmd/eval/` | the retrieval eval (`make eval`); with tests, the only code that may link testcontainers |
 | `internal/<pkg>/` | Go packages, one concern each |
 | `migrations/` | Postgres schema migrations |
 | `apps/web/` | React + TypeScript + Tailwind v4 frontend |
@@ -18,6 +20,10 @@ Where things live, in full. AGENTS.md keeps the short version.
 | `internal/annotation/` | a user's highlights and notes: selectors into one block's plain text, in UTF-16 code units, and the rules a write must keep (docs/adr/0007-annotations-and-anchoring.md) |
 | `internal/importer/` | the import pipeline: the job handler that fetches, extracts and stores a document, and the service the API enqueues imports with |
 | `internal/jobs/` | the jobs port: enqueue in the caller's transaction, deliver at least once (docs/adr/0009-jobs-port.md); `riverjobs` runs it on River and is the only package that imports River, `memjobs` in memory for unit tests, `jobstest` is the suite both pass |
+| `internal/search/` | retrieval: chunking documents and notes, indexing them on the jobs port, hybrid search (docs/adr/0011-retrieval.md) |
+| `internal/embed/` | embedders: the OpenAI-compatible client, a deterministic fake, and the eval's replay of recorded vectors |
+| `internal/ratelimit/` | per-key fixed-window counting, in memory, for the API's rate limits |
+| `testdata/retrieval/` | the eval's corpus, queries, recorded vectors and baseline, with `SOURCES.md` |
 | `internal/events/` | import status changes from Postgres (LISTEN import_status, one connection per API process) to the API's event streams |
 | `internal/canon/` | canonical URLs: what sources and imports are keyed by, and the same-host rule for a page's canonical link |
 | `internal/fetch/` | the only way to fetch a user-supplied URL: SSRF guard, limits, robots.txt, rate limit |

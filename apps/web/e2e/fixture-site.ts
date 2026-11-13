@@ -15,6 +15,10 @@ import { stack } from "./stack.ts";
  *                         the request's run parameter, so a test's links
  *                         lead to pages no other test has imported; page B
  *                         answers late, so following a link can be watched
+ *   /long/                a page of 60 sections, each a long paragraph and
+ *                         30 lines of code, the 55th about "zanzibar": its
+ *                         layout moves as its font arrives and its code
+ *                         renders
  *   /files/sample.pdf     a PDF, which RoNote does not import
  * Anything else answers 404. Query strings are otherwise ignored, so every
  * test imports a URL of its own.
@@ -51,6 +55,11 @@ const server = createServer(async (request, response) => {
       return;
     }
   }
+  if (pathname === "/long/") {
+    response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    response.end(longPage());
+    return;
+  }
   if (pathname === "/files/sample.pdf") {
     response.writeHead(200, { "Content-Type": "application/pdf" });
     response.end("%PDF-1.4\n%%EOF\n");
@@ -59,6 +68,21 @@ const server = createServer(async (request, response) => {
   response.writeHead(404, { "Content-Type": "text/plain" });
   response.end("not found\n");
 });
+
+/** /long/: sections whose code renders much taller than its placeholder. */
+function longPage(): string {
+  const sections = Array.from({ length: 60 }, (_, i) => {
+    const topic = i === 54 ? "zanzibar spice routes" : `topic number ${i + 1}`;
+    const code = Array.from(
+      { length: 30 },
+      (_, line) => `step_${i}_${line} = compute(${line})`,
+    ).join("\n");
+    // Long paragraphs wrap differently once the document's own font arrives.
+    const prose = `This section is about ${topic}. ${"It explains the idea step by step, with the reasons behind each choice and the mistakes students most often make along the way. ".repeat(6)}`;
+    return `<h2>Section ${i + 1}</h2>\n<p>${prose}</p>\n<pre><code class="language-python">${code}</code></pre>`;
+  });
+  return `<!doctype html><html><head><title>Long guide</title></head><body><main><h1>Long guide</h1>\n${sections.join("\n")}</main></body></html>`;
+}
 
 const { hostname, port } = new URL(stack.fixtures);
 server.listen(Number(port), hostname, () => {

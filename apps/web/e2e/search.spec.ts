@@ -52,6 +52,34 @@ test("Mod+K finds a block of an imported page and lands on it", async ({ page })
   await expect(palette).toBeHidden();
 });
 
+test("a result far down a long page lands in view, once the code above it renders", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const path = await importPage(page, `${stack.fixtures}/long/?run=${crypto.randomUUID()}`);
+  const id = path.replace("/doc/", "");
+  await expect
+    .poll(
+      async () => {
+        const res = await page.request.get(`/api/v1/search?q=zanzibar&document_id=${id}`);
+        return ((await res.json()) as { results: unknown[] }).results.length;
+      },
+      { timeout: 30_000 },
+    )
+    .toBeGreaterThan(0);
+  await page.goto("/");
+
+  const palette = await search(page, "zanzibar");
+  await palette.getByRole("option").filter({ hasText: "Section 55" }).first().click();
+
+  await expect(page).toHaveURL(/\?block=/);
+  const block = new URL(page.url()).searchParams.get("block") ?? "";
+  // Code blocks render taller than their placeholders as they come into
+  // view; the block must still be on screen once they have.
+  await page.waitForTimeout(1500);
+  await expect(page.locator(`[data-block-id="${block}"]`)).toBeInViewport();
+});
+
 test("This document keeps the search to the open document", async ({ page }) => {
   const path = await importIndexed(page, "real-python-controlflow");
   await importIndexed(page, "real-go-effective-go");

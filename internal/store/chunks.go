@@ -12,8 +12,10 @@ import (
 // NewChunk is a piece of a document as search reads it
 // (docs/adr/0011-retrieval.md).
 type NewChunk struct {
-	// BlockIDs are its top-level blocks, in order.
+	// BlockIDs are its top-level blocks, in order, and BlockTexts their
+	// texts.
 	BlockIDs    []string
+	BlockTexts  []string
 	HeadingPath []string
 	// Kind is prose, code or note.
 	Kind string
@@ -40,7 +42,7 @@ func (s *Store) ReplaceChunks(ctx context.Context, owner, document uuid.UUID, ch
 			embedding = &v
 		}
 		err := s.q.InsertChunk(ctx, sqlcdb.InsertChunkParams{
-			OwnerID: owner, DocumentID: document, BlockIDs: c.BlockIDs, HeadingPath: c.HeadingPath,
+			OwnerID: owner, DocumentID: document, BlockIDs: c.BlockIDs, BlockTexts: c.BlockTexts, HeadingPath: c.HeadingPath,
 			Kind: c.Kind, Text: c.Text, Lang: c.Lang, Position: int32(min(i, 1<<30)), //nolint:gosec // clamped
 			Headings: c.Headings, Prose: c.Prose, Code: c.Code, Idents: c.Idents,
 			Embedding: embedding, Model: c.Model,

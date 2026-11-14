@@ -130,7 +130,7 @@ func (ix *Indexer) index(ctx context.Context, owner, document uuid.UUID, state s
 	rows := make([]store.NewChunk, len(chunks))
 	for i, c := range chunks {
 		rows[i] = store.NewChunk{
-			BlockIDs: c.BlockIDs, HeadingPath: c.HeadingPath, Kind: string(c.Kind), Text: c.Text, Lang: c.Lang,
+			BlockIDs: c.BlockIDs, BlockTexts: c.BlockTexts, HeadingPath: c.HeadingPath, Kind: string(c.Kind), Text: c.Text, Lang: c.Lang,
 			Headings: c.Headings, Prose: c.Prose, Code: c.Code, Idents: IdentVector(c.Idents),
 			Embedding: embedded.Vectors[i], Model: ix.embedder.Model(),
 		}

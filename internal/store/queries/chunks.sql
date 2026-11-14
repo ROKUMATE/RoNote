@@ -7,9 +7,9 @@ WHERE owner_id = $1 AND document_id = $2;
 -- name: InsertChunk :exec
 -- Headings and prose are read as English, code as it is; idents is a
 -- tsvector literal of the identifier tokens, weighted A.
-INSERT INTO chunks (owner_id, document_id, block_ids, heading_path, kind, text, lang, position, tsv, embedding, model)
+INSERT INTO chunks (owner_id, document_id, block_ids, block_texts, heading_path, kind, text, lang, position, tsv, embedding, model)
 VALUES (
-    sqlc.arg(owner_id), sqlc.arg(document_id), sqlc.arg(block_ids)::text[], sqlc.arg(heading_path)::text[],
+    sqlc.arg(owner_id), sqlc.arg(document_id), sqlc.arg(block_ids)::text[], sqlc.arg(block_texts)::text[], sqlc.arg(heading_path)::text[],
     sqlc.arg(kind), sqlc.arg(text), sqlc.arg(lang), sqlc.arg(position),
     setweight(to_tsvector('english', sqlc.arg(headings)::text), 'A')
         || setweight(to_tsvector('english', sqlc.arg(prose)::text), 'B')

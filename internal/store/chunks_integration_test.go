@@ -12,7 +12,7 @@ func someChunks(texts ...string) []NewChunk {
 	var cs []NewChunk
 	for _, text := range texts {
 		cs = append(cs, NewChunk{
-			BlockIDs: []string{"b1", "b2"}, HeadingPath: []string{"Guide"}, Kind: "prose", Text: text,
+			BlockIDs: []string{"b1", "b2"}, BlockTexts: []string{text, "more"}, HeadingPath: []string{"Guide"}, Kind: "prose", Text: text,
 			Headings: "Guide", Prose: text, Idents: "'http.servemux':1A 'servemux':2A",
 		})
 	}

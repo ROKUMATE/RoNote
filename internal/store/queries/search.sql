@@ -46,7 +46,7 @@ fused AS (
     FROM (SELECT id, row_number() OVER (ORDER BY rank DESC, id) AS r FROM words) w
     FULL JOIN (SELECT id, distance, row_number() OVER (ORDER BY distance, id) AS r FROM meaning) m ON w.id = m.id
 )
-SELECT c.document_id, d.title, c.block_ids, c.heading_path, c.kind,
+SELECT c.id, c.document_id, d.title, c.block_ids, c.block_texts, c.heading_path, c.kind,
     -- 0 and -1 mean the half didn't find the chunk.
     f.score::double precision AS score, coalesce(f.words_rank, 0)::int AS words_rank,
     coalesce(f.meaning_rank, 0)::int AS meaning_rank, coalesce(f.distance, -1)::double precision AS distance,

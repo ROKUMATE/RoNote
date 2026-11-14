@@ -38,8 +38,10 @@ type Note struct {
 // Chunk is a piece of a document for search.
 type Chunk struct {
 	// BlockIDs are its top-level blocks in order; a note's is the top-level
-	// block its highlight is in.
+	// block its highlight is in. BlockTexts are their texts as Text holds
+	// them, a note's its own.
 	BlockIDs    []string
+	BlockTexts  []string
 	HeadingPath []string
 	Kind        Kind
 	// Lang is a code chunk's language: the user's choice, else the page's.
@@ -166,6 +168,7 @@ func (c *chunker) flush() {
 	var text, prose, code, embed, idents []string
 	for _, p := range c.open {
 		ch.BlockIDs = append(ch.BlockIDs, p.id)
+		ch.BlockTexts = append(ch.BlockTexts, p.text())
 		if !p.isCode {
 			ch.Kind = KindProse
 		}
@@ -201,6 +204,7 @@ func (c *chunker) note(content *doccontent.Doc, n Note) {
 	path := c.pathAt[top]
 	c.out = append(c.out, Chunk{
 		BlockIDs:    []string{content.Blocks[top].ID},
+		BlockTexts:  []string{n.Text},
 		HeadingPath: path,
 		Kind:        KindNote,
 		Text:        n.Text,

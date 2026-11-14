@@ -92,7 +92,8 @@ func TestChunkGoldens(t *testing.T) {
 // TestChunkRules checks every fixture against the rules: each top-level
 // block in exactly one chunk, in order; each code block's text whole in one
 // chunk; chunks within the limit unless one block is larger; breadcrumbs
-// from the title; a chunk of one block holding its BlockText.
+// from the title; each block's BlockText, in order, making up its chunk's
+// text.
 func TestChunkRules(t *testing.T) {
 	t.Parallel()
 	for name, doc := range fixtures(t) {
@@ -123,8 +124,14 @@ func TestChunkRules(t *testing.T) {
 			}
 		}
 		for _, c := range chunks {
-			if len(c.BlockIDs) == 1 && c.Text != texts[c.BlockIDs[0]] {
-				t.Errorf("%s: chunk %v holds %q, want its block's text %q", name, c.BlockIDs, cut(c.Text, 40), cut(texts[c.BlockIDs[0]], 40))
+			if len(c.BlockTexts) != len(c.BlockIDs) || strings.Join(c.BlockTexts, "\n\n") != c.Text {
+				t.Errorf("%s: chunk %v's block texts don't make up its text", name, c.BlockIDs)
+				continue
+			}
+			for i, id := range c.BlockIDs {
+				if c.BlockTexts[i] != texts[id] {
+					t.Errorf("%s: chunk %v holds %q for block %s, want its text %q", name, c.BlockIDs, cut(c.BlockTexts[i], 40), id, cut(texts[id], 40))
+				}
 			}
 		}
 		if !slices.Equal(order, want) {
@@ -213,7 +220,11 @@ func TestChunkSections(t *testing.T) {
 	if !slices.Contains(chunks[4].Idents, "http.servemux") || !slices.Contains(chunks[4].Idents, "serve") {
 		t.Errorf("inline code idents = %q, want http.servemux and its words", chunks[4].Idents)
 	}
-	if note := chunks[5]; note.Text != "Remember this one" || !strings.Contains(note.Embed, `Note on "Call": Remember this one`) {
+	if !slices.Equal(chunks[1].BlockTexts, []string{"Run this:", "go install ./..."}) {
+		t.Errorf("block texts = %q, want a text per block", chunks[1].BlockTexts)
+	}
+	if note := chunks[5]; note.Text != "Remember this one" || !slices.Equal(note.BlockTexts, []string{"Remember this one"}) ||
+		!strings.Contains(note.Embed, `Note on "Call": Remember this one`) {
 		t.Errorf("note chunk = %+v", note)
 	}
 }

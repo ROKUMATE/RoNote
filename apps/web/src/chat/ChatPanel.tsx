@@ -3,7 +3,7 @@ import { PlusIcon } from "@phosphor-icons/react/Plus";
 import { TrashIcon } from "@phosphor-icons/react/Trash";
 import { XIcon } from "@phosphor-icons/react/X";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { requestErrorMessage } from "../api/messages";
 import { chatKey, conversationsQuery, deleteConversation } from "../api/queries";
 import { formatDate } from "../format";
@@ -42,14 +42,18 @@ export function ChatPanel({ documentId, onClose }: { documentId?: string; onClos
     if (window.matchMedia?.(besidePage).matches ?? true) d.show();
     else d.showModal();
     d.querySelector("textarea")?.focus();
+    // Escape closes the panel from inside it, and when focus has fallen to
+    // the page, as when what held it was redrawn; not from the reader.
+    const onKey = (event: KeyboardEvent) => {
+      const at = document.activeElement;
+      if (event.key === "Escape" && (at === document.body || d.contains(at))) {
+        event.preventDefault();
+        d.close();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
-
-  const onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      dialog.current?.close();
-    }
-  };
 
   const startNew = () => {
     setConversationId(undefined);
@@ -63,7 +67,6 @@ export function ChatPanel({ documentId, onClose }: { documentId?: string; onClos
       ref={dialog}
       aria-labelledby={titleId}
       onClose={onClose}
-      onKeyDown={onKeyDown}
       className="fixed inset-0 z-20 m-0 ml-auto flex h-dvh max-h-none w-full max-w-none flex-col border-rule bg-paper p-0 text-ink backdrop:bg-ink/30 notes:w-96 notes:border-l [&:not([open])]:hidden"
     >
       <div className="flex items-center gap-1 border-rule border-b px-4 py-2">

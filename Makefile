@@ -183,6 +183,9 @@ eval-record: ## Embed the eval's corpus and queries through RONOTE_EMBED_URL and
 eval-review: ## List the eval's queries marked for review: expected blocks and hybrid's top 5 (writes nothing)
 	sh scripts/container.sh test go run ./cmd/eval -review
 
+eval-chat: ## Ask the eval's queries through chat, of the real model; writes chat-report.md (local only: ANTHROPIC_API_KEY, the embedder, cents)
+	sh scripts/container.sh test go run ./cmd/eval -chat
+
 test-perf-search: ## Time search over 5k-25k chunks for one user, among 200,000 others (local only: minutes, and a container)
 	sh scripts/container.sh test go test -tags perf,integration -p 1 -count=1 -timeout 30m -run '^TestPerfSearch' -v ./internal/search
 
@@ -222,5 +225,5 @@ web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromiu
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp run-llm extract lint lint-go lint-web fmt
 .PHONY: doctor stop dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
-.PHONY: test-integration eval eval-record eval-review test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
+.PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
 .PHONY: web-dev web-build web-e2e

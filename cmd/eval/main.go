@@ -9,12 +9,15 @@
 // below baseline.json, or when meaning no longer beats words on paraphrases
 // (as broken vectors would make it).
 //
-//	go run ./cmd/eval [-record] [-update-baseline] [-review]
+//	go run ./cmd/eval [-record] [-update-baseline] [-review] [-chat]
 //
 // -record embeds everything through RONOTE_EMBED_URL and RONOTE_EMBED_MODEL
 // (make eval-record) and writes the vectors; -update-baseline writes this
 // run's hybrid metrics as the baseline. -review (make eval-review) prints the
 // queries marked for review instead of measuring, and writes nothing.
+// -chat (make eval-chat) asks the queries through chat instead, of the real
+// model with ANTHROPIC_API_KEY, or of RONOTE_EVAL_CHAT_URL, and writes
+// chat-report.md from the real model alone (docs/adr/0012-chat.md).
 package main
 
 import (
@@ -59,13 +62,14 @@ func main() {
 	record := flag.Bool("record", false, "embed the corpus and queries with the configured model and record the vectors")
 	updateBaseline := flag.Bool("update-baseline", false, "write this run's hybrid metrics as the baseline")
 	reviewOnly := flag.Bool("review", false, "print the queries marked for review with their expected blocks and hybrid's top 5, and write nothing")
+	chatOnly := flag.Bool("chat", false, "ask the queries through chat, and report how its answers cite")
 	flag.Parse()
-	if *reviewOnly && (*record || *updateBaseline) {
-		fmt.Fprintln(os.Stderr, "eval: -review writes nothing, so it can't go with -record or -update-baseline")
+	if (*reviewOnly || *chatOnly) && (*record || *updateBaseline) || *reviewOnly && *chatOnly {
+		fmt.Fprintln(os.Stderr, "eval: -review and -chat each run alone, without -record or -update-baseline")
 		os.Exit(2)
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	err := run(ctx, options{record: *record, updateBaseline: *updateBaseline, review: *reviewOnly})
+	err := run(ctx, options{record: *record, updateBaseline: *updateBaseline, review: *reviewOnly, chat: *chatOnly})
 	stop()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "eval:", err)
@@ -97,7 +101,7 @@ func (m metrics) values() []float64 { return []float64{m.Recall5, m.Recall10, m.
 var metricNames = []string{"recall@5", "recall@10", "mrr@10", "ndcg@10"}
 
 type options struct {
-	record, updateBaseline, review bool
+	record, updateBaseline, review, chat bool
 }
 
 func run(ctx context.Context, opts options) error {
@@ -165,6 +169,9 @@ func run(ctx context.Context, opts options) error {
 
 	if opts.review {
 		return review(ctx, st, search.NewSearcher(st, embedder, discard), user.ID, docs, ids, queries)
+	}
+	if opts.chat {
+		return chatEval(ctx, st, user.ID, embedder, queries)
 	}
 	if opts.record {
 		inputs := make([]string, len(queries))

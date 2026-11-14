@@ -23,6 +23,11 @@ type Passage struct {
 // Source names the passage to the model.
 func (p Passage) Source() string { return "ronote:chunk/" + p.ChunkID.String() }
 
+// result is the passage as a search result.
+func (p Passage) result() Result {
+	return Result{Source: p.Source(), Title: p.Title, Texts: p.Texts}
+}
+
 // citer turns a reply's citations into the owner's blocks
 // (docs/adr/0012-chat.md). It knows every passage the turn's request sent,
 // in the order the model counts them.

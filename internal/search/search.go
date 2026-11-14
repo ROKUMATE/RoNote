@@ -62,11 +62,13 @@ type Segment struct {
 
 // Hit is a chunk a search found.
 type Hit struct {
+	ChunkID    uuid.UUID
 	DocumentID uuid.UUID
 	Title      string
-	// BlockIDs are the chunk's top-level blocks; a result lands on the
-	// first.
+	// BlockIDs are the chunk's top-level blocks, and BlockTexts their
+	// texts; a result lands on the first.
 	BlockIDs    []string
+	BlockTexts  []string
 	HeadingPath []string
 	Kind        Kind
 	Snippet     []Segment
@@ -129,7 +131,7 @@ func (s *Searcher) Search(ctx context.Context, r Request) (Results, error) {
 	res.Hits = make([]Hit, len(rows))
 	for i, row := range rows {
 		res.Hits[i] = Hit{
-			DocumentID: row.DocumentID, Title: row.Title, BlockIDs: row.BlockIDs, HeadingPath: row.HeadingPath,
+			ChunkID: row.ID, DocumentID: row.DocumentID, Title: row.Title, BlockIDs: row.BlockIDs, BlockTexts: row.BlockTexts, HeadingPath: row.HeadingPath,
 			Kind: Kind(row.Kind), Snippet: segments(row.Snippet), Score: row.Score,
 			WordsRank: int(row.WordsRank), MeaningRank: int(row.MeaningRank), Distance: row.Distance,
 		}

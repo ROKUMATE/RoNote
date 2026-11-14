@@ -84,15 +84,15 @@ func (q *Queries) GetCachedEmbeddings(ctx context.Context, arg GetCachedEmbeddin
 }
 
 const insertChunk = `-- name: InsertChunk :exec
-INSERT INTO chunks (owner_id, document_id, block_ids, heading_path, kind, text, lang, position, tsv, embedding, model)
+INSERT INTO chunks (owner_id, document_id, block_ids, block_texts, heading_path, kind, text, lang, position, tsv, embedding, model)
 VALUES (
-    $1, $2, $3::text[], $4::text[],
-    $5, $6, $7, $8,
-    setweight(to_tsvector('english', $9::text), 'A')
-        || setweight(to_tsvector('english', $10::text), 'B')
-        || setweight(to_tsvector('simple', $11::text), 'C')
-        || $12::text::tsvector,
-    $13::halfvec, $14
+    $1, $2, $3::text[], $4::text[], $5::text[],
+    $6, $7, $8, $9,
+    setweight(to_tsvector('english', $10::text), 'A')
+        || setweight(to_tsvector('english', $11::text), 'B')
+        || setweight(to_tsvector('simple', $12::text), 'C')
+        || $13::text::tsvector,
+    $14::halfvec, $15
 )
 `
 
@@ -100,6 +100,7 @@ type InsertChunkParams struct {
 	OwnerID     uuid.UUID
 	DocumentID  uuid.UUID
 	BlockIDs    []string
+	BlockTexts  []string
 	HeadingPath []string
 	Kind        string
 	Text        string
@@ -120,6 +121,7 @@ func (q *Queries) InsertChunk(ctx context.Context, arg InsertChunkParams) error 
 		arg.OwnerID,
 		arg.DocumentID,
 		arg.BlockIDs,
+		arg.BlockTexts,
 		arg.HeadingPath,
 		arg.Kind,
 		arg.Text,

@@ -76,8 +76,8 @@ func TestVectorSearchReadsOnlyTheOwnersRows(t *testing.T) {
 	}})
 	// Twenty thousand of another user's chunks, sharing one vector.
 	_, err = pool.Exec(ctx, `
-		INSERT INTO chunks (owner_id, document_id, block_ids, heading_path, kind, text, position, tsv, embedding, model)
-		SELECT $1, $2, ARRAY['000000000001'], ARRAY[]::text[], 'prose', 'chunk ' || g, g,
+		INSERT INTO chunks (owner_id, document_id, block_ids, block_texts, heading_path, kind, text, position, tsv, embedding, model)
+		SELECT $1, $2, ARRAY['000000000001'], ARRAY['chunk ' || g], ARRAY[]::text[], 'prose', 'chunk ' || g, g,
 			to_tsvector('simple', 'chunk ' || g), c.embedding, c.model
 		FROM generate_series(1, 20000) g, (SELECT embedding, model FROM chunks WHERE document_id = $2 LIMIT 1) c`,
 		others, crowd)

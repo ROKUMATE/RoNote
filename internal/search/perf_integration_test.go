@@ -34,8 +34,8 @@ func fill(t *testing.T, owner, doc uuid.UUID, from, n int) {
 			SELECT v, (SELECT array_agg(sin(v * 7.1 + d * 0.37))::real[] FROM generate_series(1, 1024) d)::halfvec AS embedding
 			FROM generate_series(0, 63) v
 		)
-		INSERT INTO chunks (owner_id, document_id, block_ids, heading_path, kind, text, position, tsv, embedding, model)
-		SELECT $1, $2, ARRAY['000000000001'], ARRAY['Section ' || (g % 50)], 'prose', t.text, g,
+		INSERT INTO chunks (owner_id, document_id, block_ids, block_texts, heading_path, kind, text, position, tsv, embedding, model)
+		SELECT $1, $2, ARRAY['000000000001'], ARRAY[t.text], ARRAY['Section ' || (g % 50)], 'prose', t.text, g,
 			to_tsvector('english', t.text), vecs.embedding, $6
 		FROM generate_series($3::int, $3::int + $4::int - 1) g
 		CROSS JOIN words

@@ -13,6 +13,7 @@ output-options:
   # the spec only documents them.
   exclude-operation-ids:
     - getImportEvents
+    - sendMessage
     - startGitHubSignIn
     - finishGitHubSignIn
     - logout

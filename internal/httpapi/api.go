@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/rokumate/ronote/internal/chat"
 	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/httpapi/gen"
 	"github.com/rokumate/ronote/internal/importer"
@@ -45,10 +46,11 @@ func apiRoutes(o Options, lim limiters) *http.ServeMux {
 	logger := o.Logger
 	mux := http.NewServeMux()
 	mux.Handle("GET /api/v1/imports/{id}/events", importEvents(o.Backend, o.Events, o.Done, heartbeat))
+	mux.Handle("POST /api/v1/conversations/{id}/messages", sendMessage(o, heartbeat))
 	mux.Handle("POST /api/v1/auth/logout", lim.byIP(logout(o)))
 	mux.Handle("POST /api/v1/auth/logout-all", lim.byIP(logoutAll(o)))
 	mux.Handle("DELETE /api/v1/me", deleteMe(o))
-	strict := gen.NewStrictHandlerWithOptions(apiServer{backend: o.Backend, accounts: o.Accounts, searcher: o.Searcher, showScores: o.ShowScores}, nil, gen.StrictHTTPServerOptions{
+	strict := gen.NewStrictHandlerWithOptions(apiServer{backend: o.Backend, accounts: o.Accounts, searcher: o.Searcher, showScores: o.ShowScores, chat: o.Chat}, nil, gen.StrictHTTPServerOptions{
 		RequestErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {
 			badBody(w, r, err, "the request body is not valid JSON for this operation")
 		},
@@ -72,6 +74,7 @@ type apiServer struct {
 	accounts   Accounts
 	searcher   Searcher
 	showScores bool
+	chat       *chat.Service
 }
 
 func apiError(ctx context.Context, code gen.ErrorCode, message string) gen.Error {
@@ -289,11 +292,11 @@ func (s apiServer) ListDocuments(ctx context.Context, req gen.ListDocumentsReque
 	}
 	var after *store.DocumentCursor
 	if req.Params.Cursor != nil {
-		c, err := decodeCursor(*req.Params.Cursor)
+		at, id, err := decodeCursor(*req.Params.Cursor)
 		if err != nil {
 			return gen.ListDocuments400JSONResponse(apiError(ctx, gen.ErrorCodeInvalidCursor, "the cursor is not one this API made")), nil
 		}
-		after = &c
+		after = &store.DocumentCursor{CreatedAt: at, ID: id}
 	}
 	// One more than asked tells whether another page follows.
 	docs, err := s.backend.ListDocuments(ctx, userFrom(ctx), after, limit+1)
@@ -304,7 +307,7 @@ func (s apiServer) ListDocuments(ctx context.Context, req gen.ListDocumentsReque
 	if len(docs) > limit {
 		docs = docs[:limit]
 		last := docs[limit-1]
-		next := encodeCursor(store.DocumentCursor{CreatedAt: last.CreatedAt, ID: last.ID})
+		next := encodeCursor(last.CreatedAt, last.ID)
 		out.NextCursor = &next
 	}
 	for _, d := range docs {

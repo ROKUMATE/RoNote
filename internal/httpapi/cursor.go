@@ -7,34 +7,34 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-
-	"github.com/rokumate/ronote/internal/store"
 )
 
 var errBadCursor = errors.New("invalid cursor")
 
-// encodeCursor makes the opaque next_cursor for a page that ends at c.
-func encodeCursor(c store.DocumentCursor) string {
-	return base64.RawURLEncoding.EncodeToString([]byte(c.CreatedAt.UTC().Format(time.RFC3339Nano) + "|" + c.ID.String()))
+// encodeCursor makes the opaque next_cursor for a page whose last row has
+// the time at and id: a document's created_at, a conversation's
+// updated_at.
+func encodeCursor(at time.Time, id uuid.UUID) string {
+	return base64.RawURLEncoding.EncodeToString([]byte(at.UTC().Format(time.RFC3339Nano) + "|" + id.String()))
 }
 
 // decodeCursor reads a cursor encodeCursor made.
-func decodeCursor(s string) (store.DocumentCursor, error) {
+func decodeCursor(s string) (time.Time, uuid.UUID, error) {
 	raw, err := base64.RawURLEncoding.DecodeString(s)
 	if err != nil {
-		return store.DocumentCursor{}, errBadCursor
+		return time.Time{}, uuid.Nil, errBadCursor
 	}
-	at, id, ok := strings.Cut(string(raw), "|")
+	rawAt, rawID, ok := strings.Cut(string(raw), "|")
 	if !ok {
-		return store.DocumentCursor{}, errBadCursor
+		return time.Time{}, uuid.Nil, errBadCursor
 	}
-	createdAt, err := time.Parse(time.RFC3339Nano, at)
+	at, err := time.Parse(time.RFC3339Nano, rawAt)
 	if err != nil {
-		return store.DocumentCursor{}, errBadCursor
+		return time.Time{}, uuid.Nil, errBadCursor
 	}
-	docID, err := uuid.Parse(id)
+	id, err := uuid.Parse(rawID)
 	if err != nil {
-		return store.DocumentCursor{}, errBadCursor
+		return time.Time{}, uuid.Nil, errBadCursor
 	}
-	return store.DocumentCursor{CreatedAt: createdAt, ID: docID}, nil
+	return at, id, nil
 }

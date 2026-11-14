@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"github.com/rokumate/ronote/internal/auth"
+	"github.com/rokumate/ronote/internal/chat"
+	"github.com/rokumate/ronote/internal/chat/anthropic"
 	"github.com/rokumate/ronote/internal/config"
 	"github.com/rokumate/ronote/internal/db"
 	"github.com/rokumate/ronote/internal/embed"
@@ -69,6 +71,18 @@ func run() error {
 		defer close(listening)
 		broker.Listen(ctx, pool, logger)
 	}()
+	searcher := search.NewSearcher(st, embed.NewClient(cfg.Embed.URL, cfg.Embed.Model), logger)
+	chats, err := chat.NewService(chat.Options{
+		Store: st, Searcher: searcher,
+		Model:     anthropic.New(cfg.Chat.URL, cfg.Chat.APIKey, cfg.Chat.Model),
+		ModelName: cfg.Chat.Model, Enabled: cfg.Chat.Enabled,
+		Limits: chat.Limits{MessagesPerDay: cfg.Limits.ChatMessagesPerDay, TokensPerDay: cfg.Limits.ChatTokensPerDay},
+		Logger: logger,
+	})
+	if err != nil {
+		return err
+	}
+
 	streamsDone := make(chan struct{})
 
 	var lc net.ListenConfig
@@ -89,8 +103,9 @@ func run() error {
 		PublicURL: cfg.PublicURL,
 		Limits:    httpapi.Limits{APIPerMinute: cfg.Limits.APIPerMinute, AuthPerMinute: cfg.Limits.AuthPerMinute},
 		// Scores help tune search in dev and test; people don't need them.
-		Searcher:   search.NewSearcher(st, embed.NewClient(cfg.Embed.URL, cfg.Embed.Model), logger),
+		Searcher:   searcher,
 		ShowScores: !cfg.Env.Deployed(),
+		Chat:       chats,
 		GitHub: auth.GitHub{
 			ClientID:     cfg.GitHub.ClientID,
 			ClientSecret: cfg.GitHub.ClientSecret,
@@ -119,6 +134,10 @@ func run() error {
 	defer cancel()
 	if err := srv.Shutdown(shutdownCtx); err != nil {
 		return fmt.Errorf("shutdown: %w", err)
+	}
+	// Answers outlive their streams: each is saved before the process ends.
+	if err := chats.Shutdown(shutdownCtx); err != nil {
+		logger.Warn("answers stopped at shutdown", "error", err)
 	}
 	if err := <-serveErr; !errors.Is(err, http.ErrServerClosed) {
 		return fmt.Errorf("serve: %w", err)

@@ -70,6 +70,9 @@ run-worker: ## Run the import worker locally (RONOTE_ENV defaults to dev); make 
 run-idp: ## Run the fake GitHub sign-in on 127.0.0.1:8090 (dev only); make stop ends it
 	sh scripts/run.sh idp go run ./cmd/fakeidp
 
+run-llm: ## Run the fake chat model on 127.0.0.1:8094 (dev only); make stop ends it
+	sh scripts/run.sh llm go run ./cmd/fakellm
+
 extract: ## Print a page's IR: make extract url=https://... [format=text]
 	@test -n "$(url)" || { echo "usage: make extract url=https://... [format=text]" >&2; exit 1; }
 	go run ./cmd/extract --format=$(or $(format),json) "$(url)"
@@ -199,9 +202,9 @@ web-browsers: ## Install Playwright's Chromium (WITH_DEPS=1 adds its system pack
 check-node-version: ## Print the Node version; fail unless it is the one .nvmrc pins
 	@$(node_required); echo "Node $$(node --version), as pinned in .nvmrc"
 
-web-dev: ## Run the web dev server (styleguide at /_styleguide), the runner and the fake sign-in; make stop ends them
+web-dev: ## Run the web dev server (styleguide at /_styleguide), the runner, the fake sign-in and the fake chat model; make stop ends them
 	@$(node_required)
-	sh scripts/run.sh web sh -c 'go run ./cmd/fakeidp & idp=$$!; $(WEB) runner & runner=$$!; $(WEB) dev; kill $$idp $$runner'
+	sh scripts/run.sh web sh -c 'go run ./cmd/fakeidp & idp=$$!; go run ./cmd/fakellm & llm=$$!; $(WEB) runner & runner=$$!; $(WEB) dev; kill $$idp $$llm $$runner'
 
 web-build: ## Build the web app and the runner; fails if dev-only code ships or it is over budget
 	@$(node_required)
@@ -216,7 +219,7 @@ web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromiu
 	go build -o bin/e2e/ ./cmd/api ./cmd/worker ./cmd/fakeidp ./cmd/fakeembed
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" $(WEB) e2e
 
-.PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp extract lint lint-go lint-web fmt
+.PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp run-llm extract lint lint-go lint-web fmt
 .PHONY: doctor stop dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version

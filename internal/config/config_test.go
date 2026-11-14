@@ -29,6 +29,7 @@ func validEnv(overrides map[string]string) map[string]string {
 		"RONOTE_PUBLIC_URL":           "https://ronote.test",
 		"RONOTE_GITHUB_CLIENT_ID":     "client",
 		"RONOTE_GITHUB_CLIENT_SECRET": leakMarker,
+		"ANTHROPIC_API_KEY":           leakMarker,
 	}
 	maps.Copy(env, overrides)
 	return env
@@ -44,7 +45,11 @@ var github = GitHub{
 var embedDefault = Embed{URL: "http://127.0.0.1:11434/v1", Model: "qwen3-embedding:0.6b"}
 
 // limits are the default limits.
-var limits = Limits{ImportsPerDay: 60, Documents: 500, APIPerMinute: 120, AuthPerMinute: 20}
+var limits = Limits{ImportsPerDay: 60, Documents: 500, APIPerMinute: 120, AuthPerMinute: 20, ChatMessagesPerDay: 50, ChatTokensPerDay: 400_000}
+
+// chatDefault is the default model: Haiku through Anthropic's API, with the
+// key validEnv sets.
+var chatDefault = Chat{Enabled: true, URL: "https://api.anthropic.com", Model: "claude-haiku-5-5", APIKey: leakMarker}
 
 // fakeProvider points every provider URL at a local fake provider.
 var fakeProvider = map[string]string{ //nolint:gosec // URLs, not credentials
@@ -72,7 +77,7 @@ func TestLoad(t *testing.T) {
 		{
 			name: "defaults",
 			env:  validEnv(nil),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault},
 		},
 		{
 			name: "all set",
@@ -82,12 +87,12 @@ func TestLoad(t *testing.T) {
 				"RONOTE_LOG_LEVEL":    "debug",
 				"RONOTE_DATABASE_URL": "postgresql://db/ronote",
 			}),
-			want: Config{Env: EnvProd, HTTPAddr: "0.0.0.0:9000", LogLevel: slog.LevelDebug, DatabaseURL: "postgresql://db/ronote", SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
+			want: Config{Env: EnvProd, HTTPAddr: "0.0.0.0:9000", LogLevel: slog.LevelDebug, DatabaseURL: "postgresql://db/ronote", SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault},
 		},
 		{
 			name: "empty host",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_HTTP_ADDR": ":8080", "RONOTE_LOG_LEVEL": "warn"}),
-			want: Config{Env: EnvStaging, HTTPAddr: ":8080", LogLevel: slog.LevelWarn, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
+			want: Config{Env: EnvStaging, HTTPAddr: ":8080", LogLevel: slog.LevelWarn, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault},
 		},
 		{
 			name:    "missing env",
@@ -152,17 +157,17 @@ func TestLoad(t *testing.T) {
 		{
 			name: "private fetches allowed in dev",
 			env:  validEnv(map[string]string{"RONOTE_FETCH_ALLOW_PRIVATE": "true"}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault},
 		},
 		{
 			name: "private fetches allowed in test",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "test", "RONOTE_FETCH_ALLOW_PRIVATE": "1"}),
-			want: Config{Env: EnvTest, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
+			want: Config{Env: EnvTest, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, FetchAllowPrivateNetworks: true, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault},
 		},
 		{
 			name: "private fetches off in prod",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_FETCH_ALLOW_PRIVATE": "false"}),
-			want: Config{Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
+			want: Config{Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault},
 		},
 		{
 			name:    "private fetches refused in prod",
@@ -182,12 +187,12 @@ func TestLoad(t *testing.T) {
 		{
 			name: "source TTL",
 			env:  validEnv(map[string]string{"RONOTE_SOURCE_TTL": "90m"}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: 90 * time.Minute, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: 90 * time.Minute, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault},
 		},
 		{
 			name: "source TTL of zero always revalidates",
 			env:  validEnv(map[string]string{"RONOTE_SOURCE_TTL": "0s"}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault},
 		},
 		{
 			name:    "source TTL not a duration",
@@ -210,7 +215,7 @@ func TestLoad(t *testing.T) {
 					AuthorizeURL: fakeProvider["RONOTE_GITHUB_AUTHORIZE_URL"], TokenURL: fakeProvider["RONOTE_GITHUB_TOKEN_URL"],
 					APIURL: "http://127.0.0.1:8090",
 				},
-				Limits: limits, Embed: embedDefault,
+				Limits: limits, Embed: embedDefault, Chat: chatDefault,
 			},
 		},
 		{
@@ -235,7 +240,7 @@ func TestLoad(t *testing.T) {
 		{
 			name: "public URL with a trailing slash",
 			env:  validEnv(map[string]string{"RONOTE_PUBLIC_URL": "http://127.0.0.1:5173/"}),
-			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "http://127.0.0.1:5173", GitHub: github, Limits: limits, Embed: embedDefault},
+			want: Config{Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "http://127.0.0.1:5173", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault},
 		},
 		{
 			name:    "missing public URL",
@@ -257,12 +262,13 @@ func TestLoad(t *testing.T) {
 			env: validEnv(map[string]string{
 				"RONOTE_LIMIT_IMPORTS_PER_DAY": "10", "RONOTE_LIMIT_DOCUMENTS": "20",
 				"RONOTE_LIMIT_API_PER_MINUTE": "30", "RONOTE_LIMIT_AUTH_PER_MINUTE": "40",
+				"RONOTE_LIMIT_CHAT_MESSAGES_PER_DAY": "5", "RONOTE_LIMIT_CHAT_TOKENS_PER_DAY": "6000",
 			}),
 			want: Config{
 				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
 				PublicURL: "https://ronote.test", GitHub: github,
-				Limits: Limits{ImportsPerDay: 10, Documents: 20, APIPerMinute: 30, AuthPerMinute: 40},
-				Embed:  embedDefault,
+				Limits: Limits{ImportsPerDay: 10, Documents: 20, APIPerMinute: 30, AuthPerMinute: 40, ChatMessagesPerDay: 5, ChatTokensPerDay: 6000},
+				Embed:  embedDefault, Chat: chatDefault,
 			},
 		},
 		{
@@ -281,8 +287,41 @@ func TestLoad(t *testing.T) {
 			want: Config{
 				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
 				PublicURL: "https://ronote.test", GitHub: github, Limits: limits,
-				Embed: Embed{URL: "http://127.0.0.1:18093/v1", Model: "fake-words"},
+				Embed: Embed{URL: "http://127.0.0.1:18093/v1", Model: "fake-words"}, Chat: chatDefault,
 			},
+		},
+		{
+			name: "the fake model needs no key",
+			env:  validEnv(map[string]string{"RONOTE_CHAT_URL": "http://127.0.0.1:8094/", "ANTHROPIC_API_KEY": ""}),
+			want: Config{
+				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
+				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault,
+				Chat: Chat{Enabled: true, URL: "http://127.0.0.1:8094", Model: "claude-haiku-5-5"},
+			},
+		},
+		{
+			name: "chat turned off needs no key",
+			env:  validEnv(map[string]string{"RONOTE_CHAT_ENABLED": "false", "ANTHROPIC_API_KEY": "", "RONOTE_CHAT_MODEL": "claude-other"}),
+			want: Config{
+				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
+				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault,
+				Chat: Chat{URL: "https://api.anthropic.com", Model: "claude-other"},
+			},
+		},
+		{
+			name:    "Anthropic's API needs a key",
+			env:     validEnv(map[string]string{"ANTHROPIC_API_KEY": ""}),
+			wantErr: []string{"ANTHROPIC_API_KEY: not set; https://api.anthropic.com needs one"},
+		},
+		{
+			name:    "the fake model refused in prod",
+			env:     validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_CHAT_URL": "http://127.0.0.1:8094"}),
+			wantErr: []string{`RONOTE_CHAT_URL: "http://127.0.0.1:8094" must be https://api.anthropic.com when RONOTE_ENV is staging or prod`},
+		},
+		{
+			name:    "a kill switch that isn't a boolean",
+			env:     validEnv(map[string]string{"RONOTE_CHAT_ENABLED": "maybe"}),
+			wantErr: []string{`RONOTE_CHAT_ENABLED: "maybe" is not true or false`},
 		},
 		{
 			name:    "an embedder URL that isn't one",

@@ -121,11 +121,17 @@ func send(w http.ResponseWriter, rc *http.ResponseController, imp store.Import) 
 	if imp.DocumentID != uuid.Nil {
 		ev.DocumentID = &imp.DocumentID
 	}
-	data, err := json.Marshal(ev)
+	return writeEvent(w, rc, "status", ev)
+}
+
+// writeEvent writes one server-sent event, its data v as JSON, and flushes
+// it to the client.
+func writeEvent(w http.ResponseWriter, rc *http.ResponseController, event string, v any) error {
+	data, err := json.Marshal(v)
 	if err != nil {
 		return err
 	}
-	if _, err := fmt.Fprintf(w, "event: status\ndata: %s\n\n", data); err != nil {
+	if _, err := fmt.Fprintf(w, "event: %s\ndata: %s\n\n", event, data); err != nil {
 		return err
 	}
 	return rc.Flush()

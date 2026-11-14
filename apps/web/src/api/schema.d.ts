@@ -354,6 +354,106 @@ export interface paths {
         patch: operations["updateAnnotation"];
         trace?: never;
     };
+    "/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the user's conversations, most recently active first
+         * @description One page of conversations, and how many questions the user may
+         *     still ask today (docs/adr/0012-chat.md).
+         */
+        get: operations["listConversations"];
+        put?: never;
+        /**
+         * Start a conversation
+         * @description Starts a conversation over the user's whole library, or about one of
+         *     their documents when document_id is set. The scope is fixed: another
+         *     scope is another conversation.
+         */
+        post: operations["createConversation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/conversations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a conversation and its messages, in order */
+        get: operations["getConversation"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a conversation and its messages
+         * @description An answer being written in it stops.
+         */
+        delete: operations["deleteConversation"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/conversations/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask a question, and stream its answer
+         * @description Saves the question and streams the answer as server-sent events:
+         *     `delta` (ChatDelta) as text arrives, a segment being a run of text
+         *     its citations back; `citation` (ChatCitation) as a segment is
+         *     backed by blocks of the user's documents; `tool` (ChatTool) as the
+         *     model searches the library; then `done` (ChatDone) with the answer
+         *     as saved. `error` (ChatError) comes before `done` when the answer
+         *     failed, and alone when it couldn't be saved. A comment line
+         *     (`: heartbeat`) every 15 seconds keeps idle connections open.
+         *
+         *     The answer is written apart from the request: a client that
+         *     disconnects finds it saved. Stopping it is its own request.
+         *     This handler is written by hand; the spec documents it.
+         */
+        post: operations["sendMessage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/conversations/{id}/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stop the answer being written
+         * @description Ends the answer being written in the conversation, which is saved as
+         *     stopped with what it said so far. Nothing to stop is no error.
+         */
+        post: operations["stopConversation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -370,7 +470,7 @@ export interface components {
          * @description Why a request failed. Each response lists the codes it can carry.
          * @enum {string}
          */
-        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unknown_block" | "quote_mismatch" | "annotation_limit" | "unauthenticated" | "cross_origin" | "rate_limited" | "quota_exceeded" | "body_too_large" | "internal_error";
+        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unknown_block" | "quote_mismatch" | "annotation_limit" | "unauthenticated" | "cross_origin" | "rate_limited" | "quota_exceeded" | "body_too_large" | "chat_disabled" | "conversation_busy" | "internal_error";
         Me: {
             /** Format: uuid */
             id: string;
@@ -510,6 +610,112 @@ export interface components {
             error: components["schemas"]["ErrorBody"];
             /** @description The document's version now. */
             current_version: number;
+        };
+        Conversation: {
+            /** Format: uuid */
+            id: string;
+            /**
+             * Format: uuid
+             * @description The document the conversation is about; absent for the whole library.
+             */
+            document_id?: string;
+            document_title?: string;
+            /** @description The first question, cut; empty until there is one. */
+            title: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        ConversationList: {
+            conversations: components["schemas"]["Conversation"][];
+            /** @description Present when there are more conversations. */
+            next_cursor?: string;
+            /** @description Questions the user may still ask in the last 24 hours' quota. */
+            messages_left_today: number;
+        };
+        ConversationDetail: {
+            conversation: components["schemas"]["Conversation"];
+            messages: components["schemas"]["Message"][];
+        };
+        CreateConversationRequest: {
+            /**
+             * Format: uuid
+             * @description The user's document to ask about; leave it out for the whole library.
+             */
+            document_id?: string;
+        };
+        SendMessageRequest: {
+            text: string;
+        };
+        /** @description A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). An answer with no citations didn't find its answer in the library. */
+        Message: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            role: "user" | "assistant";
+            /**
+             * @description An answer streams until it is done, stopped or failed; a question is done.
+             * @enum {string}
+             */
+            status: "streaming" | "done" | "stopped" | "failed";
+            segments: components["schemas"]["MessageSegment"][];
+            citations: components["schemas"]["Citation"][];
+            error?: components["schemas"]["ChatErrorCode"];
+            usage?: components["schemas"]["ChatUsage"];
+            /** Format: date-time */
+            created_at: string;
+        };
+        /** @description A run of a message's Markdown, and the numbers of the citations that back it. */
+        MessageSegment: {
+            text: string;
+            citations: number[];
+        };
+        /** @description Blocks of one of the user's documents that an answer cites, and their text as the model read it. */
+        Citation: {
+            /** @description The citation's number in its answer, from 1. */
+            n: number;
+            /** Format: uuid */
+            document_id: string;
+            block_ids: string[];
+            cited_text: string;
+            /** @description The document's title and the blocks' headings, as "Title > Heading". */
+            title: string;
+        };
+        /** @description What an answer cost, across its calls to the model. */
+        ChatUsage: {
+            model: string;
+            input_tokens: number;
+            output_tokens: number;
+            cache_creation_input_tokens: number;
+            cache_read_input_tokens: number;
+            /** Format: int64 */
+            cost_microusd: number;
+            first_token_ms: number;
+            latency_ms: number;
+        };
+        /**
+         * @description Why an answer failed: the model didn't answer or was overloaded (model_unavailable), declined (model_refused), or the server failed (internal_error).
+         * @enum {string}
+         */
+        ChatErrorCode: "model_unavailable" | "model_refused" | "internal_error";
+        ChatDelta: {
+            segment: number;
+            text: string;
+        };
+        ChatCitation: {
+            segment: number;
+            citation: components["schemas"]["Citation"];
+        };
+        ChatTool: {
+            query: string;
+        };
+        ChatDone: {
+            message: components["schemas"]["Message"];
+            messages_left_today: number;
+        };
+        ChatError: {
+            code: components["schemas"]["ChatErrorCode"];
         };
         DocumentList: {
             documents: components["schemas"]["DocumentSummary"][];
@@ -758,6 +964,26 @@ export interface components {
                 "application/json": components["schemas"]["Error"];
             };
         };
+        /** @description Too many requests (code rate_limited), or over a chat quota (code quota_exceeded): 50 questions a day, or 400,000 input tokens read by their answers. */
+        TooManyQuestions: {
+            headers: {
+                /** @description Seconds until a question fits. */
+                "Retry-After"?: number;
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Chat is turned off. Code: chat_disabled. */
+        ChatDisabled: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
         /** @description The server failed; the request may be retried. Code: internal_error. */
         InternalError: {
             headers: {
@@ -801,6 +1027,21 @@ export type DocumentResponse = components['schemas']['DocumentResponse'];
 export type SaveDocumentRequest = components['schemas']['SaveDocumentRequest'];
 export type SavedDocument = components['schemas']['SavedDocument'];
 export type VersionConflict = components['schemas']['VersionConflict'];
+export type Conversation = components['schemas']['Conversation'];
+export type ConversationList = components['schemas']['ConversationList'];
+export type ConversationDetail = components['schemas']['ConversationDetail'];
+export type CreateConversationRequest = components['schemas']['CreateConversationRequest'];
+export type SendMessageRequest = components['schemas']['SendMessageRequest'];
+export type Message = components['schemas']['Message'];
+export type MessageSegment = components['schemas']['MessageSegment'];
+export type Citation = components['schemas']['Citation'];
+export type ChatUsage = components['schemas']['ChatUsage'];
+export type ChatErrorCode = components['schemas']['ChatErrorCode'];
+export type ChatDelta = components['schemas']['ChatDelta'];
+export type ChatCitation = components['schemas']['ChatCitation'];
+export type ChatTool = components['schemas']['ChatTool'];
+export type ChatDone = components['schemas']['ChatDone'];
+export type ChatError = components['schemas']['ChatError'];
 export type DocumentList = components['schemas']['DocumentList'];
 export type DocContent = components['schemas']['DocContent'];
 export type CodeLang = components['schemas']['CodeLang'];
@@ -829,6 +1070,8 @@ export type ResponseRateLimited = components['responses']['RateLimited'];
 export type ResponseTooManyImports = components['responses']['TooManyImports'];
 export type ResponseBodyTooLarge = components['responses']['BodyTooLarge'];
 export type ResponseCrossOrigin = components['responses']['CrossOrigin'];
+export type ResponseTooManyQuestions = components['responses']['TooManyQuestions'];
+export type ResponseChatDisabled = components['responses']['ChatDisabled'];
 export type ResponseInternalError = components['responses']['InternalError'];
 export type ParameterId = components['parameters']['ID'];
 export type $defs = Record<string, never>;
@@ -1545,6 +1788,226 @@ export interface operations {
             };
             429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
+        };
+    };
+    listConversations: {
+        parameters: {
+            query?: {
+                /** @description The next_cursor of the previous page. */
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of conversations. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationList"];
+                };
+            };
+            /** @description The cursor or limit is invalid. Codes: invalid_cursor, invalid_parameter. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: components["responses"]["Unauthenticated"];
+            429: components["responses"]["RateLimited"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ChatDisabled"];
+        };
+    };
+    createConversation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateConversationRequest"];
+            };
+        };
+        responses: {
+            /** @description The conversation. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Conversation"];
+                };
+            };
+            /** @description The body is not JSON for this operation. Code: invalid_request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
+            404: components["responses"]["NotFound"];
+            413: components["responses"]["BodyTooLarge"];
+            429: components["responses"]["RateLimited"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ChatDisabled"];
+        };
+    };
+    getConversation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The conversation. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationDetail"];
+                };
+            };
+            400: components["responses"]["InvalidParameter"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ChatDisabled"];
+        };
+    };
+    deleteConversation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["InvalidParameter"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ChatDisabled"];
+        };
+    };
+    sendMessage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendMessageRequest"];
+            };
+        };
+        responses: {
+            /** @description The answer's event stream. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example event: delta
+                     *     data: {"segment":0,"text":"Goroutines communicate over channels."}
+                     *
+                     *     event: citation
+                     *     data: {"segment":0,"citation":{"n":1,"document_id":"0192f1c4-7d3e-7c5a-9b1e-3f2a6d4c8e10","block_ids":["3f9a1c2b7d4e"],"cited_text":"Channels let goroutines communicate.","title":"Effective Go > Concurrency > Channels"}}
+                     *
+                     *     event: done
+                     *     data: {"message":{"id":"0192f1c4-7d3e-7c5a-9b1e-3f2a6d4c8e11","role":"assistant","status":"done","segments":[{"text":"Goroutines communicate over channels.","citations":[1]}],"citations":[{"n":1,"document_id":"0192f1c4-7d3e-7c5a-9b1e-3f2a6d4c8e10","block_ids":["3f9a1c2b7d4e"],"cited_text":"Channels let goroutines communicate.","title":"Effective Go > Concurrency > Channels"}],"usage":{"model":"claude-haiku-5-5","input_tokens":3120,"output_tokens":64,"cache_creation_input_tokens":0,"cache_read_input_tokens":640,"cost_microusd":351,"first_token_ms":740,"latency_ms":1630},"created_at":"2026-11-14T09:30:00Z"},"messages_left_today":49}
+                     */
+                    "text/event-stream": string;
+                };
+            };
+            /** @description The id, body or text is invalid. Codes: invalid_parameter, invalid_request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
+            404: components["responses"]["NotFound"];
+            /** @description An answer is already being written in this conversation. Code: conversation_busy. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            413: components["responses"]["BodyTooLarge"];
+            429: components["responses"]["TooManyQuestions"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ChatDisabled"];
+        };
+    };
+    stopConversation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Stopped, or nothing was being written. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["InvalidParameter"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            500: components["responses"]["InternalError"];
+            503: components["responses"]["ChatDisabled"];
         };
     };
 }

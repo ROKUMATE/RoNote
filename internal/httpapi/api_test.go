@@ -333,10 +333,10 @@ func TestListDocuments(t *testing.T) {
 
 func TestCursorRoundTrip(t *testing.T) {
 	t.Parallel()
-	c := store.DocumentCursor{CreatedAt: time.Date(2026, 11, 4, 9, 0, 0, 123456789, time.UTC), ID: uuid.New()}
-	got, err := decodeCursor(encodeCursor(c))
-	if err != nil || !got.CreatedAt.Equal(c.CreatedAt) || got.ID != c.ID {
-		t.Errorf("round trip = %+v, %v; want %+v", got, err, c)
+	at, id := time.Date(2026, 11, 4, 9, 0, 0, 123456789, time.UTC), uuid.New()
+	gotAt, gotID, err := decodeCursor(encodeCursor(at, id))
+	if err != nil || !gotAt.Equal(at) || gotID != id {
+		t.Errorf("round trip = %v, %v, %v; want %v, %v", gotAt, gotID, err, at, id)
 	}
 }
 

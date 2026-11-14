@@ -18,6 +18,14 @@ type Model interface {
 	Stream(ctx context.Context, req Request, on func(Event)) (Reply, error)
 }
 
+// ModelFunc is a function as a Model, as tests script one.
+type ModelFunc func(ctx context.Context, req Request, on func(Event)) (Reply, error)
+
+// Stream calls f.
+func (f ModelFunc) Stream(ctx context.Context, req Request, on func(Event)) (Reply, error) {
+	return f(ctx, req, on)
+}
+
 // Errors a Model returns, wrapped.
 var (
 	// ErrUnavailable means the model's API didn't answer, was overloaded or
@@ -161,4 +169,14 @@ type Usage struct {
 	OutputTokens             int
 	CacheCreationInputTokens int
 	CacheReadInputTokens     int
+}
+
+// Add returns u with v's tokens added.
+func (u Usage) Add(v Usage) Usage {
+	return Usage{
+		InputTokens:              u.InputTokens + v.InputTokens,
+		OutputTokens:             u.OutputTokens + v.OutputTokens,
+		CacheCreationInputTokens: u.CacheCreationInputTokens + v.CacheCreationInputTokens,
+		CacheReadInputTokens:     u.CacheReadInputTokens + v.CacheReadInputTokens,
+	}
 }

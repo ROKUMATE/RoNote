@@ -22,11 +22,10 @@ type block struct {
 
 // review prints each query marked for review: its expected blocks, and
 // hybrid's top 5 with the expected ones starred, so a reader can judge
-// whether expect names the right blocks. Each names its corpus document,
-// since an excerpt and its whole page share a title.
+// whether expect names the right blocks. Each names its corpus document.
 func review(ctx context.Context, st *store.Store, s *search.Searcher, owner uuid.UUID, docs []document, ids []uuid.UUID, queries []query) error {
-	// An excerpt shares block ids with its whole page; the first document
-	// in the corpus to hold a block names it.
+	// Identical blocks share an id across documents; the first document in
+	// the corpus to hold one names it.
 	blocks := map[string]block{}
 	// chunks maps each document's chunks by their first block, as hits
 	// name them.

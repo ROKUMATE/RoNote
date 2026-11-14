@@ -313,3 +313,17 @@ test("opened on a document, a conversation can be about it or the whole library"
   await within(panel).findByText("Asking about: This document: Guide");
   expect(bodies).toEqual([{ document_id: "doc-1" }]);
 });
+
+test("Escape closes the chat when focus has left it for the page", async () => {
+  stubApi({
+    "GET /documents": () => json({ documents: [] }),
+    "GET /conversations": () => json({ conversations: [], messages_left_today: 50 }),
+  });
+  renderApp("/");
+  const panel = await openChat();
+  // As when the answer a focused chip belonged to is replaced by its saved copy.
+  (document.activeElement as HTMLElement | null)?.blur();
+  expect(document.activeElement).toBe(document.body);
+  fireEvent.keyDown(document.body, { key: "Escape" });
+  await waitFor(() => expect(panel.isConnected).toBe(false));
+});

@@ -22,6 +22,8 @@ const budgets = {
   run: 20_000,
   /** The search palette, loaded the first time it opens (ADR 0011). */
   search: 6_000,
+  /** The chat panel, loaded the first time it opens (ADR 0012). */
+  chat: 9_000,
   /** All stylesheets. */
   css: 20_000,
 };
@@ -70,6 +72,7 @@ const groups = {
   annotations: closure(entry("src/document/annotations/ui.tsx"), seen),
   run: closure(entry("src/document/run/ui.tsx"), seen),
   search: closure(entry("src/search/SearchPalette.tsx"), seen),
+  chat: closure(entry("src/chat/ChatPanel.tsx"), seen),
 };
 const languages = Object.keys(manifest).filter(
   (k) => !seen.has(k) && manifest[k]?.file.endsWith(".js"),

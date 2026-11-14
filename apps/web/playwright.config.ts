@@ -39,12 +39,19 @@ const backend = env({
   // The real HTTP client, against a fake model.
   RONOTE_EMBED_URL: `${stack.embed}/v1`,
   RONOTE_EMBED_MODEL: "fake-words",
+  // The real adapter, against the fake model: no test calls Anthropic.
+  RONOTE_CHAT_ENABLED: "true",
+  RONOTE_CHAT_URL: stack.llm,
+  RONOTE_CHAT_MODEL: "claude-haiku-5-5",
+  ANTHROPIC_API_KEY: "",
   // The suite imports and signs in far more than a person does; Go tests
   // check the limits.
   RONOTE_LIMIT_IMPORTS_PER_DAY: "100000",
   RONOTE_LIMIT_DOCUMENTS: "100000",
   RONOTE_LIMIT_API_PER_MINUTE: "100000",
   RONOTE_LIMIT_AUTH_PER_MINUTE: "100000",
+  RONOTE_LIMIT_CHAT_MESSAGES_PER_DAY: "100000",
+  RONOTE_LIMIT_CHAT_TOKENS_PER_DAY: "1000000000",
 });
 
 const stop = { signal: "SIGTERM", timeout: 5000 } as const;
@@ -88,6 +95,15 @@ export default defineConfig({
       gracefulShutdown: stop,
     },
     {
+      name: "llm",
+      command: "bin/e2e/fakellm",
+      cwd: "../..",
+      env: env({ RONOTE_FAKELLM_ADDR: new URL(stack.llm).host }),
+      url: `${stack.llm}/healthz`,
+      reuseExistingServer: false,
+      gracefulShutdown: stop,
+    },
+    {
       name: "api",
       command: "bin/e2e/api",
       cwd: "../..",
@@ -107,6 +123,19 @@ export default defineConfig({
         RONOTE_EMBED_URL: "http://127.0.0.1:9/v1",
       },
       url: `${stack.apiDegraded}/readyz`,
+      reuseExistingServer: false,
+      gracefulShutdown: stop,
+    },
+    {
+      name: "api, one question a day",
+      command: "bin/e2e/api",
+      cwd: "../..",
+      env: {
+        ...backend,
+        RONOTE_HTTP_ADDR: new URL(stack.apiOneQuestion).host,
+        RONOTE_LIMIT_CHAT_MESSAGES_PER_DAY: "1",
+      },
+      url: `${stack.apiOneQuestion}/readyz`,
       reuseExistingServer: false,
       gracefulShutdown: stop,
     },

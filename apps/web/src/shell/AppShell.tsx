@@ -1,4 +1,5 @@
 import { BooksIcon } from "@phosphor-icons/react/Books";
+import { ChatCircleTextIcon } from "@phosphor-icons/react/ChatCircleText";
 import { MagnifyingGlassIcon } from "@phosphor-icons/react/MagnifyingGlass";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
@@ -12,13 +13,14 @@ export const outlineSlotId = "outline-slot";
 /** Where a document's notes go in the notes margin (ADR 0007). */
 export const notesSlotId = "notes-slot";
 
-// The search palette loads the first time it opens.
+// The search palette and the chat panel each load the first time they open.
 const SearchPalette = lazy(() =>
   import("../search/SearchPalette").then((m) => ({ default: m.SearchPalette })),
 );
+const ChatPanel = lazy(() => import("../chat/ChatPanel").then((m) => ({ default: m.ChatPanel })));
 
-/** How the search shortcut reads on this machine. */
-const searchShortcut = /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘K" : "Ctrl K";
+/** How the shortcuts read on this machine. */
+const mod = /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘" : "Ctrl ";
 
 const navLink =
   "flex items-center gap-2 rounded-sm px-2 py-1 text-ui-lg text-ink-2 hover:bg-paper-2 hover:text-ink aria-[current=page]:bg-paper-2 aria-[current=page]:text-ink";
@@ -30,6 +32,7 @@ const navLink =
  */
 export function AppShell({ children }: { children?: ReactNode }) {
   const [searching, setSearching] = useState(false);
+  const [chatting, setChatting] = useState(false);
   // Opened from a document, search can stay inside it.
   const documentId = useRouterState({
     select: (s) => s.matches.find((m) => m.routeId === "/shell/doc/$id")?.params.id,
@@ -37,9 +40,14 @@ export function AppShell({ children }: { children?: ReactNode }) {
   useEffect(() => {
     // Captured before the editor sees it, which has no use for the key.
     const onKey = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && !event.altKey && event.key.toLowerCase() === "k") {
+      if (!(event.metaKey || event.ctrlKey) || event.altKey) return;
+      const key = event.key.toLowerCase();
+      if (key === "k") {
         event.preventDefault();
         setSearching(true);
+      } else if (key === "j") {
+        event.preventDefault();
+        setChatting((open) => !open);
       }
     };
     window.addEventListener("keydown", onKey, { capture: true });
@@ -78,7 +86,24 @@ export function AppShell({ children }: { children?: ReactNode }) {
                   aria-hidden
                   className="ml-auto hidden font-sans text-ink-2 text-ui sidebar:inline"
                 >
-                  {searchShortcut}
+                  {mod}K
+                </kbd>
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => setChatting(true)}
+                aria-keyshortcuts="Meta+J Control+J"
+                className={`${navLink} w-full`}
+              >
+                <ChatCircleTextIcon size={16} aria-hidden />
+                Chat
+                <kbd
+                  aria-hidden
+                  className="ml-auto hidden font-sans text-ink-2 text-ui sidebar:inline"
+                >
+                  {mod}J
                 </kbd>
               </button>
             </li>
@@ -96,6 +121,11 @@ export function AppShell({ children }: { children?: ReactNode }) {
             {...(documentId ? { documentId } : {})}
             onClose={() => setSearching(false)}
           />
+        </Suspense>
+      )}
+      {chatting && (
+        <Suspense>
+          <ChatPanel {...(documentId ? { documentId } : {})} onClose={() => setChatting(false)} />
         </Suspense>
       )}
       <div className="min-w-0 notes:grid notes:grid-cols-[minmax(0,1fr)_280px]">

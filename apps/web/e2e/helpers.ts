@@ -97,3 +97,23 @@ export async function openLibrary(page: Page) {
     .click();
   await expect(page.getByRole("heading", { level: 1, name: "Library" })).toBeVisible();
 }
+
+/**
+ * Imports a golden fixture that says "statements", and waits until search
+ * finds it: indexing waits 5s for edits to settle. Returns its path.
+ */
+export async function importIndexed(page: Page, fixture: string): Promise<string> {
+  await page.goto("/");
+  const path = await importPage(page, fixtureURL("pages", fixture));
+  const id = path.replace("/doc/", "");
+  await expect
+    .poll(
+      async () => {
+        const res = await page.request.get(`/api/v1/search?q=statements&document_id=${id}`);
+        return ((await res.json()) as { results: unknown[] }).results.length;
+      },
+      { timeout: 30_000, message: `${fixture} indexed` },
+    )
+    .toBeGreaterThan(0);
+  return path;
+}

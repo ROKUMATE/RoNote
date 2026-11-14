@@ -5,17 +5,11 @@
 package main
 
 import (
-	"context"
 	"errors"
 	"fmt"
-	"log/slog"
-	"net"
-	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
+	"github.com/rokumate/ronote/internal/devserver"
 	"github.com/rokumate/ronote/internal/fakeidp"
 )
 
@@ -37,31 +31,8 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-	var lc net.ListenConfig
-	ln, err := lc.Listen(ctx, "tcp", addr)
-	if err != nil {
-		return fmt.Errorf("listen: %w", err)
-	}
-	srv := &http.Server{
-		Handler:           fakeidp.New(fakeidp.Options{ClientID: clientID, ClientSecret: secret, Users: users}),
-		ReadHeaderTimeout: 5 * time.Second,
-	}
-	serveErr := make(chan error, 1)
-	go func() { serveErr <- srv.Serve(ln) }()
-	logger.Info("fakeidp listening", "addr", ln.Addr().String(), "users", len(users))
-
-	select {
-	case err := <-serveErr:
-		return fmt.Errorf("serve: %w", err)
-	case <-ctx.Done():
-	}
-	shutdownCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
-	defer cancel()
-	return srv.Shutdown(shutdownCtx)
+	handler := fakeidp.New(fakeidp.Options{ClientID: clientID, ClientSecret: secret, Users: users})
+	return devserver.Run("fakeidp", addr, handler, "users", len(users))
 }
 
 func withDefault(value, fallback string) string {

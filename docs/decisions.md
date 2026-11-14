@@ -360,3 +360,19 @@ Recorded in [ADR 0009](adr/0009-jobs-port.md).
 - **Landing:** a result opens `/doc/$id?block=<id>`; the page moves to the block, flashes it once (a node decoration: ProseMirror redraws a node whose class is set from outside) and holds it in view while the page settles, until it stays put for 2 s or the reader scrolls, types or clicks. In Effective Go a landing first missed by 2,000 px: the document's serif font arrives after the scroll and re-wraps every paragraph above, and code coming into view renders taller than its 6em placeholder.
 - **Found while building:** memjobs read its clock twice when scheduling, so a fake clock moved in between left a delayed job waiting forever.
 
+
+## Chat (since P17, ADR 0012)
+
+- **The port:** `internal/chat.Model`, one streamed call in RoNote's own types (text, search results, tool use and results, thinking blocks); the service owns the tool loop, so thinking blocks travel as `Thinking{Thinking, Signature}` and go back unchanged within a turn. `ModelFunc` scripts a model in tests.
+- **The adapter** (`internal/chat/anthropic`) builds requests with `option.WithoutEnvironmentDefaults`: RoNote's config names the URL, key and model, and nothing comes from the environment. It reads replies from the SDK's accumulated message, block by block, not `AsAny`, so a reply cut short still yields what streamed.
+- **Errors:** an error sent mid-stream arrives with the stream's 200, so the adapter sorts errors by their API type (rate limit, overload, server, timeout: unavailable; anything else: rejected), and by status only when there is no type.
+- **Grounding:** passages are cut to 2,000 characters, dropping the blocks past the cut, so an oversized code chunk can't blow the cap and every citation still names a block sent. A passage's source is `ronote:chunk/<id>`, but citations are checked by their index too: both must agree.
+- **The cap:** the first call is estimated from its texts at 3 characters a token; later calls add the tokens the API reported the one before read and wrote, plus the tool's results. Earlier exchanges get what is left after room for 3 worst-case tool rounds: about 4,400 tokens beside 8 chunks of a usual size.
+- **Streams:** an answer runs on a context detached from its request, with a 120 s timeout and a cancel cause, so Stop (stopped), the timeout (model unavailable) and shutdown (internal error) save differently. The handler only forwards updates; leaving drops them and the answer goes on.
+- **The fake model** (`cmd/fakellm`) refuses what the API refuses within the subset (unknown fields such as `temperature`, citations on user text, mixed citation settings, a tool result mixing search results with text, a tool round without its thinking), so the adapter's requests are checked against it on every run.
+- **The web panel** renders a subset of Markdown itself, as elements: no HTML is ever injected, images become their alt text, and only links to documents the answer cites stay links. Citation numbers ride in the text as private-use markers, after the words of their segment.
+- **Tests that catch regressions:** accepting a citation without comparing its source with what was sent was caught by `TestCitations` ("a chunk not sent", "another passage's source at this index").
+- **Found while building:**
+  - `go mod tidy` failed on the SDK's own test dependencies: an old `golang.org/x/oauth2` pulled `cloud.google.com/go` v0.34.0, which still held `compute/metadata`. Requiring a later `cloud.google.com/go` once let tidy settle on the split-out module;
+  - a `<header>` inside the chat `<dialog>` is a second banner landmark to axe; the panel's top bar is a `div`;
+  - two web unit tests (`Account`, `ImportDialog`) failed once each under `make check`'s load and passed alone and in three full runs: timing, not P17's code.

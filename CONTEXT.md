@@ -4,36 +4,38 @@ The project's state, in at most 80 lines and 6 KB (`make lint` checks). Rewrite 
 
 ## Current milestone
 
-P16, retrieval: done (ADR 0011). Search and P17's chat are in scope; nothing generated enters DocContent.
-- **Chunks** (`internal/search`): blocks under one heading path up to 1,400 characters, code never split, notes their own chunks; goldens for every fixture.
-- **Embeddings** (`internal/embed`): Qwen3-Embedding-0.6B through Ollama's OpenAI-compatible API (`RONOTE_EMBED_URL`, `RONOTE_EMBED_MODEL`, `make doctor` checks the pinned build); a cache shared across users; `cmd/fakeembed` for e2e; recorded vectors for the eval.
-- **Indexing** on the jobs port, which gained delayed jobs: each change search sees enqueues `index_document` in its transaction, 5 s later; the worker backfills. One edit re-embedded 1 chunk of 6.
-- **Search:** `GET /api/v1/search`, words and meaning merged by RRF, owner-scoped, word matches alone (`degraded`) without the embedder. Exact scan, PLAIN storage: hybrid p50 13 ms, p95 21 ms at 25,000 chunks of one user among 200,000 (`make test-perf-search`).
-- **Web:** Mod+K or Search opens the palette (its own 1.75 kB chunk): results by document, arrow keys, "This document", landing on the block with one flash.
-- **Eval** (`make eval`, in CI): 14 documents, 321 chunks, 80 queries; hybrid recall@10 0.958, MRR@10 0.808 (meaning alone 0.951, 0.811; words alone 0.806, 0.513).
-- **In the browser,** "how do I run things concurrently" answers from Effective Go's Concurrency chapter (top 5), Goroutines 4th; Effective Go never names `ServeMux`, so that search finds no code of it.
-- **Deliberate break:** dropping the owner filter from the vector half was caught by the EXPLAIN test; results never leaked, as the last join re-checks the owner.
-- **Checks:** `make check`, `make test-integration`, `make eval` and `make web-e2e` (113 passed, 1 skipped) pass.
+P17, chat over the library: built (ADR 0012), tested on the fake model. Not yet run against the real one: there is no API billing yet.
+- **Port** (`internal/chat`): `Model`, one streamed call; `internal/chat/anthropic` adapts the Messages API (SDK v2.9.0, Claude Haiku 5.5, effort low, `max_tokens` 1024, tools and system prompt cached) and is the only package importing the SDK. `cmd/fakellm` serves the same subset for dev and e2e.
+- **Grounding:** the question's top 8 chunks (hybrid search, the conversation's scope) as `search_result` blocks, a text per block (`chunks.block_texts`, migration 00013); `search_library` for up to 3 more rounds, always as the owner.
+- **Citations** count only if they point at a result sent in the turn and a block range inside it; the blocks and text are RoNote's own copy. A reply with none shows "Not found in your library".
+- **Budgets:** a 30k input-token cap a call (3 characters a token, oldest turns dropped first); 50 questions and 400k input tokens per user per day (`quota_exceeded`); `RONOTE_CHAT_ENABLED` kill switch (503 `chat_disabled`). Every answer records its tokens, cost in micro-dollars and latency.
+- **API:** conversations CRUD, `POST …/messages` streaming `delta`, `citation`, `tool`, `done`, `error`; one answer at a time (409 `conversation_busy`); answers outlive a disconnect; `POST …/stop` (per API process).
+- **Web:** the chat panel (Mod+J, its own 6.1 kB chunk), beside the page from 1100px, a sheet below; scope chip, streaming with Stop, generated treatment, numbered citation chips that preview on hover or focus and land on their block; conversation list; questions left today.
+- **Eval:** `make eval-chat` asks the 80 eval queries through chat and writes `testdata/retrieval/chat-report.md` from the real model only; dry-run against fakellm here. The search eval is unchanged: hybrid recall@10 0.958, MRR@10 0.808.
+- **Deliberate break:** citations accepted without checking their source against what was sent: `TestCitations` caught both cases.
+- **Checks:** `make check`, `make test-integration`, `make eval` and `make web-e2e` pass.
+
+**Waiting on billing:** recording the adapter's streams (`go test ./internal/chat/anthropic -record`), `make eval-chat` and its committed report, and the real model's answers in the browser.
 
 ## What exists
 
-- **Go** (`cmd/api`, `cmd/worker`, dev tools in `cmd/`, `internal/*`): a spec-first API (`api/openapi.yaml`) behind GitHub sign-in, hybrid search over each library, and an import pipeline on the jobs port (fetch with SSRF guard and robots.txt, extract to IR with framework adapters, documents per owner). Event streams come from Postgres LISTEN/NOTIFY; editing keeps source blocks locked; highlights and notes.
+- **Go** (`cmd/api`, `cmd/worker`, dev tools in `cmd/`, `internal/*`): a spec-first API (`api/openapi.yaml`) behind GitHub sign-in; hybrid search over each library and chat over it; an import pipeline on the jobs port (fetch with SSRF guard and robots.txt, extract to IR with framework adapters, documents per owner). Event streams come from Postgres LISTEN/NOTIFY; editing keeps source blocks locked; highlights and notes.
 - **Web** (`apps/web`):
   - the library, and an import dialog with live progress;
   - the document reader and editor (Tiptap), with same-domain links that import on click;
   - code highlighting and language choice, highlights and notes, and code that runs in the browser;
-  - the search palette.
+  - the search palette and the chat panel.
 - **Runner** (`apps/web/runner`): its own origin, Pyodide and JavaScript workers, a versioned message protocol.
-- **Quality:** golden fixtures and live checks for the extractor, integration tests on testcontainers, Playwright and axe end to end, CI on every push and pull request.
+- **Quality:** golden fixtures and live checks for the extractor, integration tests on testcontainers, Playwright and axe end to end, CI on every push and pull request; the search eval in CI.
 - **ADRs:**
   - 0001 stack, 0002 verbatim source, 0003 commits;
   - 0004 IR and links, 0005 import pipeline, 0006 editor and DocContent;
   - 0007 annotations, 0008 in-browser code execution, 0009 the jobs port;
-  - 0010 sign-in and sessions, 0011 retrieval.
+  - 0010 sign-in and sessions, 0011 retrieval, 0012 chat.
 
 ## Next step
 
-P17, chat over the library, per its brief; it needs more than a similarity threshold to say "I don't know" (`docs/open-questions.md`). v1 still lacks printed-PDF import; the runner's deployment is P18, proxy headers P19.
+Add API billing and run what waits on it, then P18, the runner's deployment, and P19, proxy headers. v1 still lacks printed-PDF import.
 
 ## Quarantined tests
 

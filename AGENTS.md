@@ -4,7 +4,7 @@ Rules for any coding agent working in this repo. Read CONTEXT.md before you star
 
 ## Product
 
-RoNote turns ONE documentation page (a URL) or a printed PDF into an editable study doc for IT and CS students. Source content is reproduced verbatim; nothing is AI-added. Students highlight, annotate and run code blocks. Same-domain links inside a page import on click; other-domain links stay plain links. Students search their library, and (P17) chat over it: answers cite blocks and are never written into documents (docs/adr/0011-retrieval.md).
+RoNote turns ONE documentation page (a URL) or a printed PDF into an editable study doc for IT and CS students. Source content is reproduced verbatim; nothing is AI-added. Students highlight, annotate and run code blocks. Same-domain links inside a page import on click; other-domain links stay plain links. Students search their library and chat over it: answers cite blocks and are never written into documents (docs/adr/0011-retrieval.md, docs/adr/0012-chat.md).
 
 Stack: Go backend, React + TypeScript + Tailwind v4 frontend, Postgres + pgvector, one monorepo. Repo: github.com/ROKUMATE/RoNote.
 
@@ -14,7 +14,7 @@ Out of scope for v1: site crawling, AI summaries, handwritten OCR, pseudocode co
 
 | Path | Holds |
 |---|---|
-| `cmd/` | `api`, `worker`; dev tools `extract`, `eval`, `fakeidp`, `fakeembed` |
+| `cmd/` | `api`, `worker`; dev tools `extract`, `eval`, `fakeidp`, `fakeembed`, `fakellm` |
 | `internal/<pkg>/` | Go packages, one concern each |
 | `internal/jobs/` | the jobs port (docs/adr/0009-jobs-port.md); only `riverjobs` may import River |
 | `migrations/` | goose migrations; goose owns all schema, River's included |
@@ -39,16 +39,17 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make test-integration` | unit and integration tests on testcontainers |
 | `make eval` / `eval-record` | the retrieval eval on recorded vectors, gated on `baseline.json` / re-record them through the model |
 | `make eval-review` | the eval's queries marked for review, with their expected blocks and hybrid's top 5 |
+| `make eval-chat` | the eval's queries through chat, of the real model; local only, costs cents |
 | `make test-perf-search` | search timing over large libraries; local only |
 | `make test-live` | extract the live pages and check the RAG tutorial; network, never CI |
 | `make hooks-test` | test the commit hook and the scripts |
 | `make check-commits RANGE=main..HEAD` | check each commit message in strict mode |
-| `make web-dev` | app on `127.0.0.1:5173` and the runner on `localhost:5174` |
+| `make web-dev` | app on `127.0.0.1:5173`, the runner on `localhost:5174`, the fake sign-in and chat model |
 | `make web-build` | production build and bundle budgets |
 | `make web-e2e` | Playwright and axe against the full stack (`make dev-up` first) |
 | `make run-api` / `run-worker` | the API on `127.0.0.1:8080` / the job worker |
-| `make run-idp` | the fake GitHub sign-in on `127.0.0.1:8090` (`web-dev` starts it too) |
-| `make stop` | end what `run-api`, `run-worker`, `run-idp` and `web-dev` started |
+| `make run-idp` / `run-llm` | the fake GitHub sign-in on `127.0.0.1:8090` / the fake chat model on `:8094` (`web-dev` starts both) |
+| `make stop` | end what the `run-*` targets and `web-dev` started |
 | `make dev-up` / `dev-down` | start / stop the dev stack (Postgres) |
 | `make doctor` | check the container VM's clock, and that the pinned embedding model answers |
 | `make generate` / `check-generated` | regenerate sqlc and OpenAPI output / fail if stale |

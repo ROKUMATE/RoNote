@@ -7,7 +7,7 @@ Where things live, in full. AGENTS.md keeps the short version.
 | `cmd/api/` | HTTP API server |
 | `cmd/worker/` | background job runner |
 | `cmd/extract/` | dev tool: fetch one page and print its IR (`make extract`) |
-| `cmd/fakeidp/`, `cmd/fakeembed/` | dev and test stand-ins for GitHub sign-in and the embedder |
+| `cmd/fakeidp/`, `cmd/fakeembed/`, `cmd/fakellm/` | dev and test stand-ins for GitHub sign-in, the embedder and the chat model, each served by `internal/devserver` |
 | `cmd/eval/` | the retrieval eval (`make eval`); with tests, the only code that may link testcontainers |
 | `internal/<pkg>/` | Go packages, one concern each |
 | `migrations/` | Postgres schema migrations |
@@ -22,6 +22,10 @@ Where things live, in full. AGENTS.md keeps the short version.
 | `internal/jobs/` | the jobs port: enqueue in the caller's transaction, deliver at least once (docs/adr/0009-jobs-port.md); `riverjobs` runs it on River and is the only package that imports River, `memjobs` in memory for unit tests, `jobstest` is the suite both pass |
 | `internal/search/` | retrieval: chunking documents and notes, indexing them on the jobs port, hybrid search (docs/adr/0011-retrieval.md) |
 | `internal/embed/` | embedders: the OpenAI-compatible client, a deterministic fake, and the eval's replay of recorded vectors |
+| `internal/chat/` | chat over a library (docs/adr/0012-chat.md): the `Model` port, the service that grounds, streams, validates citations, budgets and saves answers, and the `search_library` tool |
+| `internal/chat/anthropic/` | the port's adapter to Anthropic's Messages API; the only package that imports the SDK (depguard); `testdata/` holds its streams and request goldens |
+| `internal/fakellm/` | the fake Messages API `cmd/fakellm` serves: the subset chat uses, answering deterministically from the search results it is sent |
+| `internal/devserver/` | runs a dev stand-in until it is interrupted |
 | `internal/ratelimit/` | per-key fixed-window counting, in memory, for the API's rate limits |
 | `testdata/retrieval/` | the eval's corpus, queries, recorded vectors and baseline, with `SOURCES.md` |
 | `internal/events/` | import status changes from Postgres (LISTEN import_status, one connection per API process) to the API's event streams |

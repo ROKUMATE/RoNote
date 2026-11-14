@@ -13,6 +13,7 @@ if (!HTMLDialogElement.prototype.showModal) {
   HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) {
     this.open = true;
   };
+  HTMLDialogElement.prototype.show = HTMLDialogElement.prototype.showModal;
   HTMLDialogElement.prototype.close = function close(this: HTMLDialogElement) {
     if (!this.open) return;
     this.open = false;

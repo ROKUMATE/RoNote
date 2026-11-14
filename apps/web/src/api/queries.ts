@@ -3,6 +3,7 @@ import { ApiError, api, dataOrThrow, okOrThrow } from "./client";
 import type {
   Annotation,
   AnnotationPatch,
+  Conversation,
   DocContent,
   Document,
   DocumentSummary,
@@ -184,6 +185,52 @@ export async function reanchorAnnotations(
       body: { annotations },
     }),
   ).annotations;
+}
+
+/** Every chat query sits under this key (ADR 0012). */
+export const chatKey = ["chat"] as const;
+
+/** How many conversations the chat panel lists. */
+const conversationCount = 30;
+
+/** The user's latest conversations, and the questions they have left today. */
+export const conversationsQuery = queryOptions({
+  queryKey: [...chatKey, "list"],
+  queryFn: async () =>
+    dataOrThrow(
+      await api.GET("/conversations", { params: { query: { limit: conversationCount } } }),
+    ),
+});
+
+/**
+ * One conversation and its messages. While an answer is still being
+ * written, as when the panel closed mid-answer, it is read again every few
+ * seconds until it is saved.
+ */
+export function conversationQuery(id: string) {
+  return queryOptions({
+    queryKey: [...chatKey, "one", id],
+    queryFn: async () =>
+      dataOrThrow(await api.GET("/conversations/{id}", { params: { path: { id } } })),
+    refetchInterval: (query) =>
+      query.state.data?.messages.some((m) => m.status === "streaming") ? 2000 : false,
+  });
+}
+
+/** Starts a conversation about a document, or over the whole library. */
+export async function createConversation(documentId?: string): Promise<Conversation> {
+  return dataOrThrow(
+    await api.POST("/conversations", { body: documentId ? { document_id: documentId } : {} }),
+  );
+}
+
+export async function deleteConversation(id: string): Promise<void> {
+  okOrThrow(await api.DELETE("/conversations/{id}", { params: { path: { id } } }));
+}
+
+/** Stops the answer being written; it is saved as stopped. */
+export async function stopAnswer(id: string): Promise<void> {
+  okOrThrow(await api.POST("/conversations/{id}/stop", { params: { path: { id } } }));
 }
 
 /**

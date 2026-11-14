@@ -1,5 +1,5 @@
 import { ApiError } from "./client";
-import type { ErrorCode, ImportErrorCode, SignInErrorCode } from "./schema";
+import type { ChatErrorCode, ErrorCode, ImportErrorCode, SignInErrorCode } from "./schema";
 
 /** Why signing in failed, one plain sentence per code. */
 export const signInErrorMessages: Record<SignInErrorCode, string> = {
@@ -26,6 +26,13 @@ export const importErrorMessages: Record<ImportErrorCode, string> = {
   upstream_error: "The site is having trouble right now. Try again later.",
   robots_unavailable: "The site couldn't say whether RoNote may fetch its pages. Try again later.",
   network_error: "RoNote couldn't connect to the site.",
+  internal_error: "Something went wrong on RoNote's side. Try again.",
+};
+
+/** Why an answer failed, one plain sentence per code (ADR 0012). */
+export const chatErrorMessages: Record<ChatErrorCode, string> = {
+  model_unavailable: "The model isn't answering right now. Try again in a minute.",
+  model_refused: "The model declined to answer this question.",
   internal_error: "Something went wrong on RoNote's side. Try again.",
 };
 

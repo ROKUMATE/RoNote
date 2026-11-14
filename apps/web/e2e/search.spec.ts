@@ -3,28 +3,11 @@ import {
   chooseTheme,
   expectNoAxeViolations,
   expectNoHorizontalScroll,
-  fixtureURL,
+  importIndexed,
   importPage,
 } from "./helpers";
 import { stack } from "./stack";
 import { expect, test } from "./test";
-
-/** Imports fixture and waits until search finds it: indexing waits 5s for edits to settle. */
-async function importIndexed(page: Page, fixture: string): Promise<string> {
-  await page.goto("/");
-  const path = await importPage(page, fixtureURL("pages", fixture));
-  const id = path.replace("/doc/", "");
-  await expect
-    .poll(
-      async () => {
-        const res = await page.request.get(`/api/v1/search?q=statements&document_id=${id}`);
-        return ((await res.json()) as { results: unknown[] }).results.length;
-      },
-      { timeout: 30_000, message: `${fixture} indexed` },
-    )
-    .toBeGreaterThan(0);
-  return path;
-}
 
 /** Opens the palette with the shortcut and searches for q. */
 async function search(page: Page, q: string) {

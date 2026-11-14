@@ -14,5 +14,6 @@ The local stack: containers, the dev environment, and the processes dev runs.
 Dev runs two processes, each in its own terminal, after `make dev-up` and `make migrate-up`:
 - `make run-api` serves the API. Every `/api/v1` route but sign-in answers 401 without a session: sign in at `/login` through the fake GitHub (`cmd/fakeidp`), which `make web-dev` starts (or `make run-idp` alone). `.env.example`'s provider URLs point at it, and its users (`deploy/fakeidp/dev-users.json`) include `dev@ronote.local`, so documents from before sign-in stay reachable (docs/adr/0010-sign-in-and-sessions.md).
 - `make run-worker` runs imports. Without it, imports stay `queued`.
+- Chat answers from the fake model (`cmd/fakellm`), which `make web-dev` starts (or `make run-llm` alone), as `.env.example`'s `RONOTE_CHAT_URL` says. For the real model, set `RONOTE_CHAT_URL=https://api.anthropic.com` and `ANTHROPIC_API_KEY` in `.env.dev`; each question then costs a fraction of a cent (docs/adr/0012-chat.md).
 
 docs/adr/0005-import-pipeline.md describes the pipeline both serve.

@@ -36,6 +36,14 @@ linters:
           deny:
             - pkg: github.com/riverqueue
               desc: reach River through internal/jobs; only internal/jobs/riverjobs imports it (docs/adr/0009-jobs-port.md)
+        anthropic:
+          # Anthropic's SDK is the chat port's adapter, and stays behind it.
+          files:
+            - "$all"
+            - "!**/internal/chat/anthropic/**"
+          deny:
+            - pkg: github.com/anthropics/anthropic-sdk-go
+              desc: reach the model through internal/chat's Model; only internal/chat/anthropic imports the SDK (docs/adr/0012-chat.md)
 
 formatters:
   enable:

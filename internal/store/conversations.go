@@ -61,6 +61,8 @@ const (
 type MessageContent struct {
 	Segments  []Segment  `json:"segments"`
 	Citations []Citation `json:"citations"`
+	// Error is why a failed answer failed, as the API names it.
+	Error string `json:"error,omitempty"`
 }
 
 // Segment is a run of a message's text and the numbers of the citations

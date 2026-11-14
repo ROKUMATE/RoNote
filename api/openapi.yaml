@@ -705,6 +705,228 @@ paths:
           $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
+  /conversations:
+    get:
+      operationId: listConversations
+      summary: List the user's conversations, most recently active first
+      description: |
+        One page of conversations, and how many questions the user may
+        still ask today (docs/adr/0012-chat.md).
+      parameters:
+        - name: cursor
+          in: query
+          description: The next_cursor of the previous page.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: One page of conversations.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationList"
+        "400":
+          description: "The cursor or limit is invalid. Codes: invalid_cursor, invalid_parameter."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/ChatDisabled"
+    post:
+      operationId: createConversation
+      summary: Start a conversation
+      description: |
+        Starts a conversation over the user's whole library, or about one of
+        their documents when document_id is set. The scope is fixed: another
+        scope is another conversation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateConversationRequest"
+      responses:
+        "201":
+          description: The conversation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+        "400":
+          description: "The body is not JSON for this operation. Code: invalid_request."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "413":
+          $ref: "#/components/responses/BodyTooLarge"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/ChatDisabled"
+  /conversations/{id}:
+    get:
+      operationId: getConversation
+      summary: Get a conversation and its messages, in order
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: The conversation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationDetail"
+        "400":
+          $ref: "#/components/responses/InvalidParameter"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/ChatDisabled"
+    delete:
+      operationId: deleteConversation
+      summary: Delete a conversation and its messages
+      description: An answer being written in it stops.
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "204":
+          description: Deleted.
+        "400":
+          $ref: "#/components/responses/InvalidParameter"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/ChatDisabled"
+  /conversations/{id}/messages:
+    post:
+      operationId: sendMessage
+      summary: Ask a question, and stream its answer
+      description: |
+        Saves the question and streams the answer as server-sent events:
+        `delta` (ChatDelta) as text arrives, a segment being a run of text
+        its citations back; `citation` (ChatCitation) as a segment is
+        backed by blocks of the user's documents; `tool` (ChatTool) as the
+        model searches the library; then `done` (ChatDone) with the answer
+        as saved. `error` (ChatError) comes before `done` when the answer
+        failed, and alone when it couldn't be saved. A comment line
+        (`: heartbeat`) every 15 seconds keeps idle connections open.
+
+        The answer is written apart from the request: a client that
+        disconnects finds it saved. Stopping it is its own request.
+        This handler is written by hand; the spec documents it.
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageRequest"
+      responses:
+        "200":
+          description: The answer's event stream.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+              example: |
+                event: delta
+                data: {"segment":0,"text":"Goroutines communicate over channels."}
+
+                event: citation
+                data: {"segment":0,"citation":{"n":1,"document_id":"0192f1c4-7d3e-7c5a-9b1e-3f2a6d4c8e10","block_ids":["3f9a1c2b7d4e"],"cited_text":"Channels let goroutines communicate.","title":"Effective Go > Concurrency > Channels"}}
+
+                event: done
+                data: {"message":{"id":"0192f1c4-7d3e-7c5a-9b1e-3f2a6d4c8e11","role":"assistant","status":"done","segments":[{"text":"Goroutines communicate over channels.","citations":[1]}],"citations":[{"n":1,"document_id":"0192f1c4-7d3e-7c5a-9b1e-3f2a6d4c8e10","block_ids":["3f9a1c2b7d4e"],"cited_text":"Channels let goroutines communicate.","title":"Effective Go > Concurrency > Channels"}],"usage":{"model":"claude-haiku-5-5","input_tokens":3120,"output_tokens":64,"cache_creation_input_tokens":0,"cache_read_input_tokens":640,"cost_microusd":351,"first_token_ms":740,"latency_ms":1630},"created_at":"2026-11-14T09:30:00Z"},"messages_left_today":49}
+        "400":
+          description: "The id, body or text is invalid. Codes: invalid_parameter, invalid_request."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: "An answer is already being written in this conversation. Code: conversation_busy."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "413":
+          $ref: "#/components/responses/BodyTooLarge"
+        "429":
+          $ref: "#/components/responses/TooManyQuestions"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/ChatDisabled"
+  /conversations/{id}/stop:
+    post:
+      operationId: stopConversation
+      summary: Stop the answer being written
+      description: |
+        Ends the answer being written in the conversation, which is saved as
+        stopped with what it said so far. Nothing to stop is no error.
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "204":
+          description: Stopped, or nothing was being written.
+        "400":
+          $ref: "#/components/responses/InvalidParameter"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/ChatDisabled"
 components:
   parameters:
     ID:
@@ -781,6 +1003,26 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
+    TooManyQuestions:
+      description: >-
+        Too many requests (code rate_limited), or over a chat quota (code
+        quota_exceeded): 50 questions a day, or 400,000 input tokens read by
+        their answers.
+      headers:
+        Retry-After:
+          description: Seconds until a question fits.
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ChatDisabled:
+      description: "Chat is turned off. Code: chat_disabled."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
     InternalError:
       description: "The server failed; the request may be retried. Code: internal_error."
       content:
@@ -831,6 +1073,8 @@ components:
         - rate_limited
         - quota_exceeded
         - body_too_large
+        - chat_disabled
+        - conversation_busy
         - internal_error
     Me:
       type: object
@@ -1105,6 +1349,199 @@ components:
         current_version:
           type: integer
           description: The document's version now.
+    Conversation:
+      type: object
+      required: [id, title, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+          description: The document the conversation is about; absent for the whole library.
+        document_title:
+          type: string
+        title:
+          type: string
+          description: The first question, cut; empty until there is one.
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ConversationList:
+      type: object
+      required: [conversations, messages_left_today]
+      properties:
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Conversation"
+        next_cursor:
+          type: string
+          description: Present when there are more conversations.
+        messages_left_today:
+          type: integer
+          description: Questions the user may still ask in the last 24 hours' quota.
+    ConversationDetail:
+      type: object
+      required: [conversation, messages]
+      properties:
+        conversation:
+          $ref: "#/components/schemas/Conversation"
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
+    CreateConversationRequest:
+      type: object
+      properties:
+        document_id:
+          type: string
+          format: uuid
+          description: The user's document to ask about; leave it out for the whole library.
+    SendMessageRequest:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 2000
+    Message:
+      type: object
+      description: >-
+        A question, or an answer: generated text, never part of a document
+        (docs/adr/0012-chat.md). An answer with no citations didn't find its
+        answer in the library.
+      required: [id, role, status, segments, citations, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [user, assistant]
+        status:
+          type: string
+          description: An answer streams until it is done, stopped or failed; a question is done.
+          enum: [streaming, done, stopped, failed]
+        segments:
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageSegment"
+        citations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Citation"
+        error:
+          $ref: "#/components/schemas/ChatErrorCode"
+        usage:
+          $ref: "#/components/schemas/ChatUsage"
+        created_at:
+          type: string
+          format: date-time
+    MessageSegment:
+      type: object
+      description: A run of a message's Markdown, and the numbers of the citations that back it.
+      required: [text, citations]
+      properties:
+        text:
+          type: string
+        citations:
+          type: array
+          items:
+            type: integer
+    Citation:
+      type: object
+      description: Blocks of one of the user's documents that an answer cites, and their text as the model read it.
+      required: [n, document_id, block_ids, cited_text, title]
+      properties:
+        n:
+          type: integer
+          description: The citation's number in its answer, from 1.
+        document_id:
+          type: string
+          format: uuid
+        block_ids:
+          type: array
+          items:
+            type: string
+        cited_text:
+          type: string
+        title:
+          type: string
+          description: The document's title and the blocks' headings, as "Title > Heading".
+    ChatUsage:
+      type: object
+      description: What an answer cost, across its calls to the model.
+      required: [model, input_tokens, output_tokens, cache_creation_input_tokens, cache_read_input_tokens, cost_microusd, first_token_ms, latency_ms]
+      properties:
+        model:
+          type: string
+        input_tokens:
+          type: integer
+        output_tokens:
+          type: integer
+        cache_creation_input_tokens:
+          type: integer
+        cache_read_input_tokens:
+          type: integer
+        cost_microusd:
+          type: integer
+          format: int64
+        first_token_ms:
+          type: integer
+        latency_ms:
+          type: integer
+    ChatErrorCode:
+      type: string
+      description: >-
+        Why an answer failed: the model didn't answer or was overloaded
+        (model_unavailable), declined (model_refused), or the server failed
+        (internal_error).
+      enum:
+        - model_unavailable
+        - model_refused
+        - internal_error
+    ChatDelta:
+      type: object
+      required: [segment, text]
+      properties:
+        segment:
+          type: integer
+        text:
+          type: string
+    ChatCitation:
+      type: object
+      required: [segment, citation]
+      properties:
+        segment:
+          type: integer
+        citation:
+          $ref: "#/components/schemas/Citation"
+    ChatTool:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+    ChatDone:
+      type: object
+      required: [message, messages_left_today]
+      properties:
+        message:
+          $ref: "#/components/schemas/Message"
+        messages_left_today:
+          type: integer
+    ChatError:
+      type: object
+      required: [code]
+      properties:
+        code:
+          $ref: "#/components/schemas/ChatErrorCode"
     DocumentList:
       type: object
       required: [documents]

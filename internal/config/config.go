@@ -47,6 +47,8 @@ type Config struct {
 	Limits Limits
 	// Embed is the embedder search uses.
 	Embed Embed
+	// Chat is the model chat answers with.
+	Chat Chat
 }
 
 // The embedder by default: Ollama on this machine, with the pinned model
@@ -64,8 +66,25 @@ type Embed struct {
 	Model string
 }
 
+// The model chat answers with by default (docs/adr/0012-chat.md).
+const (
+	DefaultChatURL   = "https://api.anthropic.com"
+	DefaultChatModel = "claude-haiku-5-5"
+	chatHost         = "api.anthropic.com"
+)
+
+// Chat is the Messages API chat calls: Anthropic's, or in dev and test the
+// fake model (cmd/fakellm), which needs no key.
+type Chat struct {
+	// Enabled is the kill switch: false turns chat off for everyone.
+	Enabled bool
+	URL     string
+	Model   string
+	APIKey  string
+}
+
 // Limits are RoNote's quotas and rate limits
-// (docs/adr/0010-sign-in-and-sessions.md).
+// (docs/adr/0010-sign-in-and-sessions.md, docs/adr/0012-chat.md).
 type Limits struct {
 	ImportsPerDay int
 	Documents     int
@@ -73,6 +92,10 @@ type Limits struct {
 	// stream excepted; AuthPerMinute counts one IP's sign-in requests.
 	APIPerMinute  int
 	AuthPerMinute int
+	// ChatMessagesPerDay and ChatTokensPerDay count one user's questions,
+	// and the input tokens their answers read, in any 24 hours.
+	ChatMessagesPerDay int
+	ChatTokensPerDay   int
 }
 
 // GitHub is an OAuth app at GitHub, or, in dev and test, at the fake
@@ -144,6 +167,8 @@ func Load(getenv func(string) string) (Config, error) {
 		Model: withDefault(getenv("RONOTE_EMBED_MODEL"), DefaultEmbedModel),
 	}
 	check("RONOTE_EMBED_URL", validateHTTPURL(embed.URL))
+	chat, chatErrs := parseChat(getenv, env)
+	errs = append(errs, chatErrs...)
 	var limits Limits
 	for _, l := range []struct {
 		name     string
@@ -154,6 +179,8 @@ func Load(getenv func(string) string) (Config, error) {
 		{"RONOTE_LIMIT_DOCUMENTS", 500, &limits.Documents},
 		{"RONOTE_LIMIT_API_PER_MINUTE", 120, &limits.APIPerMinute},
 		{"RONOTE_LIMIT_AUTH_PER_MINUTE", 20, &limits.AuthPerMinute},
+		{"RONOTE_LIMIT_CHAT_MESSAGES_PER_DAY", 50, &limits.ChatMessagesPerDay},
+		{"RONOTE_LIMIT_CHAT_TOKENS_PER_DAY", 400_000, &limits.ChatTokensPerDay},
 	} {
 		n, err := parseLimit(getenv(l.name), l.fallback)
 		check(l.name, err)
@@ -174,7 +201,34 @@ func Load(getenv func(string) string) (Config, error) {
 		GitHub:                    gh,
 		Limits:                    limits,
 		Embed:                     embed,
+		Chat:                      chat,
 	}, nil
+}
+
+// parseChat reads the chat model's settings. Anthropic's API needs a key;
+// any other URL is the fake model, which only dev and test may use.
+func parseChat(getenv func(string) string, env Env) (Chat, []error) {
+	var errs []error
+	c := Chat{
+		Enabled: true,
+		URL:     strings.TrimSuffix(withDefault(getenv("RONOTE_CHAT_URL"), DefaultChatURL), "/"),
+		Model:   withDefault(getenv("RONOTE_CHAT_MODEL"), DefaultChatModel),
+		APIKey:  getenv("ANTHROPIC_API_KEY"),
+	}
+	if s := getenv("RONOTE_CHAT_ENABLED"); s != "" {
+		enabled, err := strconv.ParseBool(s)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("RONOTE_CHAT_ENABLED: %q is not true or false", s))
+		}
+		c.Enabled = enabled
+	}
+	if err := validateProviderURL(c.URL, chatHost, env); err != nil {
+		errs = append(errs, fmt.Errorf("RONOTE_CHAT_URL: %w", err))
+	}
+	if u, err := url.Parse(c.URL); err == nil && c.Enabled && u.Host == chatHost && c.APIKey == "" {
+		errs = append(errs, fmt.Errorf("ANTHROPIC_API_KEY: not set; %s needs one. Set it, point RONOTE_CHAT_URL at the fake model, or set RONOTE_CHAT_ENABLED=false", c.URL))
+	}
+	return c, errs
 }
 
 func validateHTTPURL(s string) error {

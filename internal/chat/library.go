@@ -68,7 +68,7 @@ func (l library) search(ctx context.Context, query string, wide bool) ([]Passage
 		if h.Kind == search.KindNote {
 			title += " (the student's note)"
 		}
-		passages[i] = Passage{ChunkID: h.ChunkID, DocumentID: h.DocumentID, Title: title, BlockIDs: h.BlockIDs, Texts: h.BlockTexts}
+		passages[i] = fit(Passage{ChunkID: h.ChunkID, DocumentID: h.DocumentID, Title: title, BlockIDs: h.BlockIDs, Texts: h.BlockTexts})
 	}
 	return passages, nil
 }

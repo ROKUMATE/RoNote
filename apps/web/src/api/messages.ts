@@ -53,8 +53,10 @@ export const requestErrorMessages: Record<ErrorCode, string> = {
   cross_origin: "RoNote only accepts changes from its own pages. Reload RoNote and try again.",
   rate_limited: "That's a lot of requests at once. Wait a minute and try again.",
   quota_exceeded:
-    "You've reached an import limit: 60 pages a day, or 500 documents in your library.",
+    "You've reached a daily limit: 60 imports, 50 chat questions, or 500 documents in your library.",
   body_too_large: "That change is too large to save in one go.",
+  chat_disabled: "Chat is turned off right now.",
+  conversation_busy: "An answer is still being written here. Wait for it, or stop it.",
   internal_error: "Something went wrong on RoNote's side. Try again.",
 };
 

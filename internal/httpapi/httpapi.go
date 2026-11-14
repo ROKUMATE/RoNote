@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/rokumate/ronote/internal/auth"
+	"github.com/rokumate/ronote/internal/chat"
 	"github.com/rokumate/ronote/internal/httpapi/gen"
 )
 
@@ -48,6 +49,9 @@ type Options struct {
 	// scores in the answer, in dev and test.
 	Searcher   Searcher
 	ShowScores bool
+	// Chat answers questions over a user's library; nil, or turned off,
+	// answers its routes with 503.
+	Chat *chat.Service
 }
 
 // New returns the API handler: /healthz, /readyz and the routes of
@@ -60,7 +64,7 @@ func New(o Options) http.Handler {
 	lim := newLimiters(o.Limits)
 	mux.Handle("GET /api/v1/auth/github/start", protect(lim.byIP(limitBody(signInStart(o)))))
 	mux.Handle("GET /api/v1/auth/github/callback", protect(lim.byIP(limitBody(signInCallback(o)))))
-	mux.Handle("/api/v1/", protect(requireSession(o, lim.byUser(limitBody(router{mux: apiRoutes(o, lim)})))))
+	mux.Handle("/api/v1/", protect(requireSession(o, lim.byUser(limitBody(chatOff(o.Chat, router{mux: apiRoutes(o, lim)}))))))
 	return withMiddleware(o.Logger, router{mux: mux})
 }
 

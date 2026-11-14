@@ -36,6 +36,27 @@ func (e AnnotationKind) Valid() bool {
 	}
 }
 
+// Defines values for ChatErrorCode.
+const (
+	ChatErrorCodeInternalError    ChatErrorCode = "internal_error"
+	ChatErrorCodeModelRefused     ChatErrorCode = "model_refused"
+	ChatErrorCodeModelUnavailable ChatErrorCode = "model_unavailable"
+)
+
+// Valid indicates whether the value is a known member of the ChatErrorCode enum.
+func (e ChatErrorCode) Valid() bool {
+	switch e {
+	case ChatErrorCodeInternalError:
+		return true
+	case ChatErrorCodeModelRefused:
+		return true
+	case ChatErrorCodeModelUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for CodeLang.
 const (
 	Bash       CodeLang = "bash"
@@ -143,6 +164,8 @@ const (
 	ErrorCodeAnnotationLimit     ErrorCode = "annotation_limit"
 	ErrorCodeBlockKindNotAllowed ErrorCode = "block_kind_not_allowed"
 	ErrorCodeBodyTooLarge        ErrorCode = "body_too_large"
+	ErrorCodeChatDisabled        ErrorCode = "chat_disabled"
+	ErrorCodeConversationBusy    ErrorCode = "conversation_busy"
 	ErrorCodeCrossOrigin         ErrorCode = "cross_origin"
 	ErrorCodeIPLiteralHost       ErrorCode = "ip_literal_host"
 	ErrorCodeInternalError       ErrorCode = "internal_error"
@@ -173,6 +196,10 @@ func (e ErrorCode) Valid() bool {
 	case ErrorCodeBlockKindNotAllowed:
 		return true
 	case ErrorCodeBodyTooLarge:
+		return true
+	case ErrorCodeChatDisabled:
+		return true
+	case ErrorCodeConversationBusy:
 		return true
 	case ErrorCodeCrossOrigin:
 		return true
@@ -278,25 +305,67 @@ func (e ImportErrorCode) Valid() bool {
 
 // Defines values for ImportStatus.
 const (
-	Done       ImportStatus = "done"
-	Extracting ImportStatus = "extracting"
-	Failed     ImportStatus = "failed"
-	Fetching   ImportStatus = "fetching"
-	Queued     ImportStatus = "queued"
+	ImportStatusDone       ImportStatus = "done"
+	ImportStatusExtracting ImportStatus = "extracting"
+	ImportStatusFailed     ImportStatus = "failed"
+	ImportStatusFetching   ImportStatus = "fetching"
+	ImportStatusQueued     ImportStatus = "queued"
 )
 
 // Valid indicates whether the value is a known member of the ImportStatus enum.
 func (e ImportStatus) Valid() bool {
 	switch e {
-	case Done:
+	case ImportStatusDone:
 		return true
-	case Extracting:
+	case ImportStatusExtracting:
 		return true
-	case Failed:
+	case ImportStatusFailed:
 		return true
-	case Fetching:
+	case ImportStatusFetching:
 		return true
-	case Queued:
+	case ImportStatusQueued:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for MessageRole.
+const (
+	Assistant MessageRole = "assistant"
+	User      MessageRole = "user"
+)
+
+// Valid indicates whether the value is a known member of the MessageRole enum.
+func (e MessageRole) Valid() bool {
+	switch e {
+	case Assistant:
+		return true
+	case User:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for MessageStatus.
+const (
+	MessageStatusDone      MessageStatus = "done"
+	MessageStatusFailed    MessageStatus = "failed"
+	MessageStatusStopped   MessageStatus = "stopped"
+	MessageStatusStreaming MessageStatus = "streaming"
+)
+
+// Valid indicates whether the value is a known member of the MessageStatus enum.
+func (e MessageStatus) Valid() bool {
+	switch e {
+	case MessageStatusDone:
+		return true
+	case MessageStatusFailed:
+		return true
+	case MessageStatusStopped:
+		return true
+	case MessageStatusStreaming:
 		return true
 	default:
 		return false
@@ -414,8 +483,104 @@ type AnnotationPatch struct {
 	Version  int           `json:"version"`
 }
 
+// ChatCitation defines model for ChatCitation.
+type ChatCitation struct {
+	// Citation Blocks of one of the user's documents that an answer cites, and their text as the model read it.
+	Citation Citation `json:"citation"`
+	Segment  int      `json:"segment"`
+}
+
+// ChatDelta defines model for ChatDelta.
+type ChatDelta struct {
+	Segment int    `json:"segment"`
+	Text    string `json:"text"`
+}
+
+// ChatDone defines model for ChatDone.
+type ChatDone struct {
+	// Message A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). An answer with no citations didn't find its answer in the library.
+	Message           Message `json:"message"`
+	MessagesLeftToday int     `json:"messages_left_today"`
+}
+
+// ChatError defines model for ChatError.
+type ChatError struct {
+	// Code Why an answer failed: the model didn't answer or was overloaded (model_unavailable), declined (model_refused), or the server failed (internal_error).
+	Code ChatErrorCode `json:"code"`
+}
+
+// ChatErrorCode Why an answer failed: the model didn't answer or was overloaded (model_unavailable), declined (model_refused), or the server failed (internal_error).
+type ChatErrorCode string
+
+// ChatTool defines model for ChatTool.
+type ChatTool struct {
+	Query string `json:"query"`
+}
+
+// ChatUsage What an answer cost, across its calls to the model.
+type ChatUsage struct {
+	CacheCreationInputTokens int    `json:"cache_creation_input_tokens"`
+	CacheReadInputTokens     int    `json:"cache_read_input_tokens"`
+	CostMicrousd             int64  `json:"cost_microusd"`
+	FirstTokenMs             int    `json:"first_token_ms"`
+	InputTokens              int    `json:"input_tokens"`
+	LatencyMs                int    `json:"latency_ms"`
+	Model                    string `json:"model"`
+	OutputTokens             int    `json:"output_tokens"`
+}
+
+// Citation Blocks of one of the user's documents that an answer cites, and their text as the model read it.
+type Citation struct {
+	BlockIds   []string           `json:"block_ids"`
+	CitedText  string             `json:"cited_text"`
+	DocumentID openapi_types.UUID `json:"document_id"`
+
+	// N The citation's number in its answer, from 1.
+	N int `json:"n"`
+
+	// Title The document's title and the blocks' headings, as "Title > Heading".
+	Title string `json:"title"`
+}
+
 // CodeLang A language a user may choose for a code block. plaintext means no highlighting.
 type CodeLang string
+
+// Conversation defines model for Conversation.
+type Conversation struct {
+	CreatedAt time.Time `json:"created_at"`
+
+	// DocumentID The document the conversation is about; absent for the whole library.
+	DocumentID    *openapi_types.UUID `json:"document_id,omitempty"`
+	DocumentTitle *string             `json:"document_title,omitempty"`
+	ID            openapi_types.UUID  `json:"id"`
+
+	// Title The first question, cut; empty until there is one.
+	Title     string    `json:"title"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+// ConversationDetail defines model for ConversationDetail.
+type ConversationDetail struct {
+	Conversation Conversation `json:"conversation"`
+	Messages     []Message    `json:"messages"`
+}
+
+// ConversationList defines model for ConversationList.
+type ConversationList struct {
+	Conversations []Conversation `json:"conversations"`
+
+	// MessagesLeftToday Questions the user may still ask in the last 24 hours' quota.
+	MessagesLeftToday int `json:"messages_left_today"`
+
+	// NextCursor Present when there are more conversations.
+	NextCursor *string `json:"next_cursor,omitempty"`
+}
+
+// CreateConversationRequest defines model for CreateConversationRequest.
+type CreateConversationRequest struct {
+	// DocumentID The user's document to ask about; leave it out for the whole library.
+	DocumentID *openapi_types.UUID `json:"document_id,omitempty"`
+}
 
 // CreateImportRequest defines model for CreateImportRequest.
 type CreateImportRequest struct {
@@ -574,6 +739,36 @@ type Me struct {
 	Login string `json:"login"`
 }
 
+// Message A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). An answer with no citations didn't find its answer in the library.
+type Message struct {
+	Citations []Citation `json:"citations"`
+	CreatedAt time.Time  `json:"created_at"`
+
+	// Error Why an answer failed: the model didn't answer or was overloaded (model_unavailable), declined (model_refused), or the server failed (internal_error).
+	Error    *ChatErrorCode     `json:"error,omitempty"`
+	ID       openapi_types.UUID `json:"id"`
+	Role     MessageRole        `json:"role"`
+	Segments []MessageSegment   `json:"segments"`
+
+	// Status An answer streams until it is done, stopped or failed; a question is done.
+	Status MessageStatus `json:"status"`
+
+	// Usage What an answer cost, across its calls to the model.
+	Usage *ChatUsage `json:"usage,omitempty"`
+}
+
+// MessageRole defines model for Message.Role.
+type MessageRole string
+
+// MessageStatus An answer streams until it is done, stopped or failed; a question is done.
+type MessageStatus string
+
+// MessageSegment A run of a message's Markdown, and the numbers of the citations that back it.
+type MessageSegment struct {
+	Citations []int  `json:"citations"`
+	Text      string `json:"text"`
+}
+
 // NewAnnotation defines model for NewAnnotation.
 type NewAnnotation struct {
 	BlockID string `json:"block_id"`
@@ -671,6 +866,11 @@ type SearchScore struct {
 	WordsRank *int `json:"words_rank,omitempty"`
 }
 
+// SendMessageRequest defines model for SendMessageRequest.
+type SendMessageRequest struct {
+	Text string `json:"text"`
+}
+
 // SignInErrorCode Why signing in failed, in /login?error=: the user or GitHub refused (denied); the sign-in's cookie was missing, expired or another (state_mismatch); the GitHub account has no primary, verified email (no_verified_email); or GitHub didn't answer (provider_unavailable).
 type SignInErrorCode string
 
@@ -699,6 +899,9 @@ type ID = openapi_types.UUID
 // BodyTooLarge defines model for BodyTooLarge.
 type BodyTooLarge = Error
 
+// ChatDisabled defines model for ChatDisabled.
+type ChatDisabled = Error
+
 // CrossOrigin defines model for CrossOrigin.
 type CrossOrigin = Error
 
@@ -717,8 +920,18 @@ type RateLimited = Error
 // TooManyImports defines model for TooManyImports.
 type TooManyImports = Error
 
+// TooManyQuestions defines model for TooManyQuestions.
+type TooManyQuestions = Error
+
 // Unauthenticated defines model for Unauthenticated.
 type Unauthenticated = Error
+
+// ListConversationsParams defines parameters for ListConversations.
+type ListConversationsParams struct {
+	// Cursor The next_cursor of the previous page.
+	Cursor *string `form:"cursor,omitempty" json:"cursor,omitempty"`
+	Limit  *int    `form:"limit,omitempty" json:"limit,omitempty"`
+}
 
 // ListDocumentsParams defines parameters for ListDocuments.
 type ListDocumentsParams struct {
@@ -738,6 +951,9 @@ type SearchParams struct {
 
 // UpdateAnnotationJSONRequestBody defines body for UpdateAnnotation for application/json ContentType.
 type UpdateAnnotationJSONRequestBody = AnnotationPatch
+
+// CreateConversationJSONRequestBody defines body for CreateConversation for application/json ContentType.
+type CreateConversationJSONRequestBody = CreateConversationRequest
 
 // ResolveDocumentsJSONRequestBody defines body for ResolveDocuments for application/json ContentType.
 type ResolveDocumentsJSONRequestBody = ResolveDocumentsRequest
@@ -762,6 +978,21 @@ type ServerInterface interface {
 	// UpdateAnnotation Change an annotation's note, or place it on new text
 	// (PATCH /annotations/{id})
 	UpdateAnnotation(w http.ResponseWriter, r *http.Request, id ID)
+	// ListConversations List the user's conversations, most recently active first
+	// (GET /conversations)
+	ListConversations(w http.ResponseWriter, r *http.Request, params ListConversationsParams)
+	// CreateConversation Start a conversation
+	// (POST /conversations)
+	CreateConversation(w http.ResponseWriter, r *http.Request)
+	// DeleteConversation Delete a conversation and its messages
+	// (DELETE /conversations/{id})
+	DeleteConversation(w http.ResponseWriter, r *http.Request, id ID)
+	// GetConversation Get a conversation and its messages, in order
+	// (GET /conversations/{id})
+	GetConversation(w http.ResponseWriter, r *http.Request, id ID)
+	// StopConversation Stop the answer being written
+	// (POST /conversations/{id}/stop)
+	StopConversation(w http.ResponseWriter, r *http.Request, id ID)
 	// ListDocuments List the user's documents, newest first
 	// (GET /documents)
 	ListDocuments(w http.ResponseWriter, r *http.Request, params ListDocumentsParams)
@@ -852,6 +1083,144 @@ func (siw *ServerInterfaceWrapper) UpdateAnnotation(w http.ResponseWriter, r *ht
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateAnnotation(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListConversations operation middleware
+func (siw *ServerInterfaceWrapper) ListConversations(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListConversationsParams
+
+	// ------------- Optional query parameter "cursor" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "cursor", r.URL.Query(), &params.Cursor, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "cursor"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "cursor", Err: err})
+		}
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", r.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "limit"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListConversations(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateConversation operation middleware
+func (siw *ServerInterfaceWrapper) CreateConversation(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateConversation(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteConversation operation middleware
+func (siw *ServerInterfaceWrapper) DeleteConversation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id ID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteConversation(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetConversation operation middleware
+func (siw *ServerInterfaceWrapper) GetConversation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id ID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetConversation(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// StopConversation operation middleware
+func (siw *ServerInterfaceWrapper) StopConversation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id ID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.StopConversation(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1333,11 +1702,18 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/documents/{id}/annotations/reanchor", wrapper.ReanchorAnnotations)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/annotations/{id}", wrapper.DeleteAnnotation)
 	m.HandleFunc(http.MethodPatch+" "+options.BaseURL+"/annotations/{id}", wrapper.UpdateAnnotation)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/conversations", wrapper.ListConversations)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/conversations", wrapper.CreateConversation)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/conversations/{id}", wrapper.DeleteConversation)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/conversations/{id}", wrapper.GetConversation)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/conversations/{id}/stop", wrapper.StopConversation)
 
 	return m
 }
 
 type BodyTooLargeJSONResponse Error
+
+type ChatDisabledJSONResponse Error
 
 type CrossOriginJSONResponse Error
 
@@ -1363,6 +1739,15 @@ type TooManyImportsJSONResponse struct {
 	Body Error
 
 	Headers TooManyImportsResponseHeaders
+}
+
+type TooManyQuestionsResponseHeaders struct {
+	RetryAfter *int
+}
+type TooManyQuestionsJSONResponse struct {
+	Body Error
+
+	Headers TooManyQuestionsResponseHeaders
 }
 
 type UnauthenticatedJSONResponse Error
@@ -1614,6 +1999,571 @@ func (response UpdateAnnotation500JSONResponse) VisitUpdateAnnotationResponse(w 
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListConversationsRequestObject struct {
+	Params ListConversationsParams
+}
+
+type ListConversationsResponseObject interface {
+	VisitListConversationsResponse(w http.ResponseWriter) error
+}
+
+type ListConversations200JSONResponse ConversationList
+
+func (response ListConversations200JSONResponse) VisitListConversationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListConversations400JSONResponse Error
+
+func (response ListConversations400JSONResponse) VisitListConversationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListConversations401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response ListConversations401JSONResponse) VisitListConversationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListConversations429JSONResponse struct{ RateLimitedJSONResponse }
+
+func (response ListConversations429JSONResponse) VisitListConversationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Retry-After", fmt.Sprint(response.Headers.RetryAfter))
+	w.WriteHeader(429)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListConversations500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response ListConversations500JSONResponse) VisitListConversationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListConversations503JSONResponse struct{ ChatDisabledJSONResponse }
+
+func (response ListConversations503JSONResponse) VisitListConversationsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateConversationRequestObject struct {
+	Body *CreateConversationJSONRequestBody
+}
+
+type CreateConversationResponseObject interface {
+	VisitCreateConversationResponse(w http.ResponseWriter) error
+}
+
+type CreateConversation201JSONResponse Conversation
+
+func (response CreateConversation201JSONResponse) VisitCreateConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateConversation400JSONResponse Error
+
+func (response CreateConversation400JSONResponse) VisitCreateConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateConversation401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response CreateConversation401JSONResponse) VisitCreateConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateConversation403JSONResponse struct{ CrossOriginJSONResponse }
+
+func (response CreateConversation403JSONResponse) VisitCreateConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateConversation404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response CreateConversation404JSONResponse) VisitCreateConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateConversation413JSONResponse struct{ BodyTooLargeJSONResponse }
+
+func (response CreateConversation413JSONResponse) VisitCreateConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(413)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateConversation429JSONResponse struct{ RateLimitedJSONResponse }
+
+func (response CreateConversation429JSONResponse) VisitCreateConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Retry-After", fmt.Sprint(response.Headers.RetryAfter))
+	w.WriteHeader(429)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateConversation500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response CreateConversation500JSONResponse) VisitCreateConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateConversation503JSONResponse struct{ ChatDisabledJSONResponse }
+
+func (response CreateConversation503JSONResponse) VisitCreateConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteConversationRequestObject struct {
+	ID ID `json:"id"`
+}
+
+type DeleteConversationResponseObject interface {
+	VisitDeleteConversationResponse(w http.ResponseWriter) error
+}
+
+type DeleteConversation204Response struct {
+}
+
+func (response DeleteConversation204Response) VisitDeleteConversationResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteConversation400JSONResponse struct{ InvalidParameterJSONResponse }
+
+func (response DeleteConversation400JSONResponse) VisitDeleteConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteConversation401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response DeleteConversation401JSONResponse) VisitDeleteConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteConversation403JSONResponse struct{ CrossOriginJSONResponse }
+
+func (response DeleteConversation403JSONResponse) VisitDeleteConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteConversation404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response DeleteConversation404JSONResponse) VisitDeleteConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteConversation429JSONResponse struct{ RateLimitedJSONResponse }
+
+func (response DeleteConversation429JSONResponse) VisitDeleteConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Retry-After", fmt.Sprint(response.Headers.RetryAfter))
+	w.WriteHeader(429)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteConversation500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response DeleteConversation500JSONResponse) VisitDeleteConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteConversation503JSONResponse struct{ ChatDisabledJSONResponse }
+
+func (response DeleteConversation503JSONResponse) VisitDeleteConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetConversationRequestObject struct {
+	ID ID `json:"id"`
+}
+
+type GetConversationResponseObject interface {
+	VisitGetConversationResponse(w http.ResponseWriter) error
+}
+
+type GetConversation200JSONResponse ConversationDetail
+
+func (response GetConversation200JSONResponse) VisitGetConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetConversation400JSONResponse struct{ InvalidParameterJSONResponse }
+
+func (response GetConversation400JSONResponse) VisitGetConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetConversation401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response GetConversation401JSONResponse) VisitGetConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetConversation404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response GetConversation404JSONResponse) VisitGetConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetConversation429JSONResponse struct{ RateLimitedJSONResponse }
+
+func (response GetConversation429JSONResponse) VisitGetConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Retry-After", fmt.Sprint(response.Headers.RetryAfter))
+	w.WriteHeader(429)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetConversation500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response GetConversation500JSONResponse) VisitGetConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetConversation503JSONResponse struct{ ChatDisabledJSONResponse }
+
+func (response GetConversation503JSONResponse) VisitGetConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StopConversationRequestObject struct {
+	ID ID `json:"id"`
+}
+
+type StopConversationResponseObject interface {
+	VisitStopConversationResponse(w http.ResponseWriter) error
+}
+
+type StopConversation204Response struct {
+}
+
+func (response StopConversation204Response) VisitStopConversationResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type StopConversation400JSONResponse struct{ InvalidParameterJSONResponse }
+
+func (response StopConversation400JSONResponse) VisitStopConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StopConversation401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response StopConversation401JSONResponse) VisitStopConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StopConversation403JSONResponse struct{ CrossOriginJSONResponse }
+
+func (response StopConversation403JSONResponse) VisitStopConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StopConversation404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response StopConversation404JSONResponse) VisitStopConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StopConversation429JSONResponse struct{ RateLimitedJSONResponse }
+
+func (response StopConversation429JSONResponse) VisitStopConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Retry-After", fmt.Sprint(response.Headers.RetryAfter))
+	w.WriteHeader(429)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StopConversation500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response StopConversation500JSONResponse) VisitStopConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StopConversation503JSONResponse struct{ ChatDisabledJSONResponse }
+
+func (response StopConversation503JSONResponse) VisitStopConversationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(503)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -2901,6 +3851,21 @@ type StrictServerInterface interface {
 	// UpdateAnnotation Change an annotation's note, or place it on new text
 	// (PATCH /annotations/{id})
 	UpdateAnnotation(ctx context.Context, request UpdateAnnotationRequestObject) (UpdateAnnotationResponseObject, error)
+	// ListConversations List the user's conversations, most recently active first
+	// (GET /conversations)
+	ListConversations(ctx context.Context, request ListConversationsRequestObject) (ListConversationsResponseObject, error)
+	// CreateConversation Start a conversation
+	// (POST /conversations)
+	CreateConversation(ctx context.Context, request CreateConversationRequestObject) (CreateConversationResponseObject, error)
+	// DeleteConversation Delete a conversation and its messages
+	// (DELETE /conversations/{id})
+	DeleteConversation(ctx context.Context, request DeleteConversationRequestObject) (DeleteConversationResponseObject, error)
+	// GetConversation Get a conversation and its messages, in order
+	// (GET /conversations/{id})
+	GetConversation(ctx context.Context, request GetConversationRequestObject) (GetConversationResponseObject, error)
+	// StopConversation Stop the answer being written
+	// (POST /conversations/{id}/stop)
+	StopConversation(ctx context.Context, request StopConversationRequestObject) (StopConversationResponseObject, error)
 	// ListDocuments List the user's documents, newest first
 	// (GET /documents)
 	ListDocuments(ctx context.Context, request ListDocumentsRequestObject) (ListDocumentsResponseObject, error)
@@ -3030,6 +3995,141 @@ func (sh *strictHandler) UpdateAnnotation(w http.ResponseWriter, r *http.Request
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(UpdateAnnotationResponseObject); ok {
 		if err := validResponse.VisitUpdateAnnotationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListConversations operation middleware
+func (sh *strictHandler) ListConversations(w http.ResponseWriter, r *http.Request, params ListConversationsParams) {
+	var request ListConversationsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListConversations(ctx, request.(ListConversationsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListConversations")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListConversationsResponseObject); ok {
+		if err := validResponse.VisitListConversationsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateConversation operation middleware
+func (sh *strictHandler) CreateConversation(w http.ResponseWriter, r *http.Request) {
+	var request CreateConversationRequestObject
+
+	var body CreateConversationJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateConversation(ctx, request.(CreateConversationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateConversation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateConversationResponseObject); ok {
+		if err := validResponse.VisitCreateConversationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteConversation operation middleware
+func (sh *strictHandler) DeleteConversation(w http.ResponseWriter, r *http.Request, id ID) {
+	var request DeleteConversationRequestObject
+
+	request.ID = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteConversation(ctx, request.(DeleteConversationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteConversation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteConversationResponseObject); ok {
+		if err := validResponse.VisitDeleteConversationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetConversation operation middleware
+func (sh *strictHandler) GetConversation(w http.ResponseWriter, r *http.Request, id ID) {
+	var request GetConversationRequestObject
+
+	request.ID = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetConversation(ctx, request.(GetConversationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetConversation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetConversationResponseObject); ok {
+		if err := validResponse.VisitGetConversationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// StopConversation operation middleware
+func (sh *strictHandler) StopConversation(w http.ResponseWriter, r *http.Request, id ID) {
+	var request StopConversationRequestObject
+
+	request.ID = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.StopConversation(ctx, request.(StopConversationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "StopConversation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(StopConversationResponseObject); ok {
+		if err := validResponse.VisitStopConversationResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

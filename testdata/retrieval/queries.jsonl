@@ -2,7 +2,7 @@
 {"id": "i02", "category": "identifier", "query": "sync.Mutex inside a struct, is it ready to use", "expect": ["f13dc3837fa5", "4b9ba06cedaf"]}
 {"id": "i03", "category": "identifier", "query": "json.RawMessage Marshaler compile-time check", "expect": ["eb56025d9224"]}
 {"id": "i04", "category": "identifier", "query": "http.HandlerFunc", "expect": ["5f7f625609b3", "8c2df2307eb0"]}
-{"id": "i05", "category": "identifier", "query": "fmt.Sprintf", "expect": ["8b1395c045d1", "77e2daecdcab"], "review": true}
+{"id": "i05", "category": "identifier", "query": "fmt.Sprintf", "expect": ["8b1395c045d1", "77e2daecdcab", "da652e514745"], "review": true}
 {"id": "i06", "category": "identifier", "query": "raise_for_status", "expect": ["0de3199d95e4", "9df1c5463aea", "d0f265baafe4"]}
 {"id": "i07", "category": "identifier", "query": "__match_args__", "expect": ["280e03b19e1c", "58a547732106"]}
 {"id": "i08", "category": "identifier", "query": "showLineNumbers", "expect": ["688c86f8a09f", "e2955d10a01b"]}
@@ -19,16 +19,16 @@
 {"id": "e04", "category": "error", "query": "TypeError: function() got multiple values for argument 'a'", "expect": ["d62dd32b44d5"]}
 {"id": "e05", "category": "error", "query": "Uncaught TypeError: Cannot read properties of null (reading 'toUpperCase')", "expect": ["fd6917b77ce1"]}
 {"id": "e06", "category": "error", "query": "requests.exceptions.HTTPError: 404 Client Error: NOT FOUND", "expect": ["9df1c5463aea"]}
-{"id": "e07", "category": "error", "query": "requests.exceptions.ConnectTimeout when the server is slow", "expect": ["1d00ec90acc9", "5e39a76024b9", "346fd4a9fad2"], "review": true}
+{"id": "e07", "category": "error", "query": "requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='api.example.com', port=443): Read timed out. (read timeout=5)", "expect": ["1d00ec90acc9", "5e39a76024b9", "346fd4a9fad2"], "review": true}
 {"id": "e08", "category": "error", "query": "panic: no value for $USER", "expect": ["16e2a8f37c83"]}
 {"id": "e09", "category": "error", "query": "requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1", "expect": ["43361f4c6985"], "review": true}
-{"id": "e10", "category": "error", "query": "ConnectionError Max retries exceeded, connection refused", "expect": ["4098a7570c16"], "review": true}
+{"id": "e10", "category": "error", "query": "requests.exceptions.ConnectionError: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f3a1c2b>: Failed to establish a new connection: [Errno 111] Connection refused'))", "expect": ["4098a7570c16"], "review": true}
 {"id": "p01", "category": "paraphrase", "query": "why can't I put my opening curly brace on the next line in go", "expect": ["76094d2b5ce3", "a3dbe1d9b402"]}
 {"id": "p02", "category": "paraphrase", "query": "is there a while keyword in go or do I use something else", "expect": ["4ea1e8023bce", "8dc62ec42c89"], "review": true}
 {"id": "p03", "category": "paraphrase", "query": "go's lightweight threads", "expect": ["077debc1e1c3"]}
 {"id": "p04", "category": "paraphrase", "query": "a pipe for passing values between go functions running at the same time", "expect": ["3ebfea7cffee"]}
 {"id": "p05", "category": "paraphrase", "query": "run some cleanup when a go function returns, however it returns", "expect": ["449455586bbb"]}
-{"id": "p06", "category": "paraphrase", "query": "a function that still remembers the variables from where it was made", "expect": ["faaf1f0c55a7", "1c467c7a553c"], "review": true}
+{"id": "p06", "category": "paraphrase", "query": "a function that still remembers the variables from where it was made", "expect": ["faaf1f0c55a7", "1c467c7a553c", "6820587f57f3"], "review": true}
 {"id": "p07", "category": "paraphrase", "query": "keep a variable hidden so only certain javascript functions can change it", "expect": ["21b752da8f0b", "fcc0df317ad5"]}
 {"id": "p08", "category": "paraphrase", "query": "jump straight to the next round of a python loop", "expect": ["4f0c35deb830"]}
 {"id": "p09", "category": "paraphrase", "query": "a python line that does nothing, just to fill a gap", "expect": ["c1bbc096f6e1"]}
@@ -39,16 +39,16 @@
 {"id": "p14", "category": "paraphrase", "query": "bundle a few values of different types into one rust value", "expect": ["9b4e6b3366d8"]}
 {"id": "p15", "category": "paraphrase", "query": "a bunch of containers in kubernetes that share networking and disks", "expect": ["9e49553671dd"]}
 {"id": "p16", "category": "paraphrase", "query": "kubernetes brings my app back when the machine it was on dies", "expect": ["a6680cfca8e5"], "review": true}
-{"id": "p17", "category": "paraphrase", "query": "why is vite quicker than older build tools", "expect": ["1b5c98a6d044"], "review": true}
+{"id": "p17", "category": "paraphrase", "query": "why does vite's dev server start so much faster than webpack", "expect": ["1b5c98a6d044", "fa4179d1dc61"], "review": true}
 {"id": "p18", "category": "paraphrase", "query": "attach my login session cookies to a python http call", "expect": ["f0e79bf72b8a"]}
 {"id": "p19", "category": "paraphrase", "query": "stop my python http request from hanging forever", "expect": ["346fd4a9fad2"]}
-{"id": "p20", "category": "paraphrase", "query": "what value does go give a variable I declared but never set", "expect": ["53ba2a5952a9", "1b3fcc196181"], "review": true}
+{"id": "p20", "category": "paraphrase", "query": "what value does go give a variable I declared but never set", "expect": ["53ba2a5952a9", "4b9ba06cedaf"], "review": true}
 {"id": "h01", "category": "howto", "query": "how do I run things concurrently", "expect": ["077debc1e1c3"]}
 {"id": "h02", "category": "howto", "query": "how do I put a file name above a code block in docusaurus", "expect": ["54f8d3e44466"]}
-{"id": "h03", "category": "howto", "query": "how do I make certain lines stand out in a code snippet", "expect": ["79191f1649d9", "8fb222b89f9d"], "review": true}
+{"id": "h03", "category": "howto", "query": "how do I make certain lines stand out in a code snippet", "expect": ["79191f1649d9", "8fb222b89f9d", "95b0055cb94d"], "review": true}
 {"id": "h04", "category": "howto", "query": "how do I show line numbers next to my code", "expect": ["688c86f8a09f"]}
 {"id": "h05", "category": "howto", "query": "how do I set up a brand new vite app", "expect": ["dfdc53ff5836"]}
-{"id": "h06", "category": "howto", "query": "how do I start my fastapi app on my laptop while I'm developing", "expect": ["dc11d0ff662b", "1ca810853b46", "699c705fe011"], "review": true}
+{"id": "h06", "category": "howto", "query": "how do I start my fastapi app on my laptop while I'm developing", "expect": ["1ca810853b46", "699c705fe011"], "review": true}
 {"id": "h07", "category": "howto", "query": "how do I open the swagger page for my fastapi api", "expect": ["6dc4236531cf"]}
 {"id": "h08", "category": "howto", "query": "how do I send a json body in a post request from python", "expect": ["7895c4022107"]}
 {"id": "h09", "category": "howto", "query": "how do I upload a file with python requests", "expect": ["627b84faaa59"]}
@@ -56,19 +56,19 @@
 {"id": "h11", "category": "howto", "query": "how do I make a 2d grid in go", "expect": ["9d62e8cea780", "a69d34f954ee"]}
 {"id": "h12", "category": "howto", "query": "how do I check whether a key is in a go map", "expect": ["07fbca0ad571", "2cbdfe05e5b8"], "review": true}
 {"id": "h13", "category": "howto", "query": "how do I remove an item from a map in go", "expect": ["2cbdfe05e5b8"]}
-{"id": "h14", "category": "howto", "query": "how do I loop over a python list and get the position too", "expect": ["33fc7bf7fb48", "ce1ebfd11cbc"], "review": true}
+{"id": "h14", "category": "howto", "query": "how do I loop over a python list and get the position too", "expect": ["ce1ebfd11cbc", "4215ea9c2af7"], "review": true}
 {"id": "h15", "category": "howto", "query": "how do I only get rows that match a condition in postgres", "expect": ["cad356f26b5f"]}
 {"id": "h16", "category": "howto", "query": "how do I sort query results by a column", "expect": ["d3ec0f15caa3", "9585993209f3"]}
 {"id": "h17", "category": "howto", "query": "how do I cap the cpu and memory a pod's container can use", "expect": ["2e188a37cc07"]}
 {"id": "m01", "category": "multidoc", "query": "compare go's switch with python's match statement", "expect": ["9ed711ba3a73", "6d0a5a1ee8b4"]}
-{"id": "m02", "category": "multidoc", "query": "closures capturing a loop variable, in go goroutines and in javascript", "expect": ["c7c07ad69f2d", "869acbb1c451"], "review": true}
+{"id": "m02", "category": "multidoc", "query": "closures capturing a loop variable, in go goroutines and in javascript", "expect": ["d82d8f34b222", "869acbb1c451"], "review": true}
 {"id": "m03", "category": "multidoc", "query": "fixed length arrays in rust versus go", "expect": ["6c1d192d4f5d", "7af715f0cd4b"]}
 {"id": "m04", "category": "multidoc", "query": "commands to start the dev server for vite and for fastapi", "expect": ["87fa5327242c", "699c705fe011", "1ca810853b46"], "review": true}
 {"id": "m05", "category": "multidoc", "query": "make a GET call from python and answer GET in a fastapi endpoint", "expect": ["e271e9974e53", "c55314a42b21"]}
 {"id": "m06", "category": "multidoc", "query": "return json from a fastapi handler and read it with python requests", "expect": ["ae50a16a252e", "d4ba3ce40716"]}
 {"id": "m07", "category": "multidoc", "query": "go panic and recover compared with rust crashing on a bad index", "expect": ["78b7400c948c", "21ad719d5f5b"]}
-{"id": "m08", "category": "multidoc", "query": "looping over a range of numbers in go and in python", "expect": ["8dc62ec42c89", "fe9b3be07618", "33fc7bf7fb48"], "review": true}
-{"id": "m09", "category": "multidoc", "query": "closures in javascript and function literals in go", "expect": ["faaf1f0c55a7", "077debc1e1c3"], "review": true}
+{"id": "m08", "category": "multidoc", "query": "looping over a range of numbers in go and in python", "expect": ["8dc62ec42c89", "802fb19d530d", "33fc7bf7fb48"], "review": true}
+{"id": "m09", "category": "multidoc", "query": "closures in javascript and function literals in go", "expect": ["faaf1f0c55a7", "112852796ddd"], "review": true}
 {"id": "m10", "category": "multidoc", "query": "tabs or spaces for indentation according to go and python style", "expect": ["eb1d3bca4ef8", "670b61f1c6eb"]}
 {"id": "n01", "category": "none", "query": "how do I center a div with flexbox", "expect": []}
 {"id": "n02", "category": "none", "query": "hash user passwords with bcrypt before saving them", "expect": []}

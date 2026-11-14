@@ -1,0 +1,110 @@
+{
+  "max_tokens": 1024,
+  "messages": [
+    {
+      "content": [
+        {
+          "citations": {
+            "enabled": true
+          },
+          "content": [
+            {
+              "text": "Do not communicate by sharing memory; instead, share memory by communicating.",
+              "type": "text"
+            },
+            {
+              "text": "Channels let goroutines communicate.",
+              "type": "text"
+            }
+          ],
+          "source": "ronote:chunk/01930000-0000-7000-8000-000000000001",
+          "title": "Effective Go > Concurrency > Channels",
+          "type": "search_result"
+        },
+        {
+          "text": "Search my library for using a buffered channel as a semaphore",
+          "type": "text"
+        }
+      ],
+      "role": "user"
+    },
+    {
+      "content": [
+        {
+          "signature": "EqQBCgIYAhIMfakeSignatureForTests",
+          "thinking": "",
+          "type": "thinking"
+        },
+        {
+          "id": "toolu_01A09q90qw90lq917835lq9",
+          "input": {
+            "query": "buffered channel as a semaphore",
+            "this_document_only": false
+          },
+          "name": "search_library",
+          "type": "tool_use"
+        }
+      ],
+      "role": "assistant"
+    },
+    {
+      "content": [
+        {
+          "content": [
+            {
+              "citations": {
+                "enabled": true
+              },
+              "content": [
+                {
+                  "text": "A buffered channel can be used like a semaphore, for instance to limit throughput.",
+                  "type": "text"
+                }
+              ],
+              "source": "ronote:chunk/01930000-0000-7000-8000-000000000003",
+              "title": "Effective Go > Concurrency > Channels",
+              "type": "search_result"
+            }
+          ],
+          "tool_use_id": "toolu_01A09q90qw90lq917835lq9",
+          "type": "tool_result"
+        }
+      ],
+      "role": "user"
+    }
+  ],
+  "model": "claude-haiku-5-5",
+  "output_config": {
+    "effort": "low"
+  },
+  "stream": true,
+  "system": [
+    {
+      "cache_control": {
+        "type": "ephemeral"
+      },
+      "text": "Answer the student's question from their library, and cite it.",
+      "type": "text"
+    }
+  ],
+  "tools": [
+    {
+      "description": "Search the student's library.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "this_document_only": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search_library"
+    }
+  ]
+}

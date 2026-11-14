@@ -1,6 +1,6 @@
 # Retrieval eval sources
 
-The eval (`cmd/eval`, `make eval`, docs/adr/0011-retrieval.md) searches a corpus of real documentation: the extractor's IR of ten whole pages, in `corpus/`, and the golden fixtures cut from real pages (`testdata/golden/SOURCES.md` has those excerpts' sources and licences). `corpus.txt` lists both. An excerpt and its whole page are separate documents, as two imports of the same site's pages would be, and share block ids, so an expected block found in either counts.
+The eval (`cmd/eval`, `make eval`, docs/adr/0011-retrieval.md) searches a corpus of real documentation: the extractor's IR of ten whole pages, in `corpus/`, and the four golden fixtures cut from real pages whose whole page isn't among them, `godev-getting-started`, `material-code-blocks`, `starlight-tabs` and `vitepress-markdown` (`testdata/golden/SOURCES.md` has those excerpts' sources and licences). `corpus.txt` lists both, and `cmd/eval` refuses two documents from one URL.
 
 No synthetic pages are used: the real ones cover every category of query.
 
@@ -25,6 +25,7 @@ Each file is `go run ./cmd/extract --format=json <url>`, fetched on 2026-11-12, 
 
 - https://myengineeringpath.dev/programming/python/rag-pipeline-tutorial/, the eleventh page `make test-live` extracts: it states no licence that allows a copy. Its golden fixture (`starlight-rag`) is synthetic and left out too.
 - `material-termy`, a synthetic fixture.
+- The golden fixtures cut from the ten whole pages: `docbook-postgres-select`, `docsy-k8s-pods`, `docusaurus-code-blocks`, `material-fastapi-first-steps`, `mdbook-rust-data-types`, `real-go-effective-go`, `real-kubernetes-pods`, `real-python-controlflow`, `sphinx-requests-quickstart` and `vitepress-vite-guide`. Identical blocks share an id, so an excerpt beside its page counted each of its blocks twice, and the two copies of a chunk filled two of the top 5.
 
 ## Queries
 

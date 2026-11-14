@@ -150,7 +150,7 @@ func run(ctx context.Context, opts options) error {
 	chunks := 0
 	ids := make([]uuid.UUID, len(docs))
 	for i, d := range docs {
-		id, err := st.AddDocument(ctx, user.ID, d.url, d.doc)
+		id, err := st.AddDocument(ctx, user.ID, d.doc.Source.URL, d.doc)
 		if err != nil {
 			return fmt.Errorf("%s: %w", d.path, err)
 		}
@@ -237,8 +237,8 @@ func run(ctx context.Context, opts options) error {
 
 // document is one extraction of the corpus.
 type document struct {
-	path, url string
-	doc       *ir.Doc
+	path string
+	doc  *ir.Doc
 }
 
 // name is the document's file, or its golden fixture's.
@@ -256,6 +256,7 @@ func loadCorpus(manifest string) ([]document, error) {
 	}
 	defer func() { _ = f.Close() }()
 	var docs []document
+	seen := map[string]string{} // source URL → path
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
 		path := strings.TrimSpace(sc.Text())
@@ -270,9 +271,14 @@ func loadCorpus(manifest string) ([]document, error) {
 		if err := json.Unmarshal(data, &doc); err != nil {
 			return nil, fmt.Errorf("%s: %w", path, err)
 		}
-		// An excerpt and its whole page are two documents: each gets a
-		// source of its own.
-		docs = append(docs, document{path: path, url: doc.Source.URL + "#" + path, doc: &doc})
+		// Identical blocks share an id, so a page and an excerpt of it
+		// would both hold every expected block, and fill each other's top
+		// 5 with the same text.
+		if other, ok := seen[doc.Source.URL]; ok {
+			return nil, fmt.Errorf("%s and %s are both %s: keep one", other, path, doc.Source.URL)
+		}
+		seen[doc.Source.URL] = path
+		docs = append(docs, document{path: path, doc: &doc})
 	}
 	return docs, sc.Err()
 }

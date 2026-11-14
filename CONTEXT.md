@@ -10,7 +10,7 @@ P16, retrieval: done (ADR 0011). Search and P17's chat are in scope; nothing gen
 - **Indexing** on the jobs port, which gained delayed jobs: each change search sees enqueues `index_document` in its transaction, 5 s later; the worker backfills. One edit re-embedded 1 chunk of 6.
 - **Search:** `GET /api/v1/search`, words and meaning merged by RRF, owner-scoped, word matches alone (`degraded`) without the embedder. Exact scan, PLAIN storage: hybrid p50 13 ms, p95 21 ms at 25,000 chunks of one user among 200,000 (`make test-perf-search`).
 - **Web:** Mod+K or Search opens the palette (its own 1.75 kB chunk): results by document, arrow keys, "This document", landing on the block with one flash.
-- **Eval** (`make eval`, in CI): 24 documents, 381 chunks, 80 queries; hybrid recall@10 0.944, MRR@10 0.794 (meaning alone 0.938, 0.783; words alone 0.808, 0.520).
+- **Eval** (`make eval`, in CI): 14 documents, 321 chunks, 80 queries; hybrid recall@10 0.958, MRR@10 0.797 (meaning alone 0.951, 0.792; words alone 0.815, 0.527).
 - **In the browser,** "how do I run things concurrently" answers from Effective Go's Concurrency chapter (top 5), Goroutines 4th; Effective Go never names `ServeMux`, so that search finds no code of it.
 - **Deliberate break:** dropping the owner filter from the vector half was caught by the EXPLAIN test; results never leaked, as the last join re-checks the owner.
 - **Checks:** `make check`, `make test-integration`, `make eval` and `make web-e2e` (113 passed, 1 skipped) pass.

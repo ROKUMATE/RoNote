@@ -20,7 +20,7 @@ Out of scope for v1: site crawling, AI summaries, handwritten OCR, pseudocode co
 | `migrations/` | goose migrations; goose owns all schema, River's included |
 | `api/` | `openapi.yaml`, which Go and TypeScript types are generated from |
 | `apps/web/` | the web app; `runner/` is the origin code from documents runs on |
-| `testdata/golden/` | extractor fixtures |
+| `testdata/golden/`, `testdata/pdf/` | extractor fixtures; PDF fixtures with docling's recorded answers |
 | `docs/` | ADRs, `decisions.md`, `open-questions.md`, and `agents/` reference |
 
 Read `docs/agents/repo-layout.md` when looking for where something lives. Create a directory when its first file needs it, not before.
@@ -51,8 +51,8 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make run-idp` / `run-llm` / `run-docling` | the fake GitHub sign-in on `127.0.0.1:8090` / chat model on `:8094` / docling and pdftext on `:5001`, `:5002` (`web-dev` starts all) |
 | `make pdf-fixtures` / `pdf-record` | print the PDF fixtures / record real docling's answers, goldens and the verbatim report |
 | `make stop` | end what the `run-*` targets and `web-dev` started |
-| `make dev-up` / `dev-down` | start / stop the dev stack (Postgres) |
-| `make doctor` | check the container VM's clock, and that the pinned embedding model answers |
+| `make dev-up` / `dev-down` | start / stop the dev stack (Postgres, SeaweedFS); `dev-up-docling` adds the real docling |
+| `make doctor` | check the VM's clock, the pinned embedding model, and the blob store, docling and pdftext |
 | `make generate` / `check-generated` | regenerate sqlc and OpenAPI output / fail if stale |
 | `make migrate-up` / `migrate-new name=...` | apply / create goose migrations |
 | `make extract url=...` | print one page's IR |

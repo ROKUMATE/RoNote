@@ -48,3 +48,9 @@ entry when a phase settles it; add one when a phase leaves something open.
 
 
 - Dark theme: the accent on the highlight colour (`mark`) measures 2.88:1, so a link inside a highlight is under axe's 4.5:1. The e2e pages have no such link, so no test shows it. Light is 4.63:1.
+- PDFs: scans need OCR (later phase). docling's figures are dropped and counted; a figure that is a picture of code drawn as an image (not text) is lost.
+- PDFs: docling normalizes prose: curly quotes made straight, a space now and then before punctuation (`print _ n` for `print_n`). Code is read from the text layer and keeps neither change; prose has no such reader yet.
+- PDFs: a document set wholly in a monospace font would map to code throughout; no fixture is.
+- PDFs: slides lay notes over code; where they share a box, the note comes out among the code's lines (MIT 6.0001 lecture 3).
+- PDFs: code language comes from the picker; docling's code enrichment would guess it with a model, at CPU cost, and its text would be generated. Off.
+- PDFs: conversion takes about 1 s a page on 2 CPUs: a 300-page book is five minutes, inside the 10-minute attempt. Two run at once.

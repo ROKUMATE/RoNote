@@ -13,7 +13,7 @@ Where things live, in full. AGENTS.md keeps the short version.
 | `migrations/` | Postgres schema migrations |
 | `apps/web/` | React + TypeScript + Tailwind v4 frontend |
 | `apps/web/runner/` | the runner origin's page, and its Python and JavaScript workers (with the cell runner, the JavaScript evaluator and console formatting), where code from documents runs (docs/adr/0008-in-browser-code-execution.md); `apps/web/src/runner/protocol.ts` is the message protocol both sides parse with, and `limits.ts` the limits every runtime keeps |
-| `deploy/` | deployment config |
+| `deploy/` | deployment config; `deploy/pdftext/` is the text-layer reader for code in PDFs, run beside docling from its image (docs/adr/0013-pdf-import.md) |
 | `scripts/` | repo scripts |
 | `internal/ir/` | the document model every importer produces (docs/adr/0004-ir-and-links.md) |
 | `internal/doccontent/` | a user's document: IR blocks marked source or user, and the rules a save must keep (docs/adr/0006-editor-and-doc-content.md) |
@@ -25,6 +25,7 @@ Where things live, in full. AGENTS.md keeps the short version.
 | `internal/chat/` | chat over a library (docs/adr/0012-chat.md): the `Model` port, the service that grounds, streams, validates citations, budgets and saves answers, and the `search_library` tool |
 | `internal/chat/anthropic/` | the port's adapter to Anthropic's Messages API; the only package that imports the SDK (depguard); `testdata/` holds its streams and request goldens |
 | `internal/fakellm/` | the fake Messages API `cmd/fakellm` serves: the subset chat uses, answering deterministically from the search results it is sent |
+| `internal/docling/` | PDF to IR: the part of docling's JSON RoNote reads, and the mapping to IR with code text from pdftext (docs/adr/0013-pdf-import.md) |
 | `internal/blob/` | the blob port, file storage for PDFs (docs/adr/0013-pdf-import.md): `s3blob` adapts any S3-compatible store and is the only package that imports the AWS SDK (depguard), `memblob` in memory for unit tests, `blobtest` the suite both pass |
 | `internal/s3test/` | a throwaway SeaweedFS for integration tests, like `internal/pgtest` |
 | `internal/devserver/` | runs a dev stand-in until it is interrupted |

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { test as base, expect, type Page } from "@playwright/test";
@@ -53,4 +54,30 @@ export const test = base.extend<object, { workerStorageState: string }>({
     },
     { scope: "worker" },
   ],
+});
+
+/**
+ * Like test, but each test signs in as a user of its own, registered with
+ * the fake provider just before (RONOTE_FAKEIDP_REGISTRATION, set in
+ * playwright.config.ts), so its library starts empty. Use it where
+ * assertions depend on what the library holds, or counts: search results,
+ * the library and Recent lists, chat's conversations and quotas. With the
+ * worker's shared user, a document an earlier test of the worker imported
+ * is in the library too, and an identical page from another test is
+ * another document with the same blocks.
+ */
+export const ownUserTest = test.extend({
+  storageState: async ({ browser, request }, use, testInfo) => {
+    const login = `e2e-t-${randomUUID()}`;
+    const registered = await request.post(`${stack.idp}/test/users`, {
+      data: { login, name: "Test user", email: `${login}@ronote.local` },
+    });
+    expect(registered.status(), `registering ${login}`).toBe(201);
+    const page = await browser.newPage({ baseURL: stack.web });
+    await signIn(page, login);
+    const file = join(testInfo.outputDir, "own-user.json");
+    await page.context().storageState({ path: file });
+    await page.close();
+    await use(file);
+  },
 });

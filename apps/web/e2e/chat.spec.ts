@@ -6,7 +6,7 @@ import {
   importIndexed,
 } from "./helpers";
 import { stack } from "./stack";
-import { expect, test } from "./test";
+import { expect, ownUserTest as test } from "./test";
 
 // The fake model (cmd/fakellm) cites the first block it is sent holding one
 // of the question's longer words, and says the library doesn't cover a

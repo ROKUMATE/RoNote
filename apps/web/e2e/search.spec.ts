@@ -7,7 +7,7 @@ import {
   importPage,
 } from "./helpers";
 import { stack } from "./stack";
-import { expect, test } from "./test";
+import { expect, ownUserTest as test } from "./test";
 
 /** Opens the palette with the shortcut and searches for q. */
 async function search(page: Page, q: string) {

@@ -23,7 +23,7 @@ Until P15 every `/api/v1` request acted as one dev user, `RONOTE_DEV_USER_EMAIL`
   - A new identity joins an existing user only when the provider reports that user's email as the identity's primary, verified email. Otherwise a new user is created.
   - The identity keeps the GitHub login, refreshed at every sign-in. Deleting an account asks for it.
 - **One sign-in path in every environment.** The dev identity (`RONOTE_DEV_USER_EMAIL` and its middleware) is gone.
-  - Dev and test point the provider URLs at `cmd/fakeidp`, a fake provider serving the same four endpoints. Its sign-in page lists test users from a JSON file and has a Deny button.
+  - Dev and test point the provider URLs at `cmd/fakeidp`, a fake provider serving the same four endpoints. Its sign-in page lists test users from a JSON file and has a Deny button. With `RONOTE_FAKEIDP_REGISTRATION=true`, which only the end-to-end suite sets, it also adds a user on request (`POST /test/users`), so a test can have a library of its own.
   - Config refuses any provider URL other than `https://github.com` and `https://api.github.com` in staging and prod, so the fake can't be configured there.
 - **Sessions live in Postgres** (`sessions`): 32 random bytes per session, of which only the SHA-256 is stored.
   - A session ends after 30 days unused or 90 days in all (`expires_at`), whichever comes first.
@@ -55,6 +55,6 @@ Until P15 every `/api/v1` request acted as one dev user, `RONOTE_DEV_USER_EMAIL`
 ## Consequences
 
 - Dev needs the fake provider running (`make run-idp`; `make web-dev` and `make web-e2e` start it). A dev user list includes `dev@ronote.local` as verified, so documents made under the old dev identity stay reachable.
-- End-to-end tests sign in through the same flow as people do. Each Playwright worker is its own user, which also keeps workers' libraries apart.
+- End-to-end tests sign in through the same flow as people do. Each Playwright worker is its own user, which also keeps workers' libraries apart; specs whose assertions read the library (search, the library lists, chat) get a user of their own per test, so no other test's documents are in it.
 - Staging and prod need a GitHub OAuth app per deployment, with its client ID, secret and callback URL.
 - Rate limits reset when the API restarts, and are per process.

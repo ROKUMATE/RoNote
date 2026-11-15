@@ -1,7 +1,8 @@
 // Package fakeidp is a stand-in for GitHub's OAuth app endpoints, for dev and
 // tests only (docs/adr/0010-sign-in-and-sessions.md). It serves the four
 // endpoints RoNote's sign-in calls, with GitHub's paths and shapes, for a
-// fixed list of test users; config keeps it out of staging and prod.
+// list of test users, which a test can add to when Registration is on;
+// config keeps it out of staging and prod.
 package fakeidp
 
 import (
@@ -15,6 +16,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -51,7 +53,15 @@ type Options struct {
 	ClientID     string
 	ClientSecret string
 	Users        []User
+	// Registration serves POST /test/users, which adds a user the sign-in
+	// page then offers: the end-to-end tests give each test a library of
+	// its own with it. Off unless asked for, so dev doesn't offer it.
+	Registration bool
 }
+
+// firstRegisteredID is the id of the first registered user, clear of the
+// listed users', which the dev and e2e files number from 1 and 2000.
+const firstRegisteredID = 10000
 
 // codeLifetime is how long an authorization code may wait for its exchange.
 const codeLifetime = 10 * time.Minute
@@ -68,13 +78,14 @@ type provider struct {
 	opts Options
 
 	mu     sync.Mutex
+	users  []User // the listed users, then the registered ones
 	codes  map[string]grant
 	tokens map[string]User
 }
 
 // New returns the provider's handler.
 func New(o Options) http.Handler {
-	p := &provider{opts: o, codes: map[string]grant{}, tokens: map[string]User{}}
+	p := &provider{opts: o, users: slices.Clone(o.Users), codes: map[string]grant{}, tokens: map[string]User{}}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) { _, _ = w.Write([]byte("ok\n")) })
 	mux.HandleFunc("GET /login/oauth/authorize", p.authorizePage)
@@ -82,6 +93,9 @@ func New(o Options) http.Handler {
 	mux.HandleFunc("POST /login/oauth/access_token", p.accessToken)
 	mux.HandleFunc("GET /user", p.user)
 	mux.HandleFunc("GET /user/emails", p.emails)
+	if o.Registration {
+		mux.HandleFunc("POST /test/users", p.register)
+	}
 	return mux
 }
 
@@ -137,12 +151,15 @@ func (p *provider) authorizePage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	p.mu.Lock()
+	users := slices.Clone(p.users)
+	p.mu.Unlock()
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	_ = page.Execute(w, struct {
 		request
 		ClientID string
 		Users    []User
-	}{req, p.opts.ClientID, p.opts.Users})
+	}{req, p.opts.ClientID, users})
 }
 
 func (p *provider) authorize(w http.ResponseWriter, r *http.Request) {
@@ -180,12 +197,45 @@ func (p *provider) find(id string) (User, bool) {
 	if err != nil {
 		return User{}, false
 	}
-	for _, u := range p.opts.Users {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	for _, u := range p.users {
 		if u.ID == n {
 			return u, true
 		}
 	}
 	return User{}, false
+}
+
+// register adds a verified user, and answers with it: 409 when its login or
+// email, compared without case, is already a user's.
+func (p *provider) register(w http.ResponseWriter, r *http.Request) {
+	var in struct {
+		Login string `json:"login"`
+		Name  string `json:"name"`
+		Email string `json:"email"`
+	}
+	dec := json.NewDecoder(http.MaxBytesReader(w, r.Body, 4<<10))
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(&in); err != nil || in.Login == "" || in.Email == "" {
+		http.Error(w, "want JSON with a login, a name and an email", http.StatusBadRequest)
+		return
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	id := int64(firstRegisteredID)
+	for _, u := range p.users {
+		if strings.EqualFold(u.Login, in.Login) || strings.EqualFold(u.Email, in.Email) {
+			http.Error(w, "that login or email is already a user's", http.StatusConflict)
+			return
+		}
+		id = max(id, u.ID+1)
+	}
+	u := User{ID: id, Login: in.Login, Name: in.Name, Email: in.Email, Verified: true}
+	p.users = append(p.users, u)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	_ = json.NewEncoder(w).Encode(u)
 }
 
 // accessToken exchanges a code, as GitHub does: a refusal is a 200 with an

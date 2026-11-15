@@ -121,9 +121,12 @@ test("a link to a PDF says it cannot be imported, and offers the original", asyn
   await link.click();
 
   const alert = page.getByRole("alert");
-  await expect(alert).toContainText("That link isn't a web page. PDF import comes later.", {
-    timeout: importTimeout,
-  });
+  await expect(alert).toContainText(
+    "That link isn't a web page; to import a PDF, upload the file.",
+    {
+      timeout: importTimeout,
+    },
+  );
   await expect(alert.getByRole("link", { name: "Open original" })).toHaveAttribute(
     "href",
     (await link.getAttribute("href")) ?? "",

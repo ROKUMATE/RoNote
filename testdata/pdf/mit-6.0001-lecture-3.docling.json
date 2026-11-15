@@ -1,0 +1,5783 @@
+{
+ "sha256": "fa3357521ac4e1a07091dbec1c0e920252a1dfc6b3315a3924eb734c79cfcf03",
+ "seconds": 20.3,
+ "pages": 21,
+ "inspect": {
+  "status": 200,
+  "body": {
+   "pages": 21,
+   "chars": 5778
+  }
+ },
+ "result": {
+  "status": 200,
+  "body": {
+   "document": {
+    "filename": "mit-6.0001-lecture-3.pdf",
+    "md_content": null,
+    "json_content": {
+     "schema_name": "DoclingDocument",
+     "version": "1.10.0",
+     "name": "mit-6.0001-lecture-3",
+     "origin": {
+      "mimetype": "application/pdf",
+      "binary_hash": 2660346777190780675,
+      "filename": "mit-6.0001-lecture-3.pdf",
+      "uri": null
+     },
+     "furniture": {
+      "self_ref": "#/furniture",
+      "parent": null,
+      "children": [],
+      "content_layer": "furniture",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "body": {
+      "self_ref": "#/body",
+      "parent": null,
+      "children": [
+       {
+        "$ref": "#/texts/0"
+       },
+       {
+        "$ref": "#/texts/1"
+       },
+       {
+        "$ref": "#/texts/2"
+       },
+       {
+        "$ref": "#/texts/3"
+       },
+       {
+        "$ref": "#/texts/4"
+       },
+       {
+        "$ref": "#/texts/5"
+       },
+       {
+        "$ref": "#/groups/0"
+       },
+       {
+        "$ref": "#/texts/10"
+       },
+       {
+        "$ref": "#/texts/11"
+       },
+       {
+        "$ref": "#/texts/12"
+       },
+       {
+        "$ref": "#/groups/1"
+       },
+       {
+        "$ref": "#/texts/17"
+       },
+       {
+        "$ref": "#/texts/18"
+       },
+       {
+        "$ref": "#/texts/19"
+       },
+       {
+        "$ref": "#/groups/2"
+       },
+       {
+        "$ref": "#/texts/23"
+       },
+       {
+        "$ref": "#/texts/24"
+       },
+       {
+        "$ref": "#/texts/25"
+       },
+       {
+        "$ref": "#/texts/26"
+       },
+       {
+        "$ref": "#/texts/27"
+       },
+       {
+        "$ref": "#/groups/3"
+       },
+       {
+        "$ref": "#/texts/29"
+       },
+       {
+        "$ref": "#/texts/30"
+       },
+       {
+        "$ref": "#/texts/31"
+       },
+       {
+        "$ref": "#/texts/32"
+       },
+       {
+        "$ref": "#/texts/33"
+       },
+       {
+        "$ref": "#/texts/34"
+       },
+       {
+        "$ref": "#/texts/35"
+       },
+       {
+        "$ref": "#/texts/36"
+       },
+       {
+        "$ref": "#/groups/4"
+       },
+       {
+        "$ref": "#/texts/38"
+       },
+       {
+        "$ref": "#/texts/39"
+       },
+       {
+        "$ref": "#/groups/5"
+       },
+       {
+        "$ref": "#/pictures/0"
+       },
+       {
+        "$ref": "#/texts/45"
+       },
+       {
+        "$ref": "#/texts/46"
+       },
+       {
+        "$ref": "#/texts/47"
+       },
+       {
+        "$ref": "#/groups/6"
+       },
+       {
+        "$ref": "#/texts/49"
+       },
+       {
+        "$ref": "#/texts/50"
+       },
+       {
+        "$ref": "#/texts/52"
+       },
+       {
+        "$ref": "#/texts/53"
+       },
+       {
+        "$ref": "#/texts/54"
+       },
+       {
+        "$ref": "#/groups/7"
+       },
+       {
+        "$ref": "#/texts/57"
+       },
+       {
+        "$ref": "#/texts/58"
+       },
+       {
+        "$ref": "#/texts/59"
+       },
+       {
+        "$ref": "#/texts/60"
+       },
+       {
+        "$ref": "#/pictures/1"
+       },
+       {
+        "$ref": "#/texts/61"
+       },
+       {
+        "$ref": "#/texts/62"
+       },
+       {
+        "$ref": "#/texts/63"
+       },
+       {
+        "$ref": "#/texts/64"
+       },
+       {
+        "$ref": "#/texts/65"
+       },
+       {
+        "$ref": "#/texts/66"
+       },
+       {
+        "$ref": "#/texts/67"
+       },
+       {
+        "$ref": "#/texts/68"
+       },
+       {
+        "$ref": "#/groups/8"
+       },
+       {
+        "$ref": "#/texts/74"
+       },
+       {
+        "$ref": "#/texts/75"
+       },
+       {
+        "$ref": "#/texts/76"
+       },
+       {
+        "$ref": "#/texts/77"
+       },
+       {
+        "$ref": "#/texts/78"
+       },
+       {
+        "$ref": "#/texts/79"
+       },
+       {
+        "$ref": "#/texts/80"
+       },
+       {
+        "$ref": "#/texts/81"
+       },
+       {
+        "$ref": "#/texts/82"
+       },
+       {
+        "$ref": "#/texts/83"
+       },
+       {
+        "$ref": "#/texts/84"
+       },
+       {
+        "$ref": "#/groups/9"
+       },
+       {
+        "$ref": "#/texts/90"
+       },
+       {
+        "$ref": "#/texts/91"
+       },
+       {
+        "$ref": "#/texts/92"
+       },
+       {
+        "$ref": "#/texts/93"
+       },
+       {
+        "$ref": "#/texts/94"
+       },
+       {
+        "$ref": "#/texts/95"
+       },
+       {
+        "$ref": "#/texts/96"
+       },
+       {
+        "$ref": "#/groups/10"
+       },
+       {
+        "$ref": "#/pictures/2"
+       },
+       {
+        "$ref": "#/texts/103"
+       },
+       {
+        "$ref": "#/texts/104"
+       },
+       {
+        "$ref": "#/texts/105"
+       },
+       {
+        "$ref": "#/texts/106"
+       },
+       {
+        "$ref": "#/texts/107"
+       },
+       {
+        "$ref": "#/texts/108"
+       },
+       {
+        "$ref": "#/texts/109"
+       },
+       {
+        "$ref": "#/groups/11"
+       },
+       {
+        "$ref": "#/groups/12"
+       },
+       {
+        "$ref": "#/texts/118"
+       },
+       {
+        "$ref": "#/texts/119"
+       },
+       {
+        "$ref": "#/pictures/3"
+       },
+       {
+        "$ref": "#/texts/120"
+       },
+       {
+        "$ref": "#/groups/14"
+       },
+       {
+        "$ref": "#/texts/123"
+       },
+       {
+        "$ref": "#/texts/124"
+       },
+       {
+        "$ref": "#/texts/125"
+       },
+       {
+        "$ref": "#/texts/126"
+       },
+       {
+        "$ref": "#/texts/127"
+       },
+       {
+        "$ref": "#/texts/128"
+       }
+      ],
+      "content_layer": "body",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "groups": [
+      {
+       "self_ref": "#/groups/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/6"
+        },
+        {
+         "$ref": "#/texts/7"
+        },
+        {
+         "$ref": "#/texts/8"
+        },
+        {
+         "$ref": "#/texts/9"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/13"
+        },
+        {
+         "$ref": "#/texts/14"
+        },
+        {
+         "$ref": "#/texts/15"
+        },
+        {
+         "$ref": "#/texts/16"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/2",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/20"
+        },
+        {
+         "$ref": "#/texts/21"
+        },
+        {
+         "$ref": "#/texts/22"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/3",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/28"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/4",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/37"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/5",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/40"
+        },
+        {
+         "$ref": "#/texts/41"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/6",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/48"
+        },
+        {
+         "$ref": "#/texts/51"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/7",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/55"
+        },
+        {
+         "$ref": "#/texts/56"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/8",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/69"
+        },
+        {
+         "$ref": "#/texts/70"
+        },
+        {
+         "$ref": "#/texts/71"
+        },
+        {
+         "$ref": "#/texts/72"
+        },
+        {
+         "$ref": "#/texts/73"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/9",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/85"
+        },
+        {
+         "$ref": "#/texts/86"
+        },
+        {
+         "$ref": "#/texts/87"
+        },
+        {
+         "$ref": "#/texts/88"
+        },
+        {
+         "$ref": "#/texts/89"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/10",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/97"
+        },
+        {
+         "$ref": "#/texts/98"
+        },
+        {
+         "$ref": "#/texts/99"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/11",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/110"
+        },
+        {
+         "$ref": "#/texts/114"
+        },
+        {
+         "$ref": "#/texts/115"
+        },
+        {
+         "$ref": "#/texts/116"
+        },
+        {
+         "$ref": "#/texts/117"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/12",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/groups/13"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "group",
+       "label": "key_value_area"
+      },
+      {
+       "self_ref": "#/groups/13",
+       "parent": {
+        "$ref": "#/groups/12"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/111"
+        },
+        {
+         "$ref": "#/texts/112"
+        },
+        {
+         "$ref": "#/texts/113"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/14",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/121"
+        },
+        {
+         "$ref": "#/texts/122"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      }
+     ],
+     "texts": [
+      {
+       "self_ref": "#/texts/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 72.0,
+          "t": 474.46,
+          "r": 650.4,
+          "b": 230.85500000000002,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          63
+         ]
+        }
+       ],
+       "orig": "STRING MANIPULATION, GUESS-and-CHECK, APPROXIMATIONS, BISECTION",
+       "text": "STRING MANIPULATION, GUESS-and-CHECK, APPROXIMATIONS, BISECTION",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 1
+      },
+      {
+       "self_ref": "#/texts/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 72.0,
+          "t": 230.14999999999998,
+          "r": 569.7110000000001,
+          "b": 203.14999999999998,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          49
+         ]
+        }
+       ],
+       "orig": "(download slides and .py files ĂŶĚ�follow along!)",
+       "text": "(download slides and .py files ĂŶĚ�follow along!)",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/2",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 72.16,
+          "t": 183.96000000000004,
+          "r": 277.488,
+          "b": 159.96000000000004,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/3",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 327.3,
+          "t": 20.690000000000055,
+          "r": 392.8829999999999,
+          "b": 11.690000000000055,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/4",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 649.58,
+          "t": 21.274999999999977,
+          "r": 654.9035,
+          "b": 10.774999999999977,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "1",
+       "text": "1",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/5",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 72.0,
+          "t": 455.02,
+          "r": 269.80800000000005,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          9
+         ]
+        }
+       ],
+       "orig": "LAST TIME",
+       "text": "LAST TIME",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/6",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 64.8,
+          "t": 389.866,
+          "r": 152.21400000000003,
+          "b": 363.32,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          9
+         ]
+        }
+       ],
+       "orig": " strings",
+       "text": " strings",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/7",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 64.8,
+          "t": 347.77058,
+          "r": 319.7203999999999,
+          "b": 321.245,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          26
+         ]
+        }
+       ],
+       "orig": " branching - if/elif/else",
+       "text": " branching - if/elif/else",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/8",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 64.8,
+          "t": 305.71058,
+          "r": 202.5876,
+          "b": 279.185,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          13
+         ]
+        }
+       ],
+       "orig": " while loops",
+       "text": " while loops",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/9",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 64.8,
+          "t": 263.59058,
+          "r": 175.64634,
+          "b": 237.065,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          11
+         ]
+        }
+       ],
+       "orig": " for loops",
+       "text": " for loops",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/10",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/11",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 649.58,
+          "t": 16.335000000000036,
+          "r": 654.9035,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "2",
+       "text": "2",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/12",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 72.0,
+          "t": 455.02,
+          "r": 198.288,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          5
+         ]
+        }
+       ],
+       "orig": "TODAY",
+       "text": "TODAY",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/13",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 64.8,
+          "t": 389.866,
+          "r": 288.298,
+          "b": 363.32,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": " string manipulation",
+       "text": " string manipulation",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/14",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 64.8,
+          "t": 347.77058,
+          "r": 371.7174,
+          "b": 321.245,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          28
+         ]
+        }
+       ],
+       "orig": " guess and check algorithms",
+       "text": " guess and check algorithms",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/15",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 64.8,
+          "t": 305.71058,
+          "r": 317.36724000000004,
+          "b": 279.185,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          23
+         ]
+        }
+       ],
+       "orig": " approximate solutions",
+       "text": " approximate solutions",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/16",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 64.8,
+          "t": 263.59058,
+          "r": 267.3817200000001,
+          "b": 237.065,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          18
+         ]
+        }
+       ],
+       "orig": " bisection method",
+       "text": " bisection method",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/17",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/18",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 649.58,
+          "t": 16.335000000000036,
+          "r": 654.9035,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "3",
+       "text": "3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/19",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 72.0,
+          "t": 455.02,
+          "r": 233.61600000000004,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          7
+         ]
+        }
+       ],
+       "orig": "STRINGS",
+       "text": "STRINGS",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/20",
+       "parent": {
+        "$ref": "#/groups/2"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 64.8,
+          "t": 389.866,
+          "r": 611.6619999999998,
+          "b": 363.32,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          53
+         ]
+        }
+       ],
+       "orig": " think of as a sequence of case sensitive characters",
+       "text": " think of as a sequence of case sensitive characters",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/21",
+       "parent": {
+        "$ref": "#/groups/2"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 64.8,
+          "t": 347.77058,
+          "r": 479.98696,
+          "b": 321.245,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          40
+         ]
+        }
+       ],
+       "orig": " can compare strings with ==, \u003e, \u003c etc.",
+       "text": " can compare strings with ==, \u003e, \u003c etc.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/22",
+       "parent": {
+        "$ref": "#/groups/2"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 64.8,
+          "t": 305.95058,
+          "r": 652.18768,
+          "b": 251.10500000000002,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          82
+         ]
+        }
+       ],
+       "orig": " len() is a function used to retrieve the length of the string in the parentheses",
+       "text": " len() is a function used to retrieve the length of the string in the parentheses",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/23",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "formula",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 96.0,
+          "t": 190.00574,
+          "r": 236.588,
+          "b": 170.48571534213687,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          9
+         ]
+        }
+       ],
+       "orig": "s = \"abc\"",
+       "text": "",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/24",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 96.0,
+          "t": 151.49058000000002,
+          "r": 396.99278,
+          "b": 124.96500000000003,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          23
+         ]
+        }
+       ],
+       "orig": "len(s)  evaluates to 3",
+       "text": "len(s)  evaluates to 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/25",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/26",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 649.58,
+          "t": 16.335000000000036,
+          "r": 654.9035,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "4",
+       "text": "4",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/27",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 72.0,
+          "t": 455.02,
+          "r": 233.61600000000004,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          7
+         ]
+        }
+       ],
+       "orig": "STRINGS",
+       "text": "STRINGS",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/28",
+       "parent": {
+        "$ref": "#/groups/3"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 64.8,
+          "t": 389.866,
+          "r": 653.986,
+          "b": 335.525,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          101
+         ]
+        }
+       ],
+       "orig": " square brackets used to perform indexing into a string to get the value at a certain index/position",
+       "text": " square brackets used to perform indexing into a string to get the value at a certain index/position",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/29",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 96.0,
+          "t": 325.90574000000004,
+          "r": 624.06292,
+          "b": 22.065000000000055,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          293
+         ]
+        }
+       ],
+       "orig": "s = \"abc\" s[0]  evaluates to \"a\" s[1]  evaluates to \"b\" s[2]  evaluates to \"c\" s[3]  trying to index out of bounds, error s[-1]  evaluates to \"c\" s[-2]  evaluates to \"b\" s[-3]  evaluates to \"a\" index: 0 1 2  indexing always starts at 0 index: -3 -2 -1  last element always at index -1",
+       "text": "s = \"abc\" s[0]  evaluates to \"a\" s[1]  evaluates to \"b\" s[2]  evaluates to \"c\" s[3]  trying to index out of bounds, error s[-1]  evaluates to \"c\" s[-2]  evaluates to \"b\" s[-3]  evaluates to \"a\" index: 0 1 2  indexing always starts at 0 index: -3 -2 -1  last element always at index -1",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/30",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/31",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 649.58,
+          "t": 16.335000000000036,
+          "r": 654.9035,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "5",
+       "text": "5",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/32",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 72.0,
+          "t": 454.015,
+          "r": 233.58730000000006,
+          "b": 405.995,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          7
+         ]
+        }
+       ],
+       "orig": "STRINGS",
+       "text": "STRINGS",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/33",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 23.04,
+          "t": 390.166,
+          "r": 715.7199999999999,
+          "b": 45.315,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          381
+         ]
+        }
+       ],
+       "orig": " can slice strings using [start:stop:step]  if give two numbers, [start:stop], step=1 by default  you can also omit numbers and leave just colons s = \"abcdefgh\" s[3:6] evaluates to \"def\", same as s[3:6:1] s[3:6:2] evaluates to \"df\" s[::] evaluates to \"abcdefgh\", same as s[0:len(s):1] s[::-1] evaluates to \"hgfedbca\", same as s[-1:-(len(s)+1):-1] s[4:1:-2]evaluates to \"ec\"",
+       "text": " can slice strings using [start:stop:step]  if give two numbers, [start:stop], step=1 by default  you can also omit numbers and leave just colons s = \"abcdefgh\" s[3:6] evaluates to \"def\", same as s[3:6:1] s[3:6:2] evaluates to \"df\" s[::] evaluates to \"abcdefgh\", same as s[0:len(s):1] s[::-1] evaluates to \"hgfedbca\", same as s[-1:-(len(s)+1):-1] s[4:1:-2]evaluates to \"ec\"",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/34",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/35",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 649.58,
+          "t": 16.335000000000036,
+          "r": 654.9035,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "6",
+       "text": "6",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/36",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 72.0,
+          "t": 455.02,
+          "r": 233.61600000000004,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          7
+         ]
+        }
+       ],
+       "orig": "STRINGS",
+       "text": "STRINGS",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/37",
+       "parent": {
+        "$ref": "#/groups/4"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 64.8,
+          "t": 389.866,
+          "r": 568.2719999999999,
+          "b": 363.32,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          46
+         ]
+        }
+       ],
+       "orig": " strings are \"immutable\" - cannot be modified",
+       "text": " strings are \"immutable\" - cannot be modified",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/38",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "formula",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 93.6,
+          "t": 343.712,
+          "r": 251.66000000000003,
+          "b": 325.67964465786315,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          11
+         ]
+        }
+       ],
+       "orig": "s = \"hello\"",
+       "text": "",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/39",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "formula",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 93.6,
+          "t": 300.092,
+          "r": 556.564,
+          "b": 246.86,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          44
+         ]
+        }
+       ],
+       "orig": "s[0] = 'y' s = 'y'+s[1:len(s)]  is allowed,",
+       "text": "",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/40",
+       "parent": {
+        "$ref": "#/groups/5"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 424.84,
+          "t": 303.884,
+          "r": 586.6119999999999,
+          "b": 279.38,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          15
+         ]
+        }
+       ],
+       "orig": "gives an error",
+       "text": "gives an error",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/41",
+       "parent": {
+        "$ref": "#/groups/5"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 451.72,
+          "t": 241.27999999999997,
+          "r": 668.8960000000001,
+          "b": 217.27999999999997,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "s bound to new object",
+       "text": "s bound to new object",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/42",
+       "parent": {
+        "$ref": "#/pictures/0"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 109.54,
+          "t": 74.95400000000001,
+          "r": 120.34,
+          "b": 61.42973349339735,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "s",
+       "text": "s",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/43",
+       "parent": {
+        "$ref": "#/pictures/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 291.18,
+          "t": 157.34974,
+          "r": 349.85405999999983,
+          "b": 146.84589301320528,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          7
+         ]
+        }
+       ],
+       "orig": "\"hello\"",
+       "text": "\"hello\"",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/44",
+       "parent": {
+        "$ref": "#/pictures/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 294.06,
+          "t": 109.40974,
+          "r": 352.72799999999995,
+          "b": 98.90589301320529,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          7
+         ]
+        }
+       ],
+       "orig": "\"yello\"",
+       "text": "\"yello\"",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/45",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/46",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 649.58,
+          "t": 16.335000000000036,
+          "r": 654.9035,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "7",
+       "text": "7",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/47",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 72.0,
+          "t": 455.02,
+          "r": 395.03999999999996,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          15
+         ]
+        }
+       ],
+       "orig": "for LOOPS RECAP",
+       "text": "for LOOPS RECAP",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/48",
+       "parent": {
+        "$ref": "#/groups/6"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 64.8,
+          "t": 390.166,
+          "r": 684.7919999999996,
+          "b": 335.225,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          67
+         ]
+        }
+       ],
+       "orig": " for loops have a loop variable that iterates over a set of values",
+       "text": " for loops have a loop variable that iterates over a set of values",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/49",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 64.8,
+          "t": 318.79742,
+          "r": 714.4915599999999,
+          "b": 243.635,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          127
+         ]
+        }
+       ],
+       "orig": "for var in range(4):  var iterates over values 0,1,2,3 \u003cexpressions\u003e expressions inside loop executed with each value for var",
+       "text": "for var in range(4):  var iterates over values 0,1,2,3 \u003cexpressions\u003e expressions inside loop executed with each value for var",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/50",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 64.8,
+          "t": 217.27742,
+          "r": 681.15328,
+          "b": 170.7596446578632,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          67
+         ]
+        }
+       ],
+       "orig": "for var in range(4,6):  var iterates over values 4,5 \u003cexpressions\u003e",
+       "text": "for var in range(4,6):  var iterates over values 4,5 \u003cexpressions\u003e",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/51",
+       "parent": {
+        "$ref": "#/groups/6"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 64.8,
+          "t": 124.49058000000002,
+          "r": 716.2555,
+          "b": 69.88499999999999,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          119
+         ]
+        }
+       ],
+       "orig": " range is a way to iterate over numbers, but a for loop variable can iterate over any set of values, not just numbers!",
+       "text": " range is a way to iterate over numbers, but a for loop variable can iterate over any set of values, not just numbers!",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/52",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/53",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 649.58,
+          "t": 16.335000000000036,
+          "r": 654.9035,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "8",
+       "text": "8",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/54",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 9,
+         "bbox": {
+          "l": 72.0,
+          "t": 455.02,
+          "r": 464.88,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          17
+         ]
+        }
+       ],
+       "orig": "STRINGS AND LOOPS",
+       "text": "STRINGS AND LOOPS",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/55",
+       "parent": {
+        "$ref": "#/groups/7"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 9,
+         "bbox": {
+          "l": 64.8,
+          "t": 392.38599999999997,
+          "r": 535.5839999999997,
+          "b": 365.84,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          43
+         ]
+        }
+       ],
+       "orig": " these two code snippets do the same thing",
+       "text": " these two code snippets do the same thing",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/56",
+       "parent": {
+        "$ref": "#/groups/7"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 9,
+         "bbox": {
+          "l": 64.8,
+          "t": 353.53058,
+          "r": 411.19964,
+          "b": 327.005,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          31
+         ]
+        }
+       ],
+       "orig": " bottom one is more \"pythonic\"",
+       "text": " bottom one is more \"pythonic\"",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/57",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 9,
+         "bbox": {
+          "l": 64.8,
+          "t": 311.30774,
+          "r": 568.808,
+          "b": 63.595804177671084,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          183
+         ]
+        }
+       ],
+       "orig": "s = \"abcdefgh\" for index in range(len(s)): if s[index] == 'i' or s[index] == 'u': print(\"There is an i or u\") for char in s: if char == 'i' or char == 'u': print(\"There is an i or u\")",
+       "text": "s = \"abcdefgh\" for index in range(len(s)): if s[index] == 'i' or s[index] == 'u': print(\"There is an i or u\") for char in s: if char == 'i' or char == 'u': print(\"There is an i or u\")",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/58",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 9,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/59",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 9,
+         "bbox": {
+          "l": 649.58,
+          "t": 16.335000000000036,
+          "r": 654.9035,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "9",
+       "text": "9",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/60",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 10,
+         "bbox": {
+          "l": 72.0,
+          "t": 495.85499999999996,
+          "r": 432.6602399999999,
+          "b": 406.975,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          32
+         ]
+        }
+       ],
+       "orig": "CODE EXAMPLE: ROBOT CHEERLEADERS",
+       "text": "CODE EXAMPLE: ROBOT CHEERLEADERS",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 4
+      },
+      {
+       "self_ref": "#/texts/61",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 10,
+         "bbox": {
+          "l": 64.8,
+          "t": 386.20626000000004,
+          "r": 624.1520000000006,
+          "b": 48.62973349339734,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          392
+         ]
+        }
+       ],
+       "orig": "an_letters = \"aefhilmnorsxAEFHILMNORSX\" word = input(\"I will cheer for you! Enter a word: \") times = int(input(\"Enthusiasm level (1-10): \")) i = 0 while i \u003c len(word): char = word[i] if char in an_letters: print(\"Give me an \" + char + \"! \" + char) else: print(\"Give me a \" + char + \"! \" + char) i += 1 print(\"What does that spell?\") for i in range(times): print(word, \"!!!\") for char in word:",
+       "text": "an_letters = \"aefhilmnorsxAEFHILMNORSX\" word = input(\"I will cheer for you! Enter a word: \") times = int(input(\"Enthusiasm level (1-10): \")) i = 0 while i \u003c len(word): char = word[i] if char in an_letters: print(\"Give me an \" + char + \"! \" + char) else: print(\"Give me a \" + char + \"! \" + char) i += 1 print(\"What does that spell?\") for i in range(times): print(word, \"!!!\") for char in word:",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/62",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 10,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/63",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 10,
+         "bbox": {
+          "l": 644.24,
+          "t": 16.335000000000036,
+          "r": 654.9034999999999,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "10",
+       "text": "10",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/64",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 11,
+         "bbox": {
+          "l": 72.0,
+          "t": 454.015,
+          "r": 247.32102000000003,
+          "b": 405.995,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          8
+         ]
+        }
+       ],
+       "orig": "EXERCISE",
+       "text": "EXERCISE",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/65",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 11,
+         "bbox": {
+          "l": 64.8,
+          "t": 388.098,
+          "r": 658.1756,
+          "b": 95.82571534213685,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          140
+         ]
+        }
+       ],
+       "orig": "s1 = \"mit u rock\" s2 = \"i rule mit\" if len(s1) == len(s2): for char1 in s1: for char2 in s2: if char1 == char2: print(\"common letter\") break",
+       "text": "s1 = \"mit u rock\" s2 = \"i rule mit\" if len(s1) == len(s2): for char1 in s1: for char2 in s2: if char1 == char2: print(\"common letter\") break",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/66",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 11,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/67",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 11,
+         "bbox": {
+          "l": 644.24,
+          "t": 16.335000000000036,
+          "r": 654.9034999999999,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "11",
+       "text": "11",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/68",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 12,
+         "bbox": {
+          "l": 72.0,
+          "t": 455.02,
+          "r": 436.91599999999994,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          15
+         ]
+        }
+       ],
+       "orig": "GUESS-AND-CHECK",
+       "text": "GUESS-AND-CHECK",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/69",
+       "parent": {
+        "$ref": "#/groups/8"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 12,
+         "bbox": {
+          "l": 64.8,
+          "t": 389.866,
+          "r": 658.166,
+          "b": 363.32,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          54
+         ]
+        }
+       ],
+       "orig": " the process below also called exhaustive enumeration",
+       "text": " the process below also called exhaustive enumeration",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/70",
+       "parent": {
+        "$ref": "#/groups/8"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 12,
+         "bbox": {
+          "l": 64.8,
+          "t": 305.71058,
+          "r": 270.31746000000004,
+          "b": 279.185,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          18
+         ]
+        }
+       ],
+       "orig": " given a problem…",
+       "text": " given a problem…",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/71",
+       "parent": {
+        "$ref": "#/groups/8"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 12,
+         "bbox": {
+          "l": 64.8,
+          "t": 263.59058,
+          "r": 516.7824800000001,
+          "b": 237.065,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          44
+         ]
+        }
+       ],
+       "orig": " you are able to guess a value for solution",
+       "text": " you are able to guess a value for solution",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/72",
+       "parent": {
+        "$ref": "#/groups/8"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 12,
+         "bbox": {
+          "l": 64.8,
+          "t": 221.53058,
+          "r": 568.42004,
+          "b": 195.005,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          50
+         ]
+        }
+       ],
+       "orig": " you are able to check if the solution is correct",
+       "text": " you are able to check if the solution is correct",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/73",
+       "parent": {
+        "$ref": "#/groups/8"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 12,
+         "bbox": {
+          "l": 64.8,
+          "t": 179.47057999999998,
+          "r": 644.6632800000002,
+          "b": 152.945,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          57
+         ]
+        }
+       ],
+       "orig": " keep guessing until find solution or guessed all values",
+       "text": " keep guessing until find solution or guessed all values",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/74",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 12,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/75",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 12,
+         "bbox": {
+          "l": 644.24,
+          "t": 16.335000000000036,
+          "r": 654.9034999999999,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "12",
+       "text": "12",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/76",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 13,
+         "bbox": {
+          "l": 72.0,
+          "t": 504.015,
+          "r": 436.92062,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          27
+         ]
+        }
+       ],
+       "orig": "GUESS-AND-CHECK - cube root",
+       "text": "GUESS-AND-CHECK - cube root",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/77",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 13,
+         "bbox": {
+          "l": 64.8,
+          "t": 387.48,
+          "r": 640.808,
+          "b": 265.63580417767105,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          98
+         ]
+        }
+       ],
+       "orig": "cube = 8 for guess in range(cube+1): if guess**3 == cube: print(\"Cube root of\", cube, \"is\", guess)",
+       "text": "cube = 8 for guess in range(cube+1): if guess**3 == cube: print(\"Cube root of\", cube, \"is\", guess)",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/78",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 13,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/79",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 13,
+         "bbox": {
+          "l": 644.24,
+          "t": 16.335000000000036,
+          "r": 654.9034999999999,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "13",
+       "text": "13",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/80",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 14,
+         "bbox": {
+          "l": 72.0,
+          "t": 504.015,
+          "r": 436.92062,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          27
+         ]
+        }
+       ],
+       "orig": "GUESS-AND-CHECK - cube root",
+       "text": "GUESS-AND-CHECK - cube root",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/81",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 14,
+         "bbox": {
+          "l": 64.8,
+          "t": 387.48,
+          "r": 712.828,
+          "b": 52.01580417767104,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          221
+         ]
+        }
+       ],
+       "orig": "cube = 8 for guess in range(abs(cube)+1): if guess**3 \u003e= abs(cube): break if guess**3 != abs(cube): print(cube, 'is not a perfect cube') else: if cube \u003c 0: guess = -guess print('Cube root of '+str(cube)+' is '+str(guess))",
+       "text": "cube = 8 for guess in range(abs(cube)+1): if guess**3 \u003e= abs(cube): break if guess**3 != abs(cube): print(cube, 'is not a perfect cube') else: if cube \u003c 0: guess = -guess print('Cube root of '+str(cube)+' is '+str(guess))",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/82",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 14,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/83",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 14,
+         "bbox": {
+          "l": 644.24,
+          "t": 16.335000000000036,
+          "r": 654.9034999999999,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "14",
+       "text": "14",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/84",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 15,
+         "bbox": {
+          "l": 72.0,
+          "t": 455.02,
+          "r": 571.728,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "APPROXIMATE SOLUTIONS",
+       "text": "APPROXIMATE SOLUTIONS",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/85",
+       "parent": {
+        "$ref": "#/groups/9"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 15,
+         "bbox": {
+          "l": 64.8,
+          "t": 389.866,
+          "r": 315.402,
+          "b": 363.32,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          22
+         ]
+        }
+       ],
+       "orig": " good enough solution",
+       "text": " good enough solution",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/86",
+       "parent": {
+        "$ref": "#/groups/9"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 15,
+         "bbox": {
+          "l": 64.8,
+          "t": 347.77058,
+          "r": 648.4567000000001,
+          "b": 321.245,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          54
+         ]
+        }
+       ],
+       "orig": " start with a guess and increment by some small value",
+       "text": " start with a guess and increment by some small value",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/87",
+       "parent": {
+        "$ref": "#/groups/9"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 15,
+         "bbox": {
+          "l": 64.8,
+          "t": 304.75058,
+          "r": 635.3079999999994,
+          "b": 248.945,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          68
+         ]
+        }
+       ],
+       "orig": " keep guessing if |guess 3 -cube| \u003e= epsilon for some small epsilon",
+       "text": " keep guessing if |guess 3 -cube| \u003e= epsilon for some small epsilon",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/88",
+       "parent": {
+        "$ref": "#/groups/9"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 15,
+         "bbox": {
+          "l": 64.8,
+          "t": 191.11058000000003,
+          "r": 557.9262200000001,
+          "b": 164.58500000000004,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          43
+         ]
+        }
+       ],
+       "orig": " decreasing increment size slower program",
+       "text": " decreasing increment size slower program",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/89",
+       "parent": {
+        "$ref": "#/groups/9"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 15,
+         "bbox": {
+          "l": 64.8,
+          "t": 148.97057999999998,
+          "r": 607.6884799999999,
+          "b": 122.445,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          43
+         ]
+        }
+       ],
+       "orig": " increasing epsilon  less accurate answer",
+       "text": " increasing epsilon  less accurate answer",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/90",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 15,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/91",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 15,
+         "bbox": {
+          "l": 644.24,
+          "t": 16.335000000000036,
+          "r": 654.9034999999999,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "15",
+       "text": "15",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/92",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 16,
+         "bbox": {
+          "l": 72.0,
+          "t": 504.015,
+          "r": 550.3752400000001,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          32
+         ]
+        }
+       ],
+       "orig": "APPROXIMATE SOLUTION - cube root",
+       "text": "APPROXIMATE SOLUTION - cube root",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/93",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 16,
+         "bbox": {
+          "l": 64.8,
+          "t": 382.96626000000003,
+          "r": 683.2594799999999,
+          "b": 58.349733493397366,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          333
+         ]
+        }
+       ],
+       "orig": "cube = 27 epsilon = 0.01 guess = 0.0 increment = 0.0001 num_guesses = 0 while abs(guess**3 - cube) \u003e= epsilon: guess += increment num_guesses += 1 print('num_guesses =', num_guesses) if abs(guess**3 - cube) \u003e= epsilon: print('Failed on cube root of', cube) else: print(guess, 'is close to the cube root of', cube) and guess \u003c= cube :",
+       "text": "cube = 27 epsilon = 0.01 guess = 0.0 increment = 0.0001 num_guesses = 0 while abs(guess**3 - cube) \u003e= epsilon: guess += increment num_guesses += 1 print('num_guesses =', num_guesses) if abs(guess**3 - cube) \u003e= epsilon: print('Failed on cube root of', cube) else: print(guess, 'is close to the cube root of', cube) and guess \u003c= cube :",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/94",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 16,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/95",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 16,
+         "bbox": {
+          "l": 644.24,
+          "t": 16.335000000000036,
+          "r": 654.9034999999999,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "16",
+       "text": "16",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/96",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 17,
+         "bbox": {
+          "l": 72.0,
+          "t": 455.02,
+          "r": 433.0079999999999,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "BISECTION SEARCH",
+       "text": "BISECTION SEARCH",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/97",
+       "parent": {
+        "$ref": "#/groups/10"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 17,
+         "bbox": {
+          "l": 64.8,
+          "t": 389.866,
+          "r": 360.1099999999999,
+          "b": 363.32,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          30
+         ]
+        }
+       ],
+       "orig": " half interval each iteration",
+       "text": " half interval each iteration",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/98",
+       "parent": {
+        "$ref": "#/groups/10"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 17,
+         "bbox": {
+          "l": 64.8,
+          "t": 347.77058,
+          "r": 426.8469599999999,
+          "b": 321.245,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          33
+         ]
+        }
+       ],
+       "orig": " new guess is halfway in between",
+       "text": " new guess is halfway in between",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/99",
+       "parent": {
+        "$ref": "#/groups/10"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 17,
+         "bbox": {
+          "l": 64.8,
+          "t": 305.71058,
+          "r": 398.65866000000005,
+          "b": 279.185,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          35
+         ]
+        }
+       ],
+       "orig": " to illustrate, let's play a game!",
+       "text": " to illustrate, let's play a game!",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/100",
+       "parent": {
+        "$ref": "#/pictures/2"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 17,
+         "bbox": {
+          "l": 390.3,
+          "t": 214.324,
+          "r": 453.462,
+          "b": 198.64578110383536,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          5
+         ]
+        }
+       ],
+       "orig": "GUESS",
+       "text": "GUESS",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/101",
+       "parent": {
+        "$ref": "#/pictures/2"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 17,
+         "bbox": {
+          "l": 224.9,
+          "t": 131.084,
+          "r": 288.062,
+          "b": 115.40578110383535,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          5
+         ]
+        }
+       ],
+       "orig": "GUESS",
+       "text": "GUESS",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/102",
+       "parent": {
+        "$ref": "#/pictures/2"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 17,
+         "bbox": {
+          "l": 305.36,
+          "t": 52.464,
+          "r": 368.52200000000005,
+          "b": 36.78578110383535,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          5
+         ]
+        }
+       ],
+       "orig": "GUESS",
+       "text": "GUESS",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/103",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 17,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/104",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 17,
+         "bbox": {
+          "l": 644.24,
+          "t": 16.335000000000036,
+          "r": 654.9034999999999,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "17",
+       "text": "17",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/105",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 18,
+         "bbox": {
+          "l": 72.0,
+          "t": 504.015,
+          "r": 433.06238,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          28
+         ]
+        }
+       ],
+       "orig": "BISECTION SEARCH - cube root",
+       "text": "BISECTION SEARCH - cube root",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/106",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 18,
+         "bbox": {
+          "l": 64.8,
+          "t": 385.68,
+          "r": 652.808,
+          "b": 34.615804177671066,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          303
+         ]
+        }
+       ],
+       "orig": "cube = 27 epsilon = 0.01 num_guesses = 0 low = 0 high = cube guess = (high + low)/2.0 while abs(guess**3 - cube) \u003e= epsilon: if guess**3 \u003c cube : low = guess else: high = guess guess = (high + low)/2.0 num_guesses += 1 print 'num_guesses =', num_guesses print guess, 'is close to the cube root of', cube",
+       "text": "cube = 27 epsilon = 0.01 num_guesses = 0 low = 0 high = cube guess = (high + low)/2.0 while abs(guess**3 - cube) \u003e= epsilon: if guess**3 \u003c cube : low = guess else: high = guess guess = (high + low)/2.0 num_guesses += 1 print 'num_guesses =', num_guesses print guess, 'is close to the cube root of', cube",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/107",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 18,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/108",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 18,
+         "bbox": {
+          "l": 644.24,
+          "t": 16.335000000000036,
+          "r": 654.9034999999999,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "18",
+       "text": "18",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/109",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 19,
+         "bbox": {
+          "l": 72.0,
+          "t": 504.015,
+          "r": 433.06238,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          28
+         ]
+        }
+       ],
+       "orig": "BISECTION SEARCH CONVERGENCE",
+       "text": "BISECTION SEARCH CONVERGENCE",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/110",
+       "parent": {
+        "$ref": "#/groups/11"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 19,
+         "bbox": {
+          "l": 64.8,
+          "t": 392.38599999999997,
+          "r": 217.526,
+          "b": 365.84,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          14
+         ]
+        }
+       ],
+       "orig": " search space",
+       "text": " search space",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/111",
+       "parent": {
+        "$ref": "#/groups/13"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 19,
+         "bbox": {
+          "l": 80.64,
+          "t": 362.78,
+          "r": 317.75600000000003,
+          "b": 338.78,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          18
+         ]
+        }
+       ],
+       "orig": "◦ first guess: N/2",
+       "text": "first guess: N/2",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": "◦"
+      },
+      {
+       "self_ref": "#/texts/112",
+       "parent": {
+        "$ref": "#/groups/13"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 19,
+         "bbox": {
+          "l": 80.64,
+          "t": 333.74,
+          "r": 317.75600000000003,
+          "b": 309.74,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          19
+         ]
+        }
+       ],
+       "orig": "◦ second guess: N/4",
+       "text": "second guess: N/4",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": "◦"
+      },
+      {
+       "self_ref": "#/texts/113",
+       "parent": {
+        "$ref": "#/groups/13"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 19,
+         "bbox": {
+          "l": 80.64,
+          "t": 305.91499999999996,
+          "r": 325.0691,
+          "b": 280.7,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          18
+         ]
+        }
+       ],
+       "orig": "◦ kth guess: N/2 k",
+       "text": "kth guess: N/2 k",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": "◦"
+      },
+      {
+       "self_ref": "#/texts/114",
+       "parent": {
+        "$ref": "#/groups/11"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 19,
+         "bbox": {
+          "l": 64.8,
+          "t": 266.29058,
+          "r": 543.34378,
+          "b": 235.505,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          47
+         ]
+        }
+       ],
+       "orig": " guess converges on the order of log 2 N steps",
+       "text": " guess converges on the order of log 2 N steps",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/115",
+       "parent": {
+        "$ref": "#/groups/11"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 19,
+         "bbox": {
+          "l": 64.8,
+          "t": 227.29057999999998,
+          "r": 638.0903400000003,
+          "b": 175.805,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          79
+         ]
+        }
+       ],
+       "orig": " bisection search works when value of function varies monotonically with input",
+       "text": " bisection search works when value of function varies monotonically with input",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/116",
+       "parent": {
+        "$ref": "#/groups/11"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 19,
+         "bbox": {
+          "l": 64.8,
+          "t": 163.37058000000002,
+          "r": 667.4487399999999,
+          "b": 136.84500000000003,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          56
+         ]
+        }
+       ],
+       "orig": " code as shown only works for positive cubes \u003e 1 - why?",
+       "text": " code as shown only works for positive cubes \u003e 1 - why?",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/117",
+       "parent": {
+        "$ref": "#/groups/11"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 19,
+         "bbox": {
+          "l": 64.8,
+          "t": 124.43058000000002,
+          "r": 625.3275200000002,
+          "b": 72.945,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          77
+         ]
+        }
+       ],
+       "orig": " challenges modify to work with negative cubes! modify to work with x \u003c 1!",
+       "text": " challenges modify to work with negative cubes! modify to work with x \u003c 1!",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/118",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 19,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/119",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 19,
+         "bbox": {
+          "l": 644.24,
+          "t": 16.335000000000036,
+          "r": 654.9034999999999,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "19",
+       "text": "19",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/120",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 20,
+         "bbox": {
+          "l": 72.0,
+          "t": 455.02,
+          "r": 160.07999999999998,
+          "b": 407.02,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          5
+         ]
+        }
+       ],
+       "orig": "x \u003c 1",
+       "text": "x \u003c 1",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/121",
+       "parent": {
+        "$ref": "#/groups/14"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 20,
+         "bbox": {
+          "l": 64.8,
+          "t": 389.866,
+          "r": 638.8559999999995,
+          "b": 335.225,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          82
+         ]
+        }
+       ],
+       "orig": " if x \u003c 1, search space is 0 to x but cube root is greater than x and less than 1",
+       "text": " if x \u003c 1, search space is 0 to x but cube root is greater than x and less than 1",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/122",
+       "parent": {
+        "$ref": "#/groups/14"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 20,
+         "bbox": {
+          "l": 64.8,
+          "t": 319.69058,
+          "r": 545.4716400000002,
+          "b": 265.085,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          68
+         ]
+        }
+       ],
+       "orig": " modify the code to choose the search space depending on value of x",
+       "text": " modify the code to choose the search space depending on value of x",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/123",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 20,
+         "bbox": {
+          "l": 327.3,
+          "t": 15.75,
+          "r": 392.8829999999999,
+          "b": 6.75,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "6.0001 LECTURE 3",
+       "text": "6.0001 LECTURE 3",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/124",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_footer",
+       "prov": [
+        {
+         "page_no": 20,
+         "bbox": {
+          "l": 644.24,
+          "t": 16.335000000000036,
+          "r": 654.9034999999999,
+          "b": 5.835000000000036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "20",
+       "text": "20",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/125",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 21,
+         "bbox": {
+          "l": 61.48,
+          "t": 479.07432,
+          "r": 161.98072,
+          "b": 469.58225248508944,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          18
+         ]
+        }
+       ],
+       "orig": "MIT OpenCourseWare",
+       "text": "MIT OpenCourseWare",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/126",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 21,
+         "bbox": {
+          "l": 61.48,
+          "t": 467.05432,
+          "r": 144.62596000000005,
+          "b": 457.56225248508946,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          19
+         ]
+        }
+       ],
+       "orig": "https://ocw.mit.edu",
+       "text": "https://ocw.mit.edu",
+       "formatting": null,
+       "hyperlink": "https://ocw.mit.edu/"
+      },
+      {
+       "self_ref": "#/texts/127",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 21,
+         "bbox": {
+          "l": 61.48,
+          "t": 411.352,
+          "r": 430.7160000000001,
+          "b": 387.96225248508944,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          75
+         ]
+        }
+       ],
+       "orig": "6.0001 Introduction to Computer Science and Programming in Python Fall 2016",
+       "text": "6.0001 Introduction to Computer Science and Programming in Python Fall 2016",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 1
+      },
+      {
+       "self_ref": "#/texts/128",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 21,
+         "bbox": {
+          "l": 61.48,
+          "t": 349.45432,
+          "r": 485.46756,
+          "b": 339.96225248508944,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          99
+         ]
+        }
+       ],
+       "orig": "For information about citing these materials or our Terms of Use, visit: https://ocw.mit.edu/terms.",
+       "text": "For information about citing these materials or our Terms of Use, visit: https://ocw.mit.edu/terms.",
+       "formatting": null,
+       "hyperlink": null
+      }
+     ],
+     "pictures": [
+      {
+       "self_ref": "#/pictures/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/42"
+        },
+        {
+         "$ref": "#/texts/43"
+        },
+        {
+         "$ref": "#/texts/44"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "label": "picture",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 109.51670837402344,
+          "t": 206.63442993164062,
+          "r": 403.9508361816406,
+          "b": 46.47711181640625,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          0
+         ]
+        }
+       ],
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "annotations": []
+      },
+      {
+       "self_ref": "#/pictures/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "picture",
+       "prov": [
+        {
+         "page_no": 10,
+         "bbox": {
+          "l": 619.5026245117188,
+          "t": 284.15138244628906,
+          "r": 676.2247924804688,
+          "b": 232.86074829101562,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          0
+         ]
+        }
+       ],
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "annotations": []
+      },
+      {
+       "self_ref": "#/pictures/2",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/100"
+        },
+        {
+         "$ref": "#/texts/101"
+        },
+        {
+         "$ref": "#/texts/102"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "label": "picture",
+       "prov": [
+        {
+         "page_no": 17,
+         "bbox": {
+          "l": 25.20319366455078,
+          "t": 263.9625549316406,
+          "r": 703.689453125,
+          "b": 27.62744140625,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          0
+         ]
+        }
+       ],
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "annotations": []
+      },
+      {
+       "self_ref": "#/pictures/3",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "picture",
+       "prov": [
+        {
+         "page_no": 20,
+         "bbox": {
+          "l": 71.70423126220703,
+          "t": 450.5141067504883,
+          "r": 157.63809204101562,
+          "b": 418.5782775878906,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          0
+         ]
+        }
+       ],
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "annotations": []
+      }
+     ],
+     "tables": [],
+     "key_value_items": [],
+     "form_items": [],
+     "pages": {
+      "1": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 1
+      },
+      "2": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 2
+      },
+      "3": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 3
+      },
+      "4": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 4
+      },
+      "5": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 5
+      },
+      "6": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 6
+      },
+      "7": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 7
+      },
+      "8": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 8
+      },
+      "9": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 9
+      },
+      "10": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 10
+      },
+      "11": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 11
+      },
+      "12": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 12
+      },
+      "13": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 13
+      },
+      "14": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 14
+      },
+      "15": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 15
+      },
+      "16": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 16
+      },
+      "17": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 17
+      },
+      "18": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 18
+      },
+      "19": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 19
+      },
+      "20": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 20
+      },
+      "21": {
+       "size": {
+        "width": 720.0,
+        "height": 540.0
+       },
+       "image": null,
+       "page_no": 21
+      }
+     }
+    },
+    "html_content": null,
+    "text_content": null,
+    "doctags_content": null,
+    "doclang_content": null
+   },
+   "status": "success",
+   "errors": [],
+   "processing_time": 19.84140702700006,
+   "timings": {},
+   "confidence": {
+    "parse_score": 1.0,
+    "layout_score": 0.9035493777238413,
+    "table_score": null,
+    "ocr_score": null,
+    "mean_score": 0.9446318317190633,
+    "low_score": 0.9006955214935614,
+    "mean_grade": "excellent",
+    "low_grade": "excellent",
+    "pages": {
+     "2": {
+      "parse_score": 1.0,
+      "layout_score": 0.9390323502676827,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9695161751338414,
+      "low_score": 0.9420807327542986,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "5": {
+      "parse_score": 1.0,
+      "layout_score": 0.8696868658065796,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9348434329032898,
+      "low_score": 0.8762025225162506,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     },
+     "3": {
+      "parse_score": 1.0,
+      "layout_score": 0.9479307872908456,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9739653936454228,
+      "low_score": 0.9505342479263033,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "1": {
+      "parse_score": 0.7000000000000001,
+      "layout_score": 0.8624490380287171,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.7812245190143585,
+      "low_score": 0.708122451901436,
+      "mean_grade": "fair",
+      "low_grade": "fair",
+      "pages": {}
+     },
+     "4": {
+      "parse_score": 1.0,
+      "layout_score": 0.9073281288146973,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9536640644073486,
+      "low_score": 0.9119617223739624,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "6": {
+      "parse_score": 1.0,
+      "layout_score": 0.8840805441141129,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9420402720570564,
+      "low_score": 0.8898765169084072,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     },
+     "10": {
+      "parse_score": 1.0,
+      "layout_score": 0.8291565537452698,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9145782768726349,
+      "low_score": 0.8376987260580062,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     },
+     "11": {
+      "parse_score": 1.0,
+      "layout_score": 0.939798042178154,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.969899021089077,
+      "low_score": 0.9428081400692463,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "8": {
+      "parse_score": 1.0,
+      "layout_score": 0.8432333299091884,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9216166649545943,
+      "low_score": 0.851071663413729,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     },
+     "12": {
+      "parse_score": 1.0,
+      "layout_score": 0.9559238255023956,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9779619127511978,
+      "low_score": 0.9581276342272759,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "7": {
+      "parse_score": 1.0,
+      "layout_score": 0.8844734562767876,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9422367281383939,
+      "low_score": 0.8902497834629483,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     },
+     "9": {
+      "parse_score": 1.0,
+      "layout_score": 0.9393882056077322,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9696941028038661,
+      "low_score": 0.9424187953273455,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "14": {
+      "parse_score": 1.0,
+      "layout_score": 0.9414038509130478,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9707019254565239,
+      "low_score": 0.9443336583673954,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "17": {
+      "parse_score": 1.0,
+      "layout_score": 0.9194452081407819,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.959722604070391,
+      "low_score": 0.9234729477337428,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "15": {
+      "parse_score": 1.0,
+      "layout_score": 0.9207740649580956,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9603870324790478,
+      "low_score": 0.9247353617101908,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "13": {
+      "parse_score": 1.0,
+      "layout_score": 0.9340151846408844,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9670075923204422,
+      "low_score": 0.9373144254088401,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "18": {
+      "parse_score": 1.0,
+      "layout_score": 0.9416709393262863,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9708354696631432,
+      "low_score": 0.944587392359972,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "16": {
+      "parse_score": 1.0,
+      "layout_score": 0.9469369500875473,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9734684750437737,
+      "low_score": 0.9495901025831699,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "21": {
+      "parse_score": 1.0,
+      "layout_score": 0.869064211845398,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.934532105922699,
+      "low_score": 0.8756110012531281,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     },
+     "20": {
+      "parse_score": 1.0,
+      "layout_score": 0.849950353304545,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9249751766522725,
+      "low_score": 0.8574528356393178,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     },
+     "19": {
+      "parse_score": 1.0,
+      "layout_score": 0.8487950414419174,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9243975207209587,
+      "low_score": 0.8563552893698215,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     }
+    }
+   }
+  }
+ },
+ "lines": {
+  "status": 200,
+  "body": {
+   "blocks": [
+    [
+     {
+      "text": "(download slides and .py files \u0102\u0176\u011a\u0003follow along!)",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "6.0001 LECTURE 3",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "len(s) \uf0e0 evaluates to 3",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "s = \"abc\"",
+      "mono": true
+     },
+     {
+      "text": "index: 0 1 2 \uf0df indexing always starts at 0",
+      "mono": false
+     },
+     {
+      "text": "index: -3 -2 -1 \uf0df last element always at index -1",
+      "mono": false
+     },
+     {
+      "text": "s[ 0] \uf0e0 evaluates to \"a\"",
+      "mono": false
+     },
+     {
+      "text": "s[ 1] \uf0e0 evaluates to \"b\"",
+      "mono": false
+     },
+     {
+      "text": "s[ 2] \uf0e0 evaluates to \"c\"",
+      "mono": false
+     },
+     {
+      "text": "s[ 3] \uf0e0 trying to index out of bounds, error",
+      "mono": false
+     },
+     {
+      "text": "s[ -1] \uf0e0 evaluates to \"c\"",
+      "mono": false
+     },
+     {
+      "text": "s[ -2] \uf0e0 evaluates to \"b\"",
+      "mono": false
+     },
+     {
+      "text": "s[ -3] \uf0e0 evaluates to \"a\"",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\uf0a7 can slice strings using [start: stop: step]",
+      "mono": false
+     },
+     {
+      "text": "\uf0a7 if give two numbers, [start: stop], step=1 by default",
+      "mono": false
+     },
+     {
+      "text": "\uf0a7 you can also omit numbers and leave just colons",
+      "mono": false
+     },
+     {
+      "text": "s = \"abcdefgh\"",
+      "mono": false
+     },
+     {
+      "text": "s[3: 6] \uf0e0 evaluates to \"def\", same as s[3: 6: 1]",
+      "mono": false
+     },
+     {
+      "text": "s[3: 6: 2] \uf0e0 evaluates to \"df\"",
+      "mono": false
+     },
+     {
+      "text": "s[: : ] \uf0e0 evaluates to \"abcdefgh\", same as s[0: len(s) : 1]",
+      "mono": false
+     },
+     {
+      "text": "s[: : -1] \uf0e0 evaluates to \"hgfedbca\", same as s[-1:-(len(s) +1) :-1]",
+      "mono": false
+     },
+     {
+      "text": "s[4: 1: -2] \uf0e0 evaluates to \"ec\"",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\"hello\"",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\"yello\"",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "for var in range(4) : \uf0e0 var iterates over values 0,1,2,3",
+      "mono": false
+     },
+     {
+      "text": "\u003cexpressions\u003e \uf0e0 expressions inside loop executed",
+      "mono": false
+     },
+     {
+      "text": "with each value for var",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "for var in range(4, 6) : \uf0e0 var iterates over values 4,5",
+      "mono": false
+     },
+     {
+      "text": "\u003cexpressions\u003e",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "s = \"abcdefgh\"",
+      "mono": true
+     },
+     {
+      "text": "for index in range(len(s)):",
+      "mono": true
+     },
+     {
+      "text": "    if s[index] == 'i' or s[index] == 'u':",
+      "mono": true
+     },
+     {
+      "text": "        print(\"There is an i or u\")",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "for char in s:",
+      "mono": true
+     },
+     {
+      "text": "    if char == 'i' or char == 'u':",
+      "mono": true
+     },
+     {
+      "text": "        print(\"There is an i or u\")",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "an_letters = \"aefhilmnorsxAEFHILMNORSX\"",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "word = input(\"I will cheer for you! Enter a wo rd: \")",
+      "mono": true
+     },
+     {
+      "text": "times = int(input(\"Enthusiasm level (1-10): \"))",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "i = 0",
+      "mono": true
+     },
+     {
+      "text": "while i \u003c len(word):          f or c har  in w ord:",
+      "mono": true
+     },
+     {
+      "text": "    char = word[i]",
+      "mono": true
+     },
+     {
+      "text": "    if char in an_letters:",
+      "mono": true
+     },
+     {
+      "text": "        print(\"Give me an \" + char + \"! \" + cha r)",
+      "mono": true
+     },
+     {
+      "text": "    else:",
+      "mono": true
+     },
+     {
+      "text": "        print(\"Give me a  \" + char + \"! \" + cha r)",
+      "mono": true
+     },
+     {
+      "text": "    i += 1",
+      "mono": true
+     },
+     {
+      "text": "print(\"What does that spell?\")",
+      "mono": true
+     },
+     {
+      "text": "for i in range(times):",
+      "mono": true
+     },
+     {
+      "text": "    print(word, \"!!!\")",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "s1 = \"mit u rock\"",
+      "mono": true
+     },
+     {
+      "text": "s2 = \"i rule mit\"",
+      "mono": true
+     },
+     {
+      "text": "if len(s1) == len(s2):",
+      "mono": true
+     },
+     {
+      "text": "    for char1 in s1:",
+      "mono": true
+     },
+     {
+      "text": "        for char2 in s2:",
+      "mono": true
+     },
+     {
+      "text": "            if char1 == char2:",
+      "mono": true
+     },
+     {
+      "text": "                print(\"common letter\")",
+      "mono": true
+     },
+     {
+      "text": "                break",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "cube = 8",
+      "mono": true
+     },
+     {
+      "text": "for guess in range(cube+1):",
+      "mono": true
+     },
+     {
+      "text": "    if guess**3 == cube:",
+      "mono": true
+     },
+     {
+      "text": "        print(\"Cube root of\", cube, \"is\", guess)",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "cube = 8",
+      "mono": true
+     },
+     {
+      "text": "for guess in range(abs(cube)+1):",
+      "mono": true
+     },
+     {
+      "text": "    if guess**3 \u003e= abs(cube):",
+      "mono": true
+     },
+     {
+      "text": "        break",
+      "mono": true
+     },
+     {
+      "text": "if guess**3 != abs(cube):",
+      "mono": true
+     },
+     {
+      "text": "    print(cube, 'is not a perfect cube')",
+      "mono": true
+     },
+     {
+      "text": "else:",
+      "mono": true
+     },
+     {
+      "text": "    if cube \u003c 0:",
+      "mono": true
+     },
+     {
+      "text": "        guess = -guess",
+      "mono": true
+     },
+     {
+      "text": "    print('Cube root of '+str(cube)+' is '+str(guess))",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "cube = 27",
+      "mono": true
+     },
+     {
+      "text": "epsilon = 0.01",
+      "mono": true
+     },
+     {
+      "text": "guess = 0.0",
+      "mono": true
+     },
+     {
+      "text": "increment = 0.0001",
+      "mono": true
+     },
+     {
+      "text": "num_guesses = 0",
+      "mono": true
+     },
+     {
+      "text": "while abs(guess**3 - cube) \u003e= epsilon: and guess \u003c= cube :",
+      "mono": true
+     },
+     {
+      "text": "    guess += increment",
+      "mono": true
+     },
+     {
+      "text": "    num_guesses += 1",
+      "mono": true
+     },
+     {
+      "text": "print('num_guesses =', num_guesses)",
+      "mono": true
+     },
+     {
+      "text": "if abs(guess**3 - cube) \u003e= epsilon:",
+      "mono": true
+     },
+     {
+      "text": "    print('Failed on cube root of', cube)",
+      "mono": true
+     },
+     {
+      "text": "else:",
+      "mono": true
+     },
+     {
+      "text": "    print(guess, 'is close to the cube root of', cube)",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "GUESS",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "GUESS",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "GUESS",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "cube = 27",
+      "mono": true
+     },
+     {
+      "text": "epsilon = 0.01",
+      "mono": true
+     },
+     {
+      "text": "num_guesses = 0",
+      "mono": true
+     },
+     {
+      "text": "low = 0",
+      "mono": true
+     },
+     {
+      "text": "high = cube",
+      "mono": true
+     },
+     {
+      "text": "guess = (high + low)/2.0",
+      "mono": true
+     },
+     {
+      "text": "while abs(guess**3 - cube) \u003e= epsilon:",
+      "mono": true
+     },
+     {
+      "text": "    if guess**3 \u003c cube :",
+      "mono": true
+     },
+     {
+      "text": "        low = guess",
+      "mono": true
+     },
+     {
+      "text": "    else:",
+      "mono": true
+     },
+     {
+      "text": "        high = guess",
+      "mono": true
+     },
+     {
+      "text": "    guess = (high + low)/2.0",
+      "mono": true
+     },
+     {
+      "text": "    num_guesses += 1",
+      "mono": true
+     },
+     {
+      "text": "print 'num_guesses =', num_guesses",
+      "mono": true
+     },
+     {
+      "text": "print guess, 'is close to the cube root of', cube",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "MIT OpenCourseWare",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "https://ocw.mit.edu",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "For information about citing these materials or our Terms of Use, visit: https://ocw.mit.edu/terms.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\"hello\"",
+      "mono": false
+     },
+     {
+      "text": "\"yello\"",
+      "mono": false
+     },
+     {
+      "text": "s",
+      "mono": false
+     }
+    ],
+    [],
+    [
+     {
+      "text": "GUESS",
+      "mono": false
+     },
+     {
+      "text": "GUESS",
+      "mono": false
+     },
+     {
+      "text": "GUESS",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "x \u003c 1",
+      "mono": false
+     }
+    ]
+   ]
+  }
+ }
+}

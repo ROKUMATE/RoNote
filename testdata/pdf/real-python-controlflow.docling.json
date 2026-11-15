@@ -1,0 +1,864 @@
+{
+ "sha256": "dfa0983529e55292747aacd2739f93b5c8237506fa1ca0907b4b6cb5febde77f",
+ "seconds": 2.06,
+ "pages": 2,
+ "inspect": {
+  "status": 200,
+  "body": {
+   "pages": 2,
+   "chars": 2181
+  }
+ },
+ "result": {
+  "status": 200,
+  "body": {
+   "document": {
+    "filename": "real-python-controlflow.pdf",
+    "md_content": null,
+    "json_content": {
+     "schema_name": "DoclingDocument",
+     "version": "1.10.0",
+     "name": "real-python-controlflow",
+     "origin": {
+      "mimetype": "application/pdf",
+      "binary_hash": 8884314218837174143,
+      "filename": "real-python-controlflow.pdf",
+      "uri": null
+     },
+     "furniture": {
+      "self_ref": "#/furniture",
+      "parent": null,
+      "children": [],
+      "content_layer": "furniture",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "body": {
+      "self_ref": "#/body",
+      "parent": null,
+      "children": [
+       {
+        "$ref": "#/texts/0"
+       },
+       {
+        "$ref": "#/texts/1"
+       },
+       {
+        "$ref": "#/texts/2"
+       },
+       {
+        "$ref": "#/texts/3"
+       },
+       {
+        "$ref": "#/texts/4"
+       },
+       {
+        "$ref": "#/texts/5"
+       },
+       {
+        "$ref": "#/texts/6"
+       },
+       {
+        "$ref": "#/texts/7"
+       },
+       {
+        "$ref": "#/texts/8"
+       },
+       {
+        "$ref": "#/texts/9"
+       },
+       {
+        "$ref": "#/texts/10"
+       },
+       {
+        "$ref": "#/texts/11"
+       },
+       {
+        "$ref": "#/texts/12"
+       },
+       {
+        "$ref": "#/texts/13"
+       },
+       {
+        "$ref": "#/texts/14"
+       }
+      ],
+      "content_layer": "body",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "groups": [],
+     "texts": [
+      {
+       "self_ref": "#/texts/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 792.5596895966797,
+          "r": 66.66796594216797,
+          "b": 784.2217993190918,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          4
+         ]
+        }
+       ],
+       "orig": "Site",
+       "text": "Site",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 766.8194562941894,
+          "r": 102.6621052024121,
+          "b": 758.6983628825684,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          4
+         ]
+        }
+       ],
+       "orig": "Docs",
+       "text": "Docs",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/2",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 734.962035746582,
+          "r": 342.11717318511717,
+          "b": 715.005005328125,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          27
+         ]
+        }
+       ],
+       "orig": "4. More Control Flow Tools¶",
+       "text": "4. More Control Flow Tools¶",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 1
+      },
+      {
+       "self_ref": "#/texts/3",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 693.6065687197266,
+          "r": 534.8320094153321,
+          "b": 669.2667259838868,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          110
+         ]
+        }
+       ],
+       "orig": "As well as the while statement just introduced, Python uses a few more that we will encounter in this chapter.",
+       "text": "As well as the while statement just introduced, Python uses a few more that we will encounter in this chapter.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/4",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 649.878054916748,
+          "r": 196.25975740250976,
+          "b": 634.8487586679688,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          19
+         ]
+        }
+       ],
+       "orig": "4.1. if Statements¶",
+       "text": "4.1. if Statements¶",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/5",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 615.6065719697266,
+          "r": 424.9628730532127,
+          "b": 604.7550099218751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          76
+         ]
+        }
+       ],
+       "orig": "Perhaps the most well-known statement type is the if statement. For example:",
+       "text": "Perhaps the most well-known statement type is the if statement. For example:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/6",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 591.0814557537158,
+          "r": 245.42179122993426,
+          "b": 496.2945957408028,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          246
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e x = int(input(\"Please enter an integer: \")) Please enter an integer: 42 \u003e\u003e\u003e if x \u003c 0: ... x = 0 ... print('Negative changed to zero') ... elif x == 0: ... print('Zero') ... elif x == 1: ... print('Single') ... else: ... print('More') ... More",
+       "text": "\u003e\u003e\u003e x = int(input(\"Please enter an integer: \")) Please enter an integer: 42 \u003e\u003e\u003e if x \u003c 0: ... x = 0 ... print('Negative changed to zero') ... elif x == 0: ... print('Zero') ... elif x == 1: ... print('Single') ... else: ... print('More') ... More",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/7",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 480.6065775947266,
+          "r": 548.1152156618654,
+          "b": 442.7667354213867,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          266
+         ]
+        }
+       ],
+       "orig": "There can be zero or more elif parts, and the else part is optional. The keyword ' elif' is short for 'else if' , and is useful to avoid excessive indentation. An if … elif … elif … sequence is a substitute for the switch or case statements found in other languages.",
+       "text": "There can be zero or more elif parts, and the else part is optional. The keyword ' elif' is short for 'else if' , and is useful to avoid excessive indentation. An if … elif … elif … sequence is a substitute for the switch or case statements found in other languages.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/8",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 428.1065797822266,
+          "r": 547.8398216133398,
+          "b": 403.75501829687505,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          187
+         ]
+        }
+       ],
+       "orig": "If you're comparing the same value to several constants, or checking for specific types or attributes, you may also find the match statement useful. For more details see match Statements.",
+       "text": "If you're comparing the same value to several constants, or checking for specific types or attributes, you may also find the match statement useful. For more details see match Statements.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/9",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 384.3780659792481,
+          "r": 205.03710453678696,
+          "b": 369.3487697304688,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          20
+         ]
+        }
+       ],
+       "orig": "4.2. for Statements¶",
+       "text": "4.2. for Statements¶",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/10",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 350.1065830322266,
+          "r": 547.5292744662793,
+          "b": 285.26674198388673,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          433
+         ]
+        }
+       ],
+       "orig": "The for statement in Python differs a bit from what you may be used to in C or Pascal. Rather than always iterating over an arithmetic progression of numbers (like in Pascal), or giving the user the ability to define both the iteration step and halting condition (as C), Python's for statement iterates over the items of any sequence (a list or a string), in the order that they appear in the sequence. For example (no pun intended):",
+       "text": "The for statement in Python differs a bit from what you may be used to in C or Pascal. Rather than always iterating over an arithmetic progression of numbers (like in Pascal), or giving the user the ability to define both the iteration step and halting condition (as C), Python's for statement iterates over the items of any sequence (a list or a string), in the order that they appear in the sequence. For example (no pun intended):",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/11",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 271.6600542671773,
+          "r": 237.05073595372826,
+          "b": 214.29460749080272,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          151
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e # Measure some strings: \u003e\u003e\u003e words = ['cat' , 'window' , 'defenestrate'] \u003e\u003e\u003e for w in words: ... print(w, len(w)) ... cat 3 window 6 defenestrate 12",
+       "text": "\u003e\u003e\u003e # Measure some strings: \u003e\u003e\u003e words = ['cat' , 'window' , 'defenestrate'] \u003e\u003e\u003e for w in words: ... print(w, len(w)) ... cat 3 window 6 defenestrate 12",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/12",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 198.60658934472656,
+          "r": 517.5116976370117,
+          "b": 163.1983876950684,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          215
+         ]
+        }
+       ],
+       "orig": "Code that modifies a collection while iterating over that same collection can be tricky to get right. Instead, it is usually more straight-forward to loop over a copy of the collection or to create a new collection:",
+       "text": "Code that modifies a collection while iterating over that same collection can be tricky to get right. Instead, it is usually more straight-forward to loop over a copy of the collection or to create a new collection:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/13",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 147.16005945467725,
+          "r": 338.3476067330251,
+          "b": 48.47974381105939,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          357
+         ]
+        }
+       ],
+       "orig": "# Create a sample collection users = {'Hans': 'active' , 'Éléonore': 'inactive' , '景太郎': 'active'} # Strategy: Iterate over a copy for user, status in users.copy().items(): if status == 'inactive': del users[user] # Strategy: Create a new collection active _ users = {} for user, status in users.items(): if status == 'active': active _ users[user] = status",
+       "text": "# Create a sample collection users = {'Hans': 'active' , 'Éléonore': 'inactive' , '景太郎': 'active'} # Strategy: Iterate over a copy for user, status in users.copy().items(): if status == 'inactive': del users[user] # Strategy: Create a new collection active _ users = {} for user, status in users.items(): if status == 'active': active _ users[user] = status",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/14",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 798.5714080961915,
+          "r": 98.3203083433203,
+          "b": 790.1983615700684,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          11
+         ]
+        }
+       ],
+       "orig": "Site footer",
+       "text": "Site footer",
+       "formatting": null,
+       "hyperlink": null
+      }
+     ],
+     "pictures": [],
+     "tables": [],
+     "key_value_items": [],
+     "form_items": [],
+     "pages": {
+      "1": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 1
+      },
+      "2": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 2
+      }
+     }
+    },
+    "html_content": null,
+    "text_content": null,
+    "doctags_content": null,
+    "doclang_content": null
+   },
+   "status": "success",
+   "errors": [],
+   "processing_time": 1.7672108459996707,
+   "timings": {},
+   "confidence": {
+    "parse_score": 1.0,
+    "layout_score": 0.879497902733939,
+    "table_score": null,
+    "ocr_score": null,
+    "mean_score": 0.9397489513669695,
+    "low_score": 0.885523007597242,
+    "mean_grade": "excellent",
+    "low_grade": "good",
+    "pages": {
+     "2": {
+      "parse_score": 1.0,
+      "layout_score": 0.8371586799621582,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9185793399810791,
+      "low_score": 0.8453007459640502,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     },
+     "1": {
+      "parse_score": 1.0,
+      "layout_score": 0.9218371255057198,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9609185627528599,
+      "low_score": 0.9257452692304339,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     }
+    }
+   }
+  }
+ },
+ "lines": {
+  "status": 200,
+  "body": {
+   "blocks": [
+    [
+     {
+      "text": "As well as the while statement just introduced, Python uses a few more that we will encounter in this",
+      "mono": false
+     },
+     {
+      "text": "chapter.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Perhaps the most well-known statement type is the if statement. For example:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e x = int(input(\"Please enter an integer: \"))",
+      "mono": true
+     },
+     {
+      "text": "Please enter an integer: 42",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e if x \u003c 0:",
+      "mono": true
+     },
+     {
+      "text": "...     x = 0",
+      "mono": true
+     },
+     {
+      "text": "...     print('Negative changed to zero')",
+      "mono": true
+     },
+     {
+      "text": "... elif x == 0:",
+      "mono": true
+     },
+     {
+      "text": "...     print('Zero')",
+      "mono": true
+     },
+     {
+      "text": "... elif x == 1:",
+      "mono": true
+     },
+     {
+      "text": "...     print('Single')",
+      "mono": true
+     },
+     {
+      "text": "... else:",
+      "mono": true
+     },
+     {
+      "text": "...     print('More')",
+      "mono": true
+     },
+     {
+      "text": "...",
+      "mono": true
+     },
+     {
+      "text": "More",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "There can be zero or more elif parts, and the else part is optional. The keyword \u2018elif\u2019 is short for",
+      "mono": false
+     },
+     {
+      "text": "\u2018else if\u2019, and is useful to avoid excessive indentation. An if \u2026 elif \u2026 elif \u2026 sequence is a substitute",
+      "mono": false
+     },
+     {
+      "text": "for the switch or case statements found in other languages.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "If you\u2019re comparing the same value to several constants, or checking for specific types or attributes, you",
+      "mono": false
+     },
+     {
+      "text": "may also find the match statement useful. For more details see match Statements.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "The for statement in Python differs a bit from what you may be used to in C or Pascal. Rather than",
+      "mono": false
+     },
+     {
+      "text": "always iterating over an arithmetic progression of numbers (like in Pascal), or giving the user the ability",
+      "mono": false
+     },
+     {
+      "text": "to define both the iteration step and halting condition (as C), Python\u2019s for statement iterates over the",
+      "mono": false
+     },
+     {
+      "text": "items of any sequence (a list or a string), in the order that they appear in the sequence. For example (no",
+      "mono": false
+     },
+     {
+      "text": "pun intended):",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e # Measure some strings:",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e words = ['cat', 'window', 'defenestrate']",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e for w in words:",
+      "mono": true
+     },
+     {
+      "text": "...     print(w, len(w))",
+      "mono": true
+     },
+     {
+      "text": "...",
+      "mono": true
+     },
+     {
+      "text": "cat 3",
+      "mono": true
+     },
+     {
+      "text": "window 6",
+      "mono": true
+     },
+     {
+      "text": "defenestrate 12",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Code that modifies a collection while iterating over that same collection can be tricky to get right.",
+      "mono": false
+     },
+     {
+      "text": "Instead, it is usually more straight-forward to loop over a copy of the collection or to create a new",
+      "mono": false
+     },
+     {
+      "text": "collection:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "# Create a sample collection",
+      "mono": true
+     },
+     {
+      "text": "users = {'Hans': 'active', '\u00c9l\u00e9onore': 'inactive', '\u666f\u592a\u90ce': 'active'}",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "# Strategy:  Iterate over a copy",
+      "mono": true
+     },
+     {
+      "text": "for user, status in users.copy().items():",
+      "mono": true
+     },
+     {
+      "text": "    if status == 'inactive':",
+      "mono": true
+     },
+     {
+      "text": "        del users[user]",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "# Strategy:  Create a new collection",
+      "mono": true
+     },
+     {
+      "text": "active_users = {}",
+      "mono": true
+     },
+     {
+      "text": "for user, status in users.items():",
+      "mono": true
+     },
+     {
+      "text": "    if status == 'active':",
+      "mono": true
+     },
+     {
+      "text": "        active_users[user] = status",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Site footer",
+      "mono": false
+     }
+    ]
+   ]
+  }
+ }
+}

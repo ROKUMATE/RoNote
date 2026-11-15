@@ -1,0 +1,568 @@
+{
+  "ir_version": 2,
+  "title": "sphinx-requests-quickstart",
+  "source": {
+    "url": "",
+    "final_url": "",
+    "fetched_at": "2026-11-15T00:00:00Z",
+    "body_sha256": "0076ac64e8997808e5f4bc65c6389362a194e35beca0127e6ec46afa9b87a386",
+    "pdf": {
+      "filename": "sphinx-requests-quickstart.pdf",
+      "pages": 3
+    }
+  },
+  "extractor": {
+    "name": "docling",
+    "version": "1.38.2+map1"
+  },
+  "blocks": [
+    {
+      "id": "292de2f11d8a",
+      "kind": "heading",
+      "page": 1,
+      "level": 1,
+      "content": [
+        {
+          "text": "Quickstart¶"
+        }
+      ]
+    },
+    {
+      "id": "744dbe223715",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Eager to get started? This page gives a good introduction in how to get started with Requests."
+        }
+      ]
+    },
+    {
+      "id": "2c028be9a080",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "First, make sure that:"
+        }
+      ]
+    },
+    {
+      "id": "0fcaac3b380f",
+      "kind": "list",
+      "page": 1,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "f05d9939bb44",
+              "kind": "paragraph",
+              "page": 1,
+              "content": [
+                {
+                  "text": "Requests is installed"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "a519632b2d7e",
+              "kind": "paragraph",
+              "page": 1,
+              "content": [
+                {
+                  "text": "Requests is up-to-date"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b356d2c642e5",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Let's get started with some simple examples."
+        }
+      ]
+    },
+    {
+      "id": "72e7ae93188a",
+      "kind": "heading",
+      "page": 1,
+      "level": 2,
+      "content": [
+        {
+          "text": "Make a Request¶"
+        }
+      ]
+    },
+    {
+      "id": "d6e42534efe9",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Making a request with Requests is very simple."
+        }
+      ]
+    },
+    {
+      "id": "3667f0f12cbf",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Begin by importing the Requests module:"
+        }
+      ]
+    },
+    {
+      "id": "1aa1fcc50880",
+      "kind": "code",
+      "page": 1,
+      "text": "\u003e\u003e\u003e import requests\n"
+    },
+    {
+      "id": "ed18e15fe990",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Now, let's try to get a webpage. For this example, let's get GitHub's public timeline:"
+        }
+      ]
+    },
+    {
+      "id": "6098d0132841",
+      "kind": "code",
+      "page": 1,
+      "text": "\u003e\u003e\u003e r = requests.get('https://api.github.com/events')\n"
+    },
+    {
+      "id": "ddbdc03ef0eb",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Now, we have a Response object called r. We can get all the information we need from this object."
+        }
+      ]
+    },
+    {
+      "id": "177e6c31a2ed",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Requests' simple API means that all forms of HTTP request are as obvious. For example, this is how you make an HTTP POST request:"
+        }
+      ]
+    },
+    {
+      "id": "3b8212f381f8",
+      "kind": "code",
+      "page": 1,
+      "text": "\u003e\u003e\u003e r = requests.post('https://httpbin.org/post', data={'key': 'value'})\n"
+    },
+    {
+      "id": "fb05d7b6acc1",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Nice, right? What about the other HTTP request types: PUT, DELETE, HEAD and OPTIONS? These are all just as simple:"
+        }
+      ]
+    },
+    {
+      "id": "7c7792c4fd2d",
+      "kind": "code",
+      "page": 1,
+      "text": "\u003e\u003e\u003e r = requests.put('https://httpbin.org/put', data={'key': 'value'})\n\u003e\u003e\u003e r = requests.delete('https://httpbin.org/delete')\n\u003e\u003e\u003e r = requests.head('https://httpbin.org/get')\n\u003e\u003e\u003e r = requests.options('https://httpbin.org/get')\n"
+    },
+    {
+      "id": "4b6cda14549a",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "That's all well and good, but it's also only the start of what Requests can do."
+        }
+      ]
+    },
+    {
+      "id": "7571c30b841c",
+      "kind": "heading",
+      "page": 1,
+      "level": 2,
+      "content": [
+        {
+          "text": "Passing Parameters In URLs¶"
+        }
+      ]
+    },
+    {
+      "id": "e862791388dc",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "You often want to send some sort of data in the URL's query string. If you were constructing the URL by hand, this data would be given as key/value pairs in the URL after a question mark, e.g. httpbin.org/get?key=val. Requests allows you to provide these arguments as a dictionary of strings, using the params keyword argument. As an example, if you wanted to pass key1=value1 and key2=value2 to httpbin.org/get, you would use the following code:"
+        }
+      ]
+    },
+    {
+      "id": "d15ccc243e1e",
+      "kind": "code",
+      "page": 1,
+      "text": "\u003e\u003e\u003e payload = {'key1': 'value1', 'key2': 'value2'}\n\u003e\u003e\u003e r = requests.get('https://httpbin.org/get', params=payload)\n"
+    },
+    {
+      "id": "4549f3f38ce6",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "You can see that the URL has been correctly encoded by printing the URL:"
+        }
+      ]
+    },
+    {
+      "id": "4a669909ee3e",
+      "kind": "code",
+      "page": 1,
+      "text": "\u003e\u003e\u003e print(r.url)\nhttps://httpbin.org/get?key2=value2\u0026key1=value1\n"
+    },
+    {
+      "id": "bbb445108d6c",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Note that any dictionary key whose value is None will not be added to the URL's query string."
+        }
+      ]
+    },
+    {
+      "id": "d402b8ad6e2d",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "You can also pass a list of items as a value:"
+        }
+      ]
+    },
+    {
+      "id": "2f5319f7e56f",
+      "kind": "code",
+      "page": 2,
+      "text": "\u003e\u003e\u003e payload = {'key1': 'value1', 'key2': ['value2', 'value3']}\n\n\u003e\u003e\u003e r = requests.get('https://httpbin.org/get', params=payload)\n\u003e\u003e\u003e print(r.url)\nhttps://httpbin.org/get?key1=value1\u0026key2=value2\u0026key2=value3\n"
+    },
+    {
+      "id": "e05068ee865d",
+      "kind": "heading",
+      "page": 2,
+      "level": 2,
+      "content": [
+        {
+          "text": "Response Content¶"
+        }
+      ]
+    },
+    {
+      "id": "f9cd34e41fdf",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "We can read the content of the server's response. Consider the GitHub timeline again:"
+        }
+      ]
+    },
+    {
+      "id": "0cabe91a5a93",
+      "kind": "code",
+      "page": 2,
+      "text": "\u003e\u003e\u003e import requests\n\n\u003e\u003e\u003e r = requests.get('https://api.github.com/events')\n\u003e\u003e\u003e r.text\n'[{\"repository\":{\"open_issues\":0,\"url\":\"https://github.com/...\n"
+    },
+    {
+      "id": "e5d161bfe585",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "Requests will automatically decode content from the server. Most unicode charsets are seamlessly decoded."
+        }
+      ]
+    },
+    {
+      "id": "accf8a13d5b1",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "When you make a request, Requests makes educated guesses about the encoding of the response based on the HTTP headers. The text encoding guessed by Requests is used when you access r.text. You can find out what encoding Requests is using, and change it, using the r.encoding property:"
+        }
+      ]
+    },
+    {
+      "id": "48faa67a9eab",
+      "kind": "code",
+      "page": 2,
+      "text": "\u003e\u003e\u003e r.encoding\n'utf-8'\n\u003e\u003e\u003e r.encoding = 'ISO-8859-1'\n"
+    },
+    {
+      "id": "21fb69959117",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "If you change the encoding, Requests will use the new value of r.encoding whenever you call r.text. You might want to do this in any situation where you can apply special logic to work out what the encoding of the content will be. For example, HTML and XML have the ability to specify their encoding in their body. In situations like this, you should use r.content to find the encoding, and then set r.encoding. This will let you use r.text with the correct encoding."
+        }
+      ]
+    },
+    {
+      "id": "c5b041221303",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "Requests will also use custom encodings in the event that you need them. If you have created your own encoding and registered it with the codecs module, you can simply use the codec name as the value of r.encoding and Requests will handle the decoding for you."
+        }
+      ]
+    },
+    {
+      "id": "34c00b762ac0",
+      "kind": "heading",
+      "page": 2,
+      "level": 2,
+      "content": [
+        {
+          "text": "Binary Response Content¶"
+        }
+      ]
+    },
+    {
+      "id": "72e921f90e52",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "You can also access the response body as bytes, for non-text requests:"
+        }
+      ]
+    },
+    {
+      "id": "dd269939f13d",
+      "kind": "code",
+      "page": 2,
+      "text": "\u003e\u003e\u003e r.content\nb'[{\"repository\":{\"open_issues\":0,\"url\":\"https://github.com/...\n"
+    },
+    {
+      "id": "4039d2d0020e",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "The gzip and deflate transfer-encodings are automatically decoded for you."
+        }
+      ]
+    },
+    {
+      "id": "a941e8b73da8",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "The br transfer-encoding is automatically decoded for you if a Brotli library like brotli or brotlicffi is installed."
+        }
+      ]
+    },
+    {
+      "id": "09b6e54fd5d2",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "For example, to create an image from binary data returned by a request, you can use the following code:"
+        }
+      ]
+    },
+    {
+      "id": "ae451819b51a",
+      "kind": "code",
+      "page": 2,
+      "text": "\u003e\u003e\u003e from PIL import Image\n\u003e\u003e\u003e from io import BytesIO\n\n\u003e\u003e\u003e i = Image.open(BytesIO(r.content))\n"
+    },
+    {
+      "id": "e877c3d4f73f",
+      "kind": "heading",
+      "page": 2,
+      "level": 2,
+      "content": [
+        {
+          "text": "JSON Response Content¶"
+        }
+      ]
+    },
+    {
+      "id": "a7d33d02b28e",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "There's also a builtin JSON decoder, in case you're dealing with JSON data:"
+        }
+      ]
+    },
+    {
+      "id": "921963ebf37a",
+      "kind": "code",
+      "page": 3,
+      "text": "\u003e\u003e\u003e import requests\n\n\u003e\u003e\u003e r = requests.get('https://api.github.com/events')\n\u003e\u003e\u003e r.json()\n[{'repository': {'open_issues': 0, 'url': 'https://github.com/...\n"
+    },
+    {
+      "id": "60d3ad6de91a",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "In case the JSON decoding fails, r.json() raises an exception. For example, if the response gets a 204 (No Content), or if the response contains invalid JSON, attempting r.json() raises requests.exceptions.JSONDecodeError. This wrapper exception provides interoperability for multiple exceptions that may be thrown by different python versions and json serialization libraries."
+        }
+      ]
+    },
+    {
+      "id": "95b2d429b6f8",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "It should be noted that the success of the call to r.json() does not indicate the success of the response. Some servers may return a JSON object in a failed response (e.g. error details with HTTP 500). Such JSON will be decoded and returned. To check that a request is successful, use r.raise _ for _ status() or check r.status _ code is what you expect."
+        }
+      ]
+    },
+    {
+      "id": "c42c8abb41f7",
+      "kind": "heading",
+      "page": 3,
+      "level": 2,
+      "content": [
+        {
+          "text": "Raw Response Content¶"
+        }
+      ]
+    },
+    {
+      "id": "411f3b545987",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "In the rare case that you'd like to get the raw socket response from the server, you can access r.raw. If you want to do this, make sure you set stream=True in your initial request. Once you do, you can do this:"
+        }
+      ]
+    },
+    {
+      "id": "b60d032e3f9a",
+      "kind": "code",
+      "page": 3,
+      "text": "\u003e\u003e\u003e r = requests.get('https://api.github.com/events', stream=True)\n\n\u003e\u003e\u003e r.raw\n\u003curllib3.response.HTTPResponse object at 0x101194810\u003e\n\n\u003e\u003e\u003e r.raw.read(10)\nb'\\x1f\\x8b\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x03'\n"
+    },
+    {
+      "id": "6c1953a476b7",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "In general, however, you should use a pattern like this to save what is being streamed to a file:"
+        }
+      ]
+    },
+    {
+      "id": "960fbd5c93f4",
+      "kind": "code",
+      "page": 3,
+      "text": "with open(filename, 'wb') as fd:\n    for chunk in r.iter_content(chunk_size=128):\n        fd.write(chunk)\n"
+    },
+    {
+      "id": "65b97d362751",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "Using Response.iter _ content will handle a lot of what you would otherwise have to handle when using Response.raw directly. When streaming a download, the above is the preferred and recommended way to retrieve the content. Note that chunk _ size can be freely adjusted to a number that may better fit your use cases."
+        }
+      ]
+    },
+    {
+      "id": "51abb86e840f",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "Note"
+        }
+      ]
+    },
+    {
+      "id": "7b5e30fdde83",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "An important note about using Response.iter _ content versus Response.raw. Response.iter _ content will automatically decode the gzip and deflate transfer-encodings. Response.raw is a raw stream of bytes - it does not transform the response content. If you really need access to the bytes as they were returned, use Response.raw."
+        }
+      ]
+    },
+    {
+      "id": "c4ae14a27bfe",
+      "kind": "heading",
+      "page": 3,
+      "level": 3,
+      "content": [
+        {
+          "text": "Navigation"
+        }
+      ]
+    },
+    {
+      "id": "178f0f6c10b9",
+      "kind": "list",
+      "page": 3,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "a06f04df326d",
+              "kind": "paragraph",
+              "page": 3,
+              "content": [
+                {
+                  "text": "Requests"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b7b1ca72aad4",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "©MMXVIX. A Kenneth Reitz Project."
+        }
+      ]
+    }
+  ]
+}

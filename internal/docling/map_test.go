@@ -77,7 +77,7 @@ func TestMap(t *testing.T) {
 	tests := []struct {
 		name  string
 		doc   func(t *testing.T) *Document
-		code  map[string]string
+		layer map[string][]Line
 		want  []ir.Block
 		title string
 	}{
@@ -128,10 +128,51 @@ func TestMap(t *testing.T) {
 					text(1, "code", "joined by docling", 3, `, "code_language": "unknown"`),
 				}, "")
 			},
-			code: map[string]string{"#/texts/0": ">>> if x < 0:\n...     x = 0\n"},
+			layer: map[string][]Line{"#/texts/0": mono(">>> if x < 0:", "...     x = 0")},
 			want: []ir.Block{
 				{Kind: ir.KindCode, Page: 2, Lang: "python", Text: ">>> if x < 0:\n...     x = 0\n"},
 				{Kind: ir.KindCode, Page: 3, Text: "joined by docling"},
+			},
+			title: "Lecture 3",
+		},
+		{
+			name: "a label docling's code box took in is a paragraph",
+			doc: func(t *testing.T) *Document {
+				return doc(t, refs("texts/0"), []string{text(0, "code", "Filename: src/main.rs fn main() { } Result:", 2, "")}, "")
+			},
+			layer: map[string][]Line{"#/texts/0": {
+				{Text: "Filename: src/main.rs"},
+				{Text: "fn main() {", Mono: true},
+				{Text: "", Mono: true},
+				{Text: "}", Mono: true},
+				{Text: "Result:"},
+				{Text: " city | temp", Mono: true},
+			}},
+			want: []ir.Block{
+				para(2, "Filename: src/main.rs"),
+				{Kind: ir.KindCode, Page: 2, Text: "fn main() {\n\n}\n"},
+				para(2, "Result:"),
+				{Kind: ir.KindCode, Page: 2, Text: " city | temp\n"},
+			},
+			title: "Lecture 3",
+		},
+		{
+			name: "prose and pictures set in monospace are code",
+			doc: func(t *testing.T) *Document {
+				return doc(t, refs("texts/0", "texts/1", "pictures/0"), []string{
+					text(0, "text", "cd %HOMEPATH%", 1, ""),
+					text(1, "text", "Open a prompt and run cd.", 1, ""),
+				}, `, "pictures": [{"self_ref": "#/pictures/0", "label": "picture", "content_layer": "body", "children": [], "prov": `+prov(2)+`}]`)
+			},
+			layer: map[string][]Line{
+				"#/texts/0":    mono("cd %HOMEPATH%"),
+				"#/texts/1":    {{Text: "Open a prompt and run"}, {Text: "cd.", Mono: true}},
+				"#/pictures/0": mono("$ uv run fastapi dev", "", "  Starting"),
+			},
+			want: []ir.Block{
+				{Kind: ir.KindCode, Page: 1, Text: "cd %HOMEPATH%\n"},
+				para(1, "Open a prompt and run cd."),
+				{Kind: ir.KindCode, Page: 2, Text: "$ uv run fastapi dev\n\n  Starting\n"},
 			},
 			title: "Lecture 3",
 		},
@@ -143,7 +184,7 @@ func TestMap(t *testing.T) {
 					text(1, "code", "x", 1, ""),
 				}, "")
 			},
-			code:  map[string]string{"#/texts/1": "de\ufb01ne()\n"},
+			layer: map[string][]Line{"#/texts/1": mono("de\ufb01ne()")},
 			want:  []ir.Block{para(1, "The first flag, offer, suffix, baffle."), {Kind: ir.KindCode, Page: 1, Text: "define()\n"}},
 			title: "Lecture 3",
 		},
@@ -210,7 +251,7 @@ func TestMap(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			got, err := Map(tt.doc(t), pdf, tt.code)
+			got, err := Map(tt.doc(t), pdf, tt.layer)
 			if err != nil {
 				t.Fatalf("Map() = %v", err)
 			}
@@ -283,30 +324,43 @@ func TestMapRefusesBadReferences(t *testing.T) {
 	}
 }
 
-func TestCodeBoxesAndText(t *testing.T) {
+// mono is lines all set in monospace.
+func mono(texts ...string) []Line {
+	out := make([]Line, len(texts))
+	for i, t := range texts {
+		out[i] = Line{Text: t, Mono: true}
+	}
+	return out
+}
+
+func TestLayerBoxes(t *testing.T) {
 	t.Parallel()
 	split := text(0, "code", "a b", 1, "")
 	split = strings.Replace(split, `"prov": `+prov(1), `"prov": [{"page_no": 1, "bbox": {"l": 1, "t": 30, "r": 3, "b": 20, "coord_origin": "BOTTOMLEFT"}}, {"page_no": 2, "bbox": {"l": 1, "t": 12, "r": 3, "b": 40, "coord_origin": "TOPLEFT"}}]`, 1)
-	d := doc(t, refs("texts/0", "texts/1", "texts/2"), []string{split, text(1, "text", "x", 1, ""), text(2, "code", "c", 3, "")}, "")
+	d := doc(t, refs("texts/0", "texts/1", "texts/2", "texts/3", "pictures/0"),
+		[]string{split, text(1, "text", "x", 1, ""), text(2, "section_header", "H", 1, ""), text(3, "code", "c", 3, "")},
+		`, "pictures": [{"self_ref": "#/pictures/0", "label": "picture", "content_layer": "body", "children": [], "prov": `+prov(2)+`}]`)
 
-	boxes := CodeBoxes(d)
+	boxes := LayerBoxes(d)
 	want := []Box{
 		{Ref: "#/texts/0", Page: 1, L: 1, T: 30, R: 3, B: 20},
 		{Ref: "#/texts/0", Page: 2, L: 1, T: 830, R: 3, B: 802},
-		{Ref: "#/texts/2", Page: 3, L: 48, T: 590, R: 323, B: 448},
+		{Ref: "#/texts/1", Page: 1, L: 48, T: 590, R: 323, B: 448},
+		{Ref: "#/texts/3", Page: 3, L: 48, T: 590, R: 323, B: 448},
+		{Ref: "#/pictures/0", Page: 2, L: 48, T: 590, R: 323, B: 448},
 	}
 	if !reflect.DeepEqual(boxes, want) {
-		t.Fatalf("CodeBoxes = %+v, want %+v", boxes, want)
+		t.Fatalf("LayerBoxes = %+v, want %+v", boxes, want)
 	}
-	code, err := CodeText(boxes, [][]string{{"def f():"}, {"    return 1"}, {}})
+	layer, err := Layer(boxes, [][]Line{mono("def f():"), mono("    return 1"), {{Text: "x"}}, {}, {}})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(code, map[string]string{"#/texts/0": "def f():\n    return 1\n"}) {
-		t.Errorf("CodeText = %q", code)
+	if want := mono("def f():", "    return 1"); !reflect.DeepEqual(layer["#/texts/0"], want) {
+		t.Errorf("Layer joins a split block's pages to %+v, want %+v", layer["#/texts/0"], want)
 	}
-	if _, err := CodeText(boxes, [][]string{{"x"}}); err == nil {
-		t.Error("CodeText with fewer blocks than boxes succeeded")
+	if _, err := Layer(boxes, [][]Line{mono("x")}); err == nil {
+		t.Error("Layer with fewer blocks than boxes succeeded")
 	}
 }
 

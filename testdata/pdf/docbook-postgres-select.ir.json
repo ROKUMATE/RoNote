@@ -1,0 +1,349 @@
+{
+  "ir_version": 2,
+  "title": "docbook-postgres-select",
+  "source": {
+    "url": "",
+    "final_url": "",
+    "fetched_at": "2026-11-15T00:00:00Z",
+    "body_sha256": "075d91db46d1028bc10a97537735ddb343007557ece0d14249a868aebaa17e28",
+    "pdf": {
+      "filename": "docbook-postgres-select.pdf",
+      "pages": 2
+    }
+  },
+  "extractor": {
+    "name": "docling",
+    "version": "1.38.2+map1"
+  },
+  "blocks": [
+    {
+      "id": "29438309f06c",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "PostgreSQL Documentation → PostgreSQL 18 Supported Versions: Current (18) / 17 / 16 / 15 / 14 Development Versions: 19 / devel Unsupported versions: 13 / 12 / 11 / 10 / 9.6 / 9.5 / 9.4 / 9.3 / 9.2 / 9.1 / 9.0 / 8.4 / 8.3 / 8.2 / 8.1 / 8.0 / 7.4 / 7.3 / 7.2 Search the documentatio 2.5. Querying a Table Prev Up Chapter 2. The SQL Language Home Next"
+        }
+      ]
+    },
+    {
+      "id": "435d96d6ba78",
+      "kind": "heading",
+      "page": 1,
+      "level": 1,
+      "content": [
+        {
+          "text": "2.5. Querying a Table #"
+        }
+      ]
+    },
+    {
+      "id": "7120bccae17a",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "To retrieve data from a table, the table is queried. An SQL SELECT statement is used to do this. The statement is divided into a select list (the part that lists the columns to be returned), a table list (the part that lists the tables from which to retrieve the data), and an optional qualification (the part that specifies any restrictions). For example, to retrieve all the rows of table weather, type:"
+        }
+      ]
+    },
+    {
+      "id": "5491ade05395",
+      "kind": "code",
+      "page": 1,
+      "text": "SELECT * FROM weather;\n"
+    },
+    {
+      "id": "bf38e3953c09",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Here * is a shorthand for \"all columns\" . [2] So the same result would be had with:"
+        }
+      ]
+    },
+    {
+      "id": "33a4fdfdcc8b",
+      "kind": "code",
+      "page": 1,
+      "text": "SELECT city, temp_lo, temp_hi, prcp, date FROM weather;\n"
+    },
+    {
+      "id": "ceb31c8af5f6",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "The output should be:"
+        }
+      ]
+    },
+    {
+      "id": "f5e70dd03045",
+      "kind": "code",
+      "page": 1,
+      "text": "     city      | temp_lo | temp_hi | prcp |    date\n---------------+---------+---------+------+------------\n San Francisco |      46 |      50 | 0.25 | 1994-11-27\n San Francisco |      43 |      57 |    0 | 1994-11-29\n Hayward       |      37 |      54 |      | 1994-11-29\n(3 rows)\n"
+    },
+    {
+      "id": "346198734a01",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "You can write expressions, not just simple column references, in the select list. For example, you can do:"
+        }
+      ]
+    },
+    {
+      "id": "58065adfc5fc",
+      "kind": "code",
+      "page": 1,
+      "text": "SELECT city, (temp_hi+temp_lo)/2 AS temp_avg, date FROM weather;\n"
+    },
+    {
+      "id": "0b9cfeaa0f07",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "This should give:"
+        }
+      ]
+    },
+    {
+      "id": "2c1f9e80daa9",
+      "kind": "code",
+      "page": 1,
+      "text": "     city      | temp_avg |    date\n---------------+----------+------------\n San Francisco |       48 | 1994-11-27\n San Francisco |       50 | 1994-11-29\n Hayward       |       45 | 1994-11-29\n(3 rows)\n"
+    },
+    {
+      "id": "0411e9baa02b",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Notice how the AS clause is used to relabel the output column. (The AS clause is optional.)"
+        }
+      ]
+    },
+    {
+      "id": "88168f4718a6",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "A query can be \"qualified\" by adding a WHERE clause that specifies which rows are wanted. The WHERE clause contains a Boolean (truth value) expression, and only rows for which the Boolean expression is true are returned. The usual Boolean operators (AND, OR, and NOT) are allowed in the qualification. For example, the following retrieves the weather of San Francisco on rainy days:"
+        }
+      ]
+    },
+    {
+      "id": "ddb372ed6ce6",
+      "kind": "code",
+      "page": 1,
+      "text": "SELECT * FROM weather\n"
+    },
+    {
+      "id": "3a0130aaf218",
+      "kind": "code",
+      "page": 1,
+      "text": "    WHERE city = 'San Francisco' AND prcp \u003e 0.0;\n"
+    },
+    {
+      "id": "e9ec841a65c0",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Result:"
+        }
+      ]
+    },
+    {
+      "id": "ae0d83fd938a",
+      "kind": "code",
+      "page": 1,
+      "text": "     city      | temp_lo | temp_hi | prcp |    date\n---------------+---------+---------+------+------------\n"
+    },
+    {
+      "id": "12fe35905b3f",
+      "kind": "code",
+      "page": 1,
+      "text": "     city      | temp_lo | temp_hi | prcp |    date\n---------------+---------+---------+------+------------\n San Francisco |      46 |      50 | 0.25 | 1994-11-27\n(1 row)\n"
+    },
+    {
+      "id": "70336c0672be",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "You can request that the results of a query be returned in sorted order:"
+        }
+      ]
+    },
+    {
+      "id": "cf771440afda",
+      "kind": "code",
+      "page": 2,
+      "text": "SELECT * FROM weather\n    ORDER BY city;\n"
+    },
+    {
+      "id": "40e6c19ea771",
+      "kind": "code",
+      "page": 2,
+      "text": "     city      | temp_lo | temp_hi | prcp |    date\n---------------+---------+---------+------+------------\n Hayward       |      37 |      54 |      | 1994-11-29\n San Francisco |      43 |      57 |    0 | 1994-11-29\n San Francisco |      46 |      50 | 0.25 | 1994-11-27\n"
+    },
+    {
+      "id": "528dca647841",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "In this example, the sort order isn't fully specified, and so you might get the San Francisco rows in either order. But you'd always get the results shown above if you do:"
+        }
+      ]
+    },
+    {
+      "id": "a08649b099c6",
+      "kind": "code",
+      "page": 2,
+      "text": "SELECT * FROM weather\n    ORDER BY city, temp_lo;\n"
+    },
+    {
+      "id": "e088b7fd0243",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "You can request that duplicate rows be removed from the result of a query:"
+        }
+      ]
+    },
+    {
+      "id": "fd9294ce15c7",
+      "kind": "code",
+      "page": 2,
+      "text": "SELECT DISTINCT city\n    FROM weather;\n\n     city\n---------------\n Hayward\n San Francisco\n(2 rows)\n"
+    },
+    {
+      "id": "ff7b35a5f070",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "Here again, the result row ordering might vary. You can ensure consistent results by using DISTINCT and ORDER BY together: [3]"
+        }
+      ]
+    },
+    {
+      "id": "6fdb588d29b1",
+      "kind": "code",
+      "page": 2,
+      "text": "SELECT DISTINCT city\n    FROM weather\n    ORDER BY city;\n"
+    },
+    {
+      "id": "63efebecb4f6",
+      "kind": "list",
+      "page": 2,
+      "ordered": true,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "e4fc4647c2e3",
+              "kind": "paragraph",
+              "page": 2,
+              "content": [
+                {
+                  "text": "While SELECT * is useful for off-the-cuff queries, it is widely considered bad style in production code, since adding a column to the table would change the results."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "525f8b2b80f2",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "[3] In some database systems, including older versions of PostgreSQL, the implementation of DISTINCT automatically orders the rows and so ORDER BY is unnecessary. But this is not required by the SQL standard, and current PostgreSQL does not guarantee that DISTINCT causes the rows to be ordered."
+        }
+      ]
+    },
+    {
+      "id": "37fe6465554c",
+      "kind": "table",
+      "page": 2,
+      "rows": [
+        [
+          [
+            {
+              "text": "Prev"
+            }
+          ],
+          [
+            {
+              "text": "Up"
+            }
+          ],
+          [
+            {
+              "text": "Next"
+            }
+          ]
+        ],
+        [
+          [
+            {
+              "text": "2.4. Populating a Table With Rows"
+            }
+          ],
+          [
+            {
+              "text": "Home"
+            }
+          ],
+          [
+            {
+              "text": "2.6. Joins Between Tables"
+            }
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "5dbb06889df8",
+      "kind": "heading",
+      "page": 2,
+      "level": 2,
+      "content": [
+        {
+          "text": "Submit correction"
+        }
+      ]
+    },
+    {
+      "id": "b764e104b4b8",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "If you see anything in the documentation that is not correct, does not match your experience with the particular feature or requires further clarification, please use this form to report a documentation issue."
+        }
+      ]
+    },
+    {
+      "id": "a9e00439b0da",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "Site footer"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,5757 @@
+{
+ "sha256": "4318e8bc3d766724af0e28d6c466af66375b40e8dcf24966d0909dabfc6de07c",
+ "seconds": 8.17,
+ "pages": 8,
+ "inspect": {
+  "status": 200,
+  "body": {
+   "pages": 8,
+   "chars": 14172
+  }
+ },
+ "result": {
+  "status": 200,
+  "body": {
+   "document": {
+    "filename": "think-python-iteration.pdf",
+    "md_content": null,
+    "json_content": {
+     "schema_name": "DoclingDocument",
+     "version": "1.10.0",
+     "name": "think-python-iteration",
+     "origin": {
+      "mimetype": "application/pdf",
+      "binary_hash": 15028685318535372924,
+      "filename": "think-python-iteration.pdf",
+      "uri": null
+     },
+     "furniture": {
+      "self_ref": "#/furniture",
+      "parent": null,
+      "children": [],
+      "content_layer": "furniture",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "body": {
+      "self_ref": "#/body",
+      "parent": null,
+      "children": [
+       {
+        "$ref": "#/texts/0"
+       },
+       {
+        "$ref": "#/texts/1"
+       },
+       {
+        "$ref": "#/texts/2"
+       },
+       {
+        "$ref": "#/texts/3"
+       },
+       {
+        "$ref": "#/texts/4"
+       },
+       {
+        "$ref": "#/texts/5"
+       },
+       {
+        "$ref": "#/texts/6"
+       },
+       {
+        "$ref": "#/texts/7"
+       },
+       {
+        "$ref": "#/texts/8"
+       },
+       {
+        "$ref": "#/texts/9"
+       },
+       {
+        "$ref": "#/texts/10"
+       },
+       {
+        "$ref": "#/texts/11"
+       },
+       {
+        "$ref": "#/texts/12"
+       },
+       {
+        "$ref": "#/pictures/0"
+       },
+       {
+        "$ref": "#/texts/17"
+       },
+       {
+        "$ref": "#/texts/18"
+       },
+       {
+        "$ref": "#/texts/19"
+       },
+       {
+        "$ref": "#/texts/20"
+       },
+       {
+        "$ref": "#/texts/21"
+       },
+       {
+        "$ref": "#/texts/22"
+       },
+       {
+        "$ref": "#/texts/23"
+       },
+       {
+        "$ref": "#/texts/24"
+       },
+       {
+        "$ref": "#/texts/25"
+       },
+       {
+        "$ref": "#/texts/26"
+       },
+       {
+        "$ref": "#/texts/27"
+       },
+       {
+        "$ref": "#/texts/28"
+       },
+       {
+        "$ref": "#/texts/29"
+       },
+       {
+        "$ref": "#/texts/30"
+       },
+       {
+        "$ref": "#/texts/31"
+       },
+       {
+        "$ref": "#/texts/32"
+       },
+       {
+        "$ref": "#/texts/33"
+       },
+       {
+        "$ref": "#/texts/34"
+       },
+       {
+        "$ref": "#/texts/35"
+       },
+       {
+        "$ref": "#/texts/36"
+       },
+       {
+        "$ref": "#/texts/37"
+       },
+       {
+        "$ref": "#/groups/0"
+       },
+       {
+        "$ref": "#/texts/41"
+       },
+       {
+        "$ref": "#/texts/42"
+       },
+       {
+        "$ref": "#/texts/43"
+       },
+       {
+        "$ref": "#/texts/44"
+       },
+       {
+        "$ref": "#/texts/45"
+       },
+       {
+        "$ref": "#/texts/46"
+       },
+       {
+        "$ref": "#/texts/47"
+       },
+       {
+        "$ref": "#/texts/48"
+       },
+       {
+        "$ref": "#/texts/49"
+       },
+       {
+        "$ref": "#/texts/50"
+       },
+       {
+        "$ref": "#/texts/51"
+       },
+       {
+        "$ref": "#/texts/52"
+       },
+       {
+        "$ref": "#/texts/53"
+       },
+       {
+        "$ref": "#/texts/54"
+       },
+       {
+        "$ref": "#/texts/55"
+       },
+       {
+        "$ref": "#/texts/56"
+       },
+       {
+        "$ref": "#/texts/57"
+       },
+       {
+        "$ref": "#/texts/58"
+       },
+       {
+        "$ref": "#/texts/59"
+       },
+       {
+        "$ref": "#/texts/60"
+       },
+       {
+        "$ref": "#/texts/61"
+       },
+       {
+        "$ref": "#/texts/62"
+       },
+       {
+        "$ref": "#/texts/63"
+       },
+       {
+        "$ref": "#/texts/64"
+       },
+       {
+        "$ref": "#/texts/65"
+       },
+       {
+        "$ref": "#/texts/66"
+       },
+       {
+        "$ref": "#/texts/67"
+       },
+       {
+        "$ref": "#/texts/68"
+       },
+       {
+        "$ref": "#/texts/69"
+       },
+       {
+        "$ref": "#/texts/70"
+       },
+       {
+        "$ref": "#/texts/71"
+       },
+       {
+        "$ref": "#/texts/72"
+       },
+       {
+        "$ref": "#/texts/73"
+       },
+       {
+        "$ref": "#/texts/74"
+       },
+       {
+        "$ref": "#/texts/75"
+       },
+       {
+        "$ref": "#/texts/76"
+       },
+       {
+        "$ref": "#/texts/77"
+       },
+       {
+        "$ref": "#/texts/78"
+       },
+       {
+        "$ref": "#/texts/79"
+       },
+       {
+        "$ref": "#/texts/80"
+       },
+       {
+        "$ref": "#/texts/81"
+       },
+       {
+        "$ref": "#/texts/82"
+       },
+       {
+        "$ref": "#/texts/83"
+       },
+       {
+        "$ref": "#/texts/84"
+       },
+       {
+        "$ref": "#/texts/85"
+       },
+       {
+        "$ref": "#/texts/86"
+       },
+       {
+        "$ref": "#/texts/87"
+       },
+       {
+        "$ref": "#/texts/88"
+       },
+       {
+        "$ref": "#/texts/89"
+       },
+       {
+        "$ref": "#/texts/90"
+       },
+       {
+        "$ref": "#/texts/91"
+       },
+       {
+        "$ref": "#/texts/92"
+       },
+       {
+        "$ref": "#/texts/93"
+       },
+       {
+        "$ref": "#/texts/94"
+       },
+       {
+        "$ref": "#/texts/95"
+       },
+       {
+        "$ref": "#/texts/96"
+       },
+       {
+        "$ref": "#/texts/97"
+       },
+       {
+        "$ref": "#/texts/98"
+       },
+       {
+        "$ref": "#/texts/99"
+       },
+       {
+        "$ref": "#/texts/100"
+       },
+       {
+        "$ref": "#/texts/101"
+       },
+       {
+        "$ref": "#/texts/102"
+       },
+       {
+        "$ref": "#/texts/103"
+       },
+       {
+        "$ref": "#/texts/104"
+       },
+       {
+        "$ref": "#/texts/105"
+       },
+       {
+        "$ref": "#/texts/106"
+       },
+       {
+        "$ref": "#/texts/107"
+       },
+       {
+        "$ref": "#/texts/108"
+       },
+       {
+        "$ref": "#/texts/109"
+       },
+       {
+        "$ref": "#/texts/110"
+       },
+       {
+        "$ref": "#/texts/111"
+       },
+       {
+        "$ref": "#/texts/112"
+       },
+       {
+        "$ref": "#/texts/113"
+       },
+       {
+        "$ref": "#/texts/114"
+       },
+       {
+        "$ref": "#/texts/115"
+       },
+       {
+        "$ref": "#/texts/116"
+       },
+       {
+        "$ref": "#/texts/117"
+       },
+       {
+        "$ref": "#/texts/118"
+       },
+       {
+        "$ref": "#/texts/119"
+       },
+       {
+        "$ref": "#/texts/120"
+       },
+       {
+        "$ref": "#/texts/121"
+       },
+       {
+        "$ref": "#/texts/122"
+       },
+       {
+        "$ref": "#/texts/123"
+       },
+       {
+        "$ref": "#/groups/1"
+       }
+      ],
+      "content_layer": "body",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "groups": [
+      {
+       "self_ref": "#/groups/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/38"
+        },
+        {
+         "$ref": "#/texts/39"
+        },
+        {
+         "$ref": "#/texts/40"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/124"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "group",
+       "label": "key_value_area"
+      }
+     ],
+     "texts": [
+      {
+       "self_ref": "#/texts/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 129.6,
+          "t": 625.6732000000001,
+          "r": 220.84560000000005,
+          "b": 606.5712440677967,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          9
+         ]
+        }
+       ],
+       "orig": "Chapter 7",
+       "text": "Chapter 7",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 1
+      },
+      {
+       "self_ref": "#/texts/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 129.6,
+          "t": 569.0199312000001,
+          "r": 227.36032239999997,
+          "b": 546.1048874305085,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          9
+         ]
+        }
+       ],
+       "orig": "Iteration",
+       "text": "Iteration",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 1
+      },
+      {
+       "self_ref": "#/texts/2",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 129.6,
+          "t": 498.07756800000004,
+          "r": 525.6033874000003,
+          "b": 452.04807248111894,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          344
+         ]
+        }
+       ],
+       "orig": "This chapter is about iteration, which is the ability to run a block of statements repeatedly. We saw a kind of iteration, using recursion, in Section 5.8. We saw another kind, using a for loop, in Section 4.2. In this chapter we'll see yet another kind, using a while statement. But first I want to say a little more about variable assignment.",
+       "text": "This chapter is about iteration, which is the ability to run a block of statements repeatedly. We saw a kind of iteration, using recursion, in Section 5.8. We saw another kind, using a for loop, in Section 4.2. In this chapter we'll see yet another kind, using a while statement. But first I want to say a little more about variable assignment.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/3",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 129.6,
+          "t": 418.5596464,
+          "r": 254.31151660000006,
+          "b": 405.2969492338983,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "7.1 Reassignment",
+       "text": "7.1 Reassignment",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/4",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 129.6,
+          "t": 390.785568,
+          "r": 525.6033874000002,
+          "b": 356.9510724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          198
+         ]
+        }
+       ],
+       "orig": "As you may have discovered, it is legal to make more than one assignment to the same variable. A new assignment makes an existing variable refer to a new value (and stop referring to the old value).",
+       "text": "As you may have discovered, it is legal to make more than one assignment to the same variable. A new assignment makes an existing variable refer to a new value (and stop referring to the old value).",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/5",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 129.6,
+          "t": 348.48311119999994,
+          "r": 176.6573448400001,
+          "b": 281.31437399999993,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          35
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e x = 5 \u003e\u003e\u003e x 5 \u003e\u003e\u003e x = 7 \u003e\u003e\u003e x 7",
+       "text": "\u003e\u003e\u003e x = 5 \u003e\u003e\u003e x 5 \u003e\u003e\u003e x = 7 \u003e\u003e\u003e x 7",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/6",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 129.6,
+          "t": 270.95156799999995,
+          "r": 441.9763267400002,
+          "b": 261.50507248111876,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          77
+         ]
+        }
+       ],
+       "orig": "The first time we display x, its value is 5; the second time, its value is 7.",
+       "text": "The first time we display x, its value is 5; the second time, its value is 7.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/7",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 129.6,
+          "t": 249.74356799999987,
+          "r": 420.18911679999997,
+          "b": 240.2970724811188,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          65
+         ]
+        }
+       ],
+       "orig": "Figure 7.1 shows what reassignment looks like in a state diagram.",
+       "text": "Figure 7.1 shows what reassignment looks like in a state diagram.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/8",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 129.6,
+          "t": 228.53456799999992,
+          "r": 525.6033874000003,
+          "b": 182.50507248111876,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          287
+         ]
+        }
+       ],
+       "orig": "At this point I want to address a common source of confusion. Because Python uses the equal sign (=) for assignment, it is tempting to interpret a statement like a = b as a mathematical proposition of equality; that is, the claim that a and b are equal. But this interpretation is wrong.",
+       "text": "At this point I want to address a common source of confusion. Because Python uses the equal sign (=) for assignment, it is tempting to interpret a statement like a = b as a mathematical proposition of equality; that is, the claim that a and b are equal. But this interpretation is wrong.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/9",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 129.6,
+          "t": 170.7425679999999,
+          "r": 525.6033874000002,
+          "b": 136.90807248111878,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          178
+         ]
+        }
+       ],
+       "orig": "First, equality is a symmetric relationship and assignment is not. For example, in mathematics, if a = 7 then 7 = a. But in Python, the statement a = 7 is legal and 7 = a is not.",
+       "text": "First, equality is a symmetric relationship and assignment is not. For example, in mathematics, if a = 7 then 7 = a. But in Python, the statement a = 7 is legal and 7 = a is not.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/10",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 129.6,
+          "t": 125.46129129999997,
+          "r": 525.5988735999999,
+          "b": 91.3110724811188,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          230
+         ]
+        }
+       ],
+       "orig": "Also, in mathematics, a proposition of equality is either true or false for all time. If a = b now, then a will always equal b. In Python, an assignment statement can make two variables equal, but they don't have to stay that way:",
+       "text": "Also, in mathematics, a proposition of equality is either true or false for all time. If a = b now, then a will always equal b. In Python, an assignment statement can make two variables equal, but they don't have to stay that way:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/11",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 730.2818672,
+          "r": 96.36260000000001,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "64",
+       "text": "64",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/12",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 394.1347514,
+          "t": 730.2818672,
+          "r": 482.4033873999998,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          20
+         ]
+        }
+       ],
+       "orig": "Chapter 7. Iteration",
+       "text": "Chapter 7. Iteration",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/13",
+       "parent": {
+        "$ref": "#/pictures/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "caption",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 228.042,
+          "t": 657.2395680000001,
+          "r": 340.7588563999999,
+          "b": 647.7930724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          26
+         ]
+        }
+       ],
+       "orig": "Figure 7.1: State diagram.",
+       "text": "Figure 7.1: State diagram.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/14",
+       "parent": {
+        "$ref": "#/pictures/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 293.36,
+          "t": 684.94208656,
+          "r": 298.25271104,
+          "b": 678.50060368,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "7",
+       "text": "7",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/15",
+       "parent": {
+        "$ref": "#/pictures/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 293.36,
+          "t": 699.3420865600001,
+          "r": 298.25271104,
+          "b": 692.90060368,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "5",
+       "text": "5",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/16",
+       "parent": {
+        "$ref": "#/pictures/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 268.80032,
+          "t": 694.06208656,
+          "r": 273.20024,
+          "b": 687.62060368,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "x",
+       "text": "x",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/17",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 623.7421112,
+          "r": 306.0275095200001,
+          "b": 568.7683740000001,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          91
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e a = 5 \u003e\u003e\u003e b = a # a and b are now equal \u003e\u003e\u003e a = 3 # a and b are no longer equal \u003e\u003e\u003e b 5",
+       "text": "\u003e\u003e\u003e a = 5 \u003e\u003e\u003e b = a # a and b are now equal \u003e\u003e\u003e a = 3 # a and b are no longer equal \u003e\u003e\u003e b 5",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/18",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 559.3325680000002,
+          "r": 482.4013948799999,
+          "b": 537.6910724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          102
+         ]
+        }
+       ],
+       "orig": "The third line changes the value of a but does not change the value of b, so they are no longer equal.",
+       "text": "The third line changes the value of a but does not change the value of b, so they are no longer equal.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/19",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 526.8565680000002,
+          "r": 482.40338740000044,
+          "b": 505.216072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          170
+         ]
+        }
+       ],
+       "orig": "Reassigning variables is often useful, but you should use it with caution. If the values of variables change frequently, it can make the code difficult to read and debug.",
+       "text": "Reassigning variables is often useful, but you should use it with caution. If the values of variables change frequently, it can make the code difficult to read and debug.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/20",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 474.5086464000001,
+          "r": 244.19385380000008,
+          "b": 461.2459492338984,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          22
+         ]
+        }
+       ],
+       "orig": "7.2 Updating variables",
+       "text": "7.2 Updating variables",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/21",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 448.0325680000001,
+          "r": 482.4033873999997,
+          "b": 426.392072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          99
+         ]
+        }
+       ],
+       "orig": "A common kind of reassignment is an update, where the new value of the variable depends on the old.",
+       "text": "A common kind of reassignment is an update, where the new value of the variable depends on the old.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/22",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 418.9606998000001,
+          "r": 154.37681232000006,
+          "b": 412.7540000000001,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          13
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e x = x + 1",
+       "text": "\u003e\u003e\u003e x = x + 1",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/23",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 403.21856800000006,
+          "r": 474.57079128,
+          "b": 393.772072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          87
+         ]
+        }
+       ],
+       "orig": "This means \"get the current value of x, add one, and then update x with the new value.\"",
+       "text": "This means \"get the current value of x, add one, and then update x with the new value.\"",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/24",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 382.93756800000006,
+          "r": 482.4033874000001,
+          "b": 361.29707248111896,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          141
+         ]
+        }
+       ],
+       "orig": "If you try to update a variable that doesn't exist, you get an error, because Python evaluates the right side before it assigns a value to x:",
+       "text": "If you try to update a variable that doesn't exist, you get an error, because Python evaluates the right side before it assigns a value to x:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/25",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 353.8656998000001,
+          "r": 264.19355586000023,
+          "b": 335.41518700000006,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          48
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e x = x + 1 NameError: name 'x' is not defined",
+       "text": "\u003e\u003e\u003e x = x + 1 NameError: name 'x' is not defined",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/26",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 325.929568,
+          "r": 482.4033874000001,
+          "b": 304.28807248111895,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          94
+         ]
+        }
+       ],
+       "orig": "Before you can update a variable, you have to initialize it, usually with a simple assignment:",
+       "text": "Before you can update a variable, you have to initialize it, usually with a simple assignment:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/27",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 296.85769980000003,
+          "r": 154.37681232000006,
+          "b": 278.456,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          23
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e x = 0 \u003e\u003e\u003e x = x + 1",
+       "text": "\u003e\u003e\u003e x = 0 \u003e\u003e\u003e x = x + 1",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/28",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 268.920568,
+          "r": 482.40338740000004,
+          "b": 259.4740724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          92
+         ]
+        }
+       ],
+       "orig": "Updating a variable by adding 1 is called an increment; subtracting 1 is called a decrement.",
+       "text": "Updating a variable by adding 1 is called an increment; subtracting 1 is called a decrement.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/29",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 216.57264640000005,
+          "r": 251.50324270000007,
+          "b": 203.30994923389835,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          23
+         ]
+        }
+       ],
+       "orig": "7.3 The while statement",
+       "text": "7.3 The while statement",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/30",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 190.09756800000002,
+          "r": 482.40338739999993,
+          "b": 156.26207248111893,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          231
+         ]
+        }
+       ],
+       "orig": "Computers are often used to automate repetitive tasks. Repeating identical or similar tasks without making errors is something that computers do well and people do poorly. In a computer program, repetition is also called iteration.",
+       "text": "Computers are often used to automate repetitive tasks. Repeating identical or similar tasks without making errors is something that computers do well and people do poorly. In a computer program, repetition is also called iteration.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/31",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 145.42756800000006,
+          "r": 482.4033874,
+          "b": 111.59207248111886,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          253
+         ]
+        }
+       ],
+       "orig": "We have already seen two functions, countdown and print _ n, that iterate using recursion. Because iteration is so common, Python provides language features to make it easier. One is the for statement we saw in Section 4.2. We'll get back to that later.",
+       "text": "We have already seen two functions, countdown and print _ n, that iterate using recursion. Because iteration is so common, Python provides language features to make it easier. One is the for statement we saw in Section 4.2. We'll get back to that later.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/32",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 86.4,
+          "t": 100.75756799999999,
+          "r": 482.4043836599997,
+          "b": 91.31107248111891,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          91
+         ]
+        }
+       ],
+       "orig": "Another is the while statement. Here is a version of countdown that uses a while statement:",
+       "text": "Another is the while statement. Here is a version of countdown that uses a while statement:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/33",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 129.6,
+          "t": 730.2818672,
+          "r": 240.14002830000007,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          24
+         ]
+        }
+       ],
+       "orig": "7.3. The while statement",
+       "text": "7.3. The while statement",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/34",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 515.6358061000001,
+          "t": 730.2818672,
+          "r": 525.5984061000001,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "65",
+       "text": "65",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/35",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 129.6,
+          "t": 702.9440069999999,
+          "r": 244.64463732000021,
+          "b": 645.0412654,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          68
+         ]
+        }
+       ],
+       "orig": "def countdown(n): while n \u003e 0: print(n) n = n - 1 print('Blastoff!')",
+       "text": "def countdown(n): while n \u003e 0: print(n) n = n - 1 print('Blastoff!')",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/36",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 129.6,
+          "t": 638.8715680000001,
+          "r": 525.6013948799999,
+          "b": 605.0360724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          192
+         ]
+        }
+       ],
+       "orig": "You can almost read the while statement as if it were English. It means, \"While n is greater than 0, display the value of n and then decrement n. When you get to 0, display the word Blastoff!\"",
+       "text": "You can almost read the while statement as if it were English. It means, \"While n is greater than 0, display the value of n and then decrement n. When you get to 0, display the word Blastoff!\"",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/37",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 129.6,
+          "t": 595.3655680000002,
+          "r": 420.0845094999999,
+          "b": 585.919072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          67
+         ]
+        }
+       ],
+       "orig": "More formally, here is the flow of execution for a while statement:",
+       "text": "More formally, here is the flow of execution for a while statement:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/38",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 142.053,
+          "t": 573.9905680000002,
+          "r": 368.19405740000013,
+          "b": 564.544072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          52
+         ]
+        }
+       ],
+       "orig": "1. Determine whether the condition is true or false.",
+       "text": "Determine whether the condition is true or false.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "1."
+      },
+      {
+       "self_ref": "#/texts/39",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 142.053,
+          "t": 554.6965680000002,
+          "r": 497.2047461,
+          "b": 545.250072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          83
+         ]
+        }
+       ],
+       "orig": "2. If false, exit the while statement and continue execution at the next statement.",
+       "text": "If false, exit the while statement and continue execution at the next statement.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "2."
+      },
+      {
+       "self_ref": "#/texts/40",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 142.053,
+          "t": 535.4015680000002,
+          "r": 433.7579280000001,
+          "b": 525.955072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          69
+         ]
+        }
+       ],
+       "orig": "3. If the condition is true, run the body and then go back to step 1.",
+       "text": "If the condition is true, run the body and then go back to step 1.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "3."
+      },
+      {
+       "self_ref": "#/texts/41",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 129.6,
+          "t": 514.0265680000002,
+          "r": 501.7230352,
+          "b": 504.5800724811191,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          87
+         ]
+        }
+       ],
+       "orig": "This type of flow is called a loop because the third step loops back around to the top.",
+       "text": "This type of flow is called a loop because the third step loops back around to the top.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/42",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 129.6,
+          "t": 494.90956800000015,
+          "r": 525.6033874,
+          "b": 436.686072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          368
+         ]
+        }
+       ],
+       "orig": "The body of the loop should change the value of one or more variables so that the condition becomes false eventually and the loop terminates. Otherwise the loop will repeat forever, which is called an infinite loop. An endless source of amusement for computer scientists is the observation that the directions on shampoo, \"Lather, rinse, repeat\", are an infinite loop.",
+       "text": "The body of the loop should change the value of one or more variables so that the condition becomes false eventually and the loop terminates. Otherwise the loop will repeat forever, which is called an infinite loop. An endless source of amusement for computer scientists is the observation that the directions on shampoo, \"Lather, rinse, repeat\", are an infinite loop.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/43",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 129.6,
+          "t": 427.0145680000001,
+          "r": 525.6033874000001,
+          "b": 393.180072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          200
+         ]
+        }
+       ],
+       "orig": "In the case of countdown, we can prove that the loop terminates: if n is zero or negative, the loop never runs. Otherwise, n gets smaller each time through the loop, so eventually we have to get to 0.",
+       "text": "In the case of countdown, we can prove that the loop terminates: if n is zero or negative, the loop never runs. Otherwise, n gets smaller each time through the loop, so eventually we have to get to 0.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/44",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 129.6,
+          "t": 383.50956800000006,
+          "r": 384.592747,
+          "b": 374.063072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          61
+         ]
+        }
+       ],
+       "orig": "For some other loops, it is not so easy to tell. For example:",
+       "text": "For some other loops, it is not so easy to tell. For example:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/45",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 129.6,
+          "t": 368.5130070000001,
+          "r": 343.99818338,
+          "b": 288.323374,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          105
+         ]
+        }
+       ],
+       "orig": "def sequence(n): while n != 1: print(n) if n % 2 == 0: # n is even n = n / 2 else: # n is odd n = n*3 + 1",
+       "text": "def sequence(n): while n != 1: print(n) if n % 2 == 0: # n is even n = n / 2 else: # n is odd n = n*3 + 1",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/46",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 129.6,
+          "t": 280.051568,
+          "r": 525.5974098400003,
+          "b": 258.41107248111894,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          111
+         ]
+        }
+       ],
+       "orig": "The condition for this loop is n != 1, so the loop will continue until n is 1, which makes the condition false.",
+       "text": "The condition for this loop is n != 1, so the loop will continue until n is 1, which makes the condition false.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/47",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 129.6,
+          "t": 248.74056799999994,
+          "r": 525.6023911399999,
+          "b": 202.7110724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          304
+         ]
+        }
+       ],
+       "orig": "Each time through the loop, the program outputs the value of n and then checks whether it is even or odd. If it is even, n is divided by 2. If it is odd, the value of n is replaced with n*3 + 1. For example, if the argument passed to sequence is 3, the resulting values of n are 3, 10, 5, 16, 8, 4, 2, 1.",
+       "text": "Each time through the loop, the program outputs the value of n and then checks whether it is even or odd. If it is even, n is divided by 2. If it is odd, the value of n is replaced with n*3 + 1. For example, if the argument passed to sequence is 3, the resulting values of n are 3, 10, 5, 16, 8, 4, 2, 1.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/48",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 129.6,
+          "t": 193.040568,
+          "r": 525.6033874000001,
+          "b": 134.8160724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          378
+         ]
+        }
+       ],
+       "orig": "Since n sometimes increases and sometimes decreases, there is no obvious proof that n will ever reach 1, or that the program terminates. For some particular values of n, we can prove termination. For example, if the starting value is a power of two, n will be even every time through the loop until it reaches 1. The previous example ends with such a sequence, starting with 16.",
+       "text": "Since n sometimes increases and sometimes decreases, there is no obvious proof that n will ever reach 1, or that the program terminates. For some particular values of n, we can prove termination. For example, if the starting value is a power of two, n will be even every time through the loop until it reaches 1. The previous example ends with such a sequence, starting with 16.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/49",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 129.6,
+          "t": 125.27508180000007,
+          "r": 525.6033873999999,
+          "b": 91.31107248111891,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          215
+         ]
+        }
+       ],
+       "orig": "The hard question is whether we can prove that this program terminates for all positive values of n. So far, no one has been able to prove it or disprove it! (See http: //en.wikipedia.org/wiki/Collatz _ conjecture.)",
+       "text": "The hard question is whether we can prove that this program terminates for all positive values of n. So far, no one has been able to prove it or disprove it! (See http: //en.wikipedia.org/wiki/Collatz _ conjecture.)",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/50",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.4,
+          "t": 730.2818672,
+          "r": 96.36260000000001,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "66",
+       "text": "66",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/51",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 394.1347514,
+          "t": 730.2818672,
+          "r": 482.4033873999998,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          20
+         ]
+        }
+       ],
+       "orig": "Chapter 7. Iteration",
+       "text": "Chapter 7. Iteration",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/52",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.4,
+          "t": 702.794568,
+          "r": 482.3964135799999,
+          "b": 681.1540724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          101
+         ]
+        }
+       ],
+       "orig": "As an exercise, rewrite the function print _ n from Section 5.8 using iteration instead of recursion.",
+       "text": "As an exercise, rewrite the function print _ n from Section 5.8 using iteration instead of recursion.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/53",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.4,
+          "t": 652.9266464000001,
+          "r": 155.08243250000004,
+          "b": 639.6639492338984,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          9
+         ]
+        }
+       ],
+       "orig": "7.4 break",
+       "text": "7.4 break",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/54",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.4,
+          "t": 628.115568,
+          "r": 482.4033874000002,
+          "b": 606.4750724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          159
+         ]
+        }
+       ],
+       "orig": "Sometimes you don't know it's time to end a loop until you get half way through the body. In that case you can use the break statement to jump out of the loop.",
+       "text": "Sometimes you don't know it's time to end a loop until you get half way through the body. In that case you can use the break statement to jump out of the loop.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/55",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.4,
+          "t": 597.2475680000001,
+          "r": 482.39940235999995,
+          "b": 575.6060724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          96
+         ]
+        }
+       ],
+       "orig": "For example, suppose you want to take input from the user until they type done. You could write:",
+       "text": "For example, suppose you want to take input from the user until they type done. You could write:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/56",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.4,
+          "t": 569.6830738,
+          "r": 201.43766350000018,
+          "b": 488.2082654,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          82
+         ]
+        }
+       ],
+       "orig": "while True: line = input('\u003e ') if line == 'done': break print(line) print('Done!')",
+       "text": "while True: line = input('\u003e ') if line == 'done': break print(line) print('Done!')",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/57",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.4,
+          "t": 482.48156800000004,
+          "r": 482.3994023600003,
+          "b": 460.84107248111894,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          101
+         ]
+        }
+       ],
+       "orig": "The loop condition is True, which is always true, so the loop runs until it hits the break statement.",
+       "text": "The loop condition is True, which is always true, so the loop runs until it hits the break statement.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/58",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.4,
+          "t": 451.612568,
+          "r": 482.39940235999984,
+          "b": 417.7780724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          233
+         ]
+        }
+       ],
+       "orig": "Each time through, it prompts the user with an angle bracket. If the user types done, the break statement exits the loop. Otherwise the program echoes whatever the user types and goes back to the top of the loop. Here's a sample run:",
+       "text": "Each time through, it prompts the user with an angle bracket. If the user types done, the break statement exits the loop. Otherwise the program echoes whatever the user types and goes back to the top of the loop. Here's a sample run:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/59",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.4,
+          "t": 411.85407380000004,
+          "r": 138.69567992000003,
+          "b": 369.114187,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          32
+         ]
+        }
+       ],
+       "orig": "\u003e not done not done \u003e done Done!",
+       "text": "\u003e not done not done \u003e done Done!",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/60",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.4,
+          "t": 361.235568,
+          "r": 482.40338739999976,
+          "b": 327.4010724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          258
+         ]
+        }
+       ],
+       "orig": "This way of writing while loops is common because you can check the condition anywhere in the loop (not just at the top) and you can express the stop condition affirmatively (\"stop when this happens\") rather than negatively (\"keep going until that happens\").",
+       "text": "This way of writing while loops is common because you can check the condition anywhere in the loop (not just at the top) and you can express the stop condition affirmatively (\"stop when this happens\") rather than negatively (\"keep going until that happens\").",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/61",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.4,
+          "t": 299.17364639999994,
+          "r": 201.16960000000006,
+          "b": 285.91094923389824,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "7.5 Square roots",
+       "text": "7.5 Square roots",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/62",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.4,
+          "t": 274.362568,
+          "r": 482.40338740000016,
+          "b": 252.72207248111886,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          132
+         ]
+        }
+       ],
+       "orig": "Loops are often used in programs that compute numerical results by starting with an approximate answer and iteratively improving it.",
+       "text": "Loops are often used in programs that compute numerical results by starting with an approximate answer and iteratively improving it.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/63",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.4,
+          "t": 243.49456799999996,
+          "r": 482.40338740000016,
+          "b": 209.65907248111887,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          222
+         ]
+        }
+       ],
+       "orig": "For example, one way of computing square roots is Newton's method. Suppose that you want to know the square root of a. If you start with almost any estimate, x, you can compute a better estimate with the following formula:",
+       "text": "For example, one way of computing square roots is Newton's method. Suppose that you want to know the square root of a. If you start with almost any estimate, x, you can compute a better estimate with the following formula:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/64",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "formula",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 256.637,
+          "t": 192.4932913,
+          "r": 310.8663341799999,
+          "b": 169.15207248111892,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          13
+         ]
+        }
+       ],
+       "orig": "y = x + a/x 2",
+       "text": "",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/65",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.40000000000003,
+          "t": 164.36708180000005,
+          "r": 223.67466540000007,
+          "b": 154.79107248111893,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          34
+         ]
+        }
+       ],
+       "orig": "For example, if a is 4 and x is 3:",
+       "text": "For example, if a is 4 and x is 3:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/66",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.40000000000003,
+          "t": 148.9766624,
+          "r": 196.21375476000017,
+          "b": 103.91548980000005,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          47
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e a = 4 \u003e\u003e\u003e x = 3 \u003e\u003e\u003e y = (x + a/x) / 2 \u003e\u003e\u003e y",
+       "text": "\u003e\u003e\u003e a = 4 \u003e\u003e\u003e x = 3 \u003e\u003e\u003e y = (x + a/x) / 2 \u003e\u003e\u003e y",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/67",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 86.40000000000003,
+          "t": 100.23951280000006,
+          "r": 154.38179362000008,
+          "b": 93.883374,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          13
+         ]
+        }
+       ],
+       "orig": "2.16666666667",
+       "text": "2.16666666667",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/68",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.6,
+          "t": 730.2818672,
+          "r": 199.05924720000002,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          15
+         ]
+        }
+       ],
+       "orig": "7.6. Algorithms",
+       "text": "7.6. Algorithms",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/69",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 515.6407874,
+          "t": 730.2818672,
+          "r": 525.6033874000001,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "67",
+       "text": "67",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/70",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.6,
+          "t": 711.7882913,
+          "r": 525.6028413799996,
+          "b": 681.1540724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          121
+         ]
+        }
+       ],
+       "orig": "The result is closer to the correct answer (√4 = 2). If we repeat the process with the new estimate, it gets even closer:",
+       "text": "The result is closer to the correct answer (√4 = 2). If we repeat the process with the new estimate, it gets even closer:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/71",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.6,
+          "t": 674.1003552,
+          "r": 239.41375476000022,
+          "b": 641.9514898000001,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          37
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e x = y \u003e\u003e\u003e y = (x + a/x) / 2 \u003e\u003e\u003e y",
+       "text": "\u003e\u003e\u003e x = y \u003e\u003e\u003e y = (x + a/x) / 2 \u003e\u003e\u003e y",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/72",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.6,
+          "t": 638.2346624,
+          "r": 197.58179362000016,
+          "b": 631.9183740000001,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          13
+         ]
+        }
+       ],
+       "orig": "2.00641025641",
+       "text": "2.00641025641",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/73",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.6,
+          "t": 623.568568,
+          "r": 369.5093705999999,
+          "b": 614.1220724811188,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          54
+         ]
+        }
+       ],
+       "orig": "After a fewmore updates, the estimate is almost exact:",
+       "text": "After a fewmore updates, the estimate is almost exact:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/74",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.6,
+          "t": 607.0693551999999,
+          "r": 239.41375476000022,
+          "b": 516.109374,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          103
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e x = y \u003e\u003e\u003e y = (x + a/x) / 2 \u003e\u003e\u003e y 2.00001024003 \u003e\u003e\u003e x = y \u003e\u003e\u003e y = (x + a/x) / 2 \u003e\u003e\u003e y 2.00000000003",
+       "text": "\u003e\u003e\u003e x = y \u003e\u003e\u003e y = (x + a/x) / 2 \u003e\u003e\u003e y 2.00001024003 \u003e\u003e\u003e x = y \u003e\u003e\u003e y = (x + a/x) / 2 \u003e\u003e\u003e y 2.00000000003",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/75",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.6,
+          "t": 507.75956799999994,
+          "r": 525.6033874,
+          "b": 486.11907248111885,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          157
+         ]
+        }
+       ],
+       "orig": "In general we don't know ahead of time how many steps it takes to get to the right answer, but we know when we get there because the estimate stops changing:",
+       "text": "In general we don't know ahead of time how many steps it takes to get to the right answer, but we know when we get there because the estimate stops changing:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/76",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.6,
+          "t": 479.06535519999994,
+          "r": 239.41375476000022,
+          "b": 388.10637399999985,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          83
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e x = y \u003e\u003e\u003e y = (x + a/x) / 2 \u003e\u003e\u003e y 2.0 \u003e\u003e\u003e x = y \u003e\u003e\u003e y = (x + a/x) / 2 \u003e\u003e\u003e y 2.0",
+       "text": "\u003e\u003e\u003e x = y \u003e\u003e\u003e y = (x + a/x) / 2 \u003e\u003e\u003e y 2.0 \u003e\u003e\u003e x = y \u003e\u003e\u003e y = (x + a/x) / 2 \u003e\u003e\u003e y 2.0",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/77",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.6,
+          "t": 379.7555679999998,
+          "r": 525.5984060999998,
+          "b": 358.1150724811187,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          122
+         ]
+        }
+       ],
+       "orig": "When y == x, we can stop. Here is a loop that starts with an initial estimate, x, and improves it until it stops changing:",
+       "text": "When y == x, we can stop. Here is a loop that starts with an initial estimate, x, and improves it until it stops changing:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/78",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.6,
+          "t": 351.67007379999984,
+          "r": 239.41128354000017,
+          "b": 282.3294897999998,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          61
+         ]
+        }
+       ],
+       "orig": "while True: print(x) y = (x + a/x) / 2 if y == x: break x = y",
+       "text": "while True: print(x) y = (x + a/x) / 2 if y == x: break x = y",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/79",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.6,
+          "t": 276.1415679999998,
+          "r": 525.6033874,
+          "b": 241.27507248111874,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          253
+         ]
+        }
+       ],
+       "orig": "For most values of a this works fine, but in general it is dangerous to test float equality. Floating-point values are only approximately right: most rational numbers, like 1/3, and irrational numbers, like √2, can't be represented exactly with a float.",
+       "text": "For most values of a this works fine, but in general it is dangerous to test float equality. Floating-point values are only approximately right: most rational numbers, like 1/3, and irrational numbers, like √2, can't be represented exactly with a float.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/80",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.60000000000002,
+          "t": 231.52556800000002,
+          "r": 525.6013948799998,
+          "b": 209.88507248111887,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          177
+         ]
+        }
+       ],
+       "orig": "Rather than checking whether x and y are exactly equal, it is safer to use the built-in function abs to compute the absolute value, or magnitude, of the difference between them:",
+       "text": "Rather than checking whether x and y are exactly equal, it is safer to use the built-in function abs to compute the absolute value, or magnitude, of the difference between them:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/81",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 150.51600000000002,
+          "t": 204.25600699999995,
+          "r": 265.55513846000025,
+          "b": 185.08818700000006,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          28
+         ]
+        }
+       ],
+       "orig": "if abs(y-x) \u003c epsilon: break",
+       "text": "if abs(y-x) \u003c epsilon: break",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/82",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.60000000000002,
+          "t": 176.68856800000003,
+          "r": 507.6946176400001,
+          "b": 167.24207248111895,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          83
+         ]
+        }
+       ],
+       "orig": "Where epsilon has a value like 0.0000001 that determines how close is close enough.",
+       "text": "Where epsilon has a value like 0.0000001 that determines how close is close enough.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/83",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.60000000000002,
+          "t": 138.28464640000004,
+          "r": 236.79480640000008,
+          "b": 125.02194923389834,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          14
+         ]
+        }
+       ],
+       "orig": "7.6 Algorithms",
+       "text": "7.6 Algorithms",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/84",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 129.60000000000002,
+          "t": 112.95156800000007,
+          "r": 525.6033874000002,
+          "b": 91.31107248111891,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          148
+         ]
+        }
+       ],
+       "orig": "Newton's method is an example of an algorithm: it is a mechanical process for solving a category of problems (in this case, computing square roots).",
+       "text": "Newton's method is an example of an algorithm: it is a mechanical process for solving a category of problems (in this case, computing square roots).",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/85",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 730.2818672,
+          "r": 96.36260000000001,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "68",
+       "text": "68",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/86",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 394.1347514,
+          "t": 730.2818672,
+          "r": 482.4033873999998,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          20
+         ]
+        }
+       ],
+       "orig": "Chapter 7. Iteration",
+       "text": "Chapter 7. Iteration",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/87",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 702.794568,
+          "r": 482.40338740000016,
+          "b": 656.7650724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          291
+         ]
+        }
+       ],
+       "orig": "To understand what an algorithm is, it might help to start with something that is not an algorithm. When you learned to multiply single-digit numbers, you probably memorized the multiplication table. In effect, you memorized 100 specific solutions. That kind of knowledge is not algorithmic.",
+       "text": "To understand what an algorithm is, it might help to start with something that is not an algorithm. When you learned to multiply single-digit numbers, you probably memorized the multiplication table. In effect, you memorized 100 specific solutions. That kind of knowledge is not algorithmic.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/88",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 647.000568,
+          "r": 482.4033874000004,
+          "b": 600.9710724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          276
+         ]
+        }
+       ],
+       "orig": "But if you were \"lazy\", you might have learned a few tricks. For example, to find the product of n and 9, you can write n - 1 as the first digit and 10 - n as the second digit. This trick is a general solution for multiplying any single-digit number by 9. That's an algorithm!",
+       "text": "But if you were \"lazy\", you might have learned a few tricks. For example, to find the product of n and 9, you can write n - 1 as the first digit and 10 - n as the second digit. This trick is a general solution for multiplying any single-digit number by 9. That's an algorithm!",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/89",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 591.2055680000001,
+          "r": 482.40338740000016,
+          "b": 545.1760724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          335
+         ]
+        }
+       ],
+       "orig": "Similarly, the techniques you learned for addition with carrying, subtraction with borrowing, and long division are all algorithms. One of the characteristics of algorithms is that they do not require any intelligence to carry out. They are mechanical processes where each step follows from the last according to a simple set of rules.",
+       "text": "Similarly, the techniques you learned for addition with carrying, subtraction with borrowing, and long division are all algorithms. One of the characteristics of algorithms is that they do not require any intelligence to carry out. They are mechanical processes where each step follows from the last according to a simple set of rules.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/90",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 535.4115680000001,
+          "r": 482.40338740000027,
+          "b": 513.771072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          134
+         ]
+        }
+       ],
+       "orig": "Executing algorithms is boring, but designing them is interesting, intellectually challenging, and a central part of computer science.",
+       "text": "Executing algorithms is boring, but designing them is interesting, intellectually challenging, and a central part of computer science.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/91",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 504.0055680000001,
+          "r": 482.40338740000016,
+          "b": 457.976072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          292
+         ]
+        }
+       ],
+       "orig": "Some of the things that people do naturally, without difficulty or conscious thought, are the hardest to express algorithmically. Understanding natural language is a good example. We all do it, but so far no one has been able to explain how we do it, at least not in the form of an algorithm.",
+       "text": "Some of the things that people do naturally, without difficulty or conscious thought, are the hardest to express algorithmically. Understanding natural language is a good example. We all do it, but so far no one has been able to explain how we do it, at least not in the form of an algorithm.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/92",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 428.99764640000006,
+          "r": 192.80576540000007,
+          "b": 415.73494923389836,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          13
+         ]
+        }
+       ],
+       "orig": "7.7 Debugging",
+       "text": "7.7 Debugging",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/93",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 403.6495680000001,
+          "r": 482.40338739999993,
+          "b": 382.00807248111903,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          171
+         ]
+        }
+       ],
+       "orig": "As you start writing bigger programs, you might find yourself spending more time debugging. More code means more chances to make an error and more places for bugs to hide.",
+       "text": "As you start writing bigger programs, you might find yourself spending more time debugging. More code means more chances to make an error and more places for bugs to hide.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/94",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 360.0495680000001,
+          "r": 482.4033874000001,
+          "b": 338.408072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          174
+         ]
+        }
+       ],
+       "orig": "One way to cut your debugging time is \"debugging by bisection\". For example, if there are 100 lines in your program and you check them one at a time, it would take 100 steps.",
+       "text": "One way to cut your debugging time is \"debugging by bisection\". For example, if there are 100 lines in your program and you check them one at a time, it would take 100 steps.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/95",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 328.6435680000001,
+          "r": 482.4033873999999,
+          "b": 294.808072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          222
+         ]
+        }
+       ],
+       "orig": "Instead, try to break the problem in half. Look at the middle of the program, or near it, for an intermediate value you can check. Add a print statement (or something else that has a verifiable effect) and run the program.",
+       "text": "Instead, try to break the problem in half. Look at the middle of the program, or near it, for an intermediate value you can check. Add a print statement (or something else that has a verifiable effect) and run the program.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/96",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 285.04356800000005,
+          "r": 482.4033874000001,
+          "b": 263.4020724811189,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          147
+         ]
+        }
+       ],
+       "orig": "If the mid-point check is incorrect, there must be a problem in the first half of the program. If it is correct, the problem is in the second half.",
+       "text": "If the mid-point check is incorrect, there must be a problem in the first half of the program. If it is correct, the problem is in the second half.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/97",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 253.6375680000001,
+          "r": 482.4033874000002,
+          "b": 219.802072481119,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          201
+         ]
+        }
+       ],
+       "orig": "Every time you perform a check like this, you halve the number of lines you have to search. After six steps (which is fewer than 100), you would be down to one or two lines of code, at least in theory.",
+       "text": "Every time you perform a check like this, you halve the number of lines you have to search. After six steps (which is fewer than 100), you would be down to one or two lines of code, at least in theory.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/98",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 210.03756800000008,
+          "r": 482.4033874000001,
+          "b": 151.81407248111896,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          397
+         ]
+        }
+       ],
+       "orig": "In practice it is not always clear what the \"middle of the program\" is and not always possible to check it. It doesn't make sense to count lines and find the exact midpoint. Instead, think about places in the program where there might be errors and places where it is easy to put a check. Then choose a spot where you think the chances are about the same that the bug is before or after the check.",
+       "text": "In practice it is not always clear what the \"middle of the program\" is and not always possible to check it. It doesn't make sense to count lines and find the exact midpoint. Instead, think about places in the program where there might be errors and places where it is easy to put a check. Then choose a spot where you think the chances are about the same that the bug is before or after the check.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/99",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 122.83464640000011,
+          "r": 176.85279100000005,
+          "b": 109.57194923389841,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          12
+         ]
+        }
+       ],
+       "orig": "7.8 Glossary",
+       "text": "7.8 Glossary",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/100",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 86.4,
+          "t": 100.7575680000001,
+          "r": 396.54570060000003,
+          "b": 91.31107248111903,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          70
+         ]
+        }
+       ],
+       "orig": "reassignment: Assigning a new value to a variable that already exists.",
+       "text": "reassignment: Assigning a new value to a variable that already exists.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/101",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 730.2818672,
+          "r": 188.52877900000001,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          14
+         ]
+        }
+       ],
+       "orig": "7.9. Exercises",
+       "text": "7.9. Exercises",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/102",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 515.637,
+          "t": 730.2818672,
+          "r": 525.5996,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "69",
+       "text": "69",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/103",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 702.794568,
+          "r": 484.6072884000001,
+          "b": 693.3480724811188,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          77
+         ]
+        }
+       ],
+       "orig": "update: An assignment where the new value of the variable depends on the old.",
+       "text": "update: An assignment where the new value of the variable depends on the old.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/104",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 683.074568,
+          "r": 525.6033874000003,
+          "b": 673.6280724811188,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          93
+         ]
+        }
+       ],
+       "orig": "initialization: An assignment that gives an initial value to a variable that will be updated.",
+       "text": "initialization: An assignment that gives an initial value to a variable that will be updated.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/105",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 651.159568,
+          "r": 458.3658000000001,
+          "b": 641.7130724811188,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          75
+         ]
+        }
+       ],
+       "orig": "increment: An update that increases the value of a variable (often by one).",
+       "text": "increment: An update that increases the value of a variable (often by one).",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/106",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 631.439568,
+          "r": 398.45072359999995,
+          "b": 621.9930724811188,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          60
+         ]
+        }
+       ],
+       "orig": "decrement: An update that decreases the value of a variable.",
+       "text": "decrement: An update that decreases the value of a variable.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/107",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 611.719568,
+          "r": 525.6033873999999,
+          "b": 590.0790724811188,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          102
+         ]
+        }
+       ],
+       "orig": "iteration: Repeated execution of a set of statements using either a recursive function call or a loop.",
+       "text": "iteration: Repeated execution of a set of statements using either a recursive function call or a loop.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/108",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 579.804568,
+          "r": 457.8477448000002,
+          "b": 570.3580724811188,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          76
+         ]
+        }
+       ],
+       "orig": "infinite loop: A loop in which the terminating condition is never satisfied.",
+       "text": "infinite loop: A loop in which the terminating condition is never satisfied.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/109",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 560.084568,
+          "r": 415.71590940000016,
+          "b": 550.6380724811188,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          64
+         ]
+        }
+       ],
+       "orig": "algorithm: A general process for solving a category of problems.",
+       "text": "algorithm: A general process for solving a category of problems.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/110",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 521.0916464,
+          "r": 221.63087300000004,
+          "b": 507.82894923389824,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          13
+         ]
+        }
+       ],
+       "orig": "7.9 Exercises",
+       "text": "7.9 Exercises",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/111",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 495.46808179999994,
+          "r": 525.6013948799995,
+          "b": 461.6802031166204,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          202
+         ]
+        }
+       ],
+       "orig": "Exercise 7.1. Copy the loop from Section 7.5 and encapsulate it in a function called mysqrt that takes a as a parameter, chooses a reasonable value of x, and returns an estimate of the square root of a.",
+       "text": "Exercise 7.1. Copy the loop from Section 7.5 and encapsulate it in a function called mysqrt that takes a as a parameter, chooses a reasonable value of x, and returns an estimate of the square root of a.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/112",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 451.4630817999999,
+          "r": 459.07712963999955,
+          "b": 442.0632031166204,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          86
+         ]
+        }
+       ],
+       "orig": "To test it, write a function named test _ square _ root that prints a table like this:",
+       "text": "To test it, write a function named test _ square _ root that prints a table like this:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/113",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 435.83800699999995,
+          "r": 385.82213183999994,
+          "b": 306.87137399999983,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          348
+         ]
+        }
+       ],
+       "orig": "a mysqrt(a) math.sqrt(a) diff - --------- ------------ ---- 1.0 1.0 1.0 0.0 2.0 1.41421356237 1.41421356237 2.22044604925e-16 3.0 1.73205080757 1.73205080757 0.0 4.0 2.0 2.0 0.0 5.0 2.2360679775 2.2360679775 0.0 6.0 2.44948974278 2.44948974278 0.0 7.0 2.64575131106 2.64575131106 0.0 8.0 2.82842712475 2.82842712475 4.4408920985e-16 9.0 3.0 3.0 0.0",
+       "text": "a mysqrt(a) math.sqrt(a) diff - --------- ------------ ---- 1.0 1.0 1.0 0.0 2.0 1.41421356237 1.41421356237 2.22044604925e-16 3.0 1.73205080757 1.73205080757 0.0 4.0 2.0 2.0 0.0 5.0 2.2360679775 2.2360679775 0.0 6.0 2.44948974278 2.44948974278 0.0 7.0 2.64575131106 2.64575131106 0.0 8.0 2.82842712475 2.82842712475 4.4408920985e-16 9.0 3.0 3.0 0.0",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/114",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 298.2300817999998,
+          "r": 525.6043836599994,
+          "b": 264.4412031166203,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          240
+         ]
+        }
+       ],
+       "orig": "The first column is a number, a; the second column is the square root of a computed with mysqrt; the third column is the square root computed by math.sqrt; the fourth column is the absolute value of the difference between the two estimates.",
+       "text": "The first column is a number, a; the second column is the square root of a computed with mysqrt; the third column is the square root computed by math.sqrt; the fourth column is the absolute value of the difference between the two estimates.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/115",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 261.6470817999998,
+          "r": 525.5994023599994,
+          "b": 240.05220311662038,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          115
+         ]
+        }
+       ],
+       "orig": "Exercise 7.2. The built-in function eval takes a string and evaluates it using the Python interpreter. For example:",
+       "text": "Exercise 7.2. The built-in function eval takes a string and evaluates it using the Python interpreter. For example:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/116",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 233.82700699999987,
+          "r": 260.3252521600003,
+          "b": 153.68718699999988,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          125
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e eval('1 + 2 * 3') 7 \u003e\u003e\u003e import math \u003e\u003e\u003e eval('math.sqrt(5)') 2.2360679774997898 \u003e\u003e\u003e eval('type(math.pi)') \u003cclass 'float'\u003e",
+       "text": "\u003e\u003e\u003e eval('1 + 2 * 3') 7 \u003e\u003e\u003e import math \u003e\u003e\u003e eval('math.sqrt(5)') 2.2360679774997898 \u003e\u003e\u003e eval('type(math.pi)') \u003cclass 'float'\u003e",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/117",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 144.99608179999996,
+          "r": 525.6043836599994,
+          "b": 123.4022031166204,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          148
+         ]
+        }
+       ],
+       "orig": "Write a function called eval _ loop that iteratively prompts the user, takes the resulting input and evaluates it using eval, and prints the result.",
+       "text": "Write a function called eval _ loop that iteratively prompts the user, takes the resulting input and evaluates it using eval, and prints the result.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/118",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 129.6,
+          "t": 113.18508179999992,
+          "r": 525.5974098399992,
+          "b": 91.59120311662036,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          111
+         ]
+        }
+       ],
+       "orig": "It should continue until the user enters 'done', and then return the value of the last expression it evaluated.",
+       "text": "It should continue until the user enters 'done', and then return the value of the last expression it evaluated.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/119",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 86.4,
+          "t": 730.2818672,
+          "r": 96.36260000000001,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "70",
+       "text": "70",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/120",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 394.1347514,
+          "t": 730.2818672,
+          "r": 482.4033873999998,
+          "b": 721.0716967864406,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          20
+         ]
+        }
+       ],
+       "orig": "Chapter 7. Iteration",
+       "text": "Chapter 7. Iteration",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/121",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "caption",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 86.4,
+          "t": 702.9240818,
+          "r": 482.40338739999953,
+          "b": 681.0763224,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          139
+         ]
+        }
+       ],
+       "orig": "Exercise 7.3. The mathematician Srinivasa Ramanujan found an infinite series that can be used to generate a numerical approximation of 1/π:",
+       "text": "Exercise 7.3. The mathematician Srinivasa Ramanujan found an infinite series that can be used to generate a numerical approximation of 1/π:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/122",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "formula",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 207.326,
+          "t": 668.9652913,
+          "r": 361.4859611399997,
+          "b": 633.5353286489511,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          54
+         ]
+        }
+       ],
+       "orig": "1π = 2√2 9801 ∞∑ k=0 (4k)!(1103 + 26390k) (k!)4 396 4k",
+       "text": "",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/123",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 86.40000000000003,
+          "t": 619.1180817999999,
+          "r": 482.40385489999994,
+          "b": 585.1530724811188,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          294
+         ]
+        }
+       ],
+       "orig": "Write a function called estimate _pi that uses this formula to compute and return an estimate of π. It should use a while loop to compute terms of the summation until the last term is smaller than 1e-15 (which is Python notation for 10-15 ). You can check the result by comparing it to math.pi.",
+       "text": "Write a function called estimate _pi that uses this formula to compute and return an estimate of π. It should use a while loop to compute terms of the summation until the last term is smaller than 1e-15 (which is Python notation for 10-15 ). You can check the result by comparing it to math.pi.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/124",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 86.40000000000006,
+          "t": 574.5920817999998,
+          "r": 318.6839965600002,
+          "b": 565.1922031166204,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          46
+         ]
+        }
+       ],
+       "orig": "Solution: https://thinkpython.com/code/pi.py .",
+       "text": "Solution: https://thinkpython.com/code/pi.py .",
+       "formatting": null,
+       "hyperlink": "https://thinkpython.com/code/pi.py"
+      }
+     ],
+     "pictures": [
+      {
+       "self_ref": "#/pictures/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/13"
+        },
+        {
+         "$ref": "#/texts/14"
+        },
+        {
+         "$ref": "#/texts/15"
+        },
+        {
+         "$ref": "#/texts/16"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "label": "picture",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 259.32879638671875,
+          "t": 706.5678100585938,
+          "r": 308.4834899902344,
+          "b": 672.5927124023438,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          0
+         ]
+        }
+       ],
+       "captions": [
+        {
+         "$ref": "#/texts/13"
+        }
+       ],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "annotations": []
+      }
+     ],
+     "tables": [],
+     "key_value_items": [],
+     "form_items": [],
+     "pages": {
+      "1": {
+       "size": {
+        "width": 612.0,
+        "height": 792.0
+       },
+       "image": null,
+       "page_no": 1
+      },
+      "2": {
+       "size": {
+        "width": 612.0,
+        "height": 792.0
+       },
+       "image": null,
+       "page_no": 2
+      },
+      "3": {
+       "size": {
+        "width": 612.0,
+        "height": 792.0
+       },
+       "image": null,
+       "page_no": 3
+      },
+      "4": {
+       "size": {
+        "width": 612.0,
+        "height": 792.0
+       },
+       "image": null,
+       "page_no": 4
+      },
+      "5": {
+       "size": {
+        "width": 612.0,
+        "height": 792.0
+       },
+       "image": null,
+       "page_no": 5
+      },
+      "6": {
+       "size": {
+        "width": 612.0,
+        "height": 792.0
+       },
+       "image": null,
+       "page_no": 6
+      },
+      "7": {
+       "size": {
+        "width": 612.0,
+        "height": 792.0
+       },
+       "image": null,
+       "page_no": 7
+      },
+      "8": {
+       "size": {
+        "width": 612.0,
+        "height": 792.0
+       },
+       "image": null,
+       "page_no": 8
+      }
+     }
+    },
+    "html_content": null,
+    "text_content": null,
+    "doctags_content": null,
+    "doclang_content": null
+   },
+   "status": "success",
+   "errors": [],
+   "processing_time": 7.848258427000019,
+   "timings": {},
+   "confidence": {
+    "parse_score": 1.0,
+    "layout_score": 0.931326688340375,
+    "table_score": null,
+    "ocr_score": null,
+    "mean_score": 0.9656633441701876,
+    "low_score": 0.9347603539233562,
+    "mean_grade": "excellent",
+    "low_grade": "excellent",
+    "pages": {
+     "2": {
+      "parse_score": 1.0,
+      "layout_score": 0.9355623424053192,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9677811712026596,
+      "low_score": 0.9387842252850532,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "3": {
+      "parse_score": 1.0,
+      "layout_score": 0.9558185899958891,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9779092949979445,
+      "low_score": 0.9580276604960947,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "5": {
+      "parse_score": 1.0,
+      "layout_score": 0.9286299347877502,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9643149673938751,
+      "low_score": 0.9321984380483628,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "1": {
+      "parse_score": 1.0,
+      "layout_score": 0.9648962887850675,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9824481443925337,
+      "low_score": 0.9666514743458141,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "4": {
+      "parse_score": 1.0,
+      "layout_score": 0.9006947312090132,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9503473656045066,
+      "low_score": 0.9056599946485626,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "8": {
+      "parse_score": 1.0,
+      "layout_score": 0.8664518509592328,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9332259254796165,
+      "low_score": 0.8731292584112712,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     },
+     "7": {
+      "parse_score": 1.0,
+      "layout_score": 0.9266243510776095,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9633121755388048,
+      "low_score": 0.9302931335237291,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "6": {
+      "parse_score": 1.0,
+      "layout_score": 0.9719354175031185,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9859677087515593,
+      "low_score": 0.9733386466279625,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     }
+    }
+   }
+  }
+ },
+ "lines": {
+  "status": 200,
+  "body": {
+   "blocks": [
+    [
+     {
+      "text": "This chapter is about iteration, which is the ability to run a block of statements repeatedly.",
+      "mono": false
+     },
+     {
+      "text": "We saw a kind of iteration, using recursion, in Section 5.8. We saw another kind, using a",
+      "mono": false
+     },
+     {
+      "text": "for loop, in Section 4.2. In this chapter we\u2019ll see yet another kind, using a while statement.",
+      "mono": false
+     },
+     {
+      "text": "But first I want to say a little more about variable assignment.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "As you may have discovered, it is legal to make more than one assignment to the same",
+      "mono": false
+     },
+     {
+      "text": "variable. A new assignment makes an existing variable refer to a new value (and stop",
+      "mono": false
+     },
+     {
+      "text": "referring to the old value).",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e x = 5",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e x",
+      "mono": true
+     },
+     {
+      "text": "5",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e x = 7",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e x",
+      "mono": true
+     },
+     {
+      "text": "7",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "The first time we display x, its value is 5; the second time, its value is 7.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Figure 7.1 shows what reassignment looks like in a state diagram.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "At this point I want to address a common source of confusion. Because Python uses the",
+      "mono": false
+     },
+     {
+      "text": "equal sign (=) for assignment, it is tempting to interpret a statement like a = b as a mathe\u0002",
+      "mono": false
+     },
+     {
+      "text": "matical proposition of equality; that is, the claim that a and b are equal. But this interpre\u0002",
+      "mono": false
+     },
+     {
+      "text": "tation is wrong.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "First, equality is a symmetric relationship and assignment is not. For example, in math\u0002",
+      "mono": false
+     },
+     {
+      "text": "ematics, if a = 7 then 7 = a. But in Python, the statement a = 7 is legal and 7 = a is",
+      "mono": false
+     },
+     {
+      "text": "not.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Also, in mathematics, a proposition of equality is either true or false for all time. If a =",
+      "mono": false
+     },
+     {
+      "text": "b now, then a will always equal b. In Python, an assignment statement can make two",
+      "mono": false
+     },
+     {
+      "text": "variables equal, but they don\u2019t have to stay that way:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "7",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "5",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "x",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e a = 5",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e b = a    # a and b are now equal",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e a = 3    # a and b are no longer equal",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e b",
+      "mono": true
+     },
+     {
+      "text": "5",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "The third line changes the value of a but does not change the value of b, so they are no",
+      "mono": false
+     },
+     {
+      "text": "longer equal.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Reassigning variables is often useful, but you should use it with caution. If the values of",
+      "mono": false
+     },
+     {
+      "text": "variables change frequently, it can make the code difficult to read and debug.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "A common kind ofreassignment is an update, where the new value ofthe variable depends",
+      "mono": false
+     },
+     {
+      "text": "on the old.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e x = x + 1",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "This means \u201cget the current value of x, add one, and then update x with the new value.\u201d",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "If you try to update a variable that doesn\u2019t exist, you get an error, because Python evaluates",
+      "mono": false
+     },
+     {
+      "text": "the right side before it assigns a value to x:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e x = x + 1",
+      "mono": true
+     },
+     {
+      "text": "NameError: name 'x' is not defined",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Before you can update a variable, you have to initialize it, usually with a simple assign\u0002",
+      "mono": false
+     },
+     {
+      "text": "ment:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e x = 0",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e x = x + 1",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Updating a variable by adding 1 is called an increment; subtracting 1 is called a decrement.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Computers are often used to automate repetitive tasks. Repeating identical or similar tasks",
+      "mono": false
+     },
+     {
+      "text": "without making errors is something that computers do well and people do poorly. In a",
+      "mono": false
+     },
+     {
+      "text": "computer program, repetition is also called iteration.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "We have already seen two functions, countdown and print_n, that iterate using recursion.",
+      "mono": false
+     },
+     {
+      "text": "Because iteration is so common, Python provides language features to make it easier. One",
+      "mono": false
+     },
+     {
+      "text": "is the for statement we saw in Section 4.2. We\u2019ll get back to that later.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Another is the while statement. Here is a version of countdown that uses a while statement:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "def countdown(n):",
+      "mono": true
+     },
+     {
+      "text": "    while n \u003e 0:",
+      "mono": true
+     },
+     {
+      "text": "        print(n)",
+      "mono": true
+     },
+     {
+      "text": "        n = n - 1",
+      "mono": true
+     },
+     {
+      "text": "    print('Blastoff!')",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "You can almost read the while statement as if it were English. It means, \u201cWhile n is greater",
+      "mono": false
+     },
+     {
+      "text": "than 0, display the value of n and then decrement n. When you get to 0, display the word",
+      "mono": false
+     },
+     {
+      "text": "Blastoff!\u201d",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "More formally, here is the flow of execution for a while statement:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "This type of flow is called a loop because the third step loops back around to the top.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "The body of the loop should change the value of one or more variables so that the condition",
+      "mono": false
+     },
+     {
+      "text": "becomes false eventually and the loop terminates. Otherwise the loop will repeat forever,",
+      "mono": false
+     },
+     {
+      "text": "which is called an infinite loop. An endless source of amusement for computer scientists",
+      "mono": false
+     },
+     {
+      "text": "is the observation that the directions on shampoo, \u201cLather, rinse, repeat\u201d, are an infinite",
+      "mono": false
+     },
+     {
+      "text": "loop.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "In the case of countdown, we can prove that the loop terminates: if n is zero or negative, the",
+      "mono": false
+     },
+     {
+      "text": "loop never runs. Otherwise, n gets smaller each time through the loop, so eventually we",
+      "mono": false
+     },
+     {
+      "text": "have to get to 0.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "For some other loops, it is not so easy to tell. For example:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "def sequence(n):",
+      "mono": true
+     },
+     {
+      "text": "    while n != 1:",
+      "mono": true
+     },
+     {
+      "text": "        print(n)",
+      "mono": true
+     },
+     {
+      "text": "        if n % 2 == 0:        # n is even",
+      "mono": true
+     },
+     {
+      "text": "            n = n / 2",
+      "mono": true
+     },
+     {
+      "text": "        else:                 # n is odd",
+      "mono": true
+     },
+     {
+      "text": "            n = n*3 + 1",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "The condition for this loop is n ! = 1, so the loop will continue until n is 1, which makes",
+      "mono": false
+     },
+     {
+      "text": "the condition false.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Each time through the loop, the program outputs the value of n and then checks whether",
+      "mono": false
+     },
+     {
+      "text": "it is even or odd. If it is even, n is divided by 2. If it is odd, the value of n is replaced with",
+      "mono": false
+     },
+     {
+      "text": "n*3 + 1. For example, if the argument passed to sequence is 3, the resulting values of n",
+      "mono": false
+     },
+     {
+      "text": "are 3, 10, 5, 16, 8, 4, 2, 1.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Since n sometimes increases and sometimes decreases, there is no obvious proof that n will",
+      "mono": false
+     },
+     {
+      "text": "ever reach 1, or that the program terminates. For some particular values of n, we can prove",
+      "mono": false
+     },
+     {
+      "text": "termination. For example, if the starting value is a power of two, n will be even every",
+      "mono": false
+     },
+     {
+      "text": "time through the loop until it reaches 1. The previous example ends with such a sequence,",
+      "mono": false
+     },
+     {
+      "text": "starting with 16.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "The hard question is whether we can prove that this program terminates for all posi\u0002",
+      "mono": false
+     },
+     {
+      "text": "tive values of n. So far, no one has been able to prove it or disprove it! (See http:",
+      "mono": false
+     },
+     {
+      "text": "/ / e n . w  i k i p e d i a . o  r g / w i k i / C o l  l a t z _ c o n j e  c t u r e .)",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "As an exercise, rewrite the function print_n from Section 5.8 using iteration instead of",
+      "mono": false
+     },
+     {
+      "text": "recursion.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Sometimes you don\u2019t know it\u2019s time to end a loop until you get half way through the body.",
+      "mono": false
+     },
+     {
+      "text": "In that case you can use the break statement to jump out of the loop.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "For example, suppose you want to take input from the user until they type done. You could",
+      "mono": false
+     },
+     {
+      "text": "write:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "while True:",
+      "mono": true
+     },
+     {
+      "text": "    line = input('\u003e ')",
+      "mono": true
+     },
+     {
+      "text": "    if line == 'done':",
+      "mono": true
+     },
+     {
+      "text": "        break",
+      "mono": true
+     },
+     {
+      "text": "    print(line)",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "print('Done!')",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "The loop condition is True, which is always true, so the loop runs until it hits the break",
+      "mono": false
+     },
+     {
+      "text": "statement.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Each time through, it prompts the user with an angle bracket. If the user types done, the",
+      "mono": false
+     },
+     {
+      "text": "break statement exits the loop. Otherwise the program echoes whatever the user types and",
+      "mono": false
+     },
+     {
+      "text": "goes back to the top of the loop. Here\u2019s a sample run:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e not done",
+      "mono": true
+     },
+     {
+      "text": "not done",
+      "mono": true
+     },
+     {
+      "text": "\u003e done",
+      "mono": true
+     },
+     {
+      "text": "Done!",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "This way of writing while loops is common because you can check the condition anywhere",
+      "mono": false
+     },
+     {
+      "text": "in the loop (not just at the top) and you can express the stop condition affirmatively (\u201cstop",
+      "mono": false
+     },
+     {
+      "text": "when this happens\u201d) rather than negatively (\u201ckeep going until that happens\u201d).",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Loops are often used in programs that compute numerical results by starting with an ap\u0002",
+      "mono": false
+     },
+     {
+      "text": "proximate answer and iteratively improving it.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "For example, one way of computing square roots is Newton\u2019s method. Suppose that you",
+      "mono": false
+     },
+     {
+      "text": "want to know the square root of a. If you start with almost any estimate, x, you can com\u0002",
+      "mono": false
+     },
+     {
+      "text": "pute a better estimate with the following formula:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "For example, if a is 4 and x is 3:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e a = 4",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e x = 3",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e y = (x + a/x) / 2",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e y",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "2.16666666667",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "\u221a",
+      "mono": false
+     },
+     {
+      "text": "The result is closer to the correct answer ( 4 = 2). If we repeat the process with the new",
+      "mono": false
+     },
+     {
+      "text": "estimate, it gets even closer:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e x = y",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e y = (x + a/x) / 2",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e y",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "2.00641025641",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "After a few more updates, the estimate is almost exact:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e x = y",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e y = (x + a/x) / 2",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e y",
+      "mono": true
+     },
+     {
+      "text": "2.00001024003",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e x = y",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e y = (x + a/x) / 2",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e y",
+      "mono": true
+     },
+     {
+      "text": "2.00000000003",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "In general we don\u2019t know ahead of time how many steps it takes to get to the right answer,",
+      "mono": false
+     },
+     {
+      "text": "but we know when we get there because the estimate stops changing:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e x = y",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e y = (x + a/x) / 2",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e y",
+      "mono": true
+     },
+     {
+      "text": "2.0",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e x = y",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e y = (x + a/x) / 2",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e y",
+      "mono": true
+     },
+     {
+      "text": "2.0",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "When y == x, we can stop. Here is a loop that starts with an initial estimate, x, and im\u0002",
+      "mono": false
+     },
+     {
+      "text": "proves it until it stops changing:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "while True:",
+      "mono": true
+     },
+     {
+      "text": "    print(x)",
+      "mono": true
+     },
+     {
+      "text": "    y = (x + a/x) / 2",
+      "mono": true
+     },
+     {
+      "text": "    if y == x:",
+      "mono": true
+     },
+     {
+      "text": "        break",
+      "mono": true
+     },
+     {
+      "text": "    x = y",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "For most values of a this works fine, but in general it is dangerous to test float equality.",
+      "mono": false
+     },
+     {
+      "text": "Floating-point values are\u221aonly approximately right: most rational numbers, like 1/3, and",
+      "mono": false
+     },
+     {
+      "text": "irrational numbers, like 2, can\u2019t be represented exactly with a float.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Rather than checking whether x and y are exactly equal, it is safer to use the built-in func\u0002",
+      "mono": false
+     },
+     {
+      "text": "tion abs to compute the absolute value, or magnitude, of the difference between them:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "if abs(y-x) \u003c epsilon:",
+      "mono": true
+     },
+     {
+      "text": "    break",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Where epsilon has a value like 0. 0000001 that determines how close is close enough.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Newton\u2019s method is an example of an algorithm: it is a mechanical process for solving a",
+      "mono": false
+     },
+     {
+      "text": "category of problems (in this case, computing square roots).",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "To understand what an algorithm is, it might help to start with something that is not an",
+      "mono": false
+     },
+     {
+      "text": "algorithm. When you learned to multiply single-digit numbers, you probably memorized",
+      "mono": false
+     },
+     {
+      "text": "the multiplication table. In effect, you memorized 100 specific solutions. That kind of",
+      "mono": false
+     },
+     {
+      "text": "knowledge is not algorithmic.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "But if you were \u201clazy\u201d, you might have learned a few tricks. For example, to find the",
+      "mono": false
+     },
+     {
+      "text": "product of n and 9, you can write n \u2212 1 as the first digit and 10 \u2212 n as the second digit.",
+      "mono": false
+     },
+     {
+      "text": "This trick is a general solution for multiplying any single-digit number by 9. That\u2019s an",
+      "mono": false
+     },
+     {
+      "text": "algorithm!",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Similarly, the techniques you learned for addition with carrying, subtraction with borrow\u0002",
+      "mono": false
+     },
+     {
+      "text": "ing, and long division are all algorithms. One of the characteristics of algorithms is that",
+      "mono": false
+     },
+     {
+      "text": "they do not require any intelligence to carry out. They are mechanical processes where",
+      "mono": false
+     },
+     {
+      "text": "each step follows from the last according to a simple set of rules.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Executing algorithms is boring, but designing them is interesting, intellectually challeng\u0002",
+      "mono": false
+     },
+     {
+      "text": "ing, and a central part of computer science.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Some of the things that people do naturally, without difficulty or conscious thought, are",
+      "mono": false
+     },
+     {
+      "text": "the hardest to express algorithmically. Understanding natural language is a good example.",
+      "mono": false
+     },
+     {
+      "text": "We all do it, but so far no one has been able to explain how we do it, at least not in the form",
+      "mono": false
+     },
+     {
+      "text": "of an algorithm.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "As you start writing bigger programs, you might find yourself spending more time debug\u0002",
+      "mono": false
+     },
+     {
+      "text": "ging. More code means more chances to make an error and more places for bugs to hide.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "One way to cut your debugging time is \u201cdebugging by bisection\u201d. For example, if there",
+      "mono": false
+     },
+     {
+      "text": "are 100 lines in your program and you check them one at a time, it would take 100 steps.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Instead, try to break the problem in half. Look at the middle of the program, or near it, for",
+      "mono": false
+     },
+     {
+      "text": "an intermediate value you can check. Add a print statement (or something else that has a",
+      "mono": false
+     },
+     {
+      "text": "verifiable effect) and run the program.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "If the mid-point check is incorrect, there must be a problem in the first half of the program.",
+      "mono": false
+     },
+     {
+      "text": "If it is correct, the problem is in the second half.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Every time you perform a check like this, you halve the number of lines you have to search.",
+      "mono": false
+     },
+     {
+      "text": "After six steps (which is fewer than 100), you would be down to one or two lines of code,",
+      "mono": false
+     },
+     {
+      "text": "at least in theory.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "In practice it is not always clear what the \u201cmiddle of the program\u201d is and not always pos\u0002",
+      "mono": false
+     },
+     {
+      "text": "sible to check it. It doesn\u2019t make sense to count lines and find the exact midpoint. Instead,",
+      "mono": false
+     },
+     {
+      "text": "think about places in the program where there might be errors and places where it is easy",
+      "mono": false
+     },
+     {
+      "text": "to put a check. Then choose a spot where you think the chances are about the same that",
+      "mono": false
+     },
+     {
+      "text": "the bug is before or after the check.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "reassignment: Assigning a new value to a variable that already exists.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "update: An assignment where the new value of the variable depends on the old.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "initialization: An assignment that gives an initial value to a variable that will be updated.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "increment: An update that increases the value of a variable (often by one).",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "decrement: An update that decreases the value of a variable.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "iteration: Repeated execution of a set of statements using either a recursive function call",
+      "mono": false
+     },
+     {
+      "text": "or a loop.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "infinite loop: A loop in which the terminating condition is never satisfied.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "algorithm: A general process for solving a category of problems.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Exercise 7.1. Copy the loop from Section 7.5 and encapsulate it in a function called mysqrt that",
+      "mono": false
+     },
+     {
+      "text": "takes a as a parameter, chooses a reasonable value ofx, and returns an estimate ofthe square root of",
+      "mono": false
+     },
+     {
+      "text": "a.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "To test it, write a function named test_square_root that prints a table like this:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "a   mysqrt(a)     math.sqrt(a)  diff",
+      "mono": true
+     },
+     {
+      "text": "-   ---------     ------------  ----",
+      "mono": true
+     },
+     {
+      "text": "1.0 1.0           1.0           0.0",
+      "mono": true
+     },
+     {
+      "text": "2.0 1.41421356237 1.41421356237 2.22044604925e-16",
+      "mono": true
+     },
+     {
+      "text": "3.0 1.73205080757 1.73205080757 0.0",
+      "mono": true
+     },
+     {
+      "text": "4.0 2.0           2.0           0.0",
+      "mono": true
+     },
+     {
+      "text": "5.0 2.2360679775  2.2360679775  0.0",
+      "mono": true
+     },
+     {
+      "text": "6.0 2.44948974278 2.44948974278 0.0",
+      "mono": true
+     },
+     {
+      "text": "7.0 2.64575131106 2.64575131106 0.0",
+      "mono": true
+     },
+     {
+      "text": "8.0 2.82842712475 2.82842712475 4.4408920985e-16",
+      "mono": true
+     },
+     {
+      "text": "9.0 3.0           3.0           0.0",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "The first column is a number, a; the second column is the square root of a computed with mysqrt;",
+      "mono": false
+     },
+     {
+      "text": "the third column is the square root computed by math. sqrt; the fourth column is the absolute value",
+      "mono": false
+     },
+     {
+      "text": "ofthe difference between the two estimates.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Exercise 7.2. The built-in function eval takes a string and evaluates it using the Python inter\u0002",
+      "mono": false
+     },
+     {
+      "text": "preter. For example:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e eval('1 + 2 * 3')",
+      "mono": true
+     },
+     {
+      "text": "7",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e import math",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e eval('math.sqrt(5)')",
+      "mono": true
+     },
+     {
+      "text": "2.2360679774997898",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e eval('type(math.pi)')",
+      "mono": true
+     },
+     {
+      "text": "\u003cclass 'float'\u003e",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Write a function called eval_loop that iteratively prompts the user, takes the resulting input and",
+      "mono": false
+     },
+     {
+      "text": "evaluates it using eval, and prints the result.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "It should continue until the user enters ' done' , and then return the value ofthe last expression it",
+      "mono": false
+     },
+     {
+      "text": "evaluated.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Write a function called estimate_pi that uses this formula to compute and return an estimate of",
+      "mono": false
+     },
+     {
+      "text": "\u03c0. It should use a while loop to compute terms ofthe summation until the last term is smaller than",
+      "mono": false
+     },
+     {
+      "text": "1e-15 (which is Python notation for 10\u221215). You can check the result by comparing it to math. pi.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Solution: https: //thinkpython. com/code/pi. py.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "x 5",
+      "mono": false
+     },
+     {
+      "text": "7",
+      "mono": false
+     }
+    ]
+   ]
+  }
+ }
+}

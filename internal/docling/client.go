@@ -9,6 +9,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -48,14 +49,17 @@ type Service struct {
 	Key string
 }
 
-// Client converts PDFs with docling-serve's async API and reads their code
-// with pdftext.
+// Client converts PDFs with docling-serve's async API and reads their text
+// layer with pdftext.
 type Client struct {
 	Docling Service
 	PDFText Service
 	HTTP    *http.Client
 	// PollEvery spaces docling status polls.
 	PollEvery time.Duration
+	// DocumentTimeout, when set, asks docling to give up on a document
+	// sooner than its own limit.
+	DocumentTimeout time.Duration
 }
 
 // Inspection is what pdftext found opening a PDF.
@@ -90,8 +94,15 @@ func (c *Client) Inspect(ctx context.Context, pdf []byte) (Inspection, error) {
 	return found.Inspection, nil
 }
 
-// Code reads the lines of each code box from pdf's text layer.
-func (c *Client) Code(ctx context.Context, pdf []byte, boxes []Box) ([][]string, error) {
+// Line is one line pdftext read from a box, and whether its font is
+// monospace.
+type Line struct {
+	Text string `json:"text"`
+	Mono bool   `json:"mono"`
+}
+
+// Lines reads the lines of each box from pdf's text layer.
+func (c *Client) Lines(ctx context.Context, pdf []byte, boxes []Box) ([][]Line, error) {
 	if len(boxes) == 0 {
 		return nil, nil
 	}
@@ -100,16 +111,16 @@ func (c *Client) Code(ctx context.Context, pdf []byte, boxes []Box) ([][]string,
 		return nil, err
 	}
 	var found struct {
-		Blocks [][]string `json:"blocks"`
+		Blocks [][]Line `json:"blocks"`
 	}
-	status, err := c.post(ctx, c.PDFText, "/v1/code", map[string][]byte{"file": pdf, "boxes": data}, &found)
+	status, err := c.post(ctx, c.PDFText, "/v1/lines", map[string][]byte{"file": pdf, "boxes": data}, &found)
 	switch {
 	case err != nil:
 		return nil, err
 	case status == http.StatusUnprocessableEntity:
-		return nil, &RefusedError{Code: CodeFailed, Reason: "pdftext can't read the code boxes"}
+		return nil, &RefusedError{Code: CodeFailed, Reason: "pdftext can't read the boxes"}
 	case status != http.StatusOK:
-		return nil, fmt.Errorf("%w: pdftext code answered %d", ErrUnavailable, status)
+		return nil, fmt.Errorf("%w: pdftext lines answered %d", ErrUnavailable, status)
 	case len(found.Blocks) != len(boxes):
 		return nil, fmt.Errorf("%w: pdftext answered %d blocks for %d boxes", ErrUnavailable, len(found.Blocks), len(boxes))
 	}
@@ -251,6 +262,11 @@ func (c *Client) postForm(ctx context.Context, svc Service, path, filename strin
 			if err := w.WriteField(name, v); err != nil {
 				return 0, err
 			}
+		}
+	}
+	if c.DocumentTimeout > 0 {
+		if err := w.WriteField("document_timeout", strconv.FormatFloat(c.DocumentTimeout.Seconds(), 'f', -1, 64)); err != nil {
+			return 0, err
 		}
 	}
 	if err := w.Close(); err != nil {

@@ -133,9 +133,10 @@ func (f *fakeConverter) serve(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		reply(200, `{"status": "success", "document": {"json_content": `+okDocument+`}, "errors": []}`)
-	case r.URL.Path == "/v1/code":
-		f.record("code")
-		reply(200, `{"blocks": [["def f():", "    return 1"]]}`)
+	case r.URL.Path == "/v1/lines":
+		f.record("lines")
+		// The heading, the paragraph, then the code docling joined.
+		reply(200, `{"blocks": [[{"text": "De\ufb01ne one:", "mono": false}], [{"text": "def f():", "mono": true}, {"text": "    return 1", "mono": true}]]}`)
 	default:
 		f.t.Errorf("fake converter: unexpected %s %s", r.Method, r.URL.Path)
 		w.WriteHeader(http.StatusNotFound)
@@ -186,7 +187,7 @@ func TestPDFImport(t *testing.T) {
 	if prose.Content[0].Text != "Define one:" || prose.Page != 1 {
 		t.Errorf("paragraph = %q on page %d", prose.Content[0].Text, prose.Page)
 	}
-	if want := []string{"inspect ok", "convert ok", "code"}; !slices.Equal(h.converter.called(), want) {
+	if want := []string{"inspect ok", "convert ok", "lines"}; !slices.Equal(h.converter.called(), want) {
 		t.Errorf("calls = %v, want %v", h.converter.called(), want)
 	}
 	if _, err := h.blobs.Get(t.Context(), PDFKey(h.ada.ID, sha(pdf))); err != nil {

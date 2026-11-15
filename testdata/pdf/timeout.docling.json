@@ -1,0 +1,119 @@
+{
+ "sha256": "e9cd3da51dfaa60d0fc2ff8f6092ee43979e1fc5790f0c1a0b4ef9f032f5cb4a",
+ "seconds": 1.02,
+ "pages": 1,
+ "inspect": {
+  "status": 200,
+  "body": {
+   "pages": 1,
+   "chars": 429
+  }
+ },
+ "result": {
+  "status": 200,
+  "body": {
+   "document": {
+    "filename": "timeout.pdf",
+    "md_content": null,
+    "json_content": {
+     "schema_name": "DoclingDocument",
+     "version": "1.10.0",
+     "name": "timeout",
+     "origin": {
+      "mimetype": "application/pdf",
+      "binary_hash": 814863392643074890,
+      "filename": "timeout.pdf",
+      "uri": null
+     },
+     "furniture": {
+      "self_ref": "#/furniture",
+      "parent": null,
+      "children": [],
+      "content_layer": "furniture",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "body": {
+      "self_ref": "#/body",
+      "parent": null,
+      "children": [],
+      "content_layer": "body",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "groups": [],
+     "texts": [],
+     "pictures": [],
+     "tables": [],
+     "key_value_items": [],
+     "form_items": [],
+     "pages": {
+      "1": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 1
+      }
+     }
+    },
+    "html_content": null,
+    "text_content": null,
+    "doctags_content": null,
+    "doclang_content": null
+   },
+   "status": "partial_success",
+   "errors": [
+    {
+     "component_type": "pipeline",
+     "module_name": "StandardPdfPipeline",
+     "error_message": "document timeout exceeded",
+     "category": "timeout",
+     "page_no": 1
+    },
+    {
+     "component_type": "pipeline",
+     "module_name": "StandardPdfPipeline",
+     "error_message": "Pipeline stage timeout: processed 0/1 pages successfully, 1 pages failed or incomplete.",
+     "category": "timeout",
+     "page_no": null
+    },
+    {
+     "component_type": "doc_assembler",
+     "module_name": "ReadingOrderModel",
+     "error_message": "Document processing timeout: reading-order separator extraction exceeded its time budget. Pages processed after the budget ran out fall back to the pre-separator reading order.",
+     "category": "timeout",
+     "page_no": null
+    }
+   ],
+   "processing_time": 0.5092745689998992,
+   "timings": {},
+   "confidence": {
+    "parse_score": null,
+    "layout_score": null,
+    "table_score": null,
+    "ocr_score": null,
+    "mean_score": 1.0,
+    "low_score": 1.0,
+    "mean_grade": "excellent",
+    "low_grade": "excellent",
+    "pages": {
+     "1": {
+      "parse_score": 1.0,
+      "layout_score": null,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 1.0,
+      "low_score": 1.0,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     }
+    }
+   }
+  }
+ }
+}

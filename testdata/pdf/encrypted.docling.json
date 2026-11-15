@@ -1,0 +1,9 @@
+{
+ "sha256": "b29b32b4eb0bf7700e16cd040d9276f388b7b8966ec7ff9e9b0ce2501f528f0d",
+ "inspect": {
+  "status": 422,
+  "body": {
+   "error": "password"
+  }
+ }
+}

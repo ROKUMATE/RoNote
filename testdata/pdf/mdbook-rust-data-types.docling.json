@@ -1,0 +1,6021 @@
+{
+ "sha256": "a5b7afb44481ee9d16163fa5586cab7da61cd2344654b329c07475f3a0a818e7",
+ "seconds": 12.72,
+ "pages": 11,
+ "inspect": {
+  "status": 200,
+  "body": {
+   "pages": 11,
+   "chars": 15746
+  }
+ },
+ "result": {
+  "status": 200,
+  "body": {
+   "document": {
+    "filename": "mdbook-rust-data-types.pdf",
+    "md_content": null,
+    "json_content": {
+     "schema_name": "DoclingDocument",
+     "version": "1.10.0",
+     "name": "mdbook-rust-data-types",
+     "origin": {
+      "mimetype": "application/pdf",
+      "binary_hash": 13867838841813473511,
+      "filename": "mdbook-rust-data-types.pdf",
+      "uri": null
+     },
+     "furniture": {
+      "self_ref": "#/furniture",
+      "parent": null,
+      "children": [],
+      "content_layer": "furniture",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "body": {
+      "self_ref": "#/body",
+      "parent": null,
+      "children": [
+       {
+        "$ref": "#/groups/0"
+       },
+       {
+        "$ref": "#/texts/1"
+       },
+       {
+        "$ref": "#/texts/2"
+       },
+       {
+        "$ref": "#/texts/3"
+       },
+       {
+        "$ref": "#/texts/4"
+       },
+       {
+        "$ref": "#/texts/5"
+       },
+       {
+        "$ref": "#/texts/6"
+       },
+       {
+        "$ref": "#/texts/7"
+       },
+       {
+        "$ref": "#/texts/8"
+       },
+       {
+        "$ref": "#/texts/9"
+       },
+       {
+        "$ref": "#/texts/10"
+       },
+       {
+        "$ref": "#/texts/11"
+       },
+       {
+        "$ref": "#/texts/12"
+       },
+       {
+        "$ref": "#/tables/0"
+       },
+       {
+        "$ref": "#/texts/14"
+       },
+       {
+        "$ref": "#/texts/15"
+       },
+       {
+        "$ref": "#/texts/16"
+       },
+       {
+        "$ref": "#/texts/17"
+       },
+       {
+        "$ref": "#/texts/18"
+       },
+       {
+        "$ref": "#/texts/19"
+       },
+       {
+        "$ref": "#/texts/20"
+       },
+       {
+        "$ref": "#/texts/21"
+       },
+       {
+        "$ref": "#/tables/1"
+       },
+       {
+        "$ref": "#/texts/22"
+       },
+       {
+        "$ref": "#/texts/23"
+       },
+       {
+        "$ref": "#/texts/24"
+       },
+       {
+        "$ref": "#/texts/25"
+       },
+       {
+        "$ref": "#/texts/26"
+       },
+       {
+        "$ref": "#/groups/1"
+       },
+       {
+        "$ref": "#/texts/31"
+       },
+       {
+        "$ref": "#/texts/32"
+       },
+       {
+        "$ref": "#/texts/33"
+       },
+       {
+        "$ref": "#/texts/34"
+       },
+       {
+        "$ref": "#/texts/35"
+       },
+       {
+        "$ref": "#/texts/36"
+       },
+       {
+        "$ref": "#/texts/37"
+       },
+       {
+        "$ref": "#/texts/38"
+       },
+       {
+        "$ref": "#/texts/39"
+       },
+       {
+        "$ref": "#/texts/40"
+       },
+       {
+        "$ref": "#/texts/41"
+       },
+       {
+        "$ref": "#/texts/42"
+       },
+       {
+        "$ref": "#/texts/43"
+       },
+       {
+        "$ref": "#/groups/2"
+       },
+       {
+        "$ref": "#/texts/45"
+       },
+       {
+        "$ref": "#/texts/46"
+       },
+       {
+        "$ref": "#/texts/47"
+       },
+       {
+        "$ref": "#/texts/48"
+       },
+       {
+        "$ref": "#/texts/49"
+       },
+       {
+        "$ref": "#/texts/50"
+       },
+       {
+        "$ref": "#/texts/51"
+       },
+       {
+        "$ref": "#/texts/52"
+       },
+       {
+        "$ref": "#/texts/53"
+       },
+       {
+        "$ref": "#/texts/54"
+       },
+       {
+        "$ref": "#/texts/55"
+       },
+       {
+        "$ref": "#/texts/56"
+       },
+       {
+        "$ref": "#/texts/57"
+       },
+       {
+        "$ref": "#/texts/58"
+       },
+       {
+        "$ref": "#/texts/59"
+       },
+       {
+        "$ref": "#/texts/60"
+       },
+       {
+        "$ref": "#/texts/61"
+       },
+       {
+        "$ref": "#/texts/62"
+       },
+       {
+        "$ref": "#/texts/63"
+       },
+       {
+        "$ref": "#/texts/64"
+       },
+       {
+        "$ref": "#/texts/65"
+       },
+       {
+        "$ref": "#/texts/66"
+       },
+       {
+        "$ref": "#/texts/67"
+       },
+       {
+        "$ref": "#/texts/68"
+       },
+       {
+        "$ref": "#/texts/69"
+       },
+       {
+        "$ref": "#/texts/70"
+       },
+       {
+        "$ref": "#/texts/71"
+       },
+       {
+        "$ref": "#/texts/72"
+       },
+       {
+        "$ref": "#/texts/73"
+       },
+       {
+        "$ref": "#/texts/74"
+       },
+       {
+        "$ref": "#/texts/75"
+       },
+       {
+        "$ref": "#/texts/76"
+       },
+       {
+        "$ref": "#/texts/77"
+       },
+       {
+        "$ref": "#/texts/78"
+       },
+       {
+        "$ref": "#/texts/79"
+       },
+       {
+        "$ref": "#/texts/80"
+       },
+       {
+        "$ref": "#/texts/81"
+       },
+       {
+        "$ref": "#/texts/82"
+       },
+       {
+        "$ref": "#/texts/83"
+       },
+       {
+        "$ref": "#/texts/84"
+       },
+       {
+        "$ref": "#/texts/85"
+       },
+       {
+        "$ref": "#/texts/86"
+       },
+       {
+        "$ref": "#/texts/87"
+       },
+       {
+        "$ref": "#/texts/88"
+       },
+       {
+        "$ref": "#/texts/89"
+       },
+       {
+        "$ref": "#/texts/90"
+       },
+       {
+        "$ref": "#/texts/91"
+       },
+       {
+        "$ref": "#/texts/92"
+       },
+       {
+        "$ref": "#/texts/93"
+       },
+       {
+        "$ref": "#/texts/94"
+       },
+       {
+        "$ref": "#/texts/95"
+       },
+       {
+        "$ref": "#/pictures/0"
+       },
+       {
+        "$ref": "#/pictures/1"
+       }
+      ],
+      "content_layer": "body",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "groups": [
+      {
+       "self_ref": "#/groups/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/0"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/27"
+        },
+        {
+         "$ref": "#/texts/28"
+        },
+        {
+         "$ref": "#/texts/29"
+        },
+        {
+         "$ref": "#/texts/30"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/2",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/44"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "group",
+       "label": "key_value_area"
+      }
+     ],
+     "texts": [
+      {
+       "self_ref": "#/texts/0",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 786.5596898466797,
+          "r": 239.32616194807616,
+          "b": 775.7667215463867,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          30
+         ]
+        }
+       ],
+       "orig": "1. Common Programming Concepts",
+       "text": "Common Programming Concepts",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "1."
+      },
+      {
+       "self_ref": "#/texts/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 754.4620349340821,
+          "r": 398.917951948418,
+          "b": 732.8995358325195,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          29
+         ]
+        }
+       ],
+       "orig": "The Rust Programming Language",
+       "text": "The Rust Programming Language",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 1
+      },
+      {
+       "self_ref": "#/texts/2",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 711.044067993164,
+          "r": 133.86034627748532,
+          "b": 695.171021779541,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          10
+         ]
+        }
+       ],
+       "orig": "Data Types",
+       "text": "Data Types",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/3",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 677.1065694072266,
+          "r": 528.2343571902343,
+          "b": 652.7550079218751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          203
+         ]
+        }
+       ],
+       "orig": "Every value in Rust is of a certain data type, which tells Rust what kind of data is being specified so that it knows how to work with that data. We'll look at two data type subsets: scalar and compound.",
+       "text": "Every value in Rust is of a certain data type, which tells Rust what kind of data is being specified so that it knows how to work with that data. We'll look at two data type subsets: scalar and compound.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/4",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 638.1065710322266,
+          "r": 544.4823994132325,
+          "b": 573.255011234375,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          440
+         ]
+        }
+       ],
+       "orig": "Keep in mind that Rust is a statically typed language, which means that it must know the types of all variables at compile time. The compiler can usually infer what type we want to use based on the value and how we use it. In cases when many types are possible, such as when we converted a String to a numeric type using parse in the \"Comparing the Guess to the Secret Number\" section in Chapter 2, we must add a type annotation, like this:",
+       "text": "Keep in mind that Rust is a statically typed language, which means that it must know the types of all variables at compile time. The compiler can usually infer what type we want to use based on the value and how we use it. In cases when many types are possible, such as when we converted a String to a numeric type using parse in the \"Comparing the Guess to the Secret Number\" section in Chapter 2, we must add a type annotation, like this:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/5",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 559.5609565790085,
+          "r": 274.755745007686,
+          "b": 553.5098961049764,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          55
+         ]
+        }
+       ],
+       "orig": "let guess: u32 = \"42\" .parse().expect(\"Not a number!\");",
+       "text": "let guess: u32 = \"42\" .parse().expect(\"Not a number!\");",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/6",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 539.1065751572266,
+          "r": 543.6210714891209,
+          "b": 514.7550136718751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          200
+         ]
+        }
+       ],
+       "orig": "If we don't add the : u32 type annotation shown in the preceding code, Rust will display the following error, which means the compiler needs more information from us to know which type we want to use:",
+       "text": "If we don't add the : u32 type annotation shown in the preceding code, Rust will display the following error, which means the compiler needs more information from us to know which type we want to use:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/7",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 501.08145950371585,
+          "r": 459.51966193418906,
+          "b": 382.2297299048094,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          625
+         ]
+        }
+       ],
+       "orig": "$ cargo build Compiling no _ type _ annotations v0.1.0 (file:///projects/no _ type _ annotations) error[E0284]: type annotations needed --\u003e src/main.rs:2:9 | 2 | let guess = \"42\" .parse().expect(\"Not a number!\"); | ^^^^^ ----- type must be known at this point | = note: cannot satisfy `\u003c _ as FromStr\u003e::Err == _ ` help: consider giving ` guess ` an explicit type | 2 | let guess: /* Type */ = \"42\" .parse().expect(\"Not a number!\"); | ++++++++++++ For more information about this error, try ` rustc --explain E0284` . error: could not compile ` no _ type _ annotations ` (bin \"no _ type _ annotations\") due to 1 previous error",
+       "text": "$ cargo build Compiling no _ type _ annotations v0.1.0 (file:///projects/no _ type _ annotations) error[E0284]: type annotations needed --\u003e src/main.rs:2:9 | 2 | let guess = \"42\" .parse().expect(\"Not a number!\"); | ^^^^^ ----- type must be known at this point | = note: cannot satisfy `\u003c _ as FromStr\u003e::Err == _ ` help: consider giving ` guess ` an explicit type | 2 | let guess: /* Type */ = \"42\" .parse().expect(\"Not a number!\"); | ++++++++++++ For more information about this error, try ` rustc --explain E0284` . error: could not compile ` no _ type _ annotations ` (bin \"no _ type _ annotations\") due to 1 previous error",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/8",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 368.1065822822266,
+          "r": 321.50389307900383,
+          "b": 357.255020234375,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          59
+         ]
+        }
+       ],
+       "orig": "You'll see different type annotations for other data types.",
+       "text": "You'll see different type annotations for other data types.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/9",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 339.6232894912473,
+          "r": 124.04129055994255,
+          "b": 326.98855924767497,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          12
+         ]
+        }
+       ],
+       "orig": "Scalar Types",
+       "text": "Scalar Types",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/10",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 310.3565846884766,
+          "r": 544.2070123697068,
+          "b": 272.5050237656251,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          233
+         ]
+        }
+       ],
+       "orig": "A scalar type represents a single value. Rust has four primary scalar types: integers, floating-point numbers, Booleans, and characters. You may recognize these from other programming languages. Let's jump into how they work in Rust.",
+       "text": "A scalar type represents a single value. Rust has four primary scalar types: integers, floating-point numbers, Booleans, and characters. You may recognize these from other programming languages. Let's jump into how they work in Rust.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/11",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 254.17104015454106,
+          "r": 117.68554239143552,
+          "b": 243.38979060375982,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          13
+         ]
+        }
+       ],
+       "orig": "Integer Types",
+       "text": "Integer Types",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 4
+      },
+      {
+       "self_ref": "#/texts/12",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 224.10658828222665,
+          "r": 542.2598689608379,
+          "b": 172.755027921875,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          411
+         ]
+        }
+       ],
+       "orig": "An integer is a number without a fractional component. We used one integer type in Chapter 2, the u32 type. This type declaration indicates that the value it's associated with should be an unsigned integer (signed integer types start with i instead of u) that takes up 32 bits of space. Table 3-1 shows the builtin integer types in Rust. We can use any of these variants to declare the type of an integer value.",
+       "text": "An integer is a number without a fractional component. We used one integer type in Chapter 2, the u32 type. This type declaration indicates that the value it's associated with should be an unsigned integer (signed integer types start with i instead of u) that takes up 32 bits of space. Table 3-1 shows the builtin integer types in Rust. We can use any of these variants to declare the type of an integer value.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/13",
+       "parent": {
+        "$ref": "#/tables/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "caption",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 158.10659103222656,
+          "r": 202.40624207640622,
+          "b": 147.25502898437503,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          32
+         ]
+        }
+       ],
+       "orig": "Table 3-1: Integer Types in Rust",
+       "text": "Table 3-1: Integer Types in Rust",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/14",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 50.249997906249995,
+          "t": 781.3096900654298,
+          "r": 84.91405890191405,
+          "b": 773.0010966616211,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          7
+         ]
+        },
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 88.54687131054686,
+          "t": 797.7393768808594,
+          "r": 125.2206978624707,
+          "b": 787.1397679475098,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          8,
+          14
+         ]
+        },
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 166.52343056152344,
+          "t": 797.9620331215821,
+          "r": 252.22850507047852,
+          "b": 787.1397679475098,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          15,
+          30
+         ]
+        },
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 166.52343056152344,
+          "t": 779.6807838833008,
+          "r": 227.61473675605222,
+          "b": 772.9728984206085,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          31,
+          40
+         ]
+        }
+       ],
+       "orig": "128-bit Length Signed Unsigned i128 u128",
+       "text": "128-bit Length Signed Unsigned i128 u128",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/15",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 50.249997906249995,
+          "t": 764.8214095024414,
+          "r": 233.46568869726255,
+          "b": 754.0167224526367,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          34
+         ]
+        }
+       ],
+       "orig": "Architecture-dependent isize usize",
+       "text": "Architecture-dependent isize usize",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/16",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 737.1065669072266,
+          "r": 542.8710717003712,
+          "b": 658.7667264213868,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          585
+         ]
+        }
+       ],
+       "orig": "Each variant can be either signed or unsigned and has an explicit size. Signed and unsigned refer to whether it's possible for the number to be negative-in other words, whether the number needs to have a sign with it (signed) or whether it will only ever be positive and can therefore be represented without a sign (unsigned). It's like writing numbers on paper: When the sign matters, a number is shown with a plus sign or a minus sign; however, when it's safe to assume the number is positive, it's shown with no sign. Signed numbers are stored using two's complement representation.",
+       "text": "Each variant can be either signed or unsigned and has an explicit size. Signed and unsigned refer to whether it's possible for the number to be negative-in other words, whether the number needs to have a sign with it (signed) or whether it will only ever be positive and can therefore be represented without a sign (unsigned). It's like writing numbers on paper: When the sign matters, a number is shown with a plus sign or a minus sign; however, when it's safe to assume the number is positive, it's shown with no sign. Signed numbers are stored using two's complement representation.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/17",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 644.0873153616178,
+          "r": 536.3554464318555,
+          "b": 583.0167295776367,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          331
+         ]
+        }
+       ],
+       "orig": "Each signed variant can store numbers from -(2 n - 1 ) to 2 n - 1 - 1 inclusive, where n is the number of bits that variant uses. So, an i8 can store numbers from -(2 7 ) to 2 7 - 1, which equals -128 to 127. Unsigned variants can store numbers from 0 to 2 n - 1, so a u8 can store numbers from 0 to 2 8 - 1, which equals 0 to 255.",
+       "text": "Each signed variant can store numbers from -(2 n - 1 ) to 2 n - 1 - 1 inclusive, where n is the number of bits that variant uses. So, an i8 can store numbers from -(2 7 ) to 2 7 - 1, which equals -128 to 127. Unsigned variants can store numbers from 0 to 2 n - 1, so a u8 can store numbers from 0 to 2 8 - 1, which equals 0 to 255.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/18",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 568.3565739384766,
+          "r": 530.2909938445409,
+          "b": 544.005012453125,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          201
+         ]
+        }
+       ],
+       "orig": "Additionally, the isize and usize types depend on the architecture of the computer your program is running on: 64 bits if you're on a 64-bit architecture and 32 bits if you're on a 32-bit architecture.",
+       "text": "Additionally, the isize and usize types depend on the architecture of the computer your program is running on: 64 bits if you're on a 64-bit architecture and 32 bits if you're on a 32-bit architecture.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/19",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 529.3565755634766,
+          "r": 542.2734189102733,
+          "b": 478.00501520312514,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          355
+         ]
+        }
+       ],
+       "orig": "You can write integer literals in any of the forms shown in Table 3-2. Note that number literals that can be multiple numeric types allow a type suffix, such as 57u8, to designate the type. Number literals can also use _ as a visual separator to make the number easier to read, such as 1 _ 000, which will have the same value as if you had specified 1000.",
+       "text": "You can write integer literals in any of the forms shown in Table 3-2. Note that number literals that can be multiple numeric types allow a type suffix, such as 57u8, to designate the type. Number literals can also use _ as a visual separator to make the number easier to read, such as 1 _ 000, which will have the same value as if you had specified 1000.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/20",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "caption",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 463.3565783134766,
+          "r": 210.7792881975293,
+          "b": 452.5167350151369,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          35
+         ]
+        }
+       ],
+       "orig": "Table 3-2: Integer Literals in Rust",
+       "text": "Table 3-2: Integer Literals in Rust",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/21",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 50.249997906249995,
+          "t": 435.671032592041,
+          "r": 188.87694524012696,
+          "b": 424.9073611655274,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          23
+         ]
+        }
+       ],
+       "orig": "Number literals Example",
+       "text": "Number literals Example",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 4
+      },
+      {
+       "self_ref": "#/texts/22",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 325.3565840634767,
+          "r": 544.7695085812695,
+          "b": 287.5167418901367,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          246
+         ]
+        }
+       ],
+       "orig": "So how do you know which type of integer to use? If you're unsure, Rust's defaults are generally good places to start: Integer types default to i32. The primary situation in which you'd use isize or usize is when indexing some sort of collection.",
+       "text": "So how do you know which type of integer to use? If you're unsure, Rust's defaults are generally good places to start: Integer types default to i32. The primary situation in which you'd use isize or usize is when indexing some sort of collection.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/23",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 268.5115667453126,
+          "r": 120.56980576997006,
+          "b": 259.5631298203125,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "Integer Overflow",
+       "text": "Integer Overflow",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 5
+      },
+      {
+       "self_ref": "#/texts/24",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 240.62416571899416,
+          "r": 547.83982113334,
+          "b": 162.26674710888688,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          541
+         ]
+        }
+       ],
+       "orig": "Let's say you have a variable of type u8 that can hold values between 0 and 255. If you try to change the variable to a value outside that range, such as 256, integer overflow will occur, which can result in one of two behaviors. When you're compiling in debug mode, Rust includes checks for integer overflow that cause your program to panic at runtime if this behavior occurs. Rust uses the term panicking when a program exits with an error; we'll discuss panics in more depth in the \"Unrecoverable Errors with panic!\" section in Chapter 9.",
+       "text": "Let's say you have a variable of type u8 that can hold values between 0 and 255. If you try to change the variable to a value outside that range, such as 256, integer overflow will occur, which can result in one of two behaviors. When you're compiling in debug mode, Rust includes checks for integer overflow that cause your program to panic at runtime if this behavior occurs. Rust uses the term panicking when a program exits with an error; we'll discuss panics in more depth in the \"Unrecoverable Errors with panic!\" section in Chapter 9.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/25",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 147.6065914697267,
+          "r": 538.5409935007912,
+          "b": 58.198392070068394,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          599
+         ]
+        }
+       ],
+       "orig": "When you're compiling in release mode with the --release flag, Rust does not include checks for integer overflow that cause panics. Instead, if overflow occurs, Rust performs two's complement wrapping. In short, values greater than the maximum value the type can hold \"wrap around\" to the minimum of the values the type can hold. In the case of a u8, the value 256 becomes 0, the value 257 becomes 1, and so on. The program won't panic, but the variable will have a value that probably isn't what you were expecting it to have. Relying on integer overflow's wrapping behavior is considered an error.",
+       "text": "When you're compiling in release mode with the --release flag, Rust does not include checks for integer overflow that cause panics. Instead, if overflow occurs, Rust performs two's complement wrapping. In short, values greater than the maximum value the type can hold \"wrap around\" to the minimum of the values the type can hold. In the case of a u8, the value 256 becomes 0, the value 257 becomes 1, and so on. The program won't panic, but the variable will have a value that probably isn't what you were expecting it to have. Relying on integer overflow's wrapping behavior is considered an error.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/26",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 798.6065643447264,
+          "r": 539.2851323097852,
+          "b": 774.2550028593748,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          149
+         ]
+        }
+       ],
+       "orig": "To explicitly handle the possibility of overflow, you can use these families of methods provided by the standard library for primitive numeric types:",
+       "text": "To explicitly handle the possibility of overflow, you can use these families of methods provided by the standard library for primitive numeric types:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/27",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 759.6065659697265,
+          "r": 490.53513956103495,
+          "b": 748.7667226713866,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          82
+         ]
+        }
+       ],
+       "orig": "Wrap in all compilation modes with the wrapping_ * methods, such as wrapping_ add.",
+       "text": "Wrap in all compilation modes with the wrapping_ * methods, such as wrapping_ add.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/28",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 746.1065665322265,
+          "r": 422.0273299755271,
+          "b": 735.5805659942473,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          72
+         ]
+        }
+       ],
+       "orig": "Return the None value if there is overflow with the checked _ * methods.",
+       "text": "Return the None value if there is overflow with the checked _ * methods.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/29",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 732.6065670947264,
+          "r": 536.9490785321212,
+          "b": 710.6983648825683,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          101
+         ]
+        }
+       ],
+       "orig": "Return the value and a Boolean indicating whether there was overflow with the overflowing_ * methods.",
+       "text": "Return the value and a Boolean indicating whether there was overflow with the overflowing_ * methods.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/30",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 705.6065682197263,
+          "r": 493.4999794975,
+          "b": 695.0805676817472,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          81
+         ]
+        }
+       ],
+       "orig": "Saturate at the value's minimum or maximum values with the saturating_ * methods.",
+       "text": "Saturate at the value's minimum or maximum values with the saturating_ * methods.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/31",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 676.4210225607908,
+          "r": 154.57616585432615,
+          "b": 665.6397730100095,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          20
+         ]
+        }
+       ],
+       "orig": "Floating-Point Types",
+       "text": "Floating-Point Types",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 4
+      },
+      {
+       "self_ref": "#/texts/32",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 646.3565706884765,
+          "r": 543.0116962745118,
+          "b": 595.0050103281249,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          352
+         ]
+        }
+       ],
+       "orig": "Rust also has two primitive types for floating-point numbers, which are numbers with decimal points. Rust's floating-point types are f32 and f64, which are 32 bits and 64 bits in size, respectively. The default type is f64 because on modern CPUs, it's roughly the same speed as f32 but is capable of more precision. All floating-point types are signed.",
+       "text": "Rust also has two primitive types for floating-point numbers, which are numbers with decimal points. Rust's floating-point types are f32 and f64, which are 32 bits and 64 bits in size, respectively. The default type is f64 because on modern CPUs, it's roughly the same speed as f32 but is capable of more precision. All floating-point types are signed.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/33",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 580.3565734384763,
+          "r": 351.94334538569325,
+          "b": 569.5167301401366,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          62
+         ]
+        }
+       ],
+       "orig": "Here's an example that shows floating-point numbers in action:",
+       "text": "Here's an example that shows floating-point numbers in action:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/34",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 554.8565745009764,
+          "r": 151.97460314772457,
+          "b": 546.4307936020507,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "Filename: src/main.rs",
+       "text": "Filename: src/main.rs",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/35",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 530.3314582849657,
+          "r": 165.57705330679843,
+          "b": 494.3555675140269,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          58
+         ]
+        }
+       ],
+       "orig": "fn main() { let x = 2.0; // f64 let y: f32 = 3.0; // f32 }",
+       "text": "fn main() { let x = 2.0; // f64 let y: f32 = 3.0; // f32 }",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/36",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 479.874155750244,
+          "r": 414.8788891133788,
+          "b": 469.01673432763664,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          74
+         ]
+        }
+       ],
+       "orig": "Floating-point numbers are represented according to the IEEE-754 standard.",
+       "text": "Floating-point numbers are represented according to the IEEE-754 standard.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/37",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 450.6710319670408,
+          "r": 152.9824155457324,
+          "b": 439.9073605405272,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          18
+         ]
+        }
+       ],
+       "orig": "Numeric Operations",
+       "text": "Numeric Operations",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 4
+      },
+      {
+       "self_ref": "#/texts/38",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 421.3565800634765,
+          "r": 533.2089622629591,
+          "b": 383.5050191406249,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          295
+         ]
+        }
+       ],
+       "orig": "Rust supports the basic mathematical operations you'd expect for all the number types: addition, subtraction, multiplication, division, and remainder. Integer division truncates toward zero to the nearest integer. The following code shows how you'd use each numeric operation in a let statement:",
+       "text": "Rust supports the basic mathematical operations you'd expect for all the number types: addition, subtraction, multiplication, division, and remainder. Integer division truncates toward zero to the nearest integer. The following code shows how you'd use each numeric operation in a let statement:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/39",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 368.8565822509763,
+          "r": 151.97460314772457,
+          "b": 360.4308013520506,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "Filename: src/main.rs",
+       "text": "Filename: src/main.rs",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/40",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 344.3314660349656,
+          "r": 232.76394050734464,
+          "b": 218.35557901402717,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          245
+         ]
+        }
+       ],
+       "orig": "fn main() { // addition let sum = 5 + 10; // subtraction let difference = 95.5 - 4.3; // multiplication let product = 4 * 30; // division let quotient = 56.7 / 32.2; let truncated = -5 / 3; // Results in -1 // remainder let remainder = 43 % 5; }",
+       "text": "fn main() { // addition let sum = 5 + 10; // subtraction let difference = 95.5 - 4.3; // multiplication let product = 4 * 30; // division let quotient = 56.7 / 32.2; let truncated = -5 / 3; // Results in -1 // remainder let remainder = 43 % 5; }",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/41",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 203.85658912597637,
+          "r": 547.1601346816601,
+          "b": 179.51674639013663,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          196
+         ]
+        }
+       ],
+       "orig": "Each expression in these statements uses a mathematical operator and evaluates to a single value, which is then bound to a variable. Appendix B contains a list of all operators that Rust provides.",
+       "text": "Each expression in these statements uses a mathematical operator and evaluates to a single value, which is then bound to a variable. Appendix B contains a list of all operators that Rust provides.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/42",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 160.98940341210937,
+          "r": 140.24999453124997,
+          "b": 150.4073726030274,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "The Boolean Type",
+       "text": "The Boolean Type",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 4
+      },
+      {
+       "self_ref": "#/texts/43",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 131.10659215722626,
+          "r": 533.7128684019629,
+          "b": 106.75503067187492,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          197
+         ]
+        }
+       ],
+       "orig": "As in most other programming languages, a Boolean type in Rust has two possible values: true and false. Booleans are one byte in size. The Boolean type in Rust is specified using bool. For example:",
+       "text": "As in most other programming languages, a Boolean type in Rust has two possible values: true and false. Booleans are one byte in size. The Boolean type in Rust is specified using bool. For example:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/44",
+       "parent": {
+        "$ref": "#/groups/2"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 92.10659378222635,
+          "r": 151.97460314772457,
+          "b": 83.6808128833004,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "Filename: src/main.rs",
+       "text": "Filename: src/main.rs",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/45",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 799.5814470662158,
+          "r": 287.3532863577884,
+          "b": 763.605556295277,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          81
+         ]
+        }
+       ],
+       "orig": "fn main() { let t = true; let f: bool = false; // with explicit type annotation }",
+       "text": "fn main() { let t = true; let f: bool = false; // with explicit type annotation }",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/46",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 749.1065664072266,
+          "r": 547.4238095006738,
+          "b": 724.7667236713869,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          160
+         ]
+        }
+       ],
+       "orig": "The main way to use Boolean values is through conditionals, such as an if expression. We'll cover how if expressions work in Rust in the \"Control Flow\" section.",
+       "text": "The main way to use Boolean values is through conditionals, such as an if expression. We'll cover how if expressions work in Rust in the \"Control Flow\" section.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/47",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 706.4210213107913,
+          "r": 151.34179056909178,
+          "b": 695.6573498842772,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          18
+         ]
+        }
+       ],
+       "orig": "The Character Type",
+       "text": "The Character Type",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 4
+      },
+      {
+       "self_ref": "#/texts/48",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 676.3565694384765,
+          "r": 544.628884127129,
+          "b": 654.4893828496092,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          115
+         ]
+        }
+       ],
+       "orig": "Rust's char type is the language's most primitive alphabetic type. Here are some examples of declaring char values:",
+       "text": "Rust's char type is the language's most primitive alphabetic type. Here are some examples of declaring char values:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/49",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 637.3565710634766,
+          "r": 151.97460314772457,
+          "b": 628.9307901645507,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "Filename: src/main.rs",
+       "text": "Filename: src/main.rs",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/50",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 612.8314548474659,
+          "r": 278.96858895715087,
+          "b": 571.605564295277,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          109
+         ]
+        }
+       ],
+       "orig": "fn main() { let c = 'z'; let z: char = 'ℤ'; // with explicit type annotation let heart _ eyed _ cat = '😻 '; }",
+       "text": "fn main() { let c = 'z'; let z: char = 'ℤ'; // with explicit type annotation let heart _ eyed _ cat = '😻 '; }",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/51",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 557.1065744072266,
+          "r": 540.8085749663084,
+          "b": 451.76673504638666,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          717
+         ]
+        }
+       ],
+       "orig": "Note that we specify char literals with single quotation marks, as opposed to string literals, which use double quotation marks. Rust's char type is 4 bytes in size and represents a Unicode scalar value, which means it can represent a lot more than just ASCII. Accented letters; Chinese, Japanese, and Korean characters; emojis; and zero-width spaces are all valid char values in Rust. Unicode scalar values range from U+0000 to U+D7FF and U+E000 to U+10FFFF inclusive. However, a \"character\" isn't really a concept in Unicode, so your human intuition for what a \"character\" is may not match up with what a char is in Rust. We'll discuss this topic in detail in \"Storing UTF-8 Encoded Text with Strings\" in Chapter 8.",
+       "text": "Note that we specify char literals with single quotation marks, as opposed to string literals, which use double quotation marks. Rust's char type is 4 bytes in size and represents a Unicode scalar value, which means it can represent a lot more than just ASCII. Accented letters; Chinese, Japanese, and Korean characters; emojis; and zero-width spaces are all valid char values in Rust. Unicode scalar values range from U+0000 to U+D7FF and U+E000 to U+10FFFF inclusive. However, a \"character\" isn't really a concept in Unicode, so your human intuition for what a \"character\" is may not match up with what a char is in Rust. We'll discuss this topic in detail in \"Storing UTF-8 Encoded Text with Strings\" in Chapter 8.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/52",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 434.82532288057473,
+          "r": 153.16832257131617,
+          "b": 422.23855527892465,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          14
+         ]
+        }
+       ],
+       "orig": "Compound Types",
+       "text": "Compound Types",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/53",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 404.8565807509767,
+          "r": 521.6074005163573,
+          "b": 380.5050192656249,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          113
+         ]
+        }
+       ],
+       "orig": "Compound types can group multiple values into one type. Rust has two primitive compound types: tuples and arrays.",
+       "text": "Compound types can group multiple values into one type. Rust has two primitive compound types: tuples and arrays.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/54",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 361.98939503710926,
+          "r": 127.61132280786131,
+          "b": 351.4073642280273,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          14
+         ]
+        }
+       ],
+       "orig": "The Tuple Type",
+       "text": "The Tuple Type",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 4
+      },
+      {
+       "self_ref": "#/texts/55",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 332.1065837822266,
+          "r": 512.2206822174707,
+          "b": 307.75502229687527,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          191
+         ]
+        }
+       ],
+       "orig": "A tuple is a general way of grouping together a number of values with a variety of types into one compound type. Tuples have a fixed length: Once declared, they cannot grow or shrink in size.",
+       "text": "A tuple is a general way of grouping together a number of values with a variety of types into one compound type. Tuples have a fixed length: Once declared, they cannot grow or shrink in size.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/56",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 293.1065854072267,
+          "r": 535.874978541875,
+          "b": 255.2550244843751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          253
+         ]
+        }
+       ],
+       "orig": "We create a tuple by writing a comma-separated list of values inside parentheses. Each position in the tuple has a type, and the types of the different values in the tuple don't have to be the same. We've added optional type annotations in this example:",
+       "text": "We create a tuple by writing a comma-separated list of values inside parentheses. Each position in the tuple has a type, and the types of the different values in the tuple don't have to be the same. We've added optional type annotations in this example:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/57",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 240.60658759472653,
+          "r": 151.97460314772457,
+          "b": 210.00991041747648,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          33
+         ]
+        }
+       ],
+       "orig": "Filename: src/main.rs fn main() {",
+       "text": "Filename: src/main.rs fn main() {",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/58",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 208.58147169121594,
+          "r": 232.76394050734464,
+          "b": 195.10557998277727,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          42
+         ]
+        }
+       ],
+       "orig": "let tup: (i32, f64, u8) = (500, 6.4, 1); }",
+       "text": "let tup: (i32, f64, u8) = (500, 6.4, 1); }",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/59",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 180.60659009472647,
+          "r": 540.3573974851074,
+          "b": 145.26870094213882,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          213
+         ]
+        }
+       ],
+       "orig": "The variable tup binds to the entire tuple because a tuple is considered a single compound element. To get the individual values out of a tuple, we can use pattern matching to destructure a tuple value, like this:",
+       "text": "The variable tup binds to the entire tuple because a tuple is considered a single compound element. To get the individual values out of a tuple, we can use pattern matching to destructure a tuple value, like this:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/60",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 128.10659228222676,
+          "r": 151.97460314772457,
+          "b": 119.6808113833008,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "Filename: src/main.rs",
+       "text": "Filename: src/main.rs",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/61",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 4,
+         "bbox": {
+          "l": 47.999998,
+          "t": 103.58147606621606,
+          "r": 211.76803825717397,
+          "b": 52.60558592027701,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          95
+         ]
+        }
+       ],
+       "orig": "fn main() { let tup = (500, 6.4, 1); let (x, y, z) = tup; println!(\"The value of y is: {y}\"); }",
+       "text": "fn main() { let tup = (500, 6.4, 1); let (x, y, z) = tup; println!(\"The value of y is: {y}\"); }",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/62",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 798.6065643447268,
+          "r": 542.9882624354882,
+          "b": 760.7550034218752,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          308
+         ]
+        }
+       ],
+       "orig": "This program first creates a tuple and binds it to the variable tup. It then uses a pattern with let to take tup and turn it into three separate variables, x, y, and z. This is called destructuring because it breaks the single tuple into three parts. Finally, the program prints the value of y, which is 6.4.",
+       "text": "This program first creates a tuple and binds it to the variable tup. It then uses a pattern with let to take tup and turn it into three separate variables, x, y, and z. This is called destructuring because it breaks the single tuple into three parts. Finally, the program prints the value of y, which is 6.4.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/63",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 746.1065665322267,
+          "r": 542.7245869264747,
+          "b": 721.7667237963869,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          132
+         ]
+        }
+       ],
+       "orig": "We can also access a tuple element directly by using a period (.) followed by the index of the value we want to access. For example:",
+       "text": "We can also access a tuple element directly by using a period (.) followed by the index of the value we want to access. For example:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/64",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 707.1065681572268,
+          "r": 151.97460314772457,
+          "b": 698.6807872583013,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "Filename: src/main.rs",
+       "text": "Filename: src/main.rs",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 6
+      },
+      {
+       "self_ref": "#/texts/65",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 682.5814519412165,
+          "r": 224.36557960727637,
+          "b": 616.6055624202772,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          122
+         ]
+        }
+       ],
+       "orig": "fn main() { let x: (i32, f64, u8) = (500, 6.4, 1); let five _ hundred = x.0; let six _point _ four = x.1; let one = x.2; }",
+       "text": "fn main() { let x: (i32, f64, u8) = (500, 6.4, 1); let five _ hundred = x.0; let six _point _ four = x.1; let one = x.2; }",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/66",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 602.1065725322269,
+          "r": 519.6738073269238,
+          "b": 577.7667297963872,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          177
+         ]
+        }
+       ],
+       "orig": "This program creates the tuple x and then accesses each element of the tuple using their respective indices. As with most programming languages, the first index in a tuple is 0.",
+       "text": "This program creates the tuple x and then accesses each element of the tuple using their respective indices. As with most programming languages, the first index in a tuple is 0.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/67",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 563.106574157227,
+          "r": 540.5800559158299,
+          "b": 525.2550132343754,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          249
+         ]
+        }
+       ],
+       "orig": "The tuple without any values has a special name, unit. This value and its corresponding type are both written () and represent an empty value or an empty return type. Expressions implicitly return the unit value if they don't return any other value.",
+       "text": "The tuple without any values has a special name, unit. This value and its corresponding type are both written () and represent an empty value or an empty return type. Expressions implicitly return the unit value if they don't return any other value.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/68",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 506.92102962329136,
+          "r": 129.5742137260742,
+          "b": 496.15735819677775,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          14
+         ]
+        }
+       ],
+       "orig": "The Array Type",
+       "text": "The Array Type",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 4
+      },
+      {
+       "self_ref": "#/texts/69",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 476.85657775097707,
+          "r": 536.5312316045312,
+          "b": 439.01673557763706,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          211
+         ]
+        }
+       ],
+       "orig": "Another way to have a collection of multiple values is with an array. Unlike a tuple, every element of an array must have the same type. Unlike arrays in some other languages, arrays in Rust have a fixed length.",
+       "text": "Another way to have a collection of multiple values is with an array. Unlike a tuple, every element of an array must have the same type. Unlike arrays in some other languages, arrays in Rust have a fixed length.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/70",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 424.3565799384769,
+          "r": 435.88474834813456,
+          "b": 413.50501789062537,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          81
+         ]
+        }
+       ],
+       "orig": "We write the values in an array as a comma-separated list inside square brackets:",
+       "text": "We write the values in an array as a comma-separated list inside square brackets:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/71",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 398.8565810009768,
+          "r": 151.97460314772457,
+          "b": 390.4308001020513,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "Filename: src/main.rs",
+       "text": "Filename: src/main.rs",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/72",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 374.33146478496656,
+          "r": 165.57705330679843,
+          "b": 353.35557338902754,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          38
+         ]
+        }
+       ],
+       "orig": "fn main() { let a = [1, 2, 3, 4, 5]; }",
+       "text": "fn main() { let a = [1, 2, 3, 4, 5]; }",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/73",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 338.85658350097674,
+          "r": 546.035137248535,
+          "b": 260.50502426562525,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          612
+         ]
+        }
+       ],
+       "orig": "Arrays are useful when you want your data allocated on the stack, the same as the other types we have seen so far, rather than the heap (we will discuss the stack and the heap more in Chapter 4) or when you want to ensure that you always have a fixed number of elements. An array isn't as flexible as the vector type, though. A vector is a similar collection type provided by the standard library that is allowed to grow or shrink in size because its contents live on the heap. If you're unsure whether to use an array or a vector, chances are you should use a vector. Chapter 8 discusses vectors in more detail.",
+       "text": "Arrays are useful when you want your data allocated on the stack, the same as the other types we have seen so far, rather than the heap (we will discuss the stack and the heap more in Chapter 4) or when you want to ensure that you always have a fixed number of elements. An array isn't as flexible as the vector type, though. A vector is a similar collection type provided by the standard library that is allowed to grow or shrink in size because its contents live on the heap. If you're unsure whether to use an array or a vector, chances are you should use a vector. Chapter 8 discusses vectors in more detail.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/74",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 245.8565873759767,
+          "r": 537.7089628254589,
+          "b": 208.00502645312554,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          267
+         ]
+        }
+       ],
+       "orig": "However, arrays are more useful when you know the number of elements will not need to change. For example, if you were using the names of the month in a program, you would probably use an array rather than a vector because you know it will always contain 12 elements:",
+       "text": "However, arrays are more useful when you know the number of elements will not need to change. For example, if you were using the names of the month in a program, you would probably use an array rather than a vector because you know it will always contain 12 elements:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/75",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 194.33147228496637,
+          "r": 371.33689535847117,
+          "b": 180.76674513196258,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          147
+         ]
+        }
+       ],
+       "orig": "let months = [\"January\" , \"February\" , \"March\" , \"April\" , \"May\" , \"June\" , \"July\" , \"August\" , \"September\" , \"October\" , \"November\" , \"December\"];",
+       "text": "let months = [\"January\" , \"February\" , \"March\" , \"April\" , \"May\" , \"June\" , \"July\" , \"August\" , \"September\" , \"October\" , \"November\" , \"December\"];",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/76",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 166.3565906884769,
+          "r": 547.9745877427246,
+          "b": 142.0050292031251,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          146
+         ]
+        }
+       ],
+       "orig": "You write an array's type using square brackets with the type of each element, a semicolon, and then the number of elements in the array, like so:",
+       "text": "You write an array's type using square brackets with the type of each element, a semicolon, and then the number of elements in the array, like so:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/77",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 128.3314750349664,
+          "r": 190.77213600700327,
+          "b": 122.36241650976353,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          34
+         ]
+        }
+       ],
+       "orig": "let a: [i32; 5] = [1, 2, 3, 4, 5];",
+       "text": "let a: [i32; 5] = [1, 2, 3, 4, 5];",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/78",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 107.85659312597681,
+          "r": 529.921853219922,
+          "b": 85.98940653710952,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          116
+         ]
+        }
+       ],
+       "orig": "Here, i32 is the type of each element. After the semicolon, the number 5 indicates the array contains five elements.",
+       "text": "Here, i32 is the type of each element. After the semicolon, the number 5 indicates the array contains five elements.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/79",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 5,
+         "bbox": {
+          "l": 47.999998,
+          "t": 68.85659475097691,
+          "r": 521.1796665641798,
+          "b": 44.505033265625116,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          201
+         ]
+        }
+       ],
+       "orig": "You can also initialize an array to contain the same value for each element by specifying the initial value, followed by a semicolon, and then the length of the array in square brackets, as shown here:",
+       "text": "You can also initialize an array to contain the same value for each element by specifying the initial value, followed by a semicolon, and then the length of the array in square brackets, as shown here:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/80",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 799.3525249590671,
+          "r": 110.98770745635466,
+          "b": 793.6123885410134,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          15
+         ]
+        }
+       ],
+       "orig": "let a = [3; 5];",
+       "text": "let a = [3; 5];",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/81",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 779.1065651572267,
+          "r": 544.7988094300489,
+          "b": 754.7550036718749,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          168
+         ]
+        }
+       ],
+       "orig": "The array named a will contain 5 elements that will all be set to the value 3 initially. This is the same as writing let a = [3, 3, 3, 3, 3]; but in a more concise way.",
+       "text": "The array named a will contain 5 elements that will all be set to the value 3 initially. This is the same as writing let a = [3, 3, 3, 3, 3]; but in a more concise way.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/82",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 736.4210200607913,
+          "r": 161.30272826905266,
+          "b": 725.6573486342772,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          20
+         ]
+        }
+       ],
+       "orig": "Array Element Access",
+       "text": "Array Element Access",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 4
+      },
+      {
+       "self_ref": "#/texts/83",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 706.3565681884766,
+          "r": 544.5409967757909,
+          "b": 682.0050067031252,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          158
+         ]
+        }
+       ],
+       "orig": "An array is a single chunk of memory of a known, fixed size that can be allocated on the stack. You can access elements of an array using indexing, like this:",
+       "text": "An array is a single chunk of memory of a known, fixed size that can be allocated on the stack. You can access elements of an array using indexing, like this:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/84",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 667.3565698134767,
+          "r": 151.97460314772457,
+          "b": 658.9307889145507,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "Filename: src/main.rs",
+       "text": "Filename: src/main.rs",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/85",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 642.8314535974664,
+          "r": 165.57705330679843,
+          "b": 599.3555631390273,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          75
+         ]
+        }
+       ],
+       "orig": "fn main() { let a = [1, 2, 3, 4, 5]; let first = a[0]; let second = a[1]; }",
+       "text": "fn main() { let a = [1, 2, 3, 4, 5]; let first = a[0]; let second = a[1]; }",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/86",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 584.8565732509765,
+          "r": 540.2050593514549,
+          "b": 560.5050117656251,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          191
+         ]
+        }
+       ],
+       "orig": "In this example, the variable named first will get the value 1 because that is the value at index [0] in the array. The variable named second will get the value 2 from index [1] in the array.",
+       "text": "In this example, the variable named first will get the value 1 because that is the value at index [0] in the array. The variable named second will get the value 2 from index [1] in the array.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/87",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 542.1710281545411,
+          "r": 200.33202389283196,
+          "b": 531.4073567280275,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          28
+         ]
+        }
+       ],
+       "orig": "Invalid Array Element Access",
+       "text": "Invalid Array Element Access",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 4
+      },
+      {
+       "self_ref": "#/texts/88",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 512.8565762509766,
+          "r": 536.7187261367188,
+          "b": 488.50501476562476,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          204
+         ]
+        }
+       ],
+       "orig": "Let's see what happens if you try to access an element of an array that is past the end of the array. Say you run this code, similar to the guessing game in Chapter 2, to get an array index from the user:",
+       "text": "Let's see what happens if you try to access an element of an array that is past the end of the array. Say you run this code, similar to the guessing game in Chapter 2, to get an array index from the user:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/89",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 473.85657787597665,
+          "r": 151.97460314772457,
+          "b": 465.4307969770507,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "Filename: src/main.rs",
+       "text": "Filename: src/main.rs",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 6
+      },
+      {
+       "self_ref": "#/texts/90",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 449.3314616599664,
+          "r": 350.34099310830044,
+          "b": 285.8555762015276,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          372
+         ]
+        }
+       ],
+       "orig": "use std::io; fn main() { let a = [1, 2, 3, 4, 5]; println!(\"Please enter an array index. \"); let mut index = String::new(); io::stdin() .read _ line(\u0026mut index) .expect(\"Failed to read line\"); let index: usize = index .trim() .parse() .expect(\"Index entered was not a number\"); let element = a[index]; println!(\"The value of the element at index {index} is: {element}\"); }",
+       "text": "use std::io; fn main() { let a = [1, 2, 3, 4, 5]; println!(\"Please enter an array index. \"); let mut index = String::new(); io::stdin() .read _ line(\u0026mut index) .expect(\"Failed to read line\"); let index: usize = index .trim() .parse() .expect(\"Index entered was not a number\"); let element = a[index]; println!(\"The value of the element at index {index} is: {element}\"); }",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/91",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 271.3565863134763,
+          "r": 538.7343508127345,
+          "b": 233.50502539062472,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          274
+         ]
+        }
+       ],
+       "orig": "This code compiles successfully. If you run this code using cargo run and enter 0, 1, 2, 3, or 4, the program will print out the corresponding value at that index in the array. If you instead enter a number past the end of the array, such as 10, you'll see output like this:",
+       "text": "This code compiles successfully. If you run this code using cargo run and enter 0, 1, 2, 3, or 4, the program will print out the corresponding value at that index in the array. If you instead enter a number past the end of the array, such as 10, you'll see output like this:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/92",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 220.02280910306763,
+          "r": 371.33689535847117,
+          "b": 198.76674438196187,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          176
+         ]
+        }
+       ],
+       "orig": "thread 'main' panicked at src/main.rs:19:19: index out of bounds: the len is 5 but the index is 10 note: run with `RUST BACKTRACE=1` environment variable to display a backtrace",
+       "text": "thread 'main' panicked at src/main.rs:19:19: index out of bounds: the len is 5 but the index is 10 note: run with `RUST BACKTRACE=1` environment variable to display a backtrace",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/93",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 131.98360700068278,
+          "t": 198.88291380947067,
+          "r": 136.1827901565595,
+          "b": 198.47973756105966,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          1
+         ]
+        }
+       ],
+       "orig": "_",
+       "text": "_",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/94",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 184.35658993847665,
+          "r": 545.8827907748829,
+          "b": 106.00503070312516,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          560
+         ]
+        }
+       ],
+       "orig": "The program resulted in a runtime error at the point of using an invalid value in the indexing operation. The program exited with an error message and didn't execute the final println! statement. When you attempt to access an element using indexing, Rust will check that the index you've specified is less than the array length. If the index is greater than or equal to the length, Rust will panic. This check has to happen at runtime, especially in this case, because the compiler can't possibly know what value a user will enter when they run the code later.",
+       "text": "The program resulted in a runtime error at the point of using an invalid value in the indexing operation. The program exited with an error message and didn't execute the final println! statement. When you attempt to access an element using indexing, Rust will check that the index you've specified is less than the array length. If the index is greater than or equal to the length, Rust will panic. This check has to happen at runtime, especially in this case, because the compiler can't possibly know what value a user will enter when they run the code later.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/95",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 6,
+         "bbox": {
+          "l": 47.999998,
+          "t": 91.35659381347705,
+          "r": 546.5683351463185,
+          "b": 53.50503289062544,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          304
+         ]
+        },
+        {
+         "page_no": 7,
+         "bbox": {
+          "l": 47.999998,
+          "t": 798.6065643447273,
+          "r": 546.5390420075393,
+          "b": 774.255002859375,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          305,
+          466
+         ]
+        }
+       ],
+       "orig": "This is an example of Rust's memory safety principles in action. In many low-level languages, this kind of check is not done, and when you provide an incorrect index, invalid memory can be accessed. Rust protects you against this kind of error by immediately exiting instead of allowing the memory access and continuing. Chapter 9 discusses more of Rust's error handling and how you can write readable, safe code that neither panics nor allows invalid memory access.",
+       "text": "This is an example of Rust's memory safety principles in action. In many low-level languages, this kind of check is not done, and when you provide an incorrect index, invalid memory can be accessed. Rust protects you against this kind of error by immediately exiting instead of allowing the memory access and continuing. Chapter 9 discusses more of Rust's error handling and how you can write readable, safe code that neither panics nor allows invalid memory access.",
+       "formatting": null,
+       "hyperlink": null
+      }
+     ],
+     "pictures": [
+      {
+       "self_ref": "#/pictures/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "picture",
+       "prov": [
+        {
+         "page_no": 8,
+         "bbox": {
+          "l": 94.74076486484374,
+          "t": 705.7756790758452,
+          "r": 450.59543897068716,
+          "b": 99.11558871774912,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          0
+         ]
+        }
+       ],
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "annotations": []
+      },
+      {
+       "self_ref": "#/pictures/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "picture",
+       "prov": [
+        {
+         "page_no": 10,
+         "bbox": {
+          "l": 145.60630251085115,
+          "t": 704.6624952735765,
+          "r": 501.00538746351305,
+          "b": 97.92563361877228,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          0
+         ]
+        }
+       ],
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "annotations": []
+      }
+     ],
+     "tables": [
+      {
+       "self_ref": "#/tables/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/13"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "label": "table",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 49.0890885651175,
+          "t": 132.1252324288256,
+          "r": 252.25543383807906,
+          "b": 54.78785420373663,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          0
+         ]
+        }
+       ],
+       "captions": [
+        {
+         "$ref": "#/texts/13"
+        }
+       ],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "data": {
+        "table_cells": [
+         {
+          "bbox": {
+           "l": 88.54687131054686,
+           "t": 712.6405953066405,
+           "r": 125.2206978624707,
+           "b": 723.2402042399901,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 0,
+          "end_row_offset_idx": 1,
+          "start_col_offset_idx": 0,
+          "end_col_offset_idx": 1,
+          "text": "Length",
+          "column_header": true,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 166.52343056152344,
+           "t": 712.417939065918,
+           "r": 252.22850507047852,
+           "b": 723.2402042399901,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 2,
+          "start_row_offset_idx": 0,
+          "end_row_offset_idx": 1,
+          "start_col_offset_idx": 1,
+          "end_col_offset_idx": 3,
+          "text": "Signed Unsigned",
+          "column_header": true,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 50.249997906249995,
+           "t": 729.0702821220702,
+           "r": 72.91405940191406,
+           "b": 737.3788755258788,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 1,
+          "end_row_offset_idx": 2,
+          "start_col_offset_idx": 0,
+          "end_col_offset_idx": 1,
+          "text": "8-bit",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 166.52343056152344,
+           "t": 730.6991883041992,
+           "r": 178.2253344439441,
+           "b": 737.4070737668915,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 1,
+          "end_row_offset_idx": 2,
+          "start_col_offset_idx": 1,
+          "end_col_offset_idx": 2,
+          "text": "i8",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 204.21092899121095,
+           "t": 731.0895691473083,
+           "r": 215.91283287363157,
+           "b": 737.4070737668915,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 1,
+          "end_row_offset_idx": 2,
+          "start_col_offset_idx": 2,
+          "end_col_offset_idx": 3,
+          "text": "u8",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 50.249997906249995,
+           "t": 745.5468439355468,
+           "r": 78.91405915191405,
+           "b": 753.8788748383788,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 2,
+          "end_row_offset_idx": 3,
+          "start_col_offset_idx": 0,
+          "end_col_offset_idx": 1,
+          "text": "16-bit",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 166.52343056152344,
+           "t": 747.1991876166992,
+           "r": 184.0762863851544,
+           "b": 753.9070730793915,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 2,
+          "end_row_offset_idx": 3,
+          "start_col_offset_idx": 1,
+          "end_col_offset_idx": 2,
+          "text": "i16",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 204.21092899121095,
+           "t": 747.5895684598083,
+           "r": 221.7637848148419,
+           "b": 753.9070730793915,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 2,
+          "end_row_offset_idx": 3,
+          "start_col_offset_idx": 2,
+          "end_col_offset_idx": 3,
+          "text": "u16",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 50.249997906249995,
+           "t": 762.0702807470702,
+           "r": 78.91405915191405,
+           "b": 770.3612960266113,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 3,
+          "end_row_offset_idx": 4,
+          "start_col_offset_idx": 0,
+          "end_col_offset_idx": 1,
+          "text": "32-bit",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 166.52343056152344,
+           "t": 763.6991869291992,
+           "r": 184.0762863851544,
+           "b": 770.4070723918915,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 3,
+          "end_row_offset_idx": 4,
+          "start_col_offset_idx": 1,
+          "end_col_offset_idx": 2,
+          "text": "i32",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 204.21092899121095,
+           "t": 764.0895677723083,
+           "r": 221.7637848148419,
+           "b": 770.4070723918915,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 3,
+          "end_row_offset_idx": 4,
+          "start_col_offset_idx": 2,
+          "end_col_offset_idx": 3,
+          "text": "u32",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 50.249997906249995,
+           "t": 778.5468425605468,
+           "r": 78.91405915191405,
+           "b": 786.8788734633788,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 4,
+          "end_row_offset_idx": 5,
+          "start_col_offset_idx": 0,
+          "end_col_offset_idx": 1,
+          "text": "64-bit",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 166.52343056152344,
+           "t": 780.1991862416992,
+           "r": 184.0762863851544,
+           "b": 786.9070717043915,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 4,
+          "end_row_offset_idx": 5,
+          "start_col_offset_idx": 1,
+          "end_col_offset_idx": 2,
+          "text": "i64",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 204.21092899121095,
+           "t": 780.5895670848083,
+           "r": 221.7637848148419,
+           "b": 786.9070717043915,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 4,
+          "end_row_offset_idx": 5,
+          "start_col_offset_idx": 2,
+          "end_col_offset_idx": 3,
+          "text": "u64",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         }
+        ],
+        "num_rows": 5,
+        "num_cols": 3,
+        "orientation": "rot_0",
+        "grid": [
+         [
+          {
+           "bbox": {
+            "l": 88.54687131054686,
+            "t": 712.6405953066405,
+            "r": 125.2206978624707,
+            "b": 723.2402042399901,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 0,
+           "end_row_offset_idx": 1,
+           "start_col_offset_idx": 0,
+           "end_col_offset_idx": 1,
+           "text": "Length",
+           "column_header": true,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 166.52343056152344,
+            "t": 712.417939065918,
+            "r": 252.22850507047852,
+            "b": 723.2402042399901,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 2,
+           "start_row_offset_idx": 0,
+           "end_row_offset_idx": 1,
+           "start_col_offset_idx": 1,
+           "end_col_offset_idx": 3,
+           "text": "Signed Unsigned",
+           "column_header": true,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 166.52343056152344,
+            "t": 712.417939065918,
+            "r": 252.22850507047852,
+            "b": 723.2402042399901,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 2,
+           "start_row_offset_idx": 0,
+           "end_row_offset_idx": 1,
+           "start_col_offset_idx": 1,
+           "end_col_offset_idx": 3,
+           "text": "Signed Unsigned",
+           "column_header": true,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          }
+         ],
+         [
+          {
+           "bbox": {
+            "l": 50.249997906249995,
+            "t": 729.0702821220702,
+            "r": 72.91405940191406,
+            "b": 737.3788755258788,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 1,
+           "end_row_offset_idx": 2,
+           "start_col_offset_idx": 0,
+           "end_col_offset_idx": 1,
+           "text": "8-bit",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 166.52343056152344,
+            "t": 730.6991883041992,
+            "r": 178.2253344439441,
+            "b": 737.4070737668915,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 1,
+           "end_row_offset_idx": 2,
+           "start_col_offset_idx": 1,
+           "end_col_offset_idx": 2,
+           "text": "i8",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 204.21092899121095,
+            "t": 731.0895691473083,
+            "r": 215.91283287363157,
+            "b": 737.4070737668915,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 1,
+           "end_row_offset_idx": 2,
+           "start_col_offset_idx": 2,
+           "end_col_offset_idx": 3,
+           "text": "u8",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          }
+         ],
+         [
+          {
+           "bbox": {
+            "l": 50.249997906249995,
+            "t": 745.5468439355468,
+            "r": 78.91405915191405,
+            "b": 753.8788748383788,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 2,
+           "end_row_offset_idx": 3,
+           "start_col_offset_idx": 0,
+           "end_col_offset_idx": 1,
+           "text": "16-bit",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 166.52343056152344,
+            "t": 747.1991876166992,
+            "r": 184.0762863851544,
+            "b": 753.9070730793915,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 2,
+           "end_row_offset_idx": 3,
+           "start_col_offset_idx": 1,
+           "end_col_offset_idx": 2,
+           "text": "i16",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 204.21092899121095,
+            "t": 747.5895684598083,
+            "r": 221.7637848148419,
+            "b": 753.9070730793915,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 2,
+           "end_row_offset_idx": 3,
+           "start_col_offset_idx": 2,
+           "end_col_offset_idx": 3,
+           "text": "u16",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          }
+         ],
+         [
+          {
+           "bbox": {
+            "l": 50.249997906249995,
+            "t": 762.0702807470702,
+            "r": 78.91405915191405,
+            "b": 770.3612960266113,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 3,
+           "end_row_offset_idx": 4,
+           "start_col_offset_idx": 0,
+           "end_col_offset_idx": 1,
+           "text": "32-bit",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 166.52343056152344,
+            "t": 763.6991869291992,
+            "r": 184.0762863851544,
+            "b": 770.4070723918915,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 3,
+           "end_row_offset_idx": 4,
+           "start_col_offset_idx": 1,
+           "end_col_offset_idx": 2,
+           "text": "i32",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 204.21092899121095,
+            "t": 764.0895677723083,
+            "r": 221.7637848148419,
+            "b": 770.4070723918915,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 3,
+           "end_row_offset_idx": 4,
+           "start_col_offset_idx": 2,
+           "end_col_offset_idx": 3,
+           "text": "u32",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          }
+         ],
+         [
+          {
+           "bbox": {
+            "l": 50.249997906249995,
+            "t": 778.5468425605468,
+            "r": 78.91405915191405,
+            "b": 786.8788734633788,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 4,
+           "end_row_offset_idx": 5,
+           "start_col_offset_idx": 0,
+           "end_col_offset_idx": 1,
+           "text": "64-bit",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 166.52343056152344,
+            "t": 780.1991862416992,
+            "r": 184.0762863851544,
+            "b": 786.9070717043915,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 4,
+           "end_row_offset_idx": 5,
+           "start_col_offset_idx": 1,
+           "end_col_offset_idx": 2,
+           "text": "i64",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 204.21092899121095,
+            "t": 780.5895670848083,
+            "r": 221.7637848148419,
+            "b": 786.9070717043915,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 4,
+           "end_row_offset_idx": 5,
+           "start_col_offset_idx": 2,
+           "end_col_offset_idx": 3,
+           "text": "u64",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          }
+         ]
+        ]
+       },
+       "annotations": []
+      },
+      {
+       "self_ref": "#/tables/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "table",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 49.066939592255075,
+          "t": 420.70533286532475,
+          "r": 197.9818378951924,
+          "b": 341.9210781110988,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          0
+         ]
+        }
+       ],
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "data": {
+        "table_cells": [
+         {
+          "bbox": {
+           "l": 50.249997906249995,
+           "t": 423.7734198427735,
+           "r": 90.89648069264646,
+           "b": 432.1406069941405,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 0,
+          "end_row_offset_idx": 1,
+          "start_col_offset_idx": 0,
+          "end_col_offset_idx": 1,
+          "text": "Decimal",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 134.02733816552734,
+           "t": 425.8395818660582,
+           "r": 169.13304981278927,
+           "b": 434.2994203807526,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 0,
+          "end_row_offset_idx": 1,
+          "start_col_offset_idx": 1,
+          "end_col_offset_idx": 2,
+          "text": "98 _ 222",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 50.249997906249995,
+           "t": 440.56052851831043,
+           "r": 70.24218463324219,
+           "b": 448.6406063066405,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 1,
+          "end_row_offset_idx": 2,
+          "start_col_offset_idx": 0,
+          "end_col_offset_idx": 1,
+          "text": "Hex",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 134.02733816552734,
+           "t": 442.2586485647429,
+           "r": 157.43114593036861,
+           "b": 448.65708579814134,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 1,
+          "end_row_offset_idx": 2,
+          "start_col_offset_idx": 1,
+          "end_col_offset_idx": 2,
+          "text": "0xff",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 50.249997906249995,
+           "t": 456.77341846777347,
+           "r": 76.23632502348633,
+           "b": 465.16990249291996,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 2,
+          "end_row_offset_idx": 3,
+          "start_col_offset_idx": 0,
+          "end_col_offset_idx": 1,
+          "text": "Octal",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 134.02733816552734,
+           "t": 458.8395804910582,
+           "r": 157.43114593036861,
+           "b": 465.15708511064133,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 2,
+          "end_row_offset_idx": 3,
+          "start_col_offset_idx": 1,
+          "end_col_offset_idx": 2,
+          "text": "0o77",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 50.249997906249995,
+           "t": 473.3202927783203,
+           "r": 82.91015282541015,
+           "b": 484.124979828125,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 3,
+          "end_row_offset_idx": 4,
+          "start_col_offset_idx": 0,
+          "end_col_offset_idx": 1,
+          "text": "Binary",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 134.02733816552734,
+           "t": 475.26816867372133,
+           "r": 198.3878095188409,
+           "b": 483.7994183182526,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 3,
+          "end_row_offset_idx": 4,
+          "start_col_offset_idx": 1,
+          "end_col_offset_idx": 2,
+          "text": "0b1111 _ 0000",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 50.249997906249995,
+           "t": 489.77341709277346,
+           "r": 119.94726058219726,
+           "b": 500.624979140625,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 4,
+          "end_row_offset_idx": 5,
+          "start_col_offset_idx": 0,
+          "end_col_offset_idx": 1,
+          "text": "Byte (u8 only)",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 134.02733816552734,
+           "t": 491.477762724884,
+           "r": 157.43114593036861,
+           "b": 498.08567260580446,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 4,
+          "end_row_offset_idx": 5,
+          "start_col_offset_idx": 1,
+          "end_col_offset_idx": 2,
+          "text": "b'A'",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         }
+        ],
+        "num_rows": 5,
+        "num_cols": 2,
+        "orientation": "rot_0",
+        "grid": [
+         [
+          {
+           "bbox": {
+            "l": 50.249997906249995,
+            "t": 423.7734198427735,
+            "r": 90.89648069264646,
+            "b": 432.1406069941405,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 0,
+           "end_row_offset_idx": 1,
+           "start_col_offset_idx": 0,
+           "end_col_offset_idx": 1,
+           "text": "Decimal",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 134.02733816552734,
+            "t": 425.8395818660582,
+            "r": 169.13304981278927,
+            "b": 434.2994203807526,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 0,
+           "end_row_offset_idx": 1,
+           "start_col_offset_idx": 1,
+           "end_col_offset_idx": 2,
+           "text": "98 _ 222",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          }
+         ],
+         [
+          {
+           "bbox": {
+            "l": 50.249997906249995,
+            "t": 440.56052851831043,
+            "r": 70.24218463324219,
+            "b": 448.6406063066405,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 1,
+           "end_row_offset_idx": 2,
+           "start_col_offset_idx": 0,
+           "end_col_offset_idx": 1,
+           "text": "Hex",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 134.02733816552734,
+            "t": 442.2586485647429,
+            "r": 157.43114593036861,
+            "b": 448.65708579814134,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 1,
+           "end_row_offset_idx": 2,
+           "start_col_offset_idx": 1,
+           "end_col_offset_idx": 2,
+           "text": "0xff",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          }
+         ],
+         [
+          {
+           "bbox": {
+            "l": 50.249997906249995,
+            "t": 456.77341846777347,
+            "r": 76.23632502348633,
+            "b": 465.16990249291996,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 2,
+           "end_row_offset_idx": 3,
+           "start_col_offset_idx": 0,
+           "end_col_offset_idx": 1,
+           "text": "Octal",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 134.02733816552734,
+            "t": 458.8395804910582,
+            "r": 157.43114593036861,
+            "b": 465.15708511064133,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 2,
+           "end_row_offset_idx": 3,
+           "start_col_offset_idx": 1,
+           "end_col_offset_idx": 2,
+           "text": "0o77",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          }
+         ],
+         [
+          {
+           "bbox": {
+            "l": 50.249997906249995,
+            "t": 473.3202927783203,
+            "r": 82.91015282541015,
+            "b": 484.124979828125,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 3,
+           "end_row_offset_idx": 4,
+           "start_col_offset_idx": 0,
+           "end_col_offset_idx": 1,
+           "text": "Binary",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 134.02733816552734,
+            "t": 475.26816867372133,
+            "r": 198.3878095188409,
+            "b": 483.7994183182526,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 3,
+           "end_row_offset_idx": 4,
+           "start_col_offset_idx": 1,
+           "end_col_offset_idx": 2,
+           "text": "0b1111 _ 0000",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          }
+         ],
+         [
+          {
+           "bbox": {
+            "l": 50.249997906249995,
+            "t": 489.77341709277346,
+            "r": 119.94726058219726,
+            "b": 500.624979140625,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 4,
+           "end_row_offset_idx": 5,
+           "start_col_offset_idx": 0,
+           "end_col_offset_idx": 1,
+           "text": "Byte (u8 only)",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 134.02733816552734,
+            "t": 491.477762724884,
+            "r": 157.43114593036861,
+            "b": 498.08567260580446,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 4,
+           "end_row_offset_idx": 5,
+           "start_col_offset_idx": 1,
+           "end_col_offset_idx": 2,
+           "text": "b'A'",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          }
+         ]
+        ]
+       },
+       "annotations": []
+      }
+     ],
+     "key_value_items": [],
+     "form_items": [],
+     "pages": {
+      "1": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 1
+      },
+      "2": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 2
+      },
+      "3": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 3
+      },
+      "4": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 4
+      },
+      "5": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 5
+      },
+      "6": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 6
+      },
+      "7": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 7
+      },
+      "8": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 8
+      },
+      "9": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 9
+      },
+      "10": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 10
+      },
+      "11": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 11
+      }
+     }
+    },
+    "html_content": null,
+    "text_content": null,
+    "doctags_content": null,
+    "doclang_content": null
+   },
+   "status": "success",
+   "errors": [],
+   "processing_time": 12.24943874399969,
+   "timings": {},
+   "confidence": {
+    "parse_score": 1.0,
+    "layout_score": 0.746474982513003,
+    "table_score": null,
+    "ocr_score": null,
+    "mean_score": 0.7773504832180674,
+    "low_score": 0.7495625325835094,
+    "mean_grade": "fair",
+    "low_grade": "fair",
+    "pages": {
+     "3": {
+      "parse_score": 1.0,
+      "layout_score": 0.899596893787384,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.949798446893692,
+      "low_score": 0.9046170490980149,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "2": {
+      "parse_score": 1.0,
+      "layout_score": 0.8191751316189766,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9095875658094883,
+      "low_score": 0.8282163750380278,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     },
+     "4": {
+      "parse_score": 1.0,
+      "layout_score": 0.9135694714153514,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9567847357076757,
+      "low_score": 0.9178909978445838,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "6": {
+      "parse_score": 1.0,
+      "layout_score": 0.9299734532833099,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.964986726641655,
+      "low_score": 0.9334747806191445,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "8": {
+      "parse_score": null,
+      "layout_score": 0.9457480907440186,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9457480907440186,
+      "low_score": 0.9457480907440186,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "9": {
+      "parse_score": null,
+      "layout_score": 0.0,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.0,
+      "low_score": 0.0,
+      "mean_grade": "poor",
+      "low_grade": "poor",
+      "pages": {}
+     },
+     "10": {
+      "parse_score": null,
+      "layout_score": 0.9447377324104309,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9447377324104309,
+      "low_score": 0.9447377324104309,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "7": {
+      "parse_score": 1.0,
+      "layout_score": 0.9033913016319275,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9516956508159637,
+      "low_score": 0.9082217365503311,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "11": {
+      "parse_score": null,
+      "layout_score": 0.0,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.0,
+      "low_score": 0.0,
+      "mean_grade": "poor",
+      "low_grade": "poor",
+      "pages": {}
+     },
+     "1": {
+      "parse_score": 1.0,
+      "layout_score": 0.9193647146224976,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9596823573112487,
+      "low_score": 0.9233964788913727,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "5": {
+      "parse_score": 1.0,
+      "layout_score": 0.9356680181291368,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9678340090645684,
+      "low_score": 0.9388846172226799,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     }
+    }
+   }
+  }
+ },
+ "lines": {
+  "status": 200,
+  "body": {
+   "blocks": [
+    [
+     {
+      "text": "Every value in Rust is of a certain data type, which tells Rust what kind of data is being specified so",
+      "mono": false
+     },
+     {
+      "text": "that it knows how to work with that data. We\u2019ll look at two data type subsets: scalar and compound.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Keep in mind that Rust is a statically typed language, which means that it must know the types of all",
+      "mono": false
+     },
+     {
+      "text": "variables at compile time. The compiler can usually infer what type we want to use based on the value",
+      "mono": false
+     },
+     {
+      "text": "and how we use it. In cases when many types are possible, such as when we converted a String to a",
+      "mono": false
+     },
+     {
+      "text": "numeric type using parse in the \u201cComparing the Guess to the Secret Number\u201d section in Chapter 2, we",
+      "mono": false
+     },
+     {
+      "text": "must add a type annotation, like this:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "let guess: u32 = \"42\".parse().expect(\"Not a number!\");",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "If we don\u2019t add the : u32 type annotation shown in the preceding code, Rust will display the following",
+      "mono": false
+     },
+     {
+      "text": "error, which means the compiler needs more information from us to know which type we want to use:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "$ cargo build",
+      "mono": true
+     },
+     {
+      "text": "   Compiling no_type_annotations v0.1.0 (file:///projects/no_type_annotations)",
+      "mono": true
+     },
+     {
+      "text": "error[E0284]: type annotations needed",
+      "mono": true
+     },
+     {
+      "text": " --\u003e src/main.rs:2:9",
+      "mono": true
+     },
+     {
+      "text": "  |",
+      "mono": true
+     },
+     {
+      "text": "2 |     let guess = \"42\".parse().expect(\"Not a number!\");",
+      "mono": true
+     },
+     {
+      "text": "  |         ^^^^^        ----- type must be known at this point",
+      "mono": true
+     },
+     {
+      "text": "  |",
+      "mono": true
+     },
+     {
+      "text": "  = note: cannot satisfy `\u003c_ as FromStr\u003e::Err == _`",
+      "mono": true
+     },
+     {
+      "text": "help: consider giving `guess` an explicit type",
+      "mono": true
+     },
+     {
+      "text": "  |",
+      "mono": true
+     },
+     {
+      "text": "2 |     let guess: /* Type */ = \"42\".parse().expect(\"Not a number!\");",
+      "mono": true
+     },
+     {
+      "text": "  |              ++++++++++++",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "For more information about this error, try `rustc --explain E0284`.",
+      "mono": true
+     },
+     {
+      "text": "error: could not compile `no_type_annotations` (bin \"no_type_annotations\") due to 1 previous error",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "You\u2019ll see different type annotations for other data types.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "A scalar type represents a single value. Rust has four primary scalar types: integers, floating-point",
+      "mono": false
+     },
+     {
+      "text": "numbers, Booleans, and characters. You may recognize these from other programming languages. Let\u2019s",
+      "mono": false
+     },
+     {
+      "text": "jump into how they work in Rust.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "An integer is a number without a fractional component. We used one integer type in Chapter 2, the u32",
+      "mono": false
+     },
+     {
+      "text": "type. This type declaration indicates that the value it\u2019s associated with should be an unsigned integer",
+      "mono": false
+     },
+     {
+      "text": "(signed integer types start with i instead of u) that takes up 32 bits of space. Table 3-1 shows the built\u0002",
+      "mono": false
+     },
+     {
+      "text": "in integer types in Rust. We can use any of these variants to declare the type of an integer value.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "128-bit",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Length",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Signed Unsigned",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "i128  u128",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Architecture-dependent isize usize",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Each variant can be either signed or unsigned and has an explicit size. Signed and unsigned refer to",
+      "mono": false
+     },
+     {
+      "text": "whether it\u2019s possible for the number to be negative\u2014in other words, whether the number needs to have",
+      "mono": false
+     },
+     {
+      "text": "a sign with it (signed) or whether it will only ever be positive and can therefore be represented without",
+      "mono": false
+     },
+     {
+      "text": "a sign (unsigned). It\u2019s like writing numbers on paper: When the sign matters, a number is shown with a",
+      "mono": false
+     },
+     {
+      "text": "plus sign or a minus sign; however, when it\u2019s safe to assume the number is positive, it\u2019s shown with no",
+      "mono": false
+     },
+     {
+      "text": "sign. Signed numbers are stored using two\u2019s complement representation.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Each signed variant can store numbers from \u2212(2n \u2212 1) to 2n \u2212 1 \u2212 1 inclusive, where n is the number of",
+      "mono": false
+     },
+     {
+      "text": "bits that variant uses. So, an i8 can store numbers from \u2212(27) to 27 \u2212 1, which equals \u2212128 to 127.",
+      "mono": false
+     },
+     {
+      "text": "Unsigned variants can store numbers from 0 to 2n \u2212 1, so a u8 can store numbers from 0 to 28 \u2212 1,",
+      "mono": false
+     },
+     {
+      "text": "which equals 0 to 255.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Additionally, the isize and usize types depend on the architecture of the computer your program is",
+      "mono": false
+     },
+     {
+      "text": "running on: 64 bits if you\u2019re on a 64-bit architecture and 32 bits if you\u2019re on a 32-bit architecture.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "You can write integer literals in any of the forms shown in Table 3-2. Note that number literals that can",
+      "mono": false
+     },
+     {
+      "text": "be multiple numeric types allow a type suffix, such as 57u8, to designate the type. Number literals can",
+      "mono": false
+     },
+     {
+      "text": "also use _ as a visual separator to make the number easier to read, such as 1_000, which will have the",
+      "mono": false
+     },
+     {
+      "text": "same value as if you had specified 1000.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "So how do you know which type of integer to use? If you\u2019re unsure, Rust\u2019s defaults are generally good",
+      "mono": false
+     },
+     {
+      "text": "places to start: Integer types default to i32. The primary situation in which you\u2019d use isize or usize is",
+      "mono": false
+     },
+     {
+      "text": "when indexing some sort of collection.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Let\u2019s say you have a variable of type u8 that can hold values between 0 and 255. If you try to change",
+      "mono": false
+     },
+     {
+      "text": "the variable to a value outside that range, such as 256, integer overflow will occur, which can result in",
+      "mono": false
+     },
+     {
+      "text": "one of two behaviors. When you\u2019re compiling in debug mode, Rust includes checks for integer",
+      "mono": false
+     },
+     {
+      "text": "overflow that cause your program to panic at runtime if this behavior occurs. Rust uses the term",
+      "mono": false
+     },
+     {
+      "text": "panicking when a program exits with an error; we\u2019ll discuss panics in more depth in the \u201cUnrecoverable",
+      "mono": false
+     },
+     {
+      "text": "Errors with panic! \u201d section in Chapter 9.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "When you\u2019re compiling in release mode with the --release flag, Rust does not include checks for",
+      "mono": false
+     },
+     {
+      "text": "integer overflow that cause panics. Instead, if overflow occurs, Rust performs two\u2019s complement",
+      "mono": false
+     },
+     {
+      "text": "wrapping. In short, values greater than the maximum value the type can hold \u201cwrap around\u201d to the",
+      "mono": false
+     },
+     {
+      "text": "minimum of the values the type can hold. In the case of a u8, the value 256 becomes 0, the value 257",
+      "mono": false
+     },
+     {
+      "text": "becomes 1, and so on. The program won\u2019t panic, but the variable will have a value that probably isn\u2019t",
+      "mono": false
+     },
+     {
+      "text": "what you were expecting it to have. Relying on integer overflow\u2019s wrapping behavior is considered an",
+      "mono": false
+     },
+     {
+      "text": "error.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "To explicitly handle the possibility of overflow, you can use these families of methods provided by the",
+      "mono": false
+     },
+     {
+      "text": "standard library for primitive numeric types:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Rust also has two primitive types for floating-point numbers, which are numbers with decimal points.",
+      "mono": false
+     },
+     {
+      "text": "Rust\u2019s floating-point types are f32 and f64, which are 32 bits and 64 bits in size, respectively. The",
+      "mono": false
+     },
+     {
+      "text": "default type is f64 because on modern CPUs, it\u2019s roughly the same speed as f32 but is capable of more",
+      "mono": false
+     },
+     {
+      "text": "precision. All floating-point types are signed.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Here\u2019s an example that shows floating-point numbers in action:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Filename: src/main.rs",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "fn main() {",
+      "mono": true
+     },
+     {
+      "text": "    let x = 2.0; // f64",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    let y: f32 = 3.0; // f32",
+      "mono": true
+     },
+     {
+      "text": "}",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Floating-point numbers are represented according to the IEEE-754 standard.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Rust supports the basic mathematical operations you\u2019d expect for all the number types: addition,",
+      "mono": false
+     },
+     {
+      "text": "subtraction, multiplication, division, and remainder. Integer division truncates toward zero to the",
+      "mono": false
+     },
+     {
+      "text": "nearest integer. The following code shows how you\u2019d use each numeric operation in a let statement:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Filename: src/main.rs",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "fn main() {",
+      "mono": true
+     },
+     {
+      "text": "    // addition",
+      "mono": true
+     },
+     {
+      "text": "    let sum = 5 + 10;",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    // subtraction",
+      "mono": true
+     },
+     {
+      "text": "    let difference = 95.5 - 4.3;",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    // multiplication",
+      "mono": true
+     },
+     {
+      "text": "    let product = 4 * 30;",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    // division",
+      "mono": true
+     },
+     {
+      "text": "    let quotient = 56.7 / 32.2;",
+      "mono": true
+     },
+     {
+      "text": "    let truncated = -5 / 3; // Results in -1",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    // remainder",
+      "mono": true
+     },
+     {
+      "text": "    let remainder = 43 % 5;",
+      "mono": true
+     },
+     {
+      "text": "}",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Each expression in these statements uses a mathematical operator and evaluates to a single value, which",
+      "mono": false
+     },
+     {
+      "text": "is then bound to a variable. Appendix B contains a list of all operators that Rust provides.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "As in most other programming languages, a Boolean type in Rust has two possible values: true and",
+      "mono": false
+     },
+     {
+      "text": "false. Booleans are one byte in size. The Boolean type in Rust is specified using bool. For example:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Filename: src/main.rs",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "fn main() {",
+      "mono": true
+     },
+     {
+      "text": "    let t = true;",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    let f: bool = false; // with explicit type annotation",
+      "mono": true
+     },
+     {
+      "text": "}",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "The main way to use Boolean values is through conditionals, such as an if expression. We\u2019ll cover how",
+      "mono": false
+     },
+     {
+      "text": "if expressions work in Rust in the \u201cControl Flow\u201d section.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Rust\u2019s char type is the language\u2019s most primitive alphabetic type. Here are some examples of declaring",
+      "mono": false
+     },
+     {
+      "text": "char values:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Filename: src/main.rs",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "fn main() {",
+      "mono": true
+     },
+     {
+      "text": "    let c = 'z';",
+      "mono": true
+     },
+     {
+      "text": "    let z: char = '\u2124'; // with explicit type annotation",
+      "mono": true
+     },
+     {
+      "text": "    let heart_eyed_cat = '\ud83d\ude3b ';",
+      "mono": true
+     },
+     {
+      "text": "}",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Note that we specify char literals with single quotation marks, as opposed to string literals, which use",
+      "mono": false
+     },
+     {
+      "text": "double quotation marks. Rust\u2019s char type is 4 bytes in size and represents a Unicode scalar value,",
+      "mono": false
+     },
+     {
+      "text": "which means it can represent a lot more than just ASCII. Accented letters; Chinese, Japanese, and",
+      "mono": false
+     },
+     {
+      "text": "Korean characters; emojis; and zero-width spaces are all valid char values in Rust. Unicode scalar",
+      "mono": false
+     },
+     {
+      "text": "values range from U+0000 to U+D7FF and U+E000 to U+10FFFF inclusive. However, a \u201ccharacter\u201d isn\u2019t",
+      "mono": false
+     },
+     {
+      "text": "really a concept in Unicode, so your human intuition for what a \u201ccharacter\u201d is may not match up with",
+      "mono": false
+     },
+     {
+      "text": "what a char is in Rust. We\u2019ll discuss this topic in detail in \u201cStoring UTF-8 Encoded Text with Strings\u201d",
+      "mono": false
+     },
+     {
+      "text": "in Chapter 8.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Compound types can group multiple values into one type. Rust has two primitive compound types:",
+      "mono": false
+     },
+     {
+      "text": "tuples and arrays.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "A tuple is a general way of grouping together a number of values with a variety of types into one",
+      "mono": false
+     },
+     {
+      "text": "compound type. Tuples have a fixed length: Once declared, they cannot grow or shrink in size.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "We create a tuple by writing a comma-separated list of values inside parentheses. Each position in the",
+      "mono": false
+     },
+     {
+      "text": "tuple has a type, and the types of the different values in the tuple don\u2019t have to be the same. We\u2019ve",
+      "mono": false
+     },
+     {
+      "text": "added optional type annotations in this example:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Filename: src/main.rs",
+      "mono": false
+     },
+     {
+      "text": "fn main() {",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "    let tup: (i32, f64, u8) = (500, 6.4, 1);",
+      "mono": true
+     },
+     {
+      "text": "}",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "The variable tup binds to the entire tuple because a tuple is considered a single compound element. To",
+      "mono": false
+     },
+     {
+      "text": "get the individual values out of a tuple, we can use pattern matching to destructure a tuple value, like",
+      "mono": false
+     },
+     {
+      "text": "this:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Filename: src/main.rs",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "fn main() {",
+      "mono": true
+     },
+     {
+      "text": "    let tup = (500, 6.4, 1);",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    let (x, y, z) = tup;",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    println!(\"The value of y is: {y}\");",
+      "mono": true
+     },
+     {
+      "text": "}",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "This program first creates a tuple and binds it to the variable tup. It then uses a pattern with let to take",
+      "mono": false
+     },
+     {
+      "text": "tup and turn it into three separate variables, x, y, and z. This is called destructuring because it breaks",
+      "mono": false
+     },
+     {
+      "text": "the single tuple into three parts. Finally, the program prints the value of y, which is 6.4.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "We can also access a tuple element directly by using a period (.) followed by the index of the value we",
+      "mono": false
+     },
+     {
+      "text": "want to access. For example:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "fn main() {",
+      "mono": true
+     },
+     {
+      "text": "    let x: (i32, f64, u8) = (500, 6.4, 1);",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    let five_hundred = x.0;",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    let six_point_four = x.1;",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    let one = x.2;",
+      "mono": true
+     },
+     {
+      "text": "}",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "This program creates the tuple x and then accesses each element of the tuple using their respective",
+      "mono": false
+     },
+     {
+      "text": "indices. As with most programming languages, the first index in a tuple is 0.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "The tuple without any values has a special name, unit. This value and its corresponding type are both",
+      "mono": false
+     },
+     {
+      "text": "written () and represent an empty value or an empty return type. Expressions implicitly return the unit",
+      "mono": false
+     },
+     {
+      "text": "value if they don\u2019t return any other value.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Another way to have a collection of multiple values is with an array. Unlike a tuple, every element of",
+      "mono": false
+     },
+     {
+      "text": "an array must have the same type. Unlike arrays in some other languages, arrays in Rust have a fixed",
+      "mono": false
+     },
+     {
+      "text": "length.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "We write the values in an array as a comma-separated list inside square brackets:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Filename: src/main.rs",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "fn main() {",
+      "mono": true
+     },
+     {
+      "text": "    let a = [1, 2, 3, 4, 5];",
+      "mono": true
+     },
+     {
+      "text": "}",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Arrays are useful when you want your data allocated on the stack, the same as the other types we have",
+      "mono": false
+     },
+     {
+      "text": "seen so far, rather than the heap (we will discuss the stack and the heap more in Chapter 4) or when you",
+      "mono": false
+     },
+     {
+      "text": "want to ensure that you always have a fixed number of elements. An array isn\u2019t as flexible as the vector",
+      "mono": false
+     },
+     {
+      "text": "type, though. A vector is a similar collection type provided by the standard library that is allowed to",
+      "mono": false
+     },
+     {
+      "text": "grow or shrink in size because its contents live on the heap. If you\u2019re unsure whether to use an array or",
+      "mono": false
+     },
+     {
+      "text": "a vector, chances are you should use a vector. Chapter 8 discusses vectors in more detail.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "However, arrays are more useful when you know the number of elements will not need to change. For",
+      "mono": false
+     },
+     {
+      "text": "example, if you were using the names of the month in a program, you would probably use an array",
+      "mono": false
+     },
+     {
+      "text": "rather than a vector because you know it will always contain 12 elements:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "let months = [\"January\", \"February\", \"March\", \"April\", \"May\", \"June\", \"July\",",
+      "mono": true
+     },
+     {
+      "text": "              \"August\", \"September\", \"October\", \"November\", \"December\"];",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "You write an array\u2019s type using square brackets with the type of each element, a semicolon, and then the",
+      "mono": false
+     },
+     {
+      "text": "number of elements in the array, like so:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "let a: [i32; 5] = [1, 2, 3, 4, 5];",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Here, i32 is the type of each element. After the semicolon, the number 5 indicates the array contains",
+      "mono": false
+     },
+     {
+      "text": "five elements.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "You can also initialize an array to contain the same value for each element by specifying the initial",
+      "mono": false
+     },
+     {
+      "text": "value, followed by a semicolon, and then the length of the array in square brackets, as shown here:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "let a = [3; 5];",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "The array named a will contain 5 elements that will all be set to the value 3 initially. This is the same as",
+      "mono": false
+     },
+     {
+      "text": "writing let a = [3, 3, 3, 3, 3]; but in a more concise way.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "An array is a single chunk of memory of a known, fixed size that can be allocated on the stack. You can",
+      "mono": false
+     },
+     {
+      "text": "access elements of an array using indexing, like this:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Filename: src/main.rs",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "fn main() {",
+      "mono": true
+     },
+     {
+      "text": "    let a = [1, 2, 3, 4, 5];",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    let first = a[0];",
+      "mono": true
+     },
+     {
+      "text": "    let second = a[1];",
+      "mono": true
+     },
+     {
+      "text": "}",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "In this example, the variable named first will get the value 1 because that is the value at index [0] in",
+      "mono": false
+     },
+     {
+      "text": "the array. The variable named second will get the value 2 from index [1] in the array.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Let\u2019s see what happens if you try to access an element of an array that is past the end of the array. Say",
+      "mono": false
+     },
+     {
+      "text": "you run this code, similar to the guessing game in Chapter 2, to get an array index from the user:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "use std::io;",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "fn main() {",
+      "mono": true
+     },
+     {
+      "text": "    let a = [1, 2, 3, 4, 5];",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    println!(\"Please enter an array index.\");",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    let mut index = String::new();",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    io::stdin()",
+      "mono": true
+     },
+     {
+      "text": "        .read_line(\u0026mut index)",
+      "mono": true
+     },
+     {
+      "text": "        .expect(\"Failed to read line\");",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    let index: usize = index",
+      "mono": true
+     },
+     {
+      "text": "        .trim()",
+      "mono": true
+     },
+     {
+      "text": "        .parse()",
+      "mono": true
+     },
+     {
+      "text": "        .expect(\"Index entered was not a number\");",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    let element = a[index];",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "    println!(\"The value of the element at index {index} is: {element}\");",
+      "mono": true
+     },
+     {
+      "text": "}",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "This code compiles successfully. If you run this code using cargo run and enter 0, 1, 2, 3, or 4, the",
+      "mono": false
+     },
+     {
+      "text": "program will print out the corresponding value at that index in the array. If you instead enter a number",
+      "mono": false
+     },
+     {
+      "text": "past the end of the array, such as 10, you\u2019ll see output like this:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "thread 'main' panicked at src/main.rs:19:19:",
+      "mono": true
+     },
+     {
+      "text": "index out of bounds: the len is 5 but the index is 10",
+      "mono": true
+     },
+     {
+      "text": "note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "_",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "The program resulted in a runtime error at the point of using an invalid value in the indexing operation.",
+      "mono": false
+     },
+     {
+      "text": "The program exited with an error message and didn\u2019t execute the final println! statement. When you",
+      "mono": false
+     },
+     {
+      "text": "attempt to access an element using indexing, Rust will check that the index you\u2019ve specified is less than",
+      "mono": false
+     },
+     {
+      "text": "the array length. If the index is greater than or equal to the length, Rust will panic. This check has to",
+      "mono": false
+     },
+     {
+      "text": "happen at runtime, especially in this case, because the compiler can\u2019t possibly know what value a user",
+      "mono": false
+     },
+     {
+      "text": "will enter when they run the code later.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "This is an example of Rust\u2019s memory safety principles in action. In many low-level languages, this kind",
+      "mono": false
+     },
+     {
+      "text": "of check is not done, and when you provide an incorrect index, invalid memory can be accessed. Rust",
+      "mono": false
+     },
+     {
+      "text": "protects you against this kind of error by immediately exiting instead of allowing the memory access",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "and continuing. Chapter 9 discusses more of Rust\u2019s error handling and how you can write readable, safe",
+      "mono": false
+     },
+     {
+      "text": "code that neither panics nor allows invalid memory access.",
+      "mono": false
+     }
+    ],
+    [],
+    []
+   ]
+  }
+ }
+}

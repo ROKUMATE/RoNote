@@ -174,10 +174,10 @@ func TestInspect(t *testing.T) {
 	}
 }
 
-func TestCode(t *testing.T) {
+func TestLines(t *testing.T) {
 	t.Parallel()
 	boxes := []Box{{Ref: "#/texts/0", Page: 1, L: 1, T: 2, R: 3, B: 0}, {Ref: "#/texts/1", Page: 2}}
-	c := stand(t, map[string]http.HandlerFunc{"POST /v1/code": func(w http.ResponseWriter, r *http.Request) {
+	c := stand(t, map[string]http.HandlerFunc{"POST /v1/lines": func(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseMultipartForm(1 << 20); err != nil {
 			t.Error(err)
 		}
@@ -188,18 +188,19 @@ func TestCode(t *testing.T) {
 		if want := (map[string]float64{"page": 1, "l": 1, "t": 2, "r": 3, "b": 0}); !reflect.DeepEqual(got[0], want) {
 			t.Errorf("box sent = %v, want %v", got[0], want)
 		}
-		answer(200, `{"blocks": [["def f():", "    pass"], []]}`)(w, r)
+		answer(200, `{"blocks": [[{"text": "Filename: a.py", "mono": false}, {"text": "def f():", "mono": true}], []]}`)(w, r)
 	}})
-	got, err := c.Code(t.Context(), []byte("%PDF-"), boxes)
-	if err != nil || !reflect.DeepEqual(got, [][]string{{"def f():", "    pass"}, {}}) {
-		t.Errorf("Code() = %q, %v", got, err)
+	got, err := c.Lines(t.Context(), []byte("%PDF-"), boxes)
+	want := [][]Line{{{Text: "Filename: a.py"}, {Text: "def f():", Mono: true}}, {}}
+	if err != nil || !reflect.DeepEqual(got, want) {
+		t.Errorf("Lines() = %+v, %v", got, err)
 	}
 
-	short := stand(t, map[string]http.HandlerFunc{"POST /v1/code": answer(200, `{"blocks": [[]]}`)})
-	if _, err := short.Code(t.Context(), []byte("%PDF-"), boxes); !errors.Is(err, ErrUnavailable) {
-		t.Errorf("Code() with too few blocks = %v, want ErrUnavailable", err)
+	short := stand(t, map[string]http.HandlerFunc{"POST /v1/lines": answer(200, `{"blocks": [[]]}`)})
+	if _, err := short.Lines(t.Context(), []byte("%PDF-"), boxes); !errors.Is(err, ErrUnavailable) {
+		t.Errorf("Lines() with too few blocks = %v, want ErrUnavailable", err)
 	}
-	if got, err := short.Code(t.Context(), []byte("%PDF-"), nil); got != nil || err != nil {
-		t.Errorf("Code() of no boxes = %v, %v; want no request", got, err)
+	if got, err := short.Lines(t.Context(), []byte("%PDF-"), nil); got != nil || err != nil {
+		t.Errorf("Lines() of no boxes = %v, %v; want no request", got, err)
 	}
 }

@@ -1,0 +1,1888 @@
+{
+ "sha256": "075d91db46d1028bc10a97537735ddb343007557ece0d14249a868aebaa17e28",
+ "seconds": 2.6,
+ "pages": 2,
+ "inspect": {
+  "status": 200,
+  "body": {
+   "pages": 2,
+   "chars": 3983
+  }
+ },
+ "result": {
+  "status": 200,
+  "body": {
+   "document": {
+    "filename": "docbook-postgres-select.pdf",
+    "md_content": null,
+    "json_content": {
+     "schema_name": "DoclingDocument",
+     "version": "1.10.0",
+     "name": "docbook-postgres-select",
+     "origin": {
+      "mimetype": "application/pdf",
+      "binary_hash": 5307607260520873512,
+      "filename": "docbook-postgres-select.pdf",
+      "uri": null
+     },
+     "furniture": {
+      "self_ref": "#/furniture",
+      "parent": null,
+      "children": [],
+      "content_layer": "furniture",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "body": {
+      "self_ref": "#/body",
+      "parent": null,
+      "children": [
+       {
+        "$ref": "#/texts/0"
+       },
+       {
+        "$ref": "#/texts/1"
+       },
+       {
+        "$ref": "#/texts/2"
+       },
+       {
+        "$ref": "#/texts/3"
+       },
+       {
+        "$ref": "#/texts/4"
+       },
+       {
+        "$ref": "#/texts/5"
+       },
+       {
+        "$ref": "#/texts/6"
+       },
+       {
+        "$ref": "#/texts/7"
+       },
+       {
+        "$ref": "#/texts/8"
+       },
+       {
+        "$ref": "#/texts/9"
+       },
+       {
+        "$ref": "#/texts/10"
+       },
+       {
+        "$ref": "#/texts/11"
+       },
+       {
+        "$ref": "#/texts/12"
+       },
+       {
+        "$ref": "#/texts/13"
+       },
+       {
+        "$ref": "#/texts/14"
+       },
+       {
+        "$ref": "#/texts/15"
+       },
+       {
+        "$ref": "#/texts/16"
+       },
+       {
+        "$ref": "#/texts/17"
+       },
+       {
+        "$ref": "#/texts/18"
+       },
+       {
+        "$ref": "#/texts/19"
+       },
+       {
+        "$ref": "#/texts/20"
+       },
+       {
+        "$ref": "#/texts/21"
+       },
+       {
+        "$ref": "#/texts/22"
+       },
+       {
+        "$ref": "#/texts/23"
+       },
+       {
+        "$ref": "#/texts/24"
+       },
+       {
+        "$ref": "#/texts/25"
+       },
+       {
+        "$ref": "#/groups/0"
+       },
+       {
+        "$ref": "#/texts/27"
+       },
+       {
+        "$ref": "#/tables/0"
+       },
+       {
+        "$ref": "#/texts/28"
+       },
+       {
+        "$ref": "#/texts/29"
+       },
+       {
+        "$ref": "#/texts/30"
+       }
+      ],
+      "content_layer": "body",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "groups": [
+      {
+       "self_ref": "#/groups/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/26"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      }
+     ],
+     "texts": [
+      {
+       "self_ref": "#/texts/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 792.4893770996094,
+          "r": 545.994121670244,
+          "b": 666.2667261088868,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          348
+         ]
+        }
+       ],
+       "orig": "PostgreSQL Documentation → PostgreSQL 18 Supported Versions: Current (18) / 17 / 16 / 15 / 14 Development Versions: 19 / devel Unsupported versions: 13 / 12 / 11 / 10 / 9.6 / 9.5 / 9.4 / 9.3 / 9.2 / 9.1 / 9.0 / 8.4 / 8.3 / 8.2 / 8.1 / 8.0 / 7.4 / 7.3 / 7.2 Search the documentatio 2.5. Querying a Table Prev Up Chapter 2. The SQL Language Home Next",
+       "text": "PostgreSQL Documentation → PostgreSQL 18 Supported Versions: Current (18) / 17 / 16 / 15 / 14 Development Versions: 19 / devel Unsupported versions: 13 / 12 / 11 / 10 / 9.6 / 9.5 / 9.4 / 9.3 / 9.2 / 9.1 / 9.0 / 8.4 / 8.3 / 8.2 / 8.1 / 8.0 / 7.4 / 7.3 / 7.2 Search the documentatio 2.5. Querying a Table Prev Up Chapter 2. The SQL Language Home Next",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 637.0665320130615,
+          "r": 226.0429630815428,
+          "b": 620.8946576868897,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          23
+         ]
+        }
+       ],
+       "orig": "2.5. Querying a Table #",
+       "text": "2.5. Querying a Table #",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 1
+      },
+      {
+       "self_ref": "#/texts/2",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 602.8565725009767,
+          "r": 543.8554466593555,
+          "b": 551.505012140625,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          405
+         ]
+        }
+       ],
+       "orig": "To retrieve data from a table, the table is queried. An SQL SELECT statement is used to do this. The statement is divided into a select list (the part that lists the columns to be returned), a table list (the part that lists the tables from which to retrieve the data), and an optional qualification (the part that specifies any restrictions). For example, to retrieve all the rows of table weather, type:",
+       "text": "To retrieve data from a table, the table is queried. An SQL SELECT statement is used to do this. The statement is divided into a select list (the part that lists the columns to be returned), a table list (the part that lists the tables from which to retrieve the data), and an optional qualification (the part that specifies any restrictions). For example, to retrieve all the rows of table weather, type:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/3",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 537.6025358653173,
+          "r": 140.38197060659363,
+          "b": 532.0400703363932,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          22
+         ]
+        }
+       ],
+       "orig": "SELECT * FROM weather;",
+       "text": "SELECT * FROM weather;",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/4",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 517.6127001819552,
+          "r": 439.7870949955368,
+          "b": 505.70227592407247,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          83
+         ]
+        }
+       ],
+       "orig": "Here * is a shorthand for \"all columns\" . [2] So the same result would be had with:",
+       "text": "Here * is a shorthand for \"all columns\" . [2] So the same result would be had with:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/5",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 489.83145997246584,
+          "r": 278.95492545772015,
+          "b": 483.47972568605945,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          57
+         ]
+        }
+       ],
+       "orig": "SELECT city, temp_ lo, temp_ hi, prcp, date FROM weather;",
+       "text": "SELECT city, temp_ lo, temp_ hi, prcp, date FROM weather;",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/6",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 469.3565780634766,
+          "r": 152.98827490548828,
+          "b": 458.51673476513673,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "The output should be:",
+       "text": "The output should be:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/7",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 445.53872865611896,
+          "r": 278.95492545772015,
+          "b": 401.25990244872645,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          223
+         ]
+        }
+       ],
+       "orig": "city | temp_ lo | temp_ hi | prcp | date ---------------+---------+---------+------+------------ San Francisco | 46 | 50 | 0.25 | 1994-11-27 San Francisco | 43 | 57 | 0 | 1994-11-29 Hayward | 37 | 54 | | 1994-11-29 (3 rows)",
+       "text": "city | temp_ lo | temp_ hi | prcp | date ---------------+---------+---------+------+------------ San Francisco | 46 | 50 | 0.25 | 1994-11-27 San Francisco | 43 | 57 | 0 | 1994-11-29 Hayward | 37 | 54 | | 1994-11-29 (3 rows)",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/8",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 386.8565815009766,
+          "r": 532.6757598501757,
+          "b": 364.9483792888184,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          106
+         ]
+        }
+       ],
+       "orig": "You can write expressions, not just simple column references, in the select list. For example, you can do:",
+       "text": "You can write expressions, not just simple column references, in the select list. For example, you can do:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/9",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 349.02280372806763,
+          "r": 316.74754950802736,
+          "b": 342.4797315610594,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          67
+         ]
+        }
+       ],
+       "orig": "SELECT city, (temp_ hi+temp_ lo)/2 AS temp_ avg, date FROM weather;",
+       "text": "SELECT city, (temp_ hi+temp_ lo)/2 AS temp_ avg, date FROM weather;",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/10",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 328.35658393847655,
+          "r": 131.33202580783203,
+          "b": 317.51674064013673,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          17
+         ]
+        }
+       ],
+       "orig": "This should give:",
+       "text": "This should give:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/11",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 304.53873453111896,
+          "r": 211.76803825717397,
+          "b": 260.25990832372645,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          162
+         ]
+        }
+       ],
+       "orig": "city | temp_ avg | date ---------------+----------+------------ San Francisco | 48 | 1994-11-27 San Francisco | 50 | 1994-11-29 Hayward | 45 | 1994-11-29 (3 rows)",
+       "text": "city | temp_ avg | date ---------------+----------+------------ San Francisco | 48 | 1994-11-27 San Francisco | 50 | 1994-11-29 Hayward | 45 | 1994-11-29 (3 rows)",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/12",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 245.85658737597657,
+          "r": 479.97068704122046,
+          "b": 235.01674407763676,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          91
+         ]
+        }
+       ],
+       "orig": "Notice how the AS clause is used to relabel the output column. (The AS clause is optional.)",
+       "text": "Notice how the AS clause is used to relabel the output column. (The AS clause is optional.)",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/13",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 220.3565884384766,
+          "r": 538.5409940407912,
+          "b": 169.00502807812506,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          382
+         ]
+        }
+       ],
+       "orig": "A query can be \"qualified\" by adding a WHERE clause that specifies which rows are wanted. The WHERE clause contains a Boolean (truth value) expression, and only rows for which the Boolean expression is true are returned. The usual Boolean operators (AND, OR, and NOT) are allowed in the qualification. For example, the following retrieves the weather of San Francisco on rainy days:",
+       "text": "A query can be \"qualified\" by adding a WHERE clause that specifies which rows are wanted. The WHERE clause contains a Boolean (truth value) expression, and only rows for which the Boolean expression is true are returned. The usual Boolean operators (AND, OR, and NOT) are allowed in the qualification. For example, the following retrieves the weather of San Francisco on rainy days:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/14",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 155.1025518028173,
+          "r": 136.1827901565595,
+          "b": 150.476275189695,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "SELECT * FROM weather",
+       "text": "SELECT * FROM weather",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/15",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 147.83147422246589,
+          "r": 278.95492545772015,
+          "b": 90.97853962627482,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          108
+         ]
+        }
+       ],
+       "orig": "WHERE city = 'San Francisco' AND prcp \u003e 0.0; Result: ---------------+---------+---------+------+------------",
+       "text": "WHERE city = 'San Francisco' AND prcp \u003e 0.0; Result: ---------------+---------+---------+------+------------",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/16",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 103.53874290611896,
+          "r": 274.755745007686,
+          "b": 74.25991607372646,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          92
+         ]
+        }
+       ],
+       "orig": "city | temp_ lo | temp_ hi | prcp | date San Francisco | 46 | 50 | 0.25 | 1994-11-27 (1 row)",
+       "text": "city | temp_ lo | temp_ hi | prcp | date San Francisco | 46 | 50 | 0.25 | 1994-11-27 (1 row)",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/17",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 59.85659512597658,
+          "r": 383.02146880577146,
+          "b": 49.00503307812505,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          72
+         ]
+        }
+       ],
+       "orig": "You can request that the results of a query be returned in sorted order:",
+       "text": "You can request that the results of a query be returned in sorted order:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/18",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 799.3525249590673,
+          "r": 136.1827901565595,
+          "b": 786.0167199132121,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          36
+         ]
+        }
+       ],
+       "orig": "SELECT * FROM weather ORDER BY city;",
+       "text": "SELECT * FROM weather ORDER BY city;",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/19",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 778.538714781119,
+          "r": 278.95492545772015,
+          "b": 741.4079632308338,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          214
+         ]
+        }
+       ],
+       "orig": "city | temp_ lo | temp_ hi | prcp | date ---------------+---------+---------+------+------------ Hayward | 37 | 54 | | 1994-11-29 San Francisco | 43 | 57 | 0 | 1994-11-29 San Francisco | 46 | 50 | 0.25 | 1994-11-27",
+       "text": "city | temp_ lo | temp_ hi | prcp | date ---------------+---------+---------+------+------------ Hayward | 37 | 54 | | 1994-11-29 San Francisco | 43 | 57 | 0 | 1994-11-29 San Francisco | 46 | 50 | 0.25 | 1994-11-27",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/20",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 727.3565673134766,
+          "r": 519.4159943576659,
+          "b": 703.005005828125,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          171
+         ]
+        }
+       ],
+       "orig": "In this example, the sort order isn't fully specified, and so you might get the San Francisco rows in either order. But you'd always get the results shown above if you do:",
+       "text": "In this example, the sort order isn't fully specified, and so you might get the San Francisco rows in either order. But you'd always get the results shown above if you do:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/21",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 689.1025295528173,
+          "r": 161.3778728567643,
+          "b": 675.4797176860595,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          46
+         ]
+        }
+       ],
+       "orig": "SELECT * FROM weather ORDER BY city, temp_ lo;",
+       "text": "SELECT * FROM weather ORDER BY city, temp_ lo;",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/22",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 661.3565700634766,
+          "r": 407.01560844601556,
+          "b": 650.5050080156251,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          74
+         ]
+        }
+       ],
+       "orig": "You can request that duplicate rows be removed from the result of a query:",
+       "text": "You can request that duplicate rows be removed from the result of a query:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/23",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 636.8314538474658,
+          "r": 131.98360970652536,
+          "b": 578.2598950737264,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          86
+         ]
+        }
+       ],
+       "orig": "SELECT DISTINCT city FROM weather; city --------------- Hayward San Francisco (2 rows)",
+       "text": "SELECT DISTINCT city FROM weather; city --------------- Hayward San Francisco (2 rows)",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/24",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 563.8565741259766,
+          "r": 528.6240054539992,
+          "b": 536.2706340253908,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          126
+         ]
+        }
+       ],
+       "orig": "Here again, the result row ordering might vary. You can ensure consistent results by using DISTINCT and ORDER BY together: [3]",
+       "text": "Here again, the result row ordering might vary. You can ensure consistent results by using DISTINCT and ORDER BY together: [3]",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/25",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 522.8314585974658,
+          "r": 131.98360970652536,
+          "b": 501.76673175696214,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          48
+         ]
+        }
+       ],
+       "orig": "SELECT DISTINCT city FROM weather ORDER BY city;",
+       "text": "SELECT DISTINCT city FROM weather ORDER BY city;",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/26",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 459.1127026194549,
+          "r": 525.7265416447265,
+          "b": 431.5167358901367,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          169
+         ]
+        }
+       ],
+       "orig": "[2] While SELECT * is useful for off-the-cuff queries, it is widely considered bad style in production code, since adding a column to the table would change the results.",
+       "text": "While SELECT * is useful for off-the-cuff queries, it is widely considered bad style in production code, since adding a column to the table would change the results.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "[2]"
+      },
+      {
+       "self_ref": "#/texts/27",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 417.1419939187963,
+          "r": 544.7372822826126,
+          "b": 376.0167382026368,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          295
+         ]
+        }
+       ],
+       "orig": "[3] In some database systems, including older versions of PostgreSQL, the implementation of DISTINCT automatically orders the rows and so ORDER BY is unnecessary. But this is not required by the SQL standard, and current PostgreSQL does not guarantee that DISTINCT causes the rows to be ordered.",
+       "text": "[3] In some database systems, including older versions of PostgreSQL, the implementation of DISTINCT automatically orders the rows and so ORDER BY is unnecessary. But this is not required by the SQL standard, and current PostgreSQL does not guarantee that DISTINCT causes the rows to be ordered.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/28",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 302.62806938549807,
+          "r": 187.15721895178223,
+          "b": 289.8575621051025,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          17
+         ]
+        }
+       ],
+       "orig": "Submit correction",
+       "text": "Submit correction",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/29",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 268.32143018994157,
+          "r": 539.1503683554006,
+          "b": 244.01674370263686,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          209
+         ]
+        }
+       ],
+       "orig": "If you see anything in the documentation that is not correct, does not match your experience with the particular feature or requires further clarification, please use this form to report a documentation issue.",
+       "text": "If you see anything in the documentation that is not correct, does not match your experience with the particular feature or requires further clarification, please use this form to report a documentation issue.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/30",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 229.32143181494143,
+          "r": 98.3203083433203,
+          "b": 220.94838528881837,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          11
+         ]
+        }
+       ],
+       "orig": "Site footer",
+       "text": "Site footer",
+       "formatting": null,
+       "hyperlink": null
+      }
+     ],
+     "pictures": [],
+     "tables": [
+      {
+       "self_ref": "#/tables/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "table",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 48.81724777901835,
+          "t": 353.9082325956406,
+          "r": 546.6745174742464,
+          "b": 324.20951887789147,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          0
+         ]
+        }
+       ],
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "data": {
+        "table_cells": [
+         {
+          "bbox": {
+           "l": 50.249997906249995,
+           "t": 491.5605263933104,
+           "r": 72.2460907097461,
+           "b": 499.64060418164047,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 0,
+          "end_row_offset_idx": 1,
+          "start_col_offset_idx": 0,
+          "end_col_offset_idx": 1,
+          "text": "Prev",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 290.77733538427714,
+           "t": 491.5605263933104,
+           "r": 305.4433504131932,
+           "b": 502.11326032861314,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 0,
+          "end_row_offset_idx": 1,
+          "start_col_offset_idx": 1,
+          "end_col_offset_idx": 2,
+          "text": "Up",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 522.6679507221678,
+           "t": 491.5605263933104,
+           "r": 545.994121670244,
+           "b": 499.64060418164047,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 0,
+          "end_row_offset_idx": 1,
+          "start_col_offset_idx": 2,
+          "end_col_offset_idx": 3,
+          "text": "Next",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 50.249997906249995,
+           "t": 507.77341634277343,
+           "r": 217.49413199774412,
+           "b": 518.6132596411131,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 1,
+          "end_row_offset_idx": 2,
+          "start_col_offset_idx": 0,
+          "end_col_offset_idx": 1,
+          "text": "2.4. Populating a Table With Rows",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 283.4531131894531,
+           "t": 508.0605257058104,
+           "r": 312.77928388752923,
+           "b": 516.1816191174315,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 1,
+          "end_row_offset_idx": 2,
+          "start_col_offset_idx": 1,
+          "end_col_offset_idx": 2,
+          "text": "Home",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         },
+         {
+          "bbox": {
+           "l": 421.4062324414062,
+           "t": 507.77341634277343,
+           "r": 545.9999773700001,
+           "b": 516.1816191174315,
+           "coord_origin": "TOPLEFT"
+          },
+          "row_span": 1,
+          "col_span": 1,
+          "start_row_offset_idx": 1,
+          "end_row_offset_idx": 2,
+          "start_col_offset_idx": 2,
+          "end_col_offset_idx": 3,
+          "text": "2.6. Joins Between Tables",
+          "column_header": false,
+          "row_header": false,
+          "row_section": false,
+          "fillable": false
+         }
+        ],
+        "num_rows": 2,
+        "num_cols": 3,
+        "orientation": "rot_0",
+        "grid": [
+         [
+          {
+           "bbox": {
+            "l": 50.249997906249995,
+            "t": 491.5605263933104,
+            "r": 72.2460907097461,
+            "b": 499.64060418164047,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 0,
+           "end_row_offset_idx": 1,
+           "start_col_offset_idx": 0,
+           "end_col_offset_idx": 1,
+           "text": "Prev",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 290.77733538427714,
+            "t": 491.5605263933104,
+            "r": 305.4433504131932,
+            "b": 502.11326032861314,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 0,
+           "end_row_offset_idx": 1,
+           "start_col_offset_idx": 1,
+           "end_col_offset_idx": 2,
+           "text": "Up",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 522.6679507221678,
+            "t": 491.5605263933104,
+            "r": 545.994121670244,
+            "b": 499.64060418164047,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 0,
+           "end_row_offset_idx": 1,
+           "start_col_offset_idx": 2,
+           "end_col_offset_idx": 3,
+           "text": "Next",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          }
+         ],
+         [
+          {
+           "bbox": {
+            "l": 50.249997906249995,
+            "t": 507.77341634277343,
+            "r": 217.49413199774412,
+            "b": 518.6132596411131,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 1,
+           "end_row_offset_idx": 2,
+           "start_col_offset_idx": 0,
+           "end_col_offset_idx": 1,
+           "text": "2.4. Populating a Table With Rows",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 283.4531131894531,
+            "t": 508.0605257058104,
+            "r": 312.77928388752923,
+            "b": 516.1816191174315,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 1,
+           "end_row_offset_idx": 2,
+           "start_col_offset_idx": 1,
+           "end_col_offset_idx": 2,
+           "text": "Home",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          },
+          {
+           "bbox": {
+            "l": 421.4062324414062,
+            "t": 507.77341634277343,
+            "r": 545.9999773700001,
+            "b": 516.1816191174315,
+            "coord_origin": "TOPLEFT"
+           },
+           "row_span": 1,
+           "col_span": 1,
+           "start_row_offset_idx": 1,
+           "end_row_offset_idx": 2,
+           "start_col_offset_idx": 2,
+           "end_col_offset_idx": 3,
+           "text": "2.6. Joins Between Tables",
+           "column_header": false,
+           "row_header": false,
+           "row_section": false,
+           "fillable": false
+          }
+         ]
+        ]
+       },
+       "annotations": []
+      }
+     ],
+     "key_value_items": [],
+     "form_items": [],
+     "pages": {
+      "1": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 1
+      },
+      "2": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 2
+      }
+     }
+    },
+    "html_content": null,
+    "text_content": null,
+    "doctags_content": null,
+    "doclang_content": null
+   },
+   "status": "success",
+   "errors": [],
+   "processing_time": 2.5020509710002443,
+   "timings": {},
+   "confidence": {
+    "parse_score": 1.0,
+    "layout_score": 0.8228730635037498,
+    "table_score": null,
+    "ocr_score": null,
+    "mean_score": 0.9114365317518749,
+    "low_score": 0.8317294103285624,
+    "mean_grade": "excellent",
+    "low_grade": "good",
+    "pages": {
+     "2": {
+      "parse_score": 1.0,
+      "layout_score": 0.8441080238137927,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9220540119068963,
+      "low_score": 0.851902622623103,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     },
+     "1": {
+      "parse_score": 1.0,
+      "layout_score": 0.801638103193707,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9008190515968535,
+      "low_score": 0.8115561980340217,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     }
+    }
+   }
+  }
+ },
+ "lines": {
+  "status": 200,
+  "body": {
+   "blocks": [
+    [
+     {
+      "text": "PostgreSQL",
+      "mono": false
+     },
+     {
+      "text": "Documentation \u2192 PostgreSQL 18",
+      "mono": false
+     },
+     {
+      "text": "Supported Versions: Current (18) / 17 / 16 / 15 / 14",
+      "mono": false
+     },
+     {
+      "text": "Development Versions: 19 / devel",
+      "mono": false
+     },
+     {
+      "text": "Unsupported versions: 13 / 12 / 11 / 10 / 9.6 / 9.5 / 9.4 / 9.3 / 9.2 / 9.1 / 9.0 / 8.4 / 8.3 / 8.2 / 8.1 / 8.0 /",
+      "mono": false
+     },
+     {
+      "text": "7.4 / 7.3 / 7.2",
+      "mono": false
+     },
+     {
+      "text": "Search the documentatio",
+      "mono": false
+     },
+     {
+      "text": "2.5. Querying a Table",
+      "mono": false
+     },
+     {
+      "text": "Prev Up Chapter 2. The SQL Language Home Next",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "To retrieve data from a table, the table is queried. An SQL SELECT statement is used to do this. The",
+      "mono": false
+     },
+     {
+      "text": "statement is divided into a select list (the part that lists the columns to be returned), a table list (the part",
+      "mono": false
+     },
+     {
+      "text": "that lists the tables from which to retrieve the data), and an optional qualification (the part that specifies",
+      "mono": false
+     },
+     {
+      "text": "any restrictions). For example, to retrieve all the rows of table weather, type:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "SELECT * FROM weather;",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Here * is a shorthand for \u201call columns\u201d. [2] So the same result would be had with:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "SELECT city, temp_lo, temp_hi, prcp, date FROM weather;",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "The output should be:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "     city      | temp_lo | temp_hi | prcp |    date",
+      "mono": true
+     },
+     {
+      "text": "---------------+---------+---------+------+------------",
+      "mono": true
+     },
+     {
+      "text": " San Francisco |      46 |      50 | 0.25 | 1994-11-27",
+      "mono": true
+     },
+     {
+      "text": " San Francisco |      43 |      57 |    0 | 1994-11-29",
+      "mono": true
+     },
+     {
+      "text": " Hayward       |      37 |      54 |      | 1994-11-29",
+      "mono": true
+     },
+     {
+      "text": "(3 rows)",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "You can write expressions, not just simple column references, in the select list. For example, you can",
+      "mono": false
+     },
+     {
+      "text": "do:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "SELECT city, (temp_hi+temp_lo)/2 AS temp_avg, date FROM weather;",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "This should give:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "     city      | temp_avg |    date",
+      "mono": true
+     },
+     {
+      "text": "---------------+----------+------------",
+      "mono": true
+     },
+     {
+      "text": " San Francisco |       48 | 1994-11-27",
+      "mono": true
+     },
+     {
+      "text": " San Francisco |       50 | 1994-11-29",
+      "mono": true
+     },
+     {
+      "text": " Hayward       |       45 | 1994-11-29",
+      "mono": true
+     },
+     {
+      "text": "(3 rows)",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Notice how the AS clause is used to relabel the output column. (The AS clause is optional.)",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "A query can be \u201cqualified\u201d by adding a WHERE clause that specifies which rows are wanted. The WHERE",
+      "mono": false
+     },
+     {
+      "text": "clause contains a Boolean (truth value) expression, and only rows for which the Boolean expression is",
+      "mono": false
+     },
+     {
+      "text": "true are returned. The usual Boolean operators (AND, OR, and NOT) are allowed in the qualification. For",
+      "mono": false
+     },
+     {
+      "text": "example, the following retrieves the weather of San Francisco on rainy days:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "SELECT * FROM weather",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "    WHERE city = 'San Francisco' AND prcp \u003e 0.0;",
+      "mono": true
+     },
+     {
+      "text": "Result:",
+      "mono": false
+     },
+     {
+      "text": "     city      | temp_lo | temp_hi | prcp |    date",
+      "mono": true
+     },
+     {
+      "text": "---------------+---------+---------+------+------------",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "     city      | temp_lo | temp_hi | prcp |    date",
+      "mono": true
+     },
+     {
+      "text": "---------------+---------+---------+------+------------",
+      "mono": true
+     },
+     {
+      "text": " San Francisco |      46 |      50 | 0.25 | 1994-11-27",
+      "mono": true
+     },
+     {
+      "text": "(1 row)",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "You can request that the results of a query be returned in sorted order:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "SELECT * FROM weather",
+      "mono": true
+     },
+     {
+      "text": "    ORDER BY city;",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "     city      | temp_lo | temp_hi | prcp |    date",
+      "mono": true
+     },
+     {
+      "text": "---------------+---------+---------+------+------------",
+      "mono": true
+     },
+     {
+      "text": " Hayward       |      37 |      54 |      | 1994-11-29",
+      "mono": true
+     },
+     {
+      "text": " San Francisco |      43 |      57 |    0 | 1994-11-29",
+      "mono": true
+     },
+     {
+      "text": " San Francisco |      46 |      50 | 0.25 | 1994-11-27",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "In this example, the sort order isn't fully specified, and so you might get the San Francisco rows in",
+      "mono": false
+     },
+     {
+      "text": "either order. But you'd always get the results shown above if you do:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "SELECT * FROM weather",
+      "mono": true
+     },
+     {
+      "text": "    ORDER BY city, temp_lo;",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "You can request that duplicate rows be removed from the result of a query:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "SELECT DISTINCT city",
+      "mono": true
+     },
+     {
+      "text": "    FROM weather;",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "     city",
+      "mono": true
+     },
+     {
+      "text": "---------------",
+      "mono": true
+     },
+     {
+      "text": " Hayward",
+      "mono": true
+     },
+     {
+      "text": " San Francisco",
+      "mono": true
+     },
+     {
+      "text": "(2 rows)",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Here again, the result row ordering might vary. You can ensure consistent results by using DISTINCT",
+      "mono": false
+     },
+     {
+      "text": "and ORDER BY together: [3]",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "SELECT DISTINCT city",
+      "mono": true
+     },
+     {
+      "text": "    FROM weather",
+      "mono": true
+     },
+     {
+      "text": "    ORDER BY city;",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "[3] In some database systems, including older versions of PostgreSQL, the implementation of DISTINCT",
+      "mono": false
+     },
+     {
+      "text": "automatically orders the rows and so ORDER BY is unnecessary. But this is not required by the SQL",
+      "mono": false
+     },
+     {
+      "text": "standard, and current PostgreSQL does not guarantee that DISTINCT causes the rows to be ordered.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "If you see anything in the documentation that is not correct, does not match your experience with the",
+      "mono": false
+     },
+     {
+      "text": "particular feature or requires further clarification, please use this form to report a documentation issue.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Site footer",
+      "mono": false
+     }
+    ]
+   ]
+  }
+ }
+}

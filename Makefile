@@ -74,6 +74,18 @@ run-idp: ## Run the fake GitHub sign-in on 127.0.0.1:8090 (dev only); make stop 
 run-llm: ## Run the fake chat model on 127.0.0.1:8094 (dev only); make stop ends it
 	sh scripts/run.sh llm go run ./cmd/fakellm
 
+pdf-fixtures: ## Print the PDF import's fixtures into testdata/pdf (Chromium, qpdf); make pdf-record after
+	@$(node_required)
+	$(WEB) exec node scripts/pdf-fixtures.ts ../..
+	qpdf --encrypt ronote-fixture owner-fixture 256 -- testdata/pdf/real-python-controlflow.pdf testdata/pdf/encrypted.pdf
+
+pdf-record: ## Record docling's and pdftext's answers for every PDF fixture, then the IR goldens and report (make dev-up-docling first); local only
+	go test ./internal/fakedocling -run TestRecordings -record -count=1 -timeout 30m
+	go test ./internal/docling -run 'TestFixturesMapToGoldens|TestPDFCodeIsVerbatim' -update -count=1
+
+run-docling: ## Run the fake docling and pdftext on 127.0.0.1:5001 and :5002 (dev only); make stop ends it
+	sh scripts/run.sh docling go run ./cmd/fakedocling
+
 extract: ## Print a page's IR: make extract url=https://... [format=text]
 	@test -n "$(url)" || { echo "usage: make extract url=https://... [format=text]" >&2; exit 1; }
 	go run ./cmd/extract --format=$(or $(format),json) "$(url)"
@@ -223,7 +235,7 @@ web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromiu
 	go build -o bin/e2e/ ./cmd/api ./cmd/worker ./cmd/fakeidp ./cmd/fakeembed ./cmd/fakellm
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" $(WEB) e2e
 
-.PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp run-llm extract lint lint-go lint-web fmt
+.PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp run-llm run-docling pdf-fixtures pdf-record extract lint lint-go lint-web fmt
 .PHONY: doctor stop dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version

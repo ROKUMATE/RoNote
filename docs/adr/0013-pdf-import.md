@@ -38,7 +38,7 @@ From P18 on, students import PDFs as well as pages: textbook chapters and lectur
   - a line a code block wraps across in print, which comes back as two lines;
   - a block split by a page break, which comes back as two blocks.
 - **Page anchors: IR version 2.** Every block from a PDF records its 1-based page (`page`, its first page when it spans more). It is a shape change, so ADR 0004's rule applies, by a bump with an upgrade path:
-  - IR 2 adds `block.page`, `source.pdf` (`filename`, `sha256`, `pages`; a PDF's source has no URL), the `figures_omitted` warning code and a warning's `count`. Nothing in version 1 changes meaning, so a version 1 document is a valid version 2 one;
+  - IR 2 adds `block.page`, `source.pdf` (`filename`, `pages`; a PDF's source has no URL, and its `body_sha256` is the file's), the `figures_omitted` warning code and a warning's `count`. Nothing in version 1 changes meaning, so a version 1 document is a valid version 2 one;
   - migration 00014 sets every stored extraction's version to 2; the eval corpus and the goldens are rewritten in the same change;
   - DocContent stays `doc_version` 1: `page` is an optional field whose absence means what it meant before (ADR 0006's exception), and the editor carries it through edits like a block's id.
 - **API.**

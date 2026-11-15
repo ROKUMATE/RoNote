@@ -76,11 +76,14 @@ func TestValidate(t *testing.T) {
 		wantErr string
 	}{
 		{name: "valid document", mutate: func(*Doc) {}},
-		{name: "wrong IR version", mutate: func(d *Doc) { d.IRVersion = 2 }, wantErr: "ir_version: is 2, want 1"},
+		{name: "wrong IR version", mutate: func(d *Doc) { d.IRVersion = 1 }, wantErr: "ir_version: is 1, want 2"},
 		{name: "relative final URL", mutate: func(d *Doc) { d.Source.FinalURL = "/doc" }, wantErr: `source.final_url: "/doc" is not an absolute http(s) URL`},
 		{name: "missing final URL", mutate: func(d *Doc) { d.Source.FinalURL = "" }, wantErr: "source.final_url: is empty"},
 		{name: "missing extractor", mutate: func(d *Doc) { d.Extractor = Extractor{} }, wantErr: "extractor: needs a name and a version"},
 		{name: "unknown warning", mutate: func(d *Doc) { d.Warnings[0].Code = "odd" }, wantErr: `warnings[0]: unknown code "odd"`},
+		{name: "count on another warning", mutate: func(d *Doc) { d.Warnings[0].Count = 2 }, wantErr: "warnings[0]: low_confidence has a count"},
+		{name: "page on a web page's block", mutate: func(d *Doc) { d.Blocks[1].Page = 1 }, wantErr: "blocks[1]: has page 1, but the source is not a PDF"},
+		{name: "page on a web page's nested block", mutate: func(d *Doc) { d.Blocks[5].Children[0].Page = 1 }, wantErr: "blocks[5].children[0]: has page 1"},
 		{name: "unknown kind", mutate: func(d *Doc) { d.Blocks[8].Kind = "marquee" }, wantErr: `blocks[8]: unknown kind "marquee"`},
 		{name: "field from another kind", mutate: func(d *Doc) { d.Blocks[1].Lang = "go" }, wantErr: "blocks[1]: paragraph block sets lang"},
 		{name: "title on a paragraph", mutate: func(d *Doc) { d.Blocks[1].Title = "main.go" }, wantErr: "blocks[1]: paragraph block sets title"},
@@ -142,9 +145,87 @@ func TestValidate(t *testing.T) {
 	}
 }
 
+// pdfDoc is sampleDoc as converted from a 3-page PDF: no URLs, and every
+// block, nested ones included, on a page.
+func pdfDoc() *Doc {
+	doc := sampleDoc()
+	doc.Source = Source{
+		FetchedAt:  doc.Source.FetchedAt,
+		BodySHA256: doc.Source.BodySHA256,
+		PDF:        &PDF{Filename: "Lecture 3.pdf", Pages: 3},
+	}
+	doc.Warnings = []Warning{{Code: WarningFiguresOmitted, Message: "2 figures are not shown.", Count: 2}}
+	var onPages func(blocks []Block, page int)
+	onPages = func(blocks []Block, page int) {
+		for i := range blocks {
+			blocks[i].Page = min(page+i/4, 3)
+			onPages(blocks[i].Children, blocks[i].Page)
+			for _, item := range blocks[i].Items {
+				onPages(item.Children, blocks[i].Page)
+			}
+		}
+	}
+	onPages(doc.Blocks, 1)
+	return doc
+}
+
+func TestValidatePDF(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		mutate  func(*Doc)
+		wantErr string
+	}{
+		{name: "valid PDF document", mutate: func(*Doc) {}},
+		{name: "block without a page", mutate: func(d *Doc) { d.Blocks[1].Page = 0 }, wantErr: "blocks[1]: page 0 is not 1-3"},
+		{name: "page past the end", mutate: func(d *Doc) { d.Blocks[9].Page = 4 }, wantErr: "blocks[9]: page 4 is not 1-3"},
+		{name: "nested block without a page", mutate: func(d *Doc) { d.Blocks[2].Items[0].Children[0].Page = 0 }, wantErr: "blocks[2].items[0].children[0]: page 0 is not 1-3"},
+		{name: "URL on a PDF", mutate: func(d *Doc) { d.Source.FinalURL = "https://example.com/a.pdf" }, wantErr: "source: a PDF's source has a URL"},
+		{name: "no filename", mutate: func(d *Doc) { d.Source.PDF.Filename = "" }, wantErr: "source.pdf.filename: is empty"},
+		{name: "no pages", mutate: func(d *Doc) { d.Source.PDF.Pages = 0 }, wantErr: "source.pdf.pages: is 0, want at least 1"},
+		{name: "figures without a count", mutate: func(d *Doc) { d.Warnings[0].Count = 0 }, wantErr: "warnings[0]: figures_omitted counts 0 figures"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			doc := pdfDoc()
+			tt.mutate(doc)
+			err := Validate(doc)
+			switch {
+			case tt.wantErr == "" && err != nil:
+				t.Fatalf("Validate() = %v, want nil", err)
+			case tt.wantErr != "" && (err == nil || !strings.Contains(err.Error(), tt.wantErr)):
+				t.Fatalf("Validate() = %v, want it to contain %q", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestValidateBlocksTakesAnyPage(t *testing.T) {
+	t.Parallel()
+	if err := ValidateBlocks(pdfDoc().Blocks); err != nil {
+		t.Errorf("ValidateBlocks(PDF blocks) = %v", err)
+	}
+	if err := ValidateBlocks(sampleDoc().Blocks); err != nil {
+		t.Errorf("ValidateBlocks(web blocks) = %v", err)
+	}
+	blocks := pdfDoc().Blocks
+	blocks[0].Page = -1
+	if err := ValidateBlocks(blocks); err == nil || !strings.Contains(err.Error(), "blocks[0]: page -1 is negative") {
+		t.Errorf("ValidateBlocks(page -1) = %v", err)
+	}
+}
+
 func TestJSONRoundTrip(t *testing.T) {
 	t.Parallel()
-	doc := sampleDoc()
+	for _, doc := range []*Doc{sampleDoc(), pdfDoc()} {
+		roundTrip(t, doc)
+	}
+}
+
+func roundTrip(t *testing.T, doc *Doc) {
+	t.Helper()
 
 	data, err := json.Marshal(doc)
 	if err != nil {

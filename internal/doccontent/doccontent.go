@@ -166,6 +166,9 @@ func validateOrigin(path string, b *Block) *Problem {
 		if b.Edited != nil || b.SourceBlockID != "" {
 			return problem(CodeInvalidContent, "%s: user block has source fields", path)
 		}
+		if b.Page != 0 {
+			return problem(CodeInvalidContent, "%s: user block is on page %d of the source", path, b.Page)
+		}
 		if id, err := uuid.Parse(b.ID); err != nil || id.Version() != 7 {
 			return problem(CodeInvalidContent, "%s: user block id %q is not a UUIDv7", path, b.ID)
 		}

@@ -687,7 +687,10 @@ type IRItem = ir.Item
 // IRLink defines model for IRLink.
 type IRLink = ir.Link
 
-// IRSource defines model for IRSource.
+// IRPDF defines model for IRPDF.
+type IRPDF = ir.PDF
+
+// IRSource Where the page was fetched from, or for a PDF (pdf set) which file it was converted from; a PDF's URLs are empty and body_sha256 is the file's.
 type IRSource = ir.Source
 
 // IRWarning defines model for IRWarning.

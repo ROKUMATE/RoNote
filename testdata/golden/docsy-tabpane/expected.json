@@ -1,5 +1,5 @@
 {
-  "ir_version": 1,
+  "ir_version": 2,
   "title": "Configure the Runner",
   "source": {
     "url": "https://runner.example.dev/docs/configure/",

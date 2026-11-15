@@ -1752,6 +1752,10 @@ components:
         kind:
           type: string
           enum: [heading, paragraph, list, code, table, callout, image, quote, divider, tabs]
+        page:
+          type: integer
+          minimum: 1
+          description: The PDF page the block starts on; only blocks from a PDF have one.
         level:
           type: integer
           minimum: 1
@@ -1803,7 +1807,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/IRInline"
-    # The IR, version 1 (docs/adr/0004-ir-and-links.md). Go uses package
+    # The IR, version 2 (docs/adr/0004-ir-and-links.md, docs/adr/0013-pdf-import.md). Go uses package
     # internal/ir for these; TestIRSchemaMatchesGoldens checks they agree.
     IRDocument:
       x-go-type: ir.Doc
@@ -1815,7 +1819,7 @@ components:
       properties:
         ir_version:
           type: integer
-          enum: [1]
+          enum: [2]
         title:
           type: string
         source:
@@ -1837,6 +1841,10 @@ components:
       type: object
       additionalProperties: false
       required: [url, final_url, fetched_at, body_sha256]
+      description: >-
+        Where the page was fetched from, or for a PDF (pdf set) which file it
+        was converted from; a PDF's URLs are empty and body_sha256 is the
+        file's.
       properties:
         url:
           type: string
@@ -1853,6 +1861,21 @@ components:
           type: string
         last_modified:
           type: string
+        pdf:
+          $ref: "#/components/schemas/IRPDF"
+    IRPDF:
+      x-go-type: ir.PDF
+      x-go-type-import:
+        path: github.com/rokumate/ronote/internal/ir
+      type: object
+      additionalProperties: false
+      required: [filename, pages]
+      properties:
+        filename:
+          type: string
+        pages:
+          type: integer
+          minimum: 1
     IRExtractor:
       x-go-type: ir.Extractor
       x-go-type-import:
@@ -1875,9 +1898,13 @@ components:
       properties:
         code:
           type: string
-          enum: [low_confidence, parse_failed, adapter_fallback]
+          enum: [low_confidence, parse_failed, adapter_fallback, figures_omitted]
         message:
           type: string
+        count:
+          type: integer
+          minimum: 1
+          description: How many figures figures_omitted left out.
     IRBlock:
       x-go-type: ir.Block
       x-go-type-import:
@@ -1897,6 +1924,10 @@ components:
         kind:
           type: string
           enum: [heading, paragraph, list, code, table, callout, image, quote, divider, tabs]
+        page:
+          type: integer
+          minimum: 1
+          description: The PDF page the block starts on; only blocks from a PDF have one.
         level:
           type: integer
           minimum: 1

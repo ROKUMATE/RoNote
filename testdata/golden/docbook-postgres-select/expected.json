@@ -1,5 +1,5 @@
 {
-  "ir_version": 1,
+  "ir_version": 2,
   "title": "PostgreSQL: Documentation: 18: 2.5. Querying a Table",
   "source": {
     "url": "https://www.postgresql.org/docs/current/tutorial-select.html",

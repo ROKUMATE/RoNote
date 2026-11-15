@@ -1,5 +1,5 @@
 {
-  "ir_version": 1,
+  "ir_version": 2,
   "title": "Generator over host",
   "source": {
     "url": "https://go.dev/doc/mirror",

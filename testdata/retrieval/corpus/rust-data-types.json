@@ -1,5 +1,5 @@
 {
-  "ir_version": 1,
+  "ir_version": 2,
   "title": "Data Types - The Rust Programming Language",
   "source": {
     "url": "https://doc.rust-lang.org/book/ch03-02-data-types.html",

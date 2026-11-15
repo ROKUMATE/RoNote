@@ -26,7 +26,7 @@ var fieldsByKind = map[Kind][]string{
 var (
 	marks    = []Mark{MarkBold, MarkItalic, MarkCode, MarkKbd, MarkStrike, MarkSub, MarkSup}
 	variants = []Variant{VariantNote, VariantTip, VariantInfo, VariantWarning, VariantDanger}
-	warnings = []WarningCode{WarningLowConfidence, WarningParseFailed, WarningAdapterFallback}
+	warnings = []WarningCode{WarningLowConfidence, WarningParseFailed, WarningAdapterFallback, WarningFiguresOmitted}
 )
 
 // Validate reports every way doc breaks the IR's rules, joined into one
@@ -37,15 +37,35 @@ func Validate(doc *Doc) error {
 	if doc.IRVersion != Version {
 		v.fail("ir_version", "is %d, want %d", doc.IRVersion, Version)
 	}
-	v.url("source.url", doc.Source.URL, false)
-	v.url("source.final_url", doc.Source.FinalURL, true)
-	v.url("source.canonical_url", doc.Source.CanonicalURL, false)
+	if pdf := doc.Source.PDF; pdf != nil {
+		// A PDF's blocks each name a page of it; it has no URLs.
+		if pdf.Filename == "" {
+			v.fail("source.pdf.filename", "is empty")
+		}
+		if pdf.Pages < 1 {
+			v.fail("source.pdf.pages", "is %d, want at least 1", pdf.Pages)
+		}
+		if doc.Source.URL != "" || doc.Source.FinalURL != "" || doc.Source.CanonicalURL != "" {
+			v.fail("source", "a PDF's source has a URL")
+		}
+		v.pages = pdf.Pages
+	} else {
+		v.url("source.url", doc.Source.URL, false)
+		v.url("source.final_url", doc.Source.FinalURL, true)
+		v.url("source.canonical_url", doc.Source.CanonicalURL, false)
+	}
 	if doc.Extractor.Name == "" || doc.Extractor.Version == "" {
 		v.fail("extractor", "needs a name and a version")
 	}
 	for i, w := range doc.Warnings {
-		if !slices.Contains(warnings, w.Code) {
-			v.fail(fmt.Sprintf("warnings[%d]", i), "unknown code %q", w.Code)
+		path := fmt.Sprintf("warnings[%d]", i)
+		switch {
+		case !slices.Contains(warnings, w.Code):
+			v.fail(path, "unknown code %q", w.Code)
+		case w.Code == WarningFiguresOmitted && w.Count < 1:
+			v.fail(path, "figures_omitted counts %d figures", w.Count)
+		case w.Code != WarningFiguresOmitted && w.Count != 0:
+			v.fail(path, "%s has a count", w.Code)
 		}
 	}
 	v.blocks("blocks", doc.Blocks)
@@ -54,9 +74,10 @@ func Validate(doc *Doc) error {
 
 // ValidateBlocks checks blocks the way Validate checks a document's: each
 // block's fields for its kind, links and URLs, and ids unique across all of
-// them, nested ones included.
+// them, nested ones included. Not knowing the source, it takes any page
+// number from 1 up, or none.
 func ValidateBlocks(blocks []Block) error {
-	v := validator{ids: map[string]string{}}
+	v := validator{ids: map[string]string{}, pages: -1}
 	v.blocks("blocks", blocks)
 	return errors.Join(v.errs...)
 }
@@ -64,6 +85,9 @@ func ValidateBlocks(blocks []Block) error {
 type validator struct {
 	errs []error
 	ids  map[string]string // block ID -> path of the block that has it
+	// pages is the PDF's page count, which every block's page must be within;
+	// 0 for a web page, whose blocks have none; -1 when unknown.
+	pages int
 }
 
 func (v *validator) fail(path, format string, args ...any) {
@@ -98,6 +122,15 @@ func (v *validator) block(path string, b *Block) {
 		v.fail(path, "repeats id %q from %s", b.ID, v.ids[b.ID])
 	default:
 		v.ids[b.ID] = path
+	}
+
+	switch {
+	case v.pages == 0 && b.Page != 0:
+		v.fail(path, "has page %d, but the source is not a PDF", b.Page)
+	case v.pages > 0 && (b.Page < 1 || b.Page > v.pages):
+		v.fail(path, "page %d is not 1-%d", b.Page, v.pages)
+	case v.pages < 0 && b.Page < 0:
+		v.fail(path, "page %d is negative", b.Page)
 	}
 
 	allowed, known := fieldsByKind[b.Kind]

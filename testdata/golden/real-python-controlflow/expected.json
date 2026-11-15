@@ -1,5 +1,5 @@
 {
-  "ir_version": 1,
+  "ir_version": 2,
   "title": "4. More Control Flow Tools",
   "source": {
     "url": "https://docs.python.org/3/tutorial/controlflow.html",

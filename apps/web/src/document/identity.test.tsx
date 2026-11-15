@@ -8,6 +8,7 @@ import { Reader } from "./Reader";
 const p1: DocBlock = {
   id: "p1",
   kind: "paragraph",
+  page: 2,
   content: [{ text: "Install it." }],
   origin: "source",
   edited: false,
@@ -99,9 +100,13 @@ test("splitting a source block keeps the page's half as source and makes the res
   });
 
   const [first, second] = topLevel(editor);
-  expect(first).toMatchObject({ blockId: "p1", origin: "source", edited: true });
-  expect(second).toMatchObject({ origin: "user", edited: null, sourceBlockId: null });
+  expect(first).toMatchObject({ blockId: "p1", origin: "source", edited: true, page: 2 });
+  // The user's half is on no page of the PDF.
+  expect(second).toMatchObject({ origin: "user", edited: null, sourceBlockId: null, page: null });
   expect(second?.blockId).toMatch(uuidv7);
+  const [edited, mine] = fromEditor(editor.getJSON(), new Map()).blocks;
+  expect(edited).toMatchObject({ id: "p1", page: 2, content: [{ text: "Install" }] });
+  expect(mine).not.toHaveProperty("page");
 });
 
 test("splitting inside a list gives the new item's blocks ids of their own", async () => {

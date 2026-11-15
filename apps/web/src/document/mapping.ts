@@ -42,7 +42,7 @@ export function topLevelNode(b: DocBlock): JSONContent {
 
 function blockNode(b: IrBlock): JSONContent {
   const type = nodeOfKind[b.kind];
-  const id = { blockId: b.id };
+  const id = { blockId: b.id, ...(b.page ? { page: b.page } : {}) };
   if ((atomNodes as readonly string[]).includes(type)) {
     const { origin: _o, edited: _e, source_block_id: _s, ...block } = b as DocBlock;
     return { type, attrs: { ...id, block } };
@@ -101,16 +101,18 @@ export function fromEditor(doc: JSONContent, originals: ReadonlyMap<string, DocB
     }
     const block = irBlock(node);
     if (!block) continue;
-    blocks.push(
-      attrs.origin === "source"
-        ? {
-            ...block,
-            origin: "source",
-            edited: Boolean(attrs.edited),
-            source_block_id: attrs.sourceBlockId,
-          }
-        : { ...block, id: isUUID(block.id) ? block.id : uuidv7(), origin: "user" },
-    );
+    if (attrs.origin === "source") {
+      blocks.push({
+        ...block,
+        origin: "source",
+        edited: Boolean(attrs.edited),
+        source_block_id: attrs.sourceBlockId,
+      });
+    } else {
+      // A user's block is on no page of the source.
+      const { page: _page, ...mine } = block;
+      blocks.push({ ...mine, id: isUUID(block.id) ? block.id : uuidv7(), origin: "user" });
+    }
   }
   return { doc_version: 1, blocks };
 }
@@ -129,6 +131,7 @@ function irBlock(node: JSONContent): IrBlock | undefined {
   if ((atomNodes as readonly string[]).includes(type)) {
     return { ...(attrs.block as IrBlock), id };
   }
+  const page = attrs.page ? { page: attrs.page as number } : {};
   const kind = kindOfNode[type];
   const children = () => blocksOf(node.content);
   switch (kind) {
@@ -140,22 +143,23 @@ function irBlock(node: JSONContent): IrBlock | undefined {
         ? {
             id,
             kind,
+            ...page,
             level: attrs.level,
             ...(attrs.anchor ? { anchor: attrs.anchor } : {}),
             content,
           }
-        : { id, kind, content };
+        : { id, kind, ...page, content };
     }
     case "list": {
       const items = (node.content ?? [])
         .map((item) => ({ children: blocksOf(item.content) }))
         .filter((item) => item.children.length > 0);
       if (items.length === 0) return undefined;
-      return { id, kind, ...(attrs.ordered ? { ordered: true } : {}), items };
+      return { id, kind, ...page, ...(attrs.ordered ? { ordered: true } : {}), items };
     }
     case "quote": {
       const content = children();
-      return content.length ? { id, kind, children: content } : undefined;
+      return content.length ? { id, kind, ...page, children: content } : undefined;
     }
     case "callout": {
       const content = children();
@@ -163,6 +167,7 @@ function irBlock(node: JSONContent): IrBlock | undefined {
       return {
         id,
         kind,
+        ...page,
         variant: attrs.variant,
         ...(attrs.title ? { title: attrs.title } : {}),
         ...(content.length ? { children: content } : {}),

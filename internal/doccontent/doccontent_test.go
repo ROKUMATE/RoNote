@@ -54,6 +54,8 @@ func TestValidate(t *testing.T) {
 		{name: "a source block without its source id", blocks: []Block{{Block: paragraph("p1", "a"), Origin: OriginSource, Edited: new(bool)}}, want: CodeInvalidContent},
 		{name: "a source block under another id", blocks: []Block{{Block: paragraph("p1", "a"), Origin: OriginSource, Edited: new(bool), SourceBlockID: "p2"}}, want: CodeInvalidContent},
 		{name: "a user block with source fields", blocks: []Block{{Block: paragraph(note, "a"), Origin: OriginUser, Edited: new(bool)}}, want: CodeInvalidContent},
+		{name: "a source block on a PDF page", blocks: []Block{source(ir.Block{ID: "p1", Kind: ir.KindParagraph, Page: 3, Content: []ir.Inline{{Text: "a"}}}, true)}},
+		{name: "a user block on a PDF page", blocks: []Block{user(ir.Block{ID: note, Kind: ir.KindParagraph, Page: 3, Content: []ir.Inline{{Text: "a"}}})}, want: CodeInvalidContent},
 		{name: "a user block id that is not a UUIDv7", blocks: []Block{user(paragraph(uuid.NewString(), "a"))}, want: CodeInvalidContent},
 		{name: "an unknown origin", blocks: []Block{{Block: paragraph("p1", "a"), Origin: "ai"}}, want: CodeInvalidContent},
 	}

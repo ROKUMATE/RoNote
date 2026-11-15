@@ -1,5 +1,5 @@
 {
-  "ir_version": 1,
+  "ir_version": 2,
   "title": "Tutorial: Get started with Go",
   "source": {
     "url": "https://go.dev/doc/tutorial/getting-started",

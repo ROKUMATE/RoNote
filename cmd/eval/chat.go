@@ -1,7 +1,9 @@
 package main
 
 import (
+	"cmp"
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"math"
@@ -34,12 +36,59 @@ type answered struct {
 	inputAll int
 }
 
-// chatEval asks every query through the chat service, a conversation each
-// over the whole library, and reports per category how its answers cite
-// (docs/adr/0012-chat.md). It searches with the recorded vectors, and asks
-// the live embedder for what the model searches for itself. It writes the
-// report only from Anthropic's API: a fake model's would mean nothing.
-func chatEval(ctx context.Context, st *store.Store, owner uuid.UUID, replay embed.Embedder, queries []query) error {
+// chatRun bounds a run of the chat eval: ask only the first limit queries
+// (0 asks all), and no further question once the answers have cost budget
+// micro-dollars.
+type chatRun struct {
+	limit  int
+	budget int64
+}
+
+// askAll asks queries in order, within run, printing each answer with what
+// it cost; complete is whether it asked them all.
+func askAll(queries []query, run chatRun, ask func(query) (store.Message, error), print func(string)) (all []answered, complete bool, err error) {
+	n := len(queries)
+	if run.limit > 0 {
+		n = min(n, run.limit)
+	}
+	var spent int64
+	for i, q := range queries[:n] {
+		if spent >= run.budget {
+			print(fmt.Sprintf("  stopped: $%.4f spent, the budget is $%.2f\n", float64(spent)/1e6, float64(run.budget)/1e6))
+			return all, false, nil
+		}
+		msg, err := ask(q)
+		if err != nil {
+			return all, false, fmt.Errorf("%s: %w", q.ID, err)
+		}
+		spent += msg.Usage.CostMicroUSD
+		all = append(all, scoreAnswer(q, msg))
+		print(fmt.Sprintf("  %2d/%d %-4s %-7s %d citations  $%.5f  ($%.4f so far)\n",
+			i+1, n, q.ID, msg.Status, len(msg.Content.Citations), float64(msg.Usage.CostMicroUSD)/1e6, float64(spent)/1e6))
+	}
+	return all, n == len(queries), nil
+}
+
+// projection is what asking total questions would cost, at the mean cost
+// of those answered, in micro-dollars.
+func projection(all []answered, total int) int64 {
+	if len(all) == 0 {
+		return 0
+	}
+	var cost int64
+	for _, a := range all {
+		cost += a.msg.Usage.CostMicroUSD
+	}
+	return cost * int64(total) / int64(len(all))
+}
+
+// chatEval asks the queries through the chat service, within run, a
+// conversation each over the whole library, and reports per category how
+// its answers cite (docs/adr/0012-chat.md). It searches with the recorded
+// vectors, and asks the live embedder for what the model searches for
+// itself. It writes the report only for a complete run against Anthropic's
+// API: a fake model's, or a part's, would mean nothing.
+func chatEval(ctx context.Context, st *store.Store, owner uuid.UUID, replay embed.Embedder, queries []query, run chatRun) error {
 	modelURL := strings.TrimSuffix(envOr("RONOTE_EVAL_CHAT_URL", config.DefaultChatURL), "/")
 	model := envOr("RONOTE_CHAT_MODEL", config.DefaultChatModel)
 	key := os.Getenv("ANTHROPIC_API_KEY")
@@ -60,16 +109,16 @@ func chatEval(ctx context.Context, st *store.Store, owner uuid.UUID, replay embe
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Asking %d questions of %s at %s\n", len(queries), model, modelURL)
-	var all []answered
-	for i, q := range queries {
+	fmt.Printf("Asking up to %d of %d questions of %s at %s, within $%.2f\n",
+		cmp.Or(min(run.limit, len(queries)), len(queries)), len(queries), model, modelURL, float64(run.budget)/1e6)
+	all, complete, err := askAll(queries, run, func(q query) (store.Message, error) {
 		conv, err := svc.Create(ctx, owner, uuid.Nil)
 		if err != nil {
-			return err
+			return store.Message{}, err
 		}
 		a, err := svc.Ask(ctx, owner, conv.ID, q.Query)
 		if err != nil {
-			return fmt.Errorf("%s: %w", q.ID, err)
+			return store.Message{}, err
 		}
 		var msg store.Message
 		for u := range a.Updates() {
@@ -78,14 +127,21 @@ func chatEval(ctx context.Context, st *store.Store, owner uuid.UUID, replay embe
 			}
 		}
 		if msg.ID == uuid.Nil {
-			return fmt.Errorf("%s: the answer wasn't saved", q.ID)
+			return store.Message{}, errors.New("the answer wasn't saved")
 		}
-		all = append(all, scoreAnswer(q, msg))
-		fmt.Printf("  %2d/%d %-4s %-7s %d citations\n", i+1, len(queries), q.ID, msg.Status, len(msg.Content.Citations))
+		return msg, nil
+	}, func(line string) { fmt.Print(line) })
+	if err != nil {
+		return err
 	}
 	report := chatTable(all, model, modelURL)
 	fmt.Println()
 	fmt.Print(report)
+	if !complete {
+		fmt.Printf("\nAll %d would cost about $%.4f at this rate. Not written: a part of the questions.\n",
+			len(queries), float64(projection(all, len(queries)))/1e6)
+		return nil
+	}
 	if !anthropicAPI {
 		fmt.Printf("\nNot written: %s is not Anthropic's API.\n", modelURL)
 		return nil

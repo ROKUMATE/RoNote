@@ -46,7 +46,7 @@ type chatRun struct {
 
 // askAll asks queries in order, within run, printing each answer with what
 // it cost; complete is whether it asked them all.
-func askAll(queries []query, run chatRun, ask func(query) (store.Message, error), print func(string)) (all []answered, complete bool, err error) {
+func askAll(queries []query, run chatRun, ask func(query) (store.Message, error), say func(string)) (all []answered, complete bool, err error) {
 	n := len(queries)
 	if run.limit > 0 {
 		n = min(n, run.limit)
@@ -54,7 +54,7 @@ func askAll(queries []query, run chatRun, ask func(query) (store.Message, error)
 	var spent int64
 	for i, q := range queries[:n] {
 		if spent >= run.budget {
-			print(fmt.Sprintf("  stopped: $%.4f spent, the budget is $%.2f\n", float64(spent)/1e6, float64(run.budget)/1e6))
+			say(fmt.Sprintf("  stopped: $%.4f spent, the budget is $%.2f\n", float64(spent)/1e6, float64(run.budget)/1e6))
 			return all, false, nil
 		}
 		msg, err := ask(q)
@@ -63,7 +63,7 @@ func askAll(queries []query, run chatRun, ask func(query) (store.Message, error)
 		}
 		spent += msg.Usage.CostMicroUSD
 		all = append(all, scoreAnswer(q, msg))
-		print(fmt.Sprintf("  %2d/%d %-4s %-7s %d citations  $%.5f  ($%.4f so far)\n",
+		say(fmt.Sprintf("  %2d/%d %-4s %-7s %d citations  $%.5f  ($%.4f so far)\n",
 			i+1, n, q.ID, msg.Status, len(msg.Content.Citations), float64(msg.Usage.CostMicroUSD)/1e6, float64(spent)/1e6))
 	}
 	return all, n == len(queries), nil

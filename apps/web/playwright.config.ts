@@ -80,6 +80,8 @@ export default defineConfig({
         ...oauthApp,
         RONOTE_FAKEIDP_ADDR: new URL(stack.idp).host,
         RONOTE_FAKEIDP_USERS: "apps/web/e2e/fixtures/idp-users.json",
+        // ownUserTest registers a user per test (e2e/test.ts).
+        RONOTE_FAKEIDP_REGISTRATION: "true",
       }),
       url: `${stack.idp}/healthz`,
       reuseExistingServer: false,

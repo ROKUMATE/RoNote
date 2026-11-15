@@ -7,7 +7,7 @@ import {
   startImport,
 } from "./helpers";
 import { stack } from "./stack";
-import { expect, test } from "./test";
+import { expect, ownUserTest as test } from "./test";
 
 declare global {
   interface Window {

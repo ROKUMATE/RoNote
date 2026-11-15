@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -18,7 +19,14 @@ var ada = User{ID: 1, Login: "ada", Name: "Ada", Email: "ada@example.com", Verif
 
 func newProvider(t *testing.T) *httptest.Server {
 	t.Helper()
-	srv := httptest.NewServer(New(Options{ClientID: "id", ClientSecret: "secret", Users: []User{ada}}))
+	return newProviderWith(t, Options{})
+}
+
+// newProviderWith is newProvider with o's other options.
+func newProviderWith(t *testing.T, o Options) *httptest.Server {
+	t.Helper()
+	o.ClientID, o.ClientSecret, o.Users = "id", "secret", []User{ada}
+	srv := httptest.NewServer(New(o))
 	t.Cleanup(srv.Close)
 	return srv
 }
@@ -207,5 +215,98 @@ func TestUnknownToken(t *testing.T) {
 	t.Parallel()
 	if status := get(t, newProvider(t), "/user", "nope", nil); status != http.StatusUnauthorized {
 		t.Errorf("/user with an unknown token = %d, want 401", status)
+	}
+}
+
+// register posts a user to the registration endpoint.
+func register(t *testing.T, srv *httptest.Server, body string) (int, User) {
+	t.Helper()
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodPost, srv.URL+"/test/users", strings.NewReader(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = res.Body.Close() }()
+	var u User
+	if res.StatusCode == http.StatusCreated {
+		if err := json.NewDecoder(res.Body).Decode(&u); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return res.StatusCode, u
+}
+
+func TestRegistrationIsOffByDefault(t *testing.T) {
+	t.Parallel()
+	if status, _ := register(t, newProvider(t), `{"login":"x","name":"X","email":"x@example.com"}`); status != http.StatusNotFound {
+		t.Errorf("POST /test/users = %d, want 404 while registration is off", status)
+	}
+}
+
+func TestRegisteredUsersSignIn(t *testing.T) {
+	t.Parallel()
+	srv := newProviderWith(t, Options{Registration: true})
+
+	status, grace := register(t, srv, `{"login":"grace","name":"Grace","email":"grace@example.com"}`)
+	if status != http.StatusCreated || grace.ID < 10000 || grace.Login != "grace" || !grace.Verified {
+		t.Fatalf("register = %d %+v, want 201, an id from 10000 and a verified Grace", status, grace)
+	}
+	if _, other := register(t, srv, `{"login":"hopper","name":"Hopper","email":"hopper@example.com"}`); other.ID == grace.ID {
+		t.Errorf("two registered users share id %d", grace.ID)
+	}
+
+	page := send(t, http.DefaultClient, http.MethodGet, srv.URL+"/login/oauth/authorize?client_id=id&redirect_uri=http%3A%2F%2Fapp.test%2Fcallback&state=s&code_challenge=c&code_challenge_method=S256", nil, "")
+	if !strings.Contains(string(page.body), "Sign in as grace") || !strings.Contains(string(page.body), "Sign in as ada") {
+		t.Errorf("sign-in page lacks the registered user or the listed one:\n%s", page.body)
+	}
+
+	back := choose(t, srv, url.Values{"user": {strconv.FormatInt(grace.ID, 10)}})
+	tok := exchange(t, srv, back.Query().Get("code"), "verifier")
+	var user struct {
+		ID    int64  `json:"id"`
+		Login string `json:"login"`
+	}
+	if status := get(t, srv, "/user", tok["access_token"], &user); status != http.StatusOK || user.ID != grace.ID || user.Login != "grace" {
+		t.Errorf("/user = %d %+v, want Grace", status, user)
+	}
+	var emails []struct {
+		Email    string `json:"email"`
+		Verified bool   `json:"verified"`
+	}
+	if status := get(t, srv, "/user/emails", tok["access_token"], &emails); status != http.StatusOK ||
+		len(emails) != 1 || emails[0].Email != "grace@example.com" || !emails[0].Verified {
+		t.Errorf("/user/emails = %d %+v, want Grace's verified email", status, emails)
+	}
+}
+
+func TestRegistrationRefusals(t *testing.T) {
+	t.Parallel()
+	srv := newProviderWith(t, Options{Registration: true})
+	if status, _ := register(t, srv, `{"login":"grace","name":"Grace","email":"grace@example.com"}`); status != http.StatusCreated {
+		t.Fatalf("first registration = %d", status)
+	}
+	tests := []struct {
+		name   string
+		body   string
+		status int
+	}{
+		{"a login already listed", `{"login":"ADA","name":"Ada again","email":"other@example.com"}`, http.StatusConflict},
+		{"a login already registered", `{"login":"Grace","name":"Grace","email":"other@example.com"}`, http.StatusConflict},
+		{"an email already registered", `{"login":"other","name":"Other","email":"GRACE@example.com"}`, http.StatusConflict},
+		{"no login", `{"name":"X","email":"x@example.com"}`, http.StatusBadRequest},
+		{"no email", `{"login":"x","name":"X"}`, http.StatusBadRequest},
+		{"not JSON", `login=x`, http.StatusBadRequest},
+		{"unknown fields", `{"login":"x","name":"X","email":"x@example.com","admin":true}`, http.StatusBadRequest},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if status, _ := register(t, srv, tt.body); status != tt.status {
+				t.Errorf("POST /test/users %s = %d, want %d", tt.body, status, tt.status)
+			}
+		})
 	}
 }

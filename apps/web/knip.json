@@ -5,7 +5,8 @@
     "e2e/*.spec.ts",
     "e2e/fixture-site.ts",
     "live/*.test.ts",
-    "scripts/budget.ts"
+    "scripts/budget.ts",
+    "scripts/pdf-fixtures.ts"
   ],
   "playwright": false,
   "ignoreBinaries": ["go"],

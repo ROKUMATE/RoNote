@@ -1,11 +1,18 @@
 import { useEffect, useId, useRef } from "react";
-import { buttonClass } from "../ui/button";
+import { buttonClass } from "./button";
 
-/** Asks before an edited block goes back to the page's text. */
-export function ConfirmRevert({
+/** A modal question before something that can't be undone. */
+export function Confirm({
+  title,
+  children,
+  action,
   onConfirm,
   onCancel,
 }: {
+  title: string;
+  children: React.ReactNode;
+  /** The confirming button's label, a plain verb. */
+  action: string;
   onConfirm: () => void;
   onCancel: () => void;
 }) {
@@ -24,14 +31,12 @@ export function ConfirmRevert({
       className="m-auto w-[min(26rem,calc(100vw-2rem))] rounded-md border border-rule bg-paper p-6 text-ink backdrop:bg-ink/30"
     >
       <h2 id={titleId} className="font-semibold text-h3">
-        Revert to source?
+        {title}
       </h2>
-      <p className="mt-2 text-ui-lg">
-        The block goes back to the page's text, and your edits to it are lost.
-      </p>
+      <div className="mt-2 text-ui-lg">{children}</div>
       <div className="mt-4 flex gap-2">
         <button type="button" onClick={onConfirm} className={buttonClass}>
-          Revert
+          {action}
         </button>
         <button type="button" onClick={() => dialog.current?.close()} className={buttonClass}>
           Cancel

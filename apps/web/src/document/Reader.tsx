@@ -3,8 +3,8 @@ import type { Editor } from "@tiptap/core";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { type MouseEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import type { DocBlock, DocContent } from "../api/schema";
+import { Confirm } from "../ui/Confirm";
 import { BlockMenu } from "./BlockMenu";
-import { ConfirmRevert } from "./ConfirmRevert";
 import { marksByBlock, sameMarks } from "./codeMarks";
 import { linkAction, openOriginal } from "./follow";
 import { Highlights, placements } from "./highlights";
@@ -203,10 +203,14 @@ export function Reader({
       )}
       {following && <FollowProgress following={following} wrapper={wrapper.current} />}
       {reverting && (
-        <ConfirmRevert
+        <Confirm
+          title="Revert to source?"
+          action="Revert"
           onConfirm={() => void revert(reverting)}
           onCancel={() => setReverting(undefined)}
-        />
+        >
+          <p>The block goes back to the page's text, and your edits to it are lost.</p>
+        </Confirm>
       )}
       {menu && (
         <BlockMenu

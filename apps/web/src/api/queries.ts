@@ -137,6 +137,11 @@ export async function saveDocument(
 }
 
 /** Puts one source block of a document back as extracted; returns the document. */
+/** Deletes a document with its notes and the conversations about it. */
+export async function deleteDocument(id: string): Promise<void> {
+  okOrThrow(await api.DELETE("/documents/{id}", { params: { path: { id } } }));
+}
+
 export async function revertBlock(id: string, blockId: string): Promise<Document> {
   const { document } = dataOrThrow(
     await api.POST("/documents/{id}/blocks/{blockId}/revert", {

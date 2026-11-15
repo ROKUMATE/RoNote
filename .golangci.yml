@@ -44,6 +44,14 @@ linters:
           deny:
             - pkg: github.com/anthropics/anthropic-sdk-go
               desc: reach the model through internal/chat's Model; only internal/chat/anthropic imports the SDK (docs/adr/0012-chat.md)
+        aws:
+          # The AWS SDK is the blob port's S3 adapter, and stays behind it.
+          files:
+            - "$all"
+            - "!**/internal/blob/s3blob/**"
+          deny:
+            - pkg: github.com/aws/aws-sdk-go-v2
+              desc: reach file storage through internal/blob's Store; only internal/blob/s3blob imports the AWS SDK (docs/adr/0013-pdf-import.md)
 
 formatters:
   enable:

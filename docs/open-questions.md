@@ -41,9 +41,10 @@ entry when a phase settles it; add one when a phase leaves something open.
 - Chat: the panel lists the 30 latest conversations, with no paging yet.
 - Chat: a citation chip focused while its answer streams loses focus when the saved answer replaces the streamed one.
 - Chat answers in one model's words; Haiku 5.5 may think within its 1,024 output tokens at effort low, which could cut a long answer short (`max_tokens`). The eval will show whether it does.
-- The Python control flow page's links in inline code measure 4.33:1 in light (the accent on `paper-2`), under axe's 4.5:1; the a11y spec's fixture has none, so only a chat test that ran axe on that page showed it. Not fixed in P17.
 - Search: identifiers, errors and how-to questions are at recall@10 1.0 on the eval; paraphrases (0.85) and questions across two documents (0.90) are where it misses. The eval's 80 queries were written by the agent; 20 are marked for review.
 - The fake embedder (`cmd/fakeembed`) matches by shared words, so end-to-end tests check the plumbing of search by meaning, not its quality; `make eval` checks that.
 - A search result lands on its chunk's first block; a result whose words are further into the chunk lands a little above them.
 - Effective Go never names `ServeMux`: searching it finds `ServeHTTP` and `HandlerFunc` code by meaning, not an exact match.
 
+
+- Dark theme: the accent on the highlight colour (`mark`) measures 2.88:1, so a link inside a highlight is under axe's 4.5:1. The e2e pages have no such link, so no test shows it. Light is 4.63:1.

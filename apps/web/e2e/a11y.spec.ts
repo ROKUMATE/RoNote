@@ -49,6 +49,19 @@ for (const theme of ["light", "dark"] as const) {
   });
 }
 
+// Reference pages write names as links inside inline code; the accent on the
+// code's own background is the tightest contrast in the reader.
+for (const theme of ["light", "dark"] as const) {
+  test(`links inside inline code have no axe violations in ${theme}`, async ({ page }) => {
+    await chooseTheme(page, theme);
+    await page.goto("/");
+
+    await importPage(page, fixtureURL("linked", "inline-code-link"));
+    await expect(page.locator(".reader code a")).toHaveCount(2);
+    await expectNoAxeViolations(page);
+  });
+}
+
 test.describe("at 375px", () => {
   test.use({ viewport: { width: 375, height: 800 } });
 

@@ -51,6 +51,10 @@ var limits = Limits{ImportsPerDay: 60, Documents: 500, APIPerMinute: 120, AuthPe
 // key validEnv sets.
 var chatDefault = Chat{Enabled: true, URL: "https://api.anthropic.com", Model: "claude-haiku-5-5", APIKey: leakMarker}
 
+// chatOffDefault is what staging and prod get unless chat is turned on by
+// name: the same model, off until it has run against the real one.
+var chatOffDefault = Chat{URL: "https://api.anthropic.com", Model: "claude-haiku-5-5", APIKey: leakMarker}
+
 // fakeProvider points every provider URL at a local fake provider.
 var fakeProvider = map[string]string{ //nolint:gosec // URLs, not credentials
 	"RONOTE_GITHUB_AUTHORIZE_URL": "http://127.0.0.1:8090/login/oauth/authorize",
@@ -87,12 +91,12 @@ func TestLoad(t *testing.T) {
 				"RONOTE_LOG_LEVEL":    "debug",
 				"RONOTE_DATABASE_URL": "postgresql://db/ronote",
 			}),
-			want: Config{Env: EnvProd, HTTPAddr: "0.0.0.0:9000", LogLevel: slog.LevelDebug, DatabaseURL: "postgresql://db/ronote", SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault},
+			want: Config{Env: EnvProd, HTTPAddr: "0.0.0.0:9000", LogLevel: slog.LevelDebug, DatabaseURL: "postgresql://db/ronote", SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatOffDefault},
 		},
 		{
 			name: "empty host",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_HTTP_ADDR": ":8080", "RONOTE_LOG_LEVEL": "warn"}),
-			want: Config{Env: EnvStaging, HTTPAddr: ":8080", LogLevel: slog.LevelWarn, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault},
+			want: Config{Env: EnvStaging, HTTPAddr: ":8080", LogLevel: slog.LevelWarn, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatOffDefault},
 		},
 		{
 			name:    "missing env",
@@ -167,7 +171,7 @@ func TestLoad(t *testing.T) {
 		{
 			name: "private fetches off in prod",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_FETCH_ALLOW_PRIVATE": "false"}),
-			want: Config{Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault},
+			want: Config{Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatOffDefault},
 		},
 		{
 			name:    "private fetches refused in prod",
@@ -307,6 +311,44 @@ func TestLoad(t *testing.T) {
 				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault,
 				Chat: Chat{URL: "https://api.anthropic.com", Model: "claude-other"},
 			},
+		},
+		{
+			name: "chat is on by default in test",
+			env:  validEnv(map[string]string{"RONOTE_ENV": "test"}),
+			want: Config{
+				Env: EnvTest, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
+				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault,
+			},
+		},
+		{
+			name: "chat is off by default in staging, even with a key",
+			env:  validEnv(map[string]string{"RONOTE_ENV": "staging"}),
+			want: Config{
+				Env: EnvStaging, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
+				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatOffDefault,
+			},
+		},
+		{
+			name: "chat is off by default in prod without a key",
+			env:  validEnv(map[string]string{"RONOTE_ENV": "prod", "ANTHROPIC_API_KEY": ""}),
+			want: Config{
+				Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
+				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault,
+				Chat: Chat{URL: "https://api.anthropic.com", Model: "claude-haiku-5-5"},
+			},
+		},
+		{
+			name: "chat turned on by name in prod",
+			env:  validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_CHAT_ENABLED": "true"}),
+			want: Config{
+				Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
+				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault,
+			},
+		},
+		{
+			name:    "chat turned on by name in staging needs the key",
+			env:     validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_CHAT_ENABLED": "true", "ANTHROPIC_API_KEY": ""}),
+			wantErr: []string{"ANTHROPIC_API_KEY: not set; https://api.anthropic.com needs one"},
 		},
 		{
 			name:    "Anthropic's API needs a key",

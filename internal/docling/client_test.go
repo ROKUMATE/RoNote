@@ -7,7 +7,10 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"reflect"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -202,5 +205,16 @@ func TestLines(t *testing.T) {
 	}
 	if got, err := short.Lines(t.Context(), []byte("%PDF-"), nil); got != nil || err != nil {
 		t.Errorf("Lines() of no boxes = %v, %v; want no request", got, err)
+	}
+}
+
+func TestServeVersionMatchesCompose(t *testing.T) {
+	t.Parallel()
+	compose, err := os.ReadFile(filepath.Join("..", "..", "deploy", "compose.dev.yml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n := strings.Count(string(compose), "docling-serve-cpu:v"+ServeVersion+"@sha256:"); n != 2 {
+		t.Errorf("deploy/compose.dev.yml runs docling-serve %s %d times, want docling and pdftext", ServeVersion, n)
 	}
 }

@@ -20,7 +20,7 @@ import (
 )
 
 // Image is the dev stack's SeaweedFS; TestImageMatchesCompose keeps the two
-// in sync once the dev stack runs it.
+// in sync.
 const Image = "chrislusf/seaweedfs:4.53@sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0"
 
 // label marks containers started here so scripts/container.sh can spot leaks.

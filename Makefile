@@ -34,6 +34,7 @@ hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the docto
 	sh scripts/test-check-commits.sh
 	sh scripts/test-container-clock.sh
 	sh scripts/test-embed-check.sh
+	sh scripts/test-pdf-check.sh
 	sh scripts/test-run-stop.sh
 	sh scripts/test-doc-sizes.sh
 
@@ -114,16 +115,21 @@ fmt: ## Format Go code with gofumpt and goimports
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) fmt
 
-doctor: ## Check the local setup: the container VM's clock is the host's, and the embedder serves the pinned model
+doctor: ## Check the local setup: the VM's clock is the host's, the embedder serves the pinned model, and the blob store, docling and pdftext answer
 	sh scripts/container.sh clock
 	sh scripts/embed-check.sh
+	sh scripts/pdf-check.sh
 
-dev-up: ## Start the dev stack (Postgres) and wait until it is healthy
+dev-up: ## Start the dev stack (Postgres, SeaweedFS with its bucket) and wait until it is healthy
 	@[ -f .env.dev ] || { cp .env.example .env.dev; echo "make dev-up: created .env.dev from .env.example"; }
 	$(COMPOSE) up -d --wait
 
-dev-down: stop ## Stop the dev processes and the dev stack; the data volume is kept
-	$(COMPOSE) down
+dev-up-docling: ## Start the dev stack with the real docling and pdftext, sandboxed, on 127.0.0.1:5001 and :5002 (a 5 GB image, 6 GB of memory)
+	@[ -f .env.dev ] || { cp .env.example .env.dev; echo "make dev-up-docling: created .env.dev from .env.example"; }
+	$(COMPOSE) --profile docling up -d --wait
+
+dev-down: stop ## Stop the dev processes and the dev stack, docling included; the data volumes are kept
+	$(COMPOSE) --profile docling down
 
 stop: ## Stop what run-api, run-worker and web-dev started, with everything they started
 	@sh scripts/stop.sh
@@ -220,7 +226,7 @@ check-node-version: ## Print the Node version; fail unless it is the one .nvmrc 
 
 web-dev: ## Run the web dev server (styleguide at /_styleguide), the runner, the fake sign-in and the fake chat model; make stop ends them
 	@$(node_required)
-	sh scripts/run.sh web sh -c 'go run ./cmd/fakeidp & idp=$$!; go run ./cmd/fakellm & llm=$$!; $(WEB) runner & runner=$$!; $(WEB) dev; kill $$idp $$llm $$runner'
+	sh scripts/run.sh web sh -c 'go run ./cmd/fakeidp & idp=$$!; go run ./cmd/fakellm & llm=$$!; go run ./cmd/fakedocling & docling=$$!; $(WEB) runner & runner=$$!; $(WEB) dev; kill $$idp $$llm $$docling $$runner'
 
 web-build: ## Build the web app and the runner; fails if dev-only code ships or it is over budget
 	@$(node_required)
@@ -236,7 +242,7 @@ web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromiu
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" $(WEB) e2e
 
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp run-llm run-docling pdf-fixtures pdf-record extract lint lint-go lint-web fmt
-.PHONY: doctor stop dev-up dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
+.PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
 .PHONY: web-dev web-build web-e2e

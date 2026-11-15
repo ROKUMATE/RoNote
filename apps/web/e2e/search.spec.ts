@@ -35,6 +35,36 @@ test("Mod+K finds a block of an imported page and lands on it", async ({ page })
   await expect(palette).toBeHidden();
 });
 
+// Block ids are hashes of their content, so the same page imported twice is
+// two documents holding the same blocks, and every chunk of one has an
+// identical twin in the other. Both must show, and each must open its own.
+test("two documents holding the same block both show, and each result lands on its own", async ({
+  page,
+}) => {
+  const first = await importIndexed(page, "real-python-controlflow");
+  const second = await importIndexed(page, "real-python-controlflow");
+  expect(second).not.toBe(first);
+  await page.goto("/");
+
+  const palette = await search(page, "for statements");
+  // One group per document, titled alike; equal results come older first.
+  const groups = palette.getByRole("group").filter({ hasText: "4.2. for Statements" });
+  await expect(groups).toHaveCount(2);
+  const forStatements = (n: number) =>
+    groups.nth(n).getByRole("option").filter({ hasText: "4.2. for Statements" });
+
+  await forStatements(0).click();
+  await expect(page).toHaveURL(new RegExp(`${first}\\?block=`));
+  const block = new URL(page.url()).searchParams.get("block") ?? "";
+  await expect(page.locator(`[data-block-id="${block}"]`)).toBeInViewport();
+
+  await search(page, "for statements");
+  await expect(groups).toHaveCount(2);
+  await forStatements(1).click();
+  await expect(page).toHaveURL(new RegExp(`${second}\\?block=${block}`));
+  await expect(page.locator(`[data-block-id="${block}"]`)).toBeInViewport();
+});
+
 test("a result far down a long page lands in view, once the code above it renders", async ({
   page,
 }) => {

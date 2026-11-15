@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 )
 
 const redirectURI = "http://app.test/callback"
@@ -252,8 +253,8 @@ func TestRegisteredUsersSignIn(t *testing.T) {
 	srv := newProviderWith(t, Options{Registration: true})
 
 	status, grace := register(t, srv, `{"login":"grace","name":"Grace","email":"grace@example.com"}`)
-	if status != http.StatusCreated || grace.ID < 10000 || grace.Login != "grace" || !grace.Verified {
-		t.Fatalf("register = %d %+v, want 201, an id from 10000 and a verified Grace", status, grace)
+	if status != http.StatusCreated || grace.ID <= ada.ID || grace.Login != "grace" || !grace.Verified {
+		t.Fatalf("register = %d %+v, want 201 and a verified Grace with an id of her own", status, grace)
 	}
 	if _, other := register(t, srv, `{"login":"hopper","name":"Hopper","email":"hopper@example.com"}`); other.ID == grace.ID {
 		t.Errorf("two registered users share id %d", grace.ID)
@@ -308,5 +309,19 @@ func TestRegistrationRefusals(t *testing.T) {
 				t.Errorf("POST /test/users %s = %d, want %d", tt.body, status, tt.status)
 			}
 		})
+	}
+}
+
+// TestRegisteredIdsSurviveARestart: RoNote keys users by the provider's id,
+// and its database outlives the provider, so a provider started again must
+// not hand a new user the id an earlier run gave someone else.
+func TestRegisteredIdsSurviveARestart(t *testing.T) {
+	t.Parallel()
+	body := `{"login":"grace","name":"Grace","email":"grace@example.com"}`
+	_, before := register(t, newProviderWith(t, Options{Registration: true}), body)
+	time.Sleep(2 * time.Millisecond)
+	_, after := register(t, newProviderWith(t, Options{Registration: true}), body)
+	if before.ID == after.ID || before.ID == 0 || after.ID == 0 {
+		t.Errorf("a provider and the next one gave ids %d and %d, want two different ones", before.ID, after.ID)
 	}
 }

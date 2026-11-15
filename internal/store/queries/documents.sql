@@ -109,3 +109,16 @@ WHERE d.indexed_seq < d.index_seq
    )
 ORDER BY d.updated_at DESC
 LIMIT sqlc.arg(max_rows);
+
+-- name: DeleteDocumentConversations :many
+-- Deletes the conversations about the owner's document, before the document
+-- itself, and names them so their answers can be stopped.
+DELETE FROM conversations
+WHERE owner_id = $1 AND document_id = $2
+RETURNING id;
+
+-- name: DeleteDocument :execrows
+-- Deletes the owner's document; its annotations and chunks go with it, and
+-- the imports that made it keep their row without it.
+DELETE FROM documents
+WHERE owner_id = $1 AND id = $2;

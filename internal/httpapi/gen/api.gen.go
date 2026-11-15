@@ -701,7 +701,7 @@ type Import struct {
 	CanonicalURL string    `json:"canonical_url"`
 	CreatedAt    time.Time `json:"created_at"`
 
-	// DocumentID Set when status is done.
+	// DocumentID Set when status is done, unless the document has since been deleted.
 	DocumentID *openapi_types.UUID `json:"document_id,omitempty"`
 
 	// ErrorCode Why an import failed; set when its status is failed.
@@ -1002,6 +1002,9 @@ type ServerInterface interface {
 	// ResolveDocuments Find which links the user already has as documents
 	// (POST /documents/resolve)
 	ResolveDocuments(w http.ResponseWriter, r *http.Request)
+	// DeleteDocument Delete a document
+	// (DELETE /documents/{id})
+	DeleteDocument(w http.ResponseWriter, r *http.Request, id ID)
 	// GetDocument Get a document with its content
 	// (GET /documents/{id})
 	GetDocument(w http.ResponseWriter, r *http.Request, id ID)
@@ -1284,6 +1287,32 @@ func (siw *ServerInterfaceWrapper) ResolveDocuments(w http.ResponseWriter, r *ht
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ResolveDocuments(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteDocument operation middleware
+func (siw *ServerInterfaceWrapper) DeleteDocument(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id ID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteDocument(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1696,6 +1725,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/imports", wrapper.CreateImport)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/imports/{id}", wrapper.GetImport)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/documents", wrapper.ListDocuments)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/documents/{id}", wrapper.DeleteDocument)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/documents/{id}", wrapper.GetDocument)
 	m.HandleFunc(http.MethodPatch+" "+options.BaseURL+"/documents/{id}", wrapper.SaveDocument)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/documents/resolve", wrapper.ResolveDocuments)
@@ -2746,6 +2776,107 @@ func (response ResolveDocuments429JSONResponse) VisitResolveDocumentsResponse(w 
 type ResolveDocuments500JSONResponse struct{ InternalErrorJSONResponse }
 
 func (response ResolveDocuments500JSONResponse) VisitResolveDocumentsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteDocumentRequestObject struct {
+	ID ID `json:"id"`
+}
+
+type DeleteDocumentResponseObject interface {
+	VisitDeleteDocumentResponse(w http.ResponseWriter) error
+}
+
+type DeleteDocument204Response struct {
+}
+
+func (response DeleteDocument204Response) VisitDeleteDocumentResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteDocument400JSONResponse struct{ InvalidParameterJSONResponse }
+
+func (response DeleteDocument400JSONResponse) VisitDeleteDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteDocument401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response DeleteDocument401JSONResponse) VisitDeleteDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteDocument403JSONResponse struct{ CrossOriginJSONResponse }
+
+func (response DeleteDocument403JSONResponse) VisitDeleteDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteDocument404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response DeleteDocument404JSONResponse) VisitDeleteDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteDocument429JSONResponse struct{ RateLimitedJSONResponse }
+
+func (response DeleteDocument429JSONResponse) VisitDeleteDocumentResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Retry-After", fmt.Sprint(response.Headers.RetryAfter))
+	w.WriteHeader(429)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type DeleteDocument500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response DeleteDocument500JSONResponse) VisitDeleteDocumentResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -3875,6 +4006,9 @@ type StrictServerInterface interface {
 	// ResolveDocuments Find which links the user already has as documents
 	// (POST /documents/resolve)
 	ResolveDocuments(ctx context.Context, request ResolveDocumentsRequestObject) (ResolveDocumentsResponseObject, error)
+	// DeleteDocument Delete a document
+	// (DELETE /documents/{id})
+	DeleteDocument(ctx context.Context, request DeleteDocumentRequestObject) (DeleteDocumentResponseObject, error)
 	// GetDocument Get a document with its content
 	// (GET /documents/{id})
 	GetDocument(ctx context.Context, request GetDocumentRequestObject) (GetDocumentResponseObject, error)
@@ -4190,6 +4324,32 @@ func (sh *strictHandler) ResolveDocuments(w http.ResponseWriter, r *http.Request
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ResolveDocumentsResponseObject); ok {
 		if err := validResponse.VisitResolveDocumentsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteDocument operation middleware
+func (sh *strictHandler) DeleteDocument(w http.ResponseWriter, r *http.Request, id ID) {
+	var request DeleteDocumentRequestObject
+
+	request.ID = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteDocument(ctx, request.(DeleteDocumentRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteDocument")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteDocumentResponseObject); ok {
+		if err := validResponse.VisitDeleteDocumentResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

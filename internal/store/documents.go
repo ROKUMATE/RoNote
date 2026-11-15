@@ -298,3 +298,29 @@ func (s *Store) AddDocument(ctx context.Context, owner uuid.UUID, url string, do
 	})
 	return id, err
 }
+
+// DeleteDocument deletes owner's document id, with its annotations, chunks
+// and conversations, in one transaction. It returns the conversations it
+// deleted, so their answers can be stopped, or ErrNotFound.
+func (s *Store) DeleteDocument(ctx context.Context, owner, id uuid.UUID) ([]uuid.UUID, error) {
+	var conversations []uuid.UUID
+	err := s.inTx(ctx, func(tx *Store) error {
+		var err error
+		conversations, err = tx.q.DeleteDocumentConversations(ctx, sqlcdb.DeleteDocumentConversationsParams{OwnerID: owner, DocumentID: uuid.NullUUID{UUID: id, Valid: true}})
+		if err != nil {
+			return mapErr("delete document's conversations", err)
+		}
+		n, err := tx.q.DeleteDocument(ctx, sqlcdb.DeleteDocumentParams{OwnerID: owner, ID: id})
+		if err != nil {
+			return mapErr("delete document", err)
+		}
+		if n == 0 {
+			return fmt.Errorf("delete document: %w", ErrNotFound)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return conversations, nil
+}

@@ -429,6 +429,31 @@ paths:
           $ref: "#/components/responses/RateLimited"
         "500":
           $ref: "#/components/responses/InternalError"
+    delete:
+      operationId: deleteDocument
+      summary: Delete a document
+      description: |
+        Deletes the document with its highlights, notes and the
+        conversations about it; an answer being written in one stops. The
+        imports that made it stay in the import history, without it, and
+        still count toward the import quota.
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "204":
+          description: Deleted.
+        "400":
+          $ref: "#/components/responses/InvalidParameter"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /documents/resolve:
     post:
       operationId: resolveDocuments
@@ -1219,7 +1244,7 @@ components:
         document_id:
           type: string
           format: uuid
-          description: Set when status is done.
+          description: Set when status is done, unless the document has since been deleted.
         created_at:
           type: string
           format: date-time

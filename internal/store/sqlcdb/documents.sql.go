@@ -67,6 +67,59 @@ func (q *Queries) CreateDocumentIfAbsent(ctx context.Context, arg CreateDocument
 	return i, err
 }
 
+const deleteDocument = `-- name: DeleteDocument :execrows
+DELETE FROM documents
+WHERE owner_id = $1 AND id = $2
+`
+
+type DeleteDocumentParams struct {
+	OwnerID uuid.UUID
+	ID      uuid.UUID
+}
+
+// Deletes the owner's document; its annotations and chunks go with it, and
+// the imports that made it keep their row without it.
+func (q *Queries) DeleteDocument(ctx context.Context, arg DeleteDocumentParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteDocument, arg.OwnerID, arg.ID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const deleteDocumentConversations = `-- name: DeleteDocumentConversations :many
+DELETE FROM conversations
+WHERE owner_id = $1 AND document_id = $2
+RETURNING id
+`
+
+type DeleteDocumentConversationsParams struct {
+	OwnerID    uuid.UUID
+	DocumentID uuid.NullUUID
+}
+
+// Deletes the conversations about the owner's document, before the document
+// itself, and names them so their answers can be stopped.
+func (q *Queries) DeleteDocumentConversations(ctx context.Context, arg DeleteDocumentConversationsParams) ([]uuid.UUID, error) {
+	rows, err := q.db.Query(ctx, deleteDocumentConversations, arg.OwnerID, arg.DocumentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []uuid.UUID
+	for rows.Next() {
+		var id uuid.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const documentExtraction = `-- name: DocumentExtraction :one
 SELECT e.ir
 FROM documents d

@@ -30,6 +30,7 @@ type Backend interface {
 	GetDocument(ctx context.Context, owner, id uuid.UUID) (store.Document, error)
 	DocumentExtraction(ctx context.Context, owner, id uuid.UUID) (*ir.Doc, error)
 	SaveDocument(ctx context.Context, owner, id uuid.UUID, content *doccontent.Doc, version int) (int, error)
+	DeleteDocument(ctx context.Context, owner, id uuid.UUID) ([]uuid.UUID, error)
 	ListDocuments(ctx context.Context, owner uuid.UUID, after *store.DocumentCursor, limit int) ([]store.DocumentSummary, error)
 	ResolveDocuments(ctx context.Context, owner uuid.UUID, urls []string) (map[string]uuid.UUID, error)
 	ListAnnotations(ctx context.Context, owner, document uuid.UUID) ([]store.Annotation, error)
@@ -146,6 +147,21 @@ func (s apiServer) GetDocument(ctx context.Context, req gen.GetDocumentRequestOb
 		return nil, err
 	}
 	return gen.GetDocument200JSONResponse(documentJSON(doc)), nil
+}
+
+func (s apiServer) DeleteDocument(ctx context.Context, req gen.DeleteDocumentRequestObject) (gen.DeleteDocumentResponseObject, error) {
+	owner := userFrom(ctx)
+	conversations, err := s.backend.DeleteDocument(ctx, owner, req.ID)
+	if errors.Is(err, store.ErrNotFound) {
+		return gen.DeleteDocument404JSONResponse{NotFoundJSONResponse: gen.NotFoundJSONResponse(apiError(ctx, gen.ErrorCodeNotFound, "no such document"))}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	if s.chat != nil {
+		s.chat.StopAll(owner, conversations)
+	}
+	return gen.DeleteDocument204Response{}, nil
 }
 
 // revertAttempts bounds how often a revert retries when a save lands

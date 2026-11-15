@@ -1,6 +1,6 @@
 # 0005: Import pipeline, caching and idempotency
 
-Accepted, 2026-11-04. Amended 2026-11-10: jobs run through the jobs port, and their completion leaves the final transaction (ADR 0009).
+Accepted, 2026-11-04. Amended 2026-11-10: jobs run through the jobs port, and their completion leaves the final transaction (ADR 0009). PDFs (P18) follow the same pipeline with owner-private sources (ADR 0013).
 
 ## Context
 
@@ -63,6 +63,6 @@ From P08 on, a user's import is stored: the API takes a URL, a worker fetches an
 
 - Imports of popular pages cost one fetch per TTL period, whoever asks.
 - A user's document keeps the IR it was made from; re-importing returns it unchanged. Syncing to newer snapshots comes with editing (P10+).
-- Raw HTML lives in Postgres (5 MiB cap per page) until file storage arrives with PDFs (P13).
+- Raw HTML lives in Postgres (5 MiB cap per page); PDFs live in blob storage (ADR 0013).
 - Running more than one worker process needs a shared rate limit first.
 - Real sign-in (P16) replaces the dev identity; until then staging and prod answer 401 on `/api/v1`.

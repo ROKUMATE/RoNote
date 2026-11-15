@@ -23,6 +23,11 @@ import (
 // in sync.
 const Image = "chrislusf/seaweedfs:4.53@sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0"
 
+// Command is the dev stack's SeaweedFS command; TestImageMatchesCompose
+// keeps the two in sync. Small volumes: the default 30 GB volume wants more
+// free disk than a dev machine's VM may have, and then nothing is written.
+var Command = []string{"server", "-s3", "-s3.config=/etc/seaweedfs/s3.json", "-dir=/data", "-master.volumeSizeLimitMB=64", "-volume.max=64"}
+
 // label marks containers started here so scripts/container.sh can spot leaks.
 const label = "ronote.s3test"
 
@@ -55,7 +60,7 @@ func New(t testing.TB) s3blob.Config {
 // and a func that removes the container. On error nothing is left running.
 func start(ctx context.Context) (s3blob.Config, func() error, error) {
 	ctr, err := testcontainers.Run(ctx, Image,
-		testcontainers.WithCmd("server", "-s3", "-s3.config=/etc/seaweedfs/s3.json", "-dir=/data"),
+		testcontainers.WithCmd(Command...),
 		testcontainers.WithFiles(testcontainers.ContainerFile{
 			Reader: strings.NewReader(config), ContainerFilePath: "/etc/seaweedfs/s3.json", FileMode: 0o644,
 		}),

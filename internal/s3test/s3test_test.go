@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -15,5 +16,9 @@ func TestImageMatchesCompose(t *testing.T) {
 	}
 	if !bytes.Contains(compose, []byte("image: "+Image+"\n")) {
 		t.Errorf("deploy/compose.dev.yml does not use %s", Image)
+	}
+	command := `command: ["` + strings.Join(Command, `", "`) + `"]`
+	if !bytes.Contains(compose, []byte(command)) {
+		t.Errorf("deploy/compose.dev.yml does not run SeaweedFS as %s", command)
 	}
 }

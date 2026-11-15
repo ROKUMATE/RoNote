@@ -24,7 +24,9 @@ services:
     # (docs/adr/0013-pdf-import.md). The digest covers arm64 and amd64. Its
     # key is the dev default of RONOTE_BLOB_ACCESS_KEY and _SECRET_KEY.
     image: chrislusf/seaweedfs:4.53@sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0
-    command: ["server", "-s3", "-s3.config=/etc/seaweedfs/s3.json", "-dir=/data"]
+    # 64 MB volumes, at most 64: the default 30 GB volume wants more free
+    # disk than a dev machine's VM has, and then nothing can be written.
+    command: ["server", "-s3", "-s3.config=/etc/seaweedfs/s3.json", "-dir=/data", "-master.volumeSizeLimitMB=64", "-volume.max=64"]
     ports:
       - "127.0.0.1:8333:8333"
     volumes:

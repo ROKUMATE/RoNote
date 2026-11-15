@@ -28,7 +28,8 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks and run/stop
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop and pdftext's arithmetic
+	PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s deploy/pdftext -t deploy/pdftext
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
 	sh scripts/test-container-clock.sh

@@ -42,7 +42,7 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make eval-chat` | the eval's queries through chat, of the real model; local only, costs cents |
 | `make test-perf-search` | search timing over large libraries; local only |
 | `make test-live` | extract the live pages and check the RAG tutorial; network, never CI |
-| `make hooks-test` | test the commit hook and the scripts |
+| `make hooks-test` | test the commit hook, the scripts and pdftext |
 | `make check-commits RANGE=main..HEAD` | check each commit message in strict mode |
 | `make web-dev` | app on `127.0.0.1:5173`, the runner on `localhost:5174`, the fake sign-in and chat model |
 | `make web-build` | production build and bundle budgets |

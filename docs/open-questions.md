@@ -54,3 +54,4 @@ entry when a phase settles it; add one when a phase leaves something open.
 - PDFs: slides lay notes over code; where they share a box, the note comes out among the code's lines (MIT 6.0001 lecture 3).
 - PDFs: code language comes from the picker; docling's code enrichment would guess it with a model, at CPU cost, and its text would be generated. Off.
 - PDFs: conversion takes about 1 s a page on 2 CPUs: a 300-page book is five minutes, inside the 10-minute attempt. Two run at once.
+- Chat: with its tools turned off (`tool_choice: none`, a turn's last call after three searches), Haiku 5.5 at effort low once thought and ended its turn with no text at all; such an answer shows as "Not found in your library". The chat eval counts how often turns end that way.

@@ -225,33 +225,46 @@ func TestAnswerWithCitations(t *testing.T) {
 	if *record {
 		return
 	}
-	if want := []string{"Goroutines communicate by sending values over channels.", " An unbuffered channel also synchronizes the two goroutines."}; !reflect.DeepEqual(h.texts, want) {
+	// What Haiku 5.5 answered, recorded 2026-11-15: text blocks, a citation
+	// on two of them, and the system prompt and tools read from the cache.
+	want := []string{
+		"Goroutines communicate through channels. ",
+		"Channels let goroutines communicate.",
+		" The guidance behind this design favors message passing over shared memory. Go's approach steers developers away from shared-memory access and toward exchanging values through channels ",
+		"Do not communicate by sharing memory; instead, share memory by communicating.",
+		"\n\nUnbuffered channels also do more than transfer data. A send on one is paired with a receive, so the two goroutines also coordinate their timing.",
+	}
+	if !reflect.DeepEqual(h.texts, want) {
 		t.Errorf("texts = %q, want %q", h.texts, want)
 	}
-	want := [][]chat.Cited{{{ResultIndex: 0, Source: channels.Source, Start: 1, End: 2}}, {{ResultIndex: 1, Source: unbuffered.Source, Start: 0, End: 1}}}
-	if !reflect.DeepEqual(h.cited, want) {
-		t.Errorf("cited = %+v, want %+v", h.cited, want)
+	wantCited := [][]chat.Cited{nil, {{ResultIndex: 0, Source: channels.Source, Start: 1, End: 2}}, nil, {{ResultIndex: 0, Source: channels.Source, Start: 0, End: 1}}, nil}
+	if !reflect.DeepEqual(h.cited, wantCited) {
+		t.Errorf("cited = %+v, want %+v", h.cited, wantCited)
 	}
-	if want := (chat.Usage{InputTokens: 214, OutputTokens: 38, CacheCreationInputTokens: 612}); reply.Usage != want {
+	if want := (chat.Usage{InputTokens: 412, OutputTokens: 635, CacheReadInputTokens: 1118}); reply.Usage != want {
 		t.Errorf("usage = %+v, want %+v", reply.Usage, want)
 	}
 }
 
-func TestAnswerWithoutCitations(t *testing.T) {
+// TestAnswerTheResultsDontHold asks what the results sent don't answer. A
+// real model says so, and may cite what the library does hold: whatever it
+// cites must point at what was sent.
+func TestAnswerTheResultsDontHold(t *testing.T) {
 	m := replay(t, "no_answer")
 	var h heard
-	reply, err := m.Stream(t.Context(), ask("How do I configure ServeMux routes?", channels, unbuffered), h.on)
+	// No tools: offered them, Haiku 5.5 searches the library before it says
+	// the results don't hold the answer; with them turned off, it once
+	// thought and ended its turn without a word (docs/open-questions.md).
+	req := ask("How do I configure ServeMux routes?", channels, unbuffered)
+	req.Tools = nil
+	reply, err := m.Stream(t.Context(), req, h.on)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if reply.Stop != chat.StopEndTurn || strings.Join(h.texts, "") == "" {
+	if reply.Stop != chat.StopEndTurn || len(reply.ToolUses) != 0 || strings.Join(h.texts, "") == "" {
 		t.Errorf("reply = %+v, texts %q; want a plain answer", reply, h.texts)
 	}
-	for _, cs := range h.cited {
-		if len(cs) > 0 {
-			t.Errorf("cited %+v, want nothing", cs)
-		}
-	}
+	checkCitations(t, h, []chat.Result{channels, unbuffered})
 }
 
 func TestToolRound(t *testing.T) {
@@ -270,11 +283,10 @@ func TestToolRound(t *testing.T) {
 	if err := json.Unmarshal(reply.ToolUses[0].Input, &input); err != nil || input.Query == "" {
 		t.Errorf("tool input %s (%v), want a query", reply.ToolUses[0].Input, err)
 	}
-	if !*record {
-		thinking, ok := reply.Content[0].(chat.Thinking)
-		if !ok || thinking.Signature != "EqQBCgIYAhIMfakeSignatureForTests" {
-			t.Errorf("content = %+v, want the thinking block first, with its signature", reply.Content)
-		}
+	// Haiku 5.5 thinks first and returns the block with its signature and,
+	// display being omitted by default, no text: it goes back as it came.
+	if thinking, ok := reply.Content[0].(chat.Thinking); !ok || thinking.Signature == "" {
+		t.Errorf("content = %+v, want the thinking block first, with its signature", reply.Content)
 	}
 
 	// The thinking and the tool use go back unchanged, then the results.

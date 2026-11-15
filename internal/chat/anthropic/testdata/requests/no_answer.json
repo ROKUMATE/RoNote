@@ -56,25 +56,5 @@
       "text": "Answer the student's question from their library, and cite it.",
       "type": "text"
     }
-  ],
-  "tools": [
-    {
-      "description": "Search the student's library.",
-      "input_schema": {
-        "properties": {
-          "query": {
-            "type": "string"
-          },
-          "this_document_only": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "query"
-        ],
-        "type": "object"
-      },
-      "name": "search_library"
-    }
   ]
 }

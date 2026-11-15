@@ -164,10 +164,14 @@ function SampleDocument() {
     <article className="reader">
       <h1>Waiting for many requests at once</h1>
       <p>
-        A <code>sync.WaitGroup</code> counts running goroutines. Since Go 1.25 the <code>Go</code>{" "}
-        method starts a goroutine and tracks it in one call, so there is no separate{" "}
-        <code>Add</code> to forget. <mark>The function below never returns partial results</mark>:
-        it reports the first error it finds instead.
+        A{" "}
+        <code>
+          <a href="https://pkg.go.dev/sync#WaitGroup">sync.WaitGroup</a>
+        </code>{" "}
+        counts running goroutines. Since Go 1.25 the <code>Go</code> method starts a goroutine and
+        tracks it in one call, so there is no separate <code>Add</code> to forget.{" "}
+        <mark>The function below never returns partial results</mark>: it reports the first error it
+        finds instead.
       </p>
 
       <h2>Fetching in parallel</h2>

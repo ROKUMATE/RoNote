@@ -58,7 +58,7 @@ func TestAskAll(t *testing.T) {
 
 func TestAskAllStopsOnAnError(t *testing.T) {
 	t.Parallel()
-	failing := func(q query) (store.Message, error) { return store.Message{}, errors.New("model down") }
+	failing := func(query) (store.Message, error) { return store.Message{}, errors.New("model down") }
 	if _, _, err := askAll(queriesN(3), chatRun{budget: 1_000_000}, failing, func(string) {}); err == nil {
 		t.Error("askAll went on after an error")
 	}

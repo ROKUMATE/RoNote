@@ -203,6 +203,9 @@ function ImportDialog({ dialog }: { dialog: RefObject<HTMLDialogElement | null> 
               </label>
               <input
                 id={inputId}
+                // showModal focuses the dialog's autofocus element. React's
+                // autoFocus only calls focus() at mount, while it is closed.
+                ref={(el) => el?.setAttribute("autofocus", "")}
                 type="url"
                 name="url"
                 value={url}

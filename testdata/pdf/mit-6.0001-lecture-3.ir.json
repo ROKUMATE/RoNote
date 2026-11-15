@@ -1,0 +1,1092 @@
+{
+  "ir_version": 2,
+  "title": "mit-6.0001-lecture-3",
+  "source": {
+    "url": "",
+    "final_url": "",
+    "fetched_at": "2026-11-15T00:00:00Z",
+    "body_sha256": "fa3357521ac4e1a07091dbec1c0e920252a1dfc6b3315a3924eb734c79cfcf03",
+    "pdf": {
+      "filename": "mit-6.0001-lecture-3.pdf",
+      "pages": 21
+    }
+  },
+  "extractor": {
+    "name": "docling",
+    "version": "1.38.2+map1"
+  },
+  "blocks": [
+    {
+      "id": "f21ec0dac1cd",
+      "kind": "heading",
+      "page": 1,
+      "level": 1,
+      "content": [
+        {
+          "text": "STRING MANIPULATION, GUESS-and-CHECK, APPROXIMATIONS, BISECTION"
+        }
+      ]
+    },
+    {
+      "id": "f14bebc208d4",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "(download slides and .py files ĂŶĚ�follow along!)"
+        }
+      ]
+    },
+    {
+      "id": "a1c2f61c404b",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "6.0001 LECTURE 3"
+        }
+      ]
+    },
+    {
+      "id": "725ade465613",
+      "kind": "heading",
+      "page": 2,
+      "level": 2,
+      "content": [
+        {
+          "text": "LAST TIME"
+        }
+      ]
+    },
+    {
+      "id": "428766bddc69",
+      "kind": "list",
+      "page": 2,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "659a8dbe3e08",
+              "kind": "paragraph",
+              "page": 2,
+              "content": [
+                {
+                  "text": " strings"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "e43f464c6911",
+              "kind": "paragraph",
+              "page": 2,
+              "content": [
+                {
+                  "text": " branching - if/elif/else"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "374424caab21",
+              "kind": "paragraph",
+              "page": 2,
+              "content": [
+                {
+                  "text": " while loops"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "6f92b6689559",
+              "kind": "paragraph",
+              "page": 2,
+              "content": [
+                {
+                  "text": " for loops"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4458a5f6f5e7",
+      "kind": "heading",
+      "page": 3,
+      "level": 2,
+      "content": [
+        {
+          "text": "TODAY"
+        }
+      ]
+    },
+    {
+      "id": "c89662c19836",
+      "kind": "list",
+      "page": 3,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "6adb75581a4e",
+              "kind": "paragraph",
+              "page": 3,
+              "content": [
+                {
+                  "text": " string manipulation"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "4e78a116c64a",
+              "kind": "paragraph",
+              "page": 3,
+              "content": [
+                {
+                  "text": " guess and check algorithms"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "b43f5d789f25",
+              "kind": "paragraph",
+              "page": 3,
+              "content": [
+                {
+                  "text": " approximate solutions"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "9c10a241105a",
+              "kind": "paragraph",
+              "page": 3,
+              "content": [
+                {
+                  "text": " bisection method"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a610298d21d9",
+      "kind": "heading",
+      "page": 4,
+      "level": 2,
+      "content": [
+        {
+          "text": "STRINGS"
+        }
+      ]
+    },
+    {
+      "id": "9a55fb1da33b",
+      "kind": "list",
+      "page": 4,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "fdc1de7dba1d",
+              "kind": "paragraph",
+              "page": 4,
+              "content": [
+                {
+                  "text": " think of as a sequence of case sensitive characters"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "ad18dc042b71",
+              "kind": "paragraph",
+              "page": 4,
+              "content": [
+                {
+                  "text": " can compare strings with ==, \u003e, \u003c etc."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "53d2ff2c19e3",
+              "kind": "paragraph",
+              "page": 4,
+              "content": [
+                {
+                  "text": " len() is a function used to retrieve the length of the string in the parentheses"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f28fd5ce2af1",
+      "kind": "paragraph",
+      "page": 4,
+      "content": [
+        {
+          "text": "len(s)  evaluates to 3"
+        }
+      ]
+    },
+    {
+      "id": "a610298d21d9-2",
+      "kind": "heading",
+      "page": 5,
+      "level": 2,
+      "content": [
+        {
+          "text": "STRINGS"
+        }
+      ]
+    },
+    {
+      "id": "6aac8193d049",
+      "kind": "list",
+      "page": 5,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "035330384b62",
+              "kind": "paragraph",
+              "page": 5,
+              "content": [
+                {
+                  "text": " square brackets used to perform indexing into a string to get the value at a certain index/position"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "91ffec7058d6",
+      "kind": "code",
+      "page": 5,
+      "text": "s = \"abc\"\n"
+    },
+    {
+      "id": "008e70cd9ada",
+      "kind": "paragraph",
+      "page": 5,
+      "content": [
+        {
+          "text": "index: 0 1 2  indexing always starts at 0 index: -3 -2 -1  last element always at index -1 s[ 0]  evaluates to \"a\" s[ 1]  evaluates to \"b\" s[ 2]  evaluates to \"c\" s[ 3]  trying to index out of bounds, error s[ -1]  evaluates to \"c\" s[ -2]  evaluates to \"b\" s[ -3]  evaluates to \"a\""
+        }
+      ]
+    },
+    {
+      "id": "a610298d21d9-3",
+      "kind": "heading",
+      "page": 6,
+      "level": 2,
+      "content": [
+        {
+          "text": "STRINGS"
+        }
+      ]
+    },
+    {
+      "id": "20e4e2555b20",
+      "kind": "paragraph",
+      "page": 6,
+      "content": [
+        {
+          "text": " can slice strings using [start: stop: step]  if give two numbers, [start: stop], step=1 by default  you can also omit numbers and leave just colons s = \"abcdefgh\" s[3: 6]  evaluates to \"def\", same as s[3: 6: 1] s[3: 6: 2]  evaluates to \"df\" s[: : ]  evaluates to \"abcdefgh\", same as s[0: len(s) : 1] s[: : -1]  evaluates to \"hgfedbca\", same as s[-1:-(len(s) +1) :-1] s[4: 1: -2]  evaluates to \"ec\""
+        }
+      ]
+    },
+    {
+      "id": "a610298d21d9-4",
+      "kind": "heading",
+      "page": 7,
+      "level": 2,
+      "content": [
+        {
+          "text": "STRINGS"
+        }
+      ]
+    },
+    {
+      "id": "b5ab0839c06f",
+      "kind": "list",
+      "page": 7,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "02365c86dc1d",
+              "kind": "paragraph",
+              "page": 7,
+              "content": [
+                {
+                  "text": " strings are \"immutable\" - cannot be modified"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "67a8ac0297ec",
+      "kind": "list",
+      "page": 7,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "16ceafec8986",
+              "kind": "paragraph",
+              "page": 7,
+              "content": [
+                {
+                  "text": "gives an error"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "d9f413128525",
+              "kind": "paragraph",
+              "page": 7,
+              "content": [
+                {
+                  "text": "s bound to new object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "89b2c49cc767",
+      "kind": "heading",
+      "page": 8,
+      "level": 3,
+      "content": [
+        {
+          "text": "for LOOPS RECAP"
+        }
+      ]
+    },
+    {
+      "id": "7e3e2037b18d",
+      "kind": "list",
+      "page": 8,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "4253c2774ab6",
+              "kind": "paragraph",
+              "page": 8,
+              "content": [
+                {
+                  "text": " for loops have a loop variable that iterates over a set of values"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "369f3b409283",
+              "kind": "paragraph",
+              "page": 8,
+              "content": [
+                {
+                  "text": " range is a way to iterate over numbers, but a for loop variable can iterate over any set of values, not just numbers!"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e75b20c052cf",
+      "kind": "paragraph",
+      "page": 8,
+      "content": [
+        {
+          "text": "for var in range(4) :  var iterates over values 0,1,2,3 \u003cexpressions\u003e  expressions inside loop executed with each value for var"
+        }
+      ]
+    },
+    {
+      "id": "412c2125e6e2",
+      "kind": "paragraph",
+      "page": 8,
+      "content": [
+        {
+          "text": "for var in range(4, 6) :  var iterates over values 4,5 \u003cexpressions\u003e"
+        }
+      ]
+    },
+    {
+      "id": "433aafd1b86c",
+      "kind": "heading",
+      "page": 9,
+      "level": 2,
+      "content": [
+        {
+          "text": "STRINGS AND LOOPS"
+        }
+      ]
+    },
+    {
+      "id": "b9f2d30624c8",
+      "kind": "list",
+      "page": 9,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "922aa737c766",
+              "kind": "paragraph",
+              "page": 9,
+              "content": [
+                {
+                  "text": " these two code snippets do the same thing"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "87d703fdf90f",
+              "kind": "paragraph",
+              "page": 9,
+              "content": [
+                {
+                  "text": " bottom one is more \"pythonic\""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1ca27898e497",
+      "kind": "code",
+      "page": 9,
+      "text": "s = \"abcdefgh\"\nfor index in range(len(s)):\n    if s[index] == 'i' or s[index] == 'u':\n        print(\"There is an i or u\")\n\nfor char in s:\n    if char == 'i' or char == 'u':\n        print(\"There is an i or u\")\n"
+    },
+    {
+      "id": "b48a85d11bf9",
+      "kind": "heading",
+      "page": 10,
+      "level": 4,
+      "content": [
+        {
+          "text": "CODE EXAMPLE: ROBOT CHEERLEADERS"
+        }
+      ]
+    },
+    {
+      "id": "2cd5f500c679",
+      "kind": "code",
+      "page": 10,
+      "text": "an_letters = \"aefhilmnorsxAEFHILMNORSX\"\n\nword = input(\"I will cheer for you! Enter a wo rd: \")\ntimes = int(input(\"Enthusiasm level (1-10): \"))\n\ni = 0\nwhile i \u003c len(word):          f or c har  in w ord:\n    char = word[i]\n    if char in an_letters:\n        print(\"Give me an \" + char + \"! \" + cha r)\n    else:\n        print(\"Give me a  \" + char + \"! \" + cha r)\n    i += 1\nprint(\"What does that spell?\")\nfor i in range(times):\n    print(word, \"!!!\")\n"
+    },
+    {
+      "id": "1f079743db13",
+      "kind": "heading",
+      "page": 11,
+      "level": 2,
+      "content": [
+        {
+          "text": "EXERCISE"
+        }
+      ]
+    },
+    {
+      "id": "b3c311cbbb4e",
+      "kind": "code",
+      "page": 11,
+      "text": "s1 = \"mit u rock\"\ns2 = \"i rule mit\"\nif len(s1) == len(s2):\n    for char1 in s1:\n        for char2 in s2:\n            if char1 == char2:\n                print(\"common letter\")\n                break\n"
+    },
+    {
+      "id": "af356eacf537",
+      "kind": "heading",
+      "page": 12,
+      "level": 2,
+      "content": [
+        {
+          "text": "GUESS-AND-CHECK"
+        }
+      ]
+    },
+    {
+      "id": "39722bb0a65f",
+      "kind": "list",
+      "page": 12,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "c60dba443e6c",
+              "kind": "paragraph",
+              "page": 12,
+              "content": [
+                {
+                  "text": " the process below also called exhaustive enumeration"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "bb4dc37373ad",
+              "kind": "paragraph",
+              "page": 12,
+              "content": [
+                {
+                  "text": " given a problem…"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "d51be0640e50",
+              "kind": "paragraph",
+              "page": 12,
+              "content": [
+                {
+                  "text": " you are able to guess a value for solution"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "2e9d266844b8",
+              "kind": "paragraph",
+              "page": 12,
+              "content": [
+                {
+                  "text": " you are able to check if the solution is correct"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "8a7582b831bf",
+              "kind": "paragraph",
+              "page": 12,
+              "content": [
+                {
+                  "text": " keep guessing until find solution or guessed all values"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "f6db78f35921",
+      "kind": "heading",
+      "page": 13,
+      "level": 3,
+      "content": [
+        {
+          "text": "GUESS-AND-CHECK - cube root"
+        }
+      ]
+    },
+    {
+      "id": "59a4d5c5caaf",
+      "kind": "code",
+      "page": 13,
+      "text": "cube = 8\nfor guess in range(cube+1):\n    if guess**3 == cube:\n        print(\"Cube root of\", cube, \"is\", guess)\n"
+    },
+    {
+      "id": "f6db78f35921-2",
+      "kind": "heading",
+      "page": 14,
+      "level": 3,
+      "content": [
+        {
+          "text": "GUESS-AND-CHECK - cube root"
+        }
+      ]
+    },
+    {
+      "id": "060c9f3de996",
+      "kind": "code",
+      "page": 14,
+      "text": "cube = 8\nfor guess in range(abs(cube)+1):\n    if guess**3 \u003e= abs(cube):\n        break\nif guess**3 != abs(cube):\n    print(cube, 'is not a perfect cube')\nelse:\n    if cube \u003c 0:\n        guess = -guess\n    print('Cube root of '+str(cube)+' is '+str(guess))\n"
+    },
+    {
+      "id": "6fdaf6819c72",
+      "kind": "heading",
+      "page": 15,
+      "level": 2,
+      "content": [
+        {
+          "text": "APPROXIMATE SOLUTIONS"
+        }
+      ]
+    },
+    {
+      "id": "22c1f6fee6cb",
+      "kind": "list",
+      "page": 15,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "5065ad3d66c1",
+              "kind": "paragraph",
+              "page": 15,
+              "content": [
+                {
+                  "text": " good enough solution"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "fa1f31ba0599",
+              "kind": "paragraph",
+              "page": 15,
+              "content": [
+                {
+                  "text": " start with a guess and increment by some small value"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "feb135a0b481",
+              "kind": "paragraph",
+              "page": 15,
+              "content": [
+                {
+                  "text": " keep guessing if |guess 3 -cube| \u003e= epsilon for some small epsilon"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "68db3cc2cfc4",
+              "kind": "paragraph",
+              "page": 15,
+              "content": [
+                {
+                  "text": " decreasing increment size slower program"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "03795e0e7117",
+              "kind": "paragraph",
+              "page": 15,
+              "content": [
+                {
+                  "text": " increasing epsilon  less accurate answer"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3bfa63a9da1d",
+      "kind": "heading",
+      "page": 16,
+      "level": 3,
+      "content": [
+        {
+          "text": "APPROXIMATE SOLUTION - cube root"
+        }
+      ]
+    },
+    {
+      "id": "a29fd6cf4bae",
+      "kind": "code",
+      "page": 16,
+      "text": "cube = 27\nepsilon = 0.01\nguess = 0.0\nincrement = 0.0001\nnum_guesses = 0\nwhile abs(guess**3 - cube) \u003e= epsilon: and guess \u003c= cube :\n    guess += increment\n    num_guesses += 1\nprint('num_guesses =', num_guesses)\nif abs(guess**3 - cube) \u003e= epsilon:\n    print('Failed on cube root of', cube)\nelse:\n    print(guess, 'is close to the cube root of', cube)\n"
+    },
+    {
+      "id": "2ab4b2035222",
+      "kind": "heading",
+      "page": 17,
+      "level": 2,
+      "content": [
+        {
+          "text": "BISECTION SEARCH"
+        }
+      ]
+    },
+    {
+      "id": "a7320c65b170",
+      "kind": "list",
+      "page": 17,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "c9b318ba30a2",
+              "kind": "paragraph",
+              "page": 17,
+              "content": [
+                {
+                  "text": " half interval each iteration"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "8e086bd4afe6",
+              "kind": "paragraph",
+              "page": 17,
+              "content": [
+                {
+                  "text": " new guess is halfway in between"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "1d4eefea52f4",
+              "kind": "paragraph",
+              "page": 17,
+              "content": [
+                {
+                  "text": " to illustrate, let's play a game!"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "98730391edf8",
+      "kind": "heading",
+      "page": 18,
+      "level": 3,
+      "content": [
+        {
+          "text": "BISECTION SEARCH - cube root"
+        }
+      ]
+    },
+    {
+      "id": "70f45f3611c7",
+      "kind": "code",
+      "page": 18,
+      "text": "cube = 27\nepsilon = 0.01\nnum_guesses = 0\nlow = 0\nhigh = cube\nguess = (high + low)/2.0\nwhile abs(guess**3 - cube) \u003e= epsilon:\n    if guess**3 \u003c cube :\n        low = guess\n    else:\n        high = guess\n    guess = (high + low)/2.0\n    num_guesses += 1\nprint 'num_guesses =', num_guesses\nprint guess, 'is close to the cube root of', cube\n"
+    },
+    {
+      "id": "dd2e5ceef5bb",
+      "kind": "heading",
+      "page": 19,
+      "level": 2,
+      "content": [
+        {
+          "text": "BISECTION SEARCH CONVERGENCE"
+        }
+      ]
+    },
+    {
+      "id": "160a1aab5836",
+      "kind": "list",
+      "page": 19,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "688320f16551",
+              "kind": "paragraph",
+              "page": 19,
+              "content": [
+                {
+                  "text": " search space"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "eca61de78b11",
+              "kind": "paragraph",
+              "page": 19,
+              "content": [
+                {
+                  "text": " guess converges on the order of log 2 N steps"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "b398ee0f78bc",
+              "kind": "paragraph",
+              "page": 19,
+              "content": [
+                {
+                  "text": " bisection search works when value of function varies monotonically with input"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "7b9b892a8420",
+              "kind": "paragraph",
+              "page": 19,
+              "content": [
+                {
+                  "text": " code as shown only works for positive cubes \u003e 1 - why?"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "02ecf72f149e",
+              "kind": "paragraph",
+              "page": 19,
+              "content": [
+                {
+                  "text": " challenges modify to work with negative cubes! modify to work with x \u003c 1!"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e861d95ae645",
+      "kind": "list",
+      "page": 19,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "0d4a7036f125",
+              "kind": "paragraph",
+              "page": 19,
+              "content": [
+                {
+                  "text": "first guess: N/2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "eb5867a097f4",
+              "kind": "paragraph",
+              "page": 19,
+              "content": [
+                {
+                  "text": "second guess: N/4"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "11c70f20c4cb",
+              "kind": "paragraph",
+              "page": 19,
+              "content": [
+                {
+                  "text": "kth guess: N/2 k"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "403f75ae385f",
+      "kind": "heading",
+      "page": 20,
+      "level": 3,
+      "content": [
+        {
+          "text": "x \u003c 1"
+        }
+      ]
+    },
+    {
+      "id": "3d775793dede",
+      "kind": "list",
+      "page": 20,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "7497255253c2",
+              "kind": "paragraph",
+              "page": 20,
+              "content": [
+                {
+                  "text": " if x \u003c 1, search space is 0 to x but cube root is greater than x and less than 1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "dd9d70acdc35",
+              "kind": "paragraph",
+              "page": 20,
+              "content": [
+                {
+                  "text": " modify the code to choose the search space depending on value of x"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1fe07e28552f",
+      "kind": "paragraph",
+      "page": 21,
+      "content": [
+        {
+          "text": "MIT OpenCourseWare"
+        }
+      ]
+    },
+    {
+      "id": "86d2c3bb1049",
+      "kind": "paragraph",
+      "page": 21,
+      "content": [
+        {
+          "text": "https://ocw.mit.edu"
+        }
+      ]
+    },
+    {
+      "id": "13c7d4b3970d",
+      "kind": "heading",
+      "page": 21,
+      "level": 1,
+      "content": [
+        {
+          "text": "6.0001 Introduction to Computer Science and Programming in Python Fall 2016"
+        }
+      ]
+    },
+    {
+      "id": "a30390346267",
+      "kind": "paragraph",
+      "page": 21,
+      "content": [
+        {
+          "text": "For information about citing these materials or our Terms of Use, visit: https://ocw.mit.edu/terms."
+        }
+      ]
+    }
+  ],
+  "warnings": [
+    {
+      "code": "figures_omitted",
+      "message": "4 figures from the PDF are not shown.",
+      "count": 4
+    }
+  ]
+}

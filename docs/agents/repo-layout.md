@@ -7,7 +7,7 @@ Where things live, in full. AGENTS.md keeps the short version.
 | `cmd/api/` | HTTP API server |
 | `cmd/worker/` | background job runner |
 | `cmd/extract/` | dev tool: fetch one page and print its IR (`make extract`) |
-| `cmd/fakeidp/`, `cmd/fakeembed/`, `cmd/fakellm/` | dev and test stand-ins for GitHub sign-in, the embedder and the chat model, each served by `internal/devserver` |
+| `cmd/fakeidp/`, `cmd/fakeembed/`, `cmd/fakellm/`, `cmd/fakedocling/` | dev and test stand-ins for GitHub sign-in, the embedder, the chat model, and docling with pdftext, each served by `internal/devserver` |
 | `cmd/eval/` | the retrieval eval (`make eval`); with tests, the only code that may link testcontainers |
 | `internal/<pkg>/` | Go packages, one concern each |
 | `migrations/` | Postgres schema migrations |
@@ -36,6 +36,8 @@ Where things live, in full. AGENTS.md keeps the short version.
 | `internal/fetch/` | the only way to fetch a user-supplied URL: SSRF guard, limits, robots.txt, rate limit |
 | `internal/extract/` | HTML to IR extractor: generic rules, refined by a framework adapter when one matches |
 | `internal/extract/adapter/` | docs-framework adapters as configuration: detection, content root, chrome, callouts, tabs and code rules |
+| `testdata/pdf/` | PDF import fixtures: printed golden pages, two openly licensed PDFs and hostile inputs, with docling's and pdftext's recorded answers, IR goldens and the PDF verbatim report (`SOURCES.md`) |
+| `internal/fakedocling/` | replays the recordings in `testdata/pdf` over docling's async API and pdftext's routes; its test records them with `-record` |
 | `testdata/golden/` | extractor fixtures: `input.html`, `meta.json`, `expected.json`; third-party excerpts are listed in `SOURCES.md` |
 | `api/` | `openapi.yaml`, the API contract that Go and TypeScript types are generated from, and the oapi-codegen config |
 | `internal/httpapi/gen/` | Go server code generated from `api/openapi.yaml`; never edit it |

@@ -38,11 +38,14 @@ Every make target and what it runs, in detail. AGENTS.md keeps one line each.
 | `make run-api` | run the API on `127.0.0.1:8080`; `RONOTE_ENV` defaults to `dev` |
 | `make run-idp` | run the fake GitHub sign-in alone (`cmd/fakeidp`, `127.0.0.1:8090`), offering the users in `RONOTE_FAKEIDP_USERS` (default `deploy/fakeidp/dev-users.json`); dev only (docs/adr/0010-sign-in-and-sessions.md) |
 | `make run-llm` | run the fake chat model alone (`cmd/fakellm`, `RONOTE_FAKELLM_ADDR`, default `127.0.0.1:8094`): the Messages API subset chat uses, answering from the search results it is sent; dev only (docs/adr/0012-chat.md) |
+| `make run-docling` | run the fake docling and pdftext alone (`cmd/fakedocling`, `RONOTE_FAKEDOCLING_ADDR` and `RONOTE_FAKEPDFTEXT_ADDR`, default `127.0.0.1:5001` and `:5002`): replays the answers recorded for each PDF fixture, keyed by the file's SHA-256, and answers 503 to any other PDF; dev and test only (docs/adr/0013-pdf-import.md) |
+| `make pdf-fixtures` | print the extractor golden pages named in `testdata/pdf/printed.json`, and the hostile inputs, to PDF with Chromium, and encrypt one with qpdf; each print is a new file, so run `make pdf-record` after |
+| `make pdf-record` | send every PDF fixture through the real docling and pdftext (`make dev-up-docling`; `RONOTE_DOCLING_URL`, `RONOTE_PDFTEXT_URL` and their keys), record their answers in `testdata/pdf/*.docling.json`, then rewrite the IR goldens and `testdata/pdf/report.md`; review that diff like code. Local only |
 | `make extract url=... [format=text]` | fetch one page with the production fetcher rules and print its IR as JSON, or as readable text |
 | `make dev` (P0x) | run API, worker and web locally |
 | `make doctor` | check the local setup: the container VM's clock is within 2s of the host's (podman machine, or Docker's VM), and the embedder at `RONOTE_EMBED_URL` serves `RONOTE_EMBED_MODEL`, the pinned Ollama build (`scripts/embed-check.sh`). On failure each prints the fix, such as `podman machine ssh sudo chronyc makestep` or `ollama pull qwen3-embedding:0.6b` |
 | `make dev-up` | start the dev stack (`deploy/compose.dev.yml`) and wait until healthy; creates `.env.dev` if missing |
-| `make stop` | end what `make run-api`, `make run-worker`, `make run-idp`, `make run-llm` and `make web-dev` started, with everything they started (such as the binary `go run` builds): each runs through `scripts/run.sh`, which records its process group in `.run/`; `scripts/stop.sh` sends TERM to each group, then KILL after 5s |
+| `make stop` | end what `make run-api`, `make run-worker`, `make run-idp`, `make run-llm`, `make run-docling` and `make web-dev` started, with everything they started (such as the binary `go run` builds): each runs through `scripts/run.sh`, which records its process group in `.run/`; `scripts/stop.sh` sends TERM to each group, then KILL after 5s |
 | `make dev-down` | `make stop`, then stop the dev stack; the data volume is kept |
 | `make dev-logs` | follow the dev stack logs |
 | `make db-shell` | psql on the dev database |

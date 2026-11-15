@@ -32,8 +32,8 @@ type PDF struct {
 // change Map makes to the PDF's text (docs/adr/0013-pdf-import.md).
 var ligatures = strings.NewReplacer("ﬀ", "ff", "ﬁ", "fi", "ﬂ", "fl", "ﬃ", "ffi", "ﬄ", "ffl")
 
-// Box is a code block's box on one page, as pdftext takes it: PDF points,
-// origin bottom left. Ref names the code item it belongs to.
+// Box is an item's box on one page, as pdftext takes it: PDF points, origin
+// bottom left. Ref names the item it belongs to.
 type Box struct {
 	Ref  string  `json:"-"`
 	Page int     `json:"page"`
@@ -43,17 +43,21 @@ type Box struct {
 	B    float64 `json:"b"`
 }
 
-// CodeBoxes returns the boxes of d's code blocks, in reading order: one per
-// page a block is on.
-func CodeBoxes(d *Document) []Box {
+// layered are the labels of the items whose text layer Map reads: code,
+// for its lines, and prose and pictures, which may be code docling's
+// layout model took for something else.
+var layered = []string{"code", "text", "paragraph", "picture"}
+
+// LayerBoxes returns the boxes of d's code, prose and pictures, in reading
+// order: one per page an item is on.
+func LayerBoxes(d *Document) []Box {
 	var boxes []Box
-	for i := range d.Texts {
-		t := &d.Texts[i]
-		if t.Label != "code" || t.ContentLayer == "furniture" {
-			continue
+	add := func(it *Item) {
+		if !slices.Contains(layered, it.Label) || it.ContentLayer == "furniture" {
+			return
 		}
-		for _, p := range t.Prov {
-			b := Box{Ref: t.SelfRef, Page: p.PageNo, L: p.BBox.L, T: p.BBox.T, R: p.BBox.R, B: p.BBox.B}
+		for _, p := range it.Prov {
+			b := Box{Ref: it.SelfRef, Page: p.PageNo, L: p.BBox.L, T: p.BBox.T, R: p.BBox.R, B: p.BBox.B}
 			if p.BBox.CoordOrigin == "TOPLEFT" {
 				height := d.Pages[strconv.Itoa(p.PageNo)].Size.Height
 				b.T, b.B = height-p.BBox.T, height-p.BBox.B
@@ -61,36 +65,56 @@ func CodeBoxes(d *Document) []Box {
 			boxes = append(boxes, b)
 		}
 	}
+	for i := range d.Texts {
+		add(&d.Texts[i])
+	}
+	for i := range d.Pictures {
+		add(&d.Pictures[i])
+	}
 	return boxes
 }
 
-// CodeText joins the lines pdftext read from each box into each code
-// block's text, by the block's reference. blocks holds a list of lines per
-// box, in the boxes' order.
-func CodeText(boxes []Box, blocks [][]string) (map[string]string, error) {
+// Layer gathers the lines pdftext read from each box by the item they
+// belong to. blocks holds a list of lines per box, in the boxes' order.
+func Layer(boxes []Box, blocks [][]Line) (map[string][]Line, error) {
 	if len(blocks) != len(boxes) {
-		return nil, fmt.Errorf("docling: %d code boxes but text for %d", len(boxes), len(blocks))
+		return nil, fmt.Errorf("docling: %d boxes but lines for %d", len(boxes), len(blocks))
 	}
-	lines := map[string][]string{}
+	lines := map[string][]Line{}
 	for i, block := range blocks {
 		lines[boxes[i].Ref] = append(lines[boxes[i].Ref], block...)
 	}
-	text := map[string]string{}
-	for ref, ls := range lines {
-		if len(ls) > 0 {
-			text[ref] = strings.Join(ls, "\n") + "\n"
-		}
-	}
-	return text, nil
+	return lines, nil
 }
 
-// Map turns d into IR. code holds each code block's text from the text
-// layer, by reference; a block without one keeps docling's text, whose
-// lines docling joined with spaces. Headers and footers are dropped, and
-// pictures too, keeping their captions and counting them in a
-// figures_omitted warning. It returns ErrNoText for a PDF with no text.
-func Map(d *Document, pdf PDF, code map[string]string) (*ir.Doc, error) {
-	m := mapper{d: d, code: code, seen: map[string]bool{}}
+// allMono reports whether lines hold text, all of it set in monospace.
+func allMono(lines []Line) bool {
+	text := false
+	for _, l := range lines {
+		if strings.TrimSpace(l.Text) == "" {
+			continue
+		}
+		if !l.Mono {
+			return false
+		}
+		text = true
+	}
+	return text
+}
+
+// Map turns d into IR. layer holds the text layer's lines of code, prose
+// and pictures, by reference:
+//   - a code block's text is its monospace lines; its prose lines, such as
+//     a label docling's box took in, are paragraphs. A code block with no
+//     lines keeps docling's text, whose lines docling joined with spaces;
+//   - prose, or a picture, whose lines are all monospace is code docling's
+//     layout model took for something else, and is code;
+//   - headers and footers are dropped, and other pictures too, keeping their
+//     captions and counting them in a figures_omitted warning.
+//
+// It returns ErrNoText for a PDF with no text.
+func Map(d *Document, pdf PDF, layer map[string][]Line) (*ir.Doc, error) {
+	m := mapper{d: d, layer: layer, seen: map[string]bool{}}
 	for _, child := range d.Body.Children {
 		if err := m.node(child.Ref, &m.blocks); err != nil {
 			return nil, err
@@ -126,7 +150,7 @@ func Map(d *Document, pdf PDF, code map[string]string) (*ir.Doc, error) {
 
 type mapper struct {
 	d       *Document
-	code    map[string]string
+	layer   map[string][]Line
 	blocks  []ir.Block
 	title   string
 	figures int
@@ -161,6 +185,11 @@ func (m *mapper) node(ref string, out *[]ir.Block) error {
 		if p.ContentLayer == "furniture" {
 			return nil
 		}
+		if lines := m.layer[p.SelfRef]; allMono(lines) {
+			m.text = true
+			m.codeRuns(lines, firstPage(p.Prov), "", out)
+			return nil
+		}
 		m.figures++
 		return m.captions(p.Captions, out)
 	case "tables":
@@ -190,15 +219,62 @@ func (m *mapper) textItem(t *Item, out *[]ir.Block) {
 	case "section_header":
 		*out = append(*out, ir.Block{Kind: ir.KindHeading, Page: page, Level: min(max(t.Level, 1), 6), Content: runs(text)})
 	case "code":
-		if from, ok := m.code[t.SelfRef]; ok {
-			text = ligatures.Replace(from)
+		if lines := m.layer[t.SelfRef]; len(lines) > 0 {
+			m.codeRuns(lines, page, language(t.CodeLanguage), out)
+			return
 		}
 		*out = append(*out, ir.Block{Kind: ir.KindCode, Page: page, Lang: language(t.CodeLanguage), Text: text})
 	case "list_item":
 		// A list item outside a list group is a list of one.
 		*out = append(*out, ir.Block{Kind: ir.KindList, Page: page, Items: []ir.Item{{Children: []ir.Block{{Kind: ir.KindParagraph, Page: page, Content: runs(text)}}}}})
+	case "text", "paragraph":
+		if lines := m.layer[t.SelfRef]; allMono(lines) {
+			m.codeRuns(lines, page, "", out)
+			return
+		}
+		*out = append(*out, ir.Block{Kind: ir.KindParagraph, Page: page, Content: runs(text)})
 	default:
 		*out = append(*out, ir.Block{Kind: ir.KindParagraph, Page: page, Content: runs(text)})
+	}
+}
+
+// codeRuns maps an item's lines: each run of monospace lines is a code
+// block, without blank lines at its ends, and each run of prose lines a
+// paragraph, its lines joined by a space.
+func (m *mapper) codeRuns(lines []Line, page int, lang string, out *[]ir.Block) {
+	for len(lines) > 0 {
+		mono := lines[0].Mono
+		n := 1
+		for n < len(lines) && (lines[n].Mono == mono || strings.TrimSpace(lines[n].Text) == "") {
+			n++
+		}
+		run := lines[:n]
+		lines = lines[n:]
+		texts := make([]string, 0, len(run))
+		for _, l := range run {
+			texts = append(texts, ligatures.Replace(l.Text))
+		}
+		if mono {
+			for len(texts) > 0 && strings.TrimSpace(texts[len(texts)-1]) == "" {
+				texts = texts[:len(texts)-1]
+			}
+			for len(texts) > 0 && strings.TrimSpace(texts[0]) == "" {
+				texts = texts[1:]
+			}
+			if len(texts) > 0 {
+				*out = append(*out, ir.Block{Kind: ir.KindCode, Page: page, Lang: lang, Text: strings.Join(texts, "\n") + "\n"})
+			}
+			continue
+		}
+		var prose []string
+		for _, t := range texts {
+			if t = strings.TrimSpace(t); t != "" {
+				prose = append(prose, t)
+			}
+		}
+		if len(prose) > 0 {
+			*out = append(*out, ir.Block{Kind: ir.KindParagraph, Page: page, Content: runs(strings.Join(prose, " "))})
+		}
 	}
 }
 

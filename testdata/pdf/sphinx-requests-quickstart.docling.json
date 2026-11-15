@@ -1,0 +1,2660 @@
+{
+ "sha256": "0076ac64e8997808e5f4bc65c6389362a194e35beca0127e6ec46afa9b87a386",
+ "seconds": 3.11,
+ "pages": 3,
+ "inspect": {
+  "status": 200,
+  "body": {
+   "pages": 3,
+   "chars": 6670
+  }
+ },
+ "result": {
+  "status": 200,
+  "body": {
+   "document": {
+    "filename": "sphinx-requests-quickstart.pdf",
+    "md_content": null,
+    "json_content": {
+     "schema_name": "DoclingDocument",
+     "version": "1.10.0",
+     "name": "sphinx-requests-quickstart",
+     "origin": {
+      "mimetype": "application/pdf",
+      "binary_hash": 7981622064191087494,
+      "filename": "sphinx-requests-quickstart.pdf",
+      "uri": null
+     },
+     "furniture": {
+      "self_ref": "#/furniture",
+      "parent": null,
+      "children": [],
+      "content_layer": "furniture",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "body": {
+      "self_ref": "#/body",
+      "parent": null,
+      "children": [
+       {
+        "$ref": "#/texts/0"
+       },
+       {
+        "$ref": "#/texts/1"
+       },
+       {
+        "$ref": "#/texts/2"
+       },
+       {
+        "$ref": "#/groups/0"
+       },
+       {
+        "$ref": "#/texts/5"
+       },
+       {
+        "$ref": "#/texts/6"
+       },
+       {
+        "$ref": "#/texts/7"
+       },
+       {
+        "$ref": "#/texts/8"
+       },
+       {
+        "$ref": "#/texts/9"
+       },
+       {
+        "$ref": "#/texts/10"
+       },
+       {
+        "$ref": "#/texts/11"
+       },
+       {
+        "$ref": "#/texts/12"
+       },
+       {
+        "$ref": "#/texts/13"
+       },
+       {
+        "$ref": "#/texts/14"
+       },
+       {
+        "$ref": "#/texts/15"
+       },
+       {
+        "$ref": "#/texts/16"
+       },
+       {
+        "$ref": "#/texts/17"
+       },
+       {
+        "$ref": "#/texts/18"
+       },
+       {
+        "$ref": "#/texts/19"
+       },
+       {
+        "$ref": "#/texts/20"
+       },
+       {
+        "$ref": "#/texts/21"
+       },
+       {
+        "$ref": "#/texts/22"
+       },
+       {
+        "$ref": "#/texts/23"
+       },
+       {
+        "$ref": "#/texts/24"
+       },
+       {
+        "$ref": "#/texts/25"
+       },
+       {
+        "$ref": "#/texts/26"
+       },
+       {
+        "$ref": "#/texts/27"
+       },
+       {
+        "$ref": "#/texts/28"
+       },
+       {
+        "$ref": "#/texts/29"
+       },
+       {
+        "$ref": "#/texts/30"
+       },
+       {
+        "$ref": "#/texts/31"
+       },
+       {
+        "$ref": "#/texts/32"
+       },
+       {
+        "$ref": "#/texts/33"
+       },
+       {
+        "$ref": "#/texts/34"
+       },
+       {
+        "$ref": "#/texts/35"
+       },
+       {
+        "$ref": "#/texts/36"
+       },
+       {
+        "$ref": "#/texts/37"
+       },
+       {
+        "$ref": "#/texts/38"
+       },
+       {
+        "$ref": "#/texts/39"
+       },
+       {
+        "$ref": "#/texts/40"
+       },
+       {
+        "$ref": "#/texts/41"
+       },
+       {
+        "$ref": "#/texts/42"
+       },
+       {
+        "$ref": "#/texts/43"
+       },
+       {
+        "$ref": "#/texts/44"
+       },
+       {
+        "$ref": "#/texts/45"
+       },
+       {
+        "$ref": "#/texts/46"
+       },
+       {
+        "$ref": "#/texts/47"
+       },
+       {
+        "$ref": "#/texts/48"
+       },
+       {
+        "$ref": "#/texts/49"
+       },
+       {
+        "$ref": "#/texts/50"
+       },
+       {
+        "$ref": "#/texts/51"
+       },
+       {
+        "$ref": "#/texts/52"
+       },
+       {
+        "$ref": "#/texts/53"
+       },
+       {
+        "$ref": "#/texts/54"
+       },
+       {
+        "$ref": "#/groups/1"
+       },
+       {
+        "$ref": "#/texts/56"
+       }
+      ],
+      "content_layer": "body",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "groups": [
+      {
+       "self_ref": "#/groups/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/3"
+        },
+        {
+         "$ref": "#/texts/4"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/55"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      }
+     ],
+     "texts": [
+      {
+       "self_ref": "#/texts/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 779.9620338715821,
+          "r": 171.62108653912108,
+          "b": 759.1143784902343,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          11
+         ]
+        }
+       ],
+       "orig": "Quickstart¶",
+       "text": "Quickstart¶",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 1
+      },
+      {
+       "self_ref": "#/texts/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 738.5714105961914,
+          "r": 496.01951100251944,
+          "b": 727.7667235463867,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          94
+         ]
+        }
+       ],
+       "orig": "Eager to get started? This page gives a good introduction in how to get started with Requests.",
+       "text": "Eager to get started? This page gives a good introduction in how to get started with Requests.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/2",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 713.0596929091797,
+          "r": 149.31444697856446,
+          "b": 703.169068321289,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          22
+         ]
+        }
+       ],
+       "orig": "First, make sure that:",
+       "text": "First, make sure that:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/3",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 687.6065689697266,
+          "r": 175.99803961674806,
+          "b": 676.7667256713868,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "Requests is installed",
+       "text": "Requests is installed",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/4",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 662.0714137836915,
+          "r": 184.65233605615234,
+          "b": 651.2667267338868,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          22
+         ]
+        }
+       ],
+       "orig": "Requests is up-to-date",
+       "text": "Requests is up-to-date",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/5",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 636.6065710947266,
+          "r": 263.6249897956249,
+          "b": 625.7667277963867,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          44
+         ]
+        }
+       ],
+       "orig": "Let's get started with some simple examples.",
+       "text": "Let's get started with some simple examples.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/6",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 606.044072368164,
+          "r": 181.71679300846665,
+          "b": 590.1710261545411,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          15
+         ]
+        }
+       ],
+       "orig": "Make a Request¶",
+       "text": "Make a Request¶",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/7",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 572.1065737822266,
+          "r": 275.29686400929677,
+          "b": 561.255011734375,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          46
+         ]
+        }
+       ],
+       "orig": "Making a request with Requests is very simple.",
+       "text": "Making a request with Requests is very simple.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/8",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 546.6065748447265,
+          "r": 248.31444297356438,
+          "b": 535.755012796875,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          39
+         ]
+        }
+       ],
+       "orig": "Begin by importing the Requests module:",
+       "text": "Begin by importing the Requests module:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/9",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 522.0814586287158,
+          "r": 127.8004736308227,
+          "b": 516.0167311632122,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          19
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e import requests",
+       "text": "\u003e\u003e\u003e import requests",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/10",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 501.6065767197266,
+          "r": 452.83006044207997,
+          "b": 490.755014671875,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          86
+         ]
+        }
+       ],
+       "orig": "Now, let's try to get a webpage. For this example, let's get GitHub's public timeline:",
+       "text": "Now, let's try to get a webpage. For this example, let's get GitHub's public timeline:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/11",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 477.27279838431764,
+          "r": 270.6249570548023,
+          "b": 471.0098995424764,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          53
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e r = requests.get('https://api.github.com/events')",
+       "text": "\u003e\u003e\u003e r = requests.get('https://api.github.com/events')",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/12",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 456.6065785947266,
+          "r": 522.9081816221582,
+          "b": 445.755016546875,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          97
+         ]
+        }
+       ],
+       "orig": "Now, we have a Response object called r. We can get all the information we need from this object.",
+       "text": "Now, we have a Response object called r. We can get all the information we need from this object.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/13",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 431.1065796572266,
+          "r": 530.9413867374413,
+          "b": 406.755018171875,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          129
+         ]
+        }
+       ],
+       "orig": "Requests' simple API means that all forms of HTTP request are as obvious. For example, this is how you make an HTTP POST request:",
+       "text": "Requests' simple API means that all forms of HTTP request are as obvious. For example, this is how you make an HTTP POST request:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/14",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 393.27280188431763,
+          "r": 350.48038435249265,
+          "b": 387.0099030424764,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          73
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e r = requests.post('https://httpbin.org/post' , data={'key': 'value'})",
+       "text": "\u003e\u003e\u003e r = requests.post('https://httpbin.org/post' , data={'key': 'value'})",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/15",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 372.57142584619146,
+          "r": 536.4667749872168,
+          "b": 348.25502060937504,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          114
+         ]
+        }
+       ],
+       "orig": "Nice, right? What about the other HTTP request types: PUT, DELETE, HEAD and OPTIONS? These are all just as simple:",
+       "text": "Nice, right? What about the other HTTP request types: PUT, DELETE, HEAD and OPTIONS? These are all just as simple:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/16",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 334.7728043218176,
+          "r": 342.0780372025905,
+          "b": 306.0099064174764,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          226
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e r = requests.put('https://httpbin.org/put' , data={'key': 'value'}) \u003e\u003e\u003e r = requests.delete('https://httpbin.org/delete') \u003e\u003e\u003e r = requests.head('https://httpbin.org/get') \u003e\u003e\u003e r = requests.options('https://httpbin.org/get')",
+       "text": "\u003e\u003e\u003e r = requests.put('https://httpbin.org/put' , data={'key': 'value'}) \u003e\u003e\u003e r = requests.delete('https://httpbin.org/delete') \u003e\u003e\u003e r = requests.head('https://httpbin.org/get') \u003e\u003e\u003e r = requests.options('https://httpbin.org/get')",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/17",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 291.6065854697266,
+          "r": 414.28123357828105,
+          "b": 280.7550234218751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          79
+         ]
+        }
+       ],
+       "orig": "That's all well and good, but it's also only the start of what Requests can do.",
+       "text": "That's all well and good, but it's also only the start of what Requests can do.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/18",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 261.3165476693116,
+          "r": 280.21287890446285,
+          "b": 245.14467334313974,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          27
+         ]
+        }
+       ],
+       "orig": "Passing Parameters In URLs¶",
+       "text": "Passing Parameters In URLs¶",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/19",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 227.07143190869147,
+          "r": 543.6327938086328,
+          "b": 162.25502835937505,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          446
+         ]
+        }
+       ],
+       "orig": "You often want to send some sort of data in the URL's query string. If you were constructing the URL by hand, this data would be given as key/value pairs in the URL after a question mark, e.g. httpbin.org/get?key=val. Requests allows you to provide these arguments as a dictionary of strings, using the params keyword argument. As an example, if you wanted to pass key1=value1 and key2=value2 to httpbin.org/get, you would use the following code:",
+       "text": "You often want to send some sort of data in the URL's query string. If you were constructing the URL by hand, this data would be given as key/value pairs in the URL after a question mark, e.g. httpbin.org/get?key=val. Requests allows you to provide these arguments as a dictionary of strings, using the params keyword argument. As an example, if you wanted to pass key1=value1 and key2=value2 to httpbin.org/get, you would use the following code:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/20",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 148.56097370400857,
+          "r": 312.64839280382574,
+          "b": 135.0099135424764,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          116
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e payload = {'key1': 'value1' , 'key2': 'value2'} \u003e\u003e\u003e r = requests.get('https://httpbin.org/get' , params=payload)",
+       "text": "\u003e\u003e\u003e payload = {'key1': 'value1' , 'key2': 'value2'} \u003e\u003e\u003e r = requests.get('https://httpbin.org/get' , params=payload)",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/21",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 120.60659259472664,
+          "r": 407.9179524284178,
+          "b": 109.7550305468751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          72
+         ]
+        }
+       ],
+       "orig": "You can see that the URL has been correctly encoded by printing the URL:",
+       "text": "You can see that the URL has been correctly encoded by printing the URL:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/22",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 96.08147637871582,
+          "r": 245.36148185744705,
+          "b": 82.51674922571215,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          64
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e print(r.url) https://httpbin.org/get?key2=value2\u0026key1=value1",
+       "text": "\u003e\u003e\u003e print(r.url) https://httpbin.org/get?key2=value2\u0026key1=value1",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/23",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 68.10659478222658,
+          "r": 498.23435241023446,
+          "b": 57.25503273437505,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          93
+         ]
+        }
+       ],
+       "orig": "Note that any dictionary key whose value is None will not be added to the URL's query string.",
+       "text": "Note that any dictionary key whose value is None will not be added to the URL's query string.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/24",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 798.6065643447266,
+          "r": 254.7538961902539,
+          "b": 787.7667210463868,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          45
+         ]
+        }
+       ],
+       "orig": "You can also pass a list of items as a value:",
+       "text": "You can also pass a list of items as a value:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/25",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 774.0609476415086,
+          "r": 312.64839280382574,
+          "b": 738.0167219132121,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          206
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e payload = {'key1': 'value1' , 'key2': ['value2' , 'value3']} \u003e\u003e\u003e r = requests.get('https://httpbin.org/get' , params=payload) \u003e\u003e\u003e print(r.url) https://httpbin.org/get?key1=value1\u0026key2=value2\u0026key2=value3",
+       "text": "\u003e\u003e\u003e payload = {'key1': 'value1' , 'key2': ['value2' , 'value3']} \u003e\u003e\u003e r = requests.get('https://httpbin.org/get' , params=payload) \u003e\u003e\u003e print(r.url) https://httpbin.org/get?key1=value1\u0026key2=value2\u0026key2=value3",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/26",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 718.8165286068115,
+          "r": 196.23631990348633,
+          "b": 702.6710214670411,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          17
+         ]
+        }
+       ],
+       "orig": "Response Content¶",
+       "text": "Response Content¶",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/27",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 684.6065690947266,
+          "r": 460.0253718322753,
+          "b": 673.7667257963867,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          85
+         ]
+        }
+       ],
+       "orig": "We can read the content of the server's response. Consider the GitHub timeline again:",
+       "text": "We can read the content of the server's response. Consider the GitHub timeline again:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/28",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 660.0814528787158,
+          "r": 308.3491886079591,
+          "b": 623.7297198423095,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          150
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e import requests \u003e\u003e\u003e r = requests.get('https://api.github.com/events') \u003e\u003e\u003e r.text '[{\"repository\":{\"open _ issues\":0, \"url\":\"https://github.com/...",
+       "text": "\u003e\u003e\u003e import requests \u003e\u003e\u003e r = requests.get('https://api.github.com/events') \u003e\u003e\u003e r.text '[{\"repository\":{\"open _ issues\":0, \"url\":\"https://github.com/...",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/29",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 609.6065722197266,
+          "r": 518.1972446484475,
+          "b": 587.6983700075684,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          105
+         ]
+        }
+       ],
+       "orig": "Requests will automatically decode content from the server. Most unicode charsets are seamlessly decoded.",
+       "text": "Requests will automatically decode content from the server. Most unicode charsets are seamlessly decoded.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/30",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 570.5714175961914,
+          "r": 547.042946046543,
+          "b": 532.755012921875,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          284
+         ]
+        }
+       ],
+       "orig": "When you make a request, Requests makes educated guesses about the encoding of the response based on the HTTP headers. The text encoding guessed by Requests is used when you access r.text. You can find out what encoding Requests is using, and change it, using the r.encoding property:",
+       "text": "When you make a request, Requests makes educated guesses about the encoding of the response based on the HTTP headers. The text encoding guessed by Requests is used when you access r.text. You can find out what encoding Requests is using, and change it, using the r.encoding property:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/31",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 519.0814587537159,
+          "r": 169.8276631296897,
+          "b": 498.0167319132122,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          52
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e r.encoding 'utf-8' \u003e\u003e\u003e r.encoding = 'ISO-8859-1'",
+       "text": "\u003e\u003e\u003e r.encoding 'utf-8' \u003e\u003e\u003e r.encoding = 'ISO-8859-1'",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/32",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 483.6065774697265,
+          "r": 544.8281022988281,
+          "b": 418.75501767187507,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          467
+         ]
+        }
+       ],
+       "orig": "If you change the encoding, Requests will use the new value of r.encoding whenever you call r.text. You might want to do this in any situation where you can apply special logic to work out what the encoding of the content will be. For example, HTML and XML have the ability to specify their encoding in their body. In situations like this, you should use r.content to find the encoding, and then set r.encoding. This will let you use r.text with the correct encoding.",
+       "text": "If you change the encoding, Requests will use the new value of r.encoding whenever you call r.text. You might want to do this in any situation where you can apply special logic to work out what the encoding of the content will be. For example, HTML and XML have the ability to specify their encoding in their body. In situations like this, you should use r.content to find the encoding, and then set r.encoding. This will let you use r.text with the correct encoding.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/33",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 404.1065807822265,
+          "r": 544.2070094447071,
+          "b": 366.2550198593751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          260
+         ]
+        }
+       ],
+       "orig": "Requests will also use custom encodings in the event that you need them. If you have created your own encoding and registered it with the codecs module, you can simply use the codec name as the value of r.encoding and Requests will handle the decoding for you.",
+       "text": "Requests will also use custom encodings in the event that you need them. If you have created your own encoding and registered it with the codecs module, you can simply use the codec name as the value of r.encoding and Requests will handle the decoding for you.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/34",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 346.81654410681153,
+          "r": 253.74022750749006,
+          "b": 330.6710369670411,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          24
+         ]
+        }
+       ],
+       "orig": "Binary Response Content¶",
+       "text": "Binary Response Content¶",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/35",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 312.60658459472666,
+          "r": 382.7109223787108,
+          "b": 301.7550225468751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          70
+         ]
+        }
+       ],
+       "orig": "You can also access the response body as bytes, for non-text requests:",
+       "text": "You can also access the response body as bytes, for non-text requests:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/36",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 287.5142882326463,
+          "r": 312.5483690579932,
+          "b": 274.2297344048095,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          80
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e r.content b'[{\"repository\":{\"open _ issues\":0, \"url\":\"https://github.com/...",
+       "text": "\u003e\u003e\u003e r.content b'[{\"repository\":{\"open _ issues\":0, \"url\":\"https://github.com/...",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/37",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 260.1065867822267,
+          "r": 419.3495922170995,
+          "b": 249.25502473437496,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          74
+         ]
+        }
+       ],
+       "orig": "The gzip and deflate transfer-encodings are automatically decoded for you.",
+       "text": "The gzip and deflate transfer-encodings are automatically decoded for you.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/38",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 234.60658784472662,
+          "r": 532.6874815846874,
+          "b": 212.73940125585932,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          117
+         ]
+        }
+       ],
+       "orig": "The br transfer-encoding is automatically decoded for you if a Brotli library like brotli or brotlicffi is installed.",
+       "text": "The br transfer-encoding is automatically decoded for you if a Brotli library like brotli or brotlicffi is installed.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/39",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 195.6065894697267,
+          "r": 547.8163840543165,
+          "b": 184.75502742187496,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          103
+         ]
+        }
+       ],
+       "orig": "For example, to create an image from binary data returned by a request, you can use the following code:",
+       "text": "For example, to create an image from binary data returned by a request, you can use the following code:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/40",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 171.08147325371579,
+          "r": 207.67570280268802,
+          "b": 142.5099132299763,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          91
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e from PIL import Image \u003e\u003e\u003e from io import BytesIO \u003e\u003e\u003e i = Image.open(BytesIO(r.content))",
+       "text": "\u003e\u003e\u003e from PIL import Image \u003e\u003e\u003e from io import BytesIO \u003e\u003e\u003e i = Image.open(BytesIO(r.content))",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/41",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 123.37807685424809,
+          "r": 246.74413029899415,
+          "b": 107.17104627954109,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          22
+         ]
+        }
+       ],
+       "orig": "JSON Response Content¶",
+       "text": "JSON Response Content¶",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/42",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 89.85659387597661,
+          "r": 415.1074071138572,
+          "b": 79.00503182812508,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          75
+         ]
+        }
+       ],
+       "orig": "There's also a builtin JSON decoder, in case you're dealing with JSON data:",
+       "text": "There's also a builtin JSON decoder, in case you're dealing with JSON data:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/43",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 799.5814470662156,
+          "r": 320.9467299580615,
+          "b": 763.2297140298092,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          154
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e import requests \u003e\u003e\u003e r = requests.get('https://api.github.com/events') \u003e\u003e\u003e r.json() [{'repository': {'open _ issues': 0, 'url': 'https://github.com/...",
+       "text": "\u003e\u003e\u003e import requests \u003e\u003e\u003e r = requests.get('https://api.github.com/events') \u003e\u003e\u003e r.json() [{'repository': {'open _ issues': 0, 'url': 'https://github.com/...",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/44",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 749.1065664072264,
+          "r": 542.6952942076953,
+          "b": 697.7550060468748,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          377
+         ]
+        }
+       ],
+       "orig": "In case the JSON decoding fails, r.json() raises an exception. For example, if the response gets a 204 (No Content), or if the response contains invalid JSON, attempting r.json() raises requests.exceptions.JSONDecodeError. This wrapper exception provides interoperability for multiple exceptions that may be thrown by different python versions and json serialization libraries.",
+       "text": "In case the JSON decoding fails, r.json() raises an exception. For example, if the response gets a 204 (No Content), or if the response contains invalid JSON, attempting r.json() raises requests.exceptions.JSONDecodeError. This wrapper exception provides interoperability for multiple exceptions that may be thrown by different python versions and json serialization libraries.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/45",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 683.1065691572264,
+          "r": 546.0351377885352,
+          "b": 631.7550087968748,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          354
+         ]
+        }
+       ],
+       "orig": "It should be noted that the success of the call to r.json() does not indicate the success of the response. Some servers may return a JSON object in a failed response (e.g. error details with HTTP 500). Such JSON will be decoded and returned. To check that a request is successful, use r.raise _ for _ status() or check r.status _ code is what you expect.",
+       "text": "It should be noted that the success of the call to r.json() does not indicate the success of the response. Some servers may return a JSON object in a failed response (e.g. error details with HTTP 500). Such JSON will be decoded and returned. To check that a request is successful, use r.raise _ for _ status() or check r.status _ code is what you expect.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/46",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 612.3165330443114,
+          "r": 235.72850575797852,
+          "b": 596.1710259045408,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          21
+         ]
+        }
+       ],
+       "orig": "Raw Response Content¶",
+       "text": "Raw Response Content¶",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/47",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 578.1065735322263,
+          "r": 540.5976374150974,
+          "b": 542.7686843796384,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          211
+         ]
+        }
+       ],
+       "orig": "In the rare case that you'd like to get the raw socket response from the server, you can access r.raw. If you want to do this, make sure you set stream=True in your initial request. Once you do, you can do this:",
+       "text": "In the rare case that you'd like to get the raw socket response from the server, you can access r.raw. If you want to do this, make sure you set stream=True in your initial request. Once you do, you can do this:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/48",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 526.7727963218176,
+          "r": 325.24604477892353,
+          "b": 476.49392274092816,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          194
+         ]
+        }
+       ],
+       "orig": "\u003e\u003e\u003e r = requests.get('https://api.github.com/events' , stream=True) \u003e\u003e\u003e r.raw \u003curllib3.response.HTTPResponse object at 0x101194810\u003e \u003e\u003e\u003e r.raw.read(10) b'\\x1f\\x8b\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x03'",
+       "text": "\u003e\u003e\u003e r = requests.get('https://api.github.com/events' , stream=True) \u003e\u003e\u003e r.raw \u003curllib3.response.HTTPResponse object at 0x101194810\u003e \u003e\u003e\u003e r.raw.read(10) b'\\x1f\\x8b\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x03'",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/49",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 461.1065784072264,
+          "r": 499.40622976140605,
+          "b": 450.25501635937485,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          97
+         ]
+        }
+       ],
+       "orig": "In general, however, you should use a pattern like this to save what is being streamed to a file:",
+       "text": "In general, however, you should use a pattern like this to save what is being streamed to a file:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/50",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 436.5814621912157,
+          "r": 249.64054105415303,
+          "b": 415.5099018549761,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          97
+         ]
+        }
+       ],
+       "orig": "with open(filename, 'wb') as fd: for chunk in r.iter _ content(chunk _ size=128): fd.write(chunk)",
+       "text": "with open(filename, 'wb') as fd: for chunk in r.iter _ content(chunk _ size=128): fd.write(chunk)",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/51",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 401.1065809072263,
+          "r": 548.0038874665039,
+          "b": 349.7550205468749,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          317
+         ]
+        }
+       ],
+       "orig": "Using Response.iter _ content will handle a lot of what you would otherwise have to handle when using Response.raw directly. When streaming a download, the above is the preferred and recommended way to retrieve the content. Note that chunk _ size can be freely adjusted to a number that may better fit your use cases.",
+       "text": "Using Response.iter _ content will handle a lot of what you would otherwise have to handle when using Response.raw directly. When streaming a download, the above is the preferred and recommended way to retrieve the content. Note that chunk _ size can be freely adjusted to a number that may better fit your use cases.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/52",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 334.8194742941894,
+          "r": 71.32616894807617,
+          "b": 326.69838088256824,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          4
+         ]
+        }
+       ],
+       "orig": "Note",
+       "text": "Note",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/53",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 309.5597097216796,
+          "r": 538.4296656054297,
+          "b": 258.25502435937506,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          329
+         ]
+        }
+       ],
+       "orig": "An important note about using Response.iter _ content versus Response.raw. Response.iter _ content will automatically decode the gzip and deflate transfer-encodings. Response.raw is a raw stream of bytes - it does not transform the response content. If you really need access to the bytes as they were returned, use Response.raw.",
+       "text": "An important note about using Response.iter _ content versus Response.raw. Response.iter _ content will automatically decode the gzip and deflate transfer-encodings. Response.raw is a raw stream of bytes - it does not transform the response content. If you really need access to the bytes as they were returned, use Response.raw.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/54",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 240.57533097432452,
+          "r": 113.48952046520552,
+          "b": 227.9680079547079,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          10
+         ]
+        }
+       ],
+       "orig": "Navigation",
+       "text": "Navigation",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/55",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 211.0694794504393,
+          "r": 121.33007326458008,
+          "b": 200.51674551513634,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          8
+         ]
+        }
+       ],
+       "orig": "Requests",
+       "text": "Requests",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/56",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 185.8097148779293,
+          "r": 233.77147517452147,
+          "b": 175.00502782812464,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          33
+         ]
+        }
+       ],
+       "orig": "©MMXVIX. A Kenneth Reitz Project.",
+       "text": "©MMXVIX. A Kenneth Reitz Project.",
+       "formatting": null,
+       "hyperlink": null
+      }
+     ],
+     "pictures": [],
+     "tables": [],
+     "key_value_items": [],
+     "form_items": [],
+     "pages": {
+      "1": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 1
+      },
+      "2": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 2
+      },
+      "3": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 3
+      }
+     }
+    },
+    "html_content": null,
+    "text_content": null,
+    "doctags_content": null,
+    "doclang_content": null
+   },
+   "status": "success",
+   "errors": [],
+   "processing_time": 2.738397434000035,
+   "timings": {},
+   "confidence": {
+    "parse_score": 1.0,
+    "layout_score": 0.9288409930422791,
+    "table_score": null,
+    "ocr_score": null,
+    "mean_score": 0.9644204965211395,
+    "low_score": 0.932398943390165,
+    "mean_grade": "excellent",
+    "low_grade": "excellent",
+    "pages": {
+     "2": {
+      "parse_score": 1.0,
+      "layout_score": 0.9395335348028886,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9697667674014443,
+      "low_score": 0.9425568580627441,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "1": {
+      "parse_score": 1.0,
+      "layout_score": 0.9172965586185455,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9586482793092728,
+      "low_score": 0.9214317306876183,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "3": {
+      "parse_score": 1.0,
+      "layout_score": 0.9296928857054029,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9648464428527015,
+      "low_score": 0.9332082414201327,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     }
+    }
+   }
+  }
+ },
+ "lines": {
+  "status": 200,
+  "body": {
+   "blocks": [
+    [
+     {
+      "text": "Eager to get started? This page gives a good introduction in how to get started with Requests.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "First, make sure that:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Let\u2019s get started with some simple examples.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Making a request with Requests is very simple.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Begin by importing the Requests module:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e import requests",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Now, let\u2019s try to get a webpage. For this example, let\u2019s get GitHub\u2019s public timeline:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e r = requests.get('https://api.github.com/events')",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Now, we have a Response object called r. We can get all the information we need from this object.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Requests\u2019 simple API means that all forms of HTTP request are as obvious. For example, this is how",
+      "mono": false
+     },
+     {
+      "text": "you make an HTTP POST request:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e r = requests.post('https://httpbin.org/post', data={'key': 'value'})",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Nice, right? What about the other HTTP request types: PUT, DELETE, HEAD and OPTIONS? These",
+      "mono": false
+     },
+     {
+      "text": "are all just as simple:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e r = requests.put('https://httpbin.org/put', data={'key': 'value'})",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e r = requests.delete('https://httpbin.org/delete')",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e r = requests.head('https://httpbin.org/get')",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e r = requests.options('https://httpbin.org/get')",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "That\u2019s all well and good, but it\u2019s also only the start of what Requests can do.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "You often want to send some sort of data in the URL\u2019s query string. If you were constructing the URL",
+      "mono": false
+     },
+     {
+      "text": "by hand, this data would be given as key/value pairs in the URL after a question mark, e.g.",
+      "mono": false
+     },
+     {
+      "text": "httpbin.org/get?key=val. Requests allows you to provide these arguments as a dictionary of strings,",
+      "mono": false
+     },
+     {
+      "text": "using the params keyword argument. As an example, if you wanted to pass key1=value1 and",
+      "mono": false
+     },
+     {
+      "text": "key2=value2 to httpbin.org/get, you would use the following code:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e payload = {'key1': 'value1', 'key2': 'value2'}",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e r = requests.get('https://httpbin.org/get', params=payload)",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "You can see that the URL has been correctly encoded by printing the URL:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e print(r.url)",
+      "mono": true
+     },
+     {
+      "text": "https://httpbin.org/get?key2=value2\u0026key1=value1",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Note that any dictionary key whose value is None will not be added to the URL\u2019s query string.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "You can also pass a list of items as a value:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e payload = {'key1': 'value1', 'key2': ['value2', 'value3']}",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e r = requests.get('https://httpbin.org/get', params=payload)",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e print(r.url)",
+      "mono": true
+     },
+     {
+      "text": "https://httpbin.org/get?key1=value1\u0026key2=value2\u0026key2=value3",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "We can read the content of the server\u2019s response. Consider the GitHub timeline again:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e import requests",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e r = requests.get('https://api.github.com/events')",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e r.text",
+      "mono": true
+     },
+     {
+      "text": "'[{\"repository\":{\"open_issues\":0,\"url\":\"https://github.com/...",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Requests will automatically decode content from the server. Most unicode charsets are seamlessly",
+      "mono": false
+     },
+     {
+      "text": "decoded.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "When you make a request, Requests makes educated guesses about the encoding of the response based",
+      "mono": false
+     },
+     {
+      "text": "on the HTTP headers. The text encoding guessed by Requests is used when you access r.text. You can",
+      "mono": false
+     },
+     {
+      "text": "find out what encoding Requests is using, and change it, using the r.encoding property:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e r.encoding",
+      "mono": true
+     },
+     {
+      "text": "'utf-8'",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e r.encoding = 'ISO-8859-1'",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "If you change the encoding, Requests will use the new value of r.encoding whenever you call r.text.",
+      "mono": false
+     },
+     {
+      "text": "You might want to do this in any situation where you can apply special logic to work out what the",
+      "mono": false
+     },
+     {
+      "text": "encoding of the content will be. For example, HTML and XML have the ability to specify their",
+      "mono": false
+     },
+     {
+      "text": "encoding in their body. In situations like this, you should use r.content to find the encoding, and then",
+      "mono": false
+     },
+     {
+      "text": "set r.encoding. This will let you use r.text with the correct encoding.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Requests will also use custom encodings in the event that you need them. If you have created your own",
+      "mono": false
+     },
+     {
+      "text": "encoding and registered it with the codecs module, you can simply use the codec name as the value of",
+      "mono": false
+     },
+     {
+      "text": "r.encoding and Requests will handle the decoding for you.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "You can also access the response body as bytes, for non-text requests:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e r.content",
+      "mono": true
+     },
+     {
+      "text": "b'[{\"repository\":{\"open_issues\":0,\"url\":\"https://github.com/...",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "The gzip and deflate transfer-encodings are automatically decoded for you.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "The br transfer-encoding is automatically decoded for you if a Brotli library like brotli or brotlicffi is",
+      "mono": false
+     },
+     {
+      "text": "installed.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "For example, to create an image from binary data returned by a request, you can use the following code:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e from PIL import Image",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e from io import BytesIO",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e i = Image.open(BytesIO(r.content))",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "There\u2019s also a builtin JSON decoder, in case you\u2019re dealing with JSON data:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e import requests",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e r = requests.get('https://api.github.com/events')",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e r.json()",
+      "mono": true
+     },
+     {
+      "text": "[{'repository': {'open_issues': 0, 'url': 'https://github.com/...",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "In case the JSON decoding fails, r.json() raises an exception. For example, if the response gets a 204",
+      "mono": false
+     },
+     {
+      "text": "(No Content), or if the response contains invalid JSON, attempting r.json() raises",
+      "mono": false
+     },
+     {
+      "text": "requests.exceptions.JSONDecodeError. This wrapper exception provides interoperability for",
+      "mono": false
+     },
+     {
+      "text": "multiple exceptions that may be thrown by different python versions and json serialization libraries.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "It should be noted that the success of the call to r.json() does not indicate the success of the response.",
+      "mono": false
+     },
+     {
+      "text": "Some servers may return a JSON object in a failed response (e.g. error details with HTTP 500). Such",
+      "mono": false
+     },
+     {
+      "text": "JSON will be decoded and returned. To check that a request is successful, use r.raise_for_status()",
+      "mono": false
+     },
+     {
+      "text": "or check r.status_code is what you expect.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "In the rare case that you\u2019d like to get the raw socket response from the server, you can access r.raw. If",
+      "mono": false
+     },
+     {
+      "text": "you want to do this, make sure you set stream=True in your initial request. Once you do, you can do",
+      "mono": false
+     },
+     {
+      "text": "this:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u003e\u003e\u003e r = requests.get('https://api.github.com/events', stream=True)",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e r.raw",
+      "mono": true
+     },
+     {
+      "text": "\u003curllib3.response.HTTPResponse object at 0x101194810\u003e",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "\u003e\u003e\u003e r.raw.read(10)",
+      "mono": true
+     },
+     {
+      "text": "b'\\x1f\\x8b\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x03'",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "In general, however, you should use a pattern like this to save what is being streamed to a file:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "with open(filename, 'wb') as fd:",
+      "mono": true
+     },
+     {
+      "text": "    for chunk in r.iter_content(chunk_size=128):",
+      "mono": true
+     },
+     {
+      "text": "        fd.write(chunk)",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Using Response.iter_content will handle a lot of what you would otherwise have to handle when",
+      "mono": false
+     },
+     {
+      "text": "using Response.raw directly. When streaming a download, the above is the preferred and",
+      "mono": false
+     },
+     {
+      "text": "recommended way to retrieve the content. Note that chunk_size can be freely adjusted to a number that",
+      "mono": false
+     },
+     {
+      "text": "may better fit your use cases.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Note",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "A  n im  p o rta nt n o te a b o ut u sin g  R e sp o n se . i te r _ co n t en t  v ers u s R e sp o n se . r aw .",
+      "mono": true
+     },
+     {
+      "text": "Response.iter_content will automatically decode the gzip and deflate transfer-encodings.",
+      "mono": false
+     },
+     {
+      "text": "Response.raw is a raw stream of bytes \u2013 it does not transform the response content. If you really need",
+      "mono": false
+     },
+     {
+      "text": "access to the bytes as they were returned, use Response.raw.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "\u00a9MMXVIX. A Kenneth Reitz Project.",
+      "mono": false
+     }
+    ]
+   ]
+  }
+ }
+}

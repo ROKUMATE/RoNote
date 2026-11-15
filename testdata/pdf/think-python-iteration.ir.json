@@ -1,0 +1,1042 @@
+{
+  "ir_version": 2,
+  "title": "think-python-iteration",
+  "source": {
+    "url": "",
+    "final_url": "",
+    "fetched_at": "2026-11-15T00:00:00Z",
+    "body_sha256": "4318e8bc3d766724af0e28d6c466af66375b40e8dcf24966d0909dabfc6de07c",
+    "pdf": {
+      "filename": "think-python-iteration.pdf",
+      "pages": 8
+    }
+  },
+  "extractor": {
+    "name": "docling",
+    "version": "1.38.2+map1"
+  },
+  "blocks": [
+    {
+      "id": "aaac97fe394c",
+      "kind": "heading",
+      "page": 1,
+      "level": 1,
+      "content": [
+        {
+          "text": "Chapter 7"
+        }
+      ]
+    },
+    {
+      "id": "cb75be92600e",
+      "kind": "heading",
+      "page": 1,
+      "level": 1,
+      "content": [
+        {
+          "text": "Iteration"
+        }
+      ]
+    },
+    {
+      "id": "7cb750f76eac",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "This chapter is about iteration, which is the ability to run a block of statements repeatedly. We saw a kind of iteration, using recursion, in Section 5.8. We saw another kind, using a for loop, in Section 4.2. In this chapter we'll see yet another kind, using a while statement. But first I want to say a little more about variable assignment."
+        }
+      ]
+    },
+    {
+      "id": "351e7e679aa0",
+      "kind": "heading",
+      "page": 1,
+      "level": 2,
+      "content": [
+        {
+          "text": "7.1 Reassignment"
+        }
+      ]
+    },
+    {
+      "id": "7b48999356a0",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "As you may have discovered, it is legal to make more than one assignment to the same variable. A new assignment makes an existing variable refer to a new value (and stop referring to the old value)."
+        }
+      ]
+    },
+    {
+      "id": "65dfdb724b77",
+      "kind": "code",
+      "page": 1,
+      "text": "\u003e\u003e\u003e x = 5\n\u003e\u003e\u003e x\n5\n\u003e\u003e\u003e x = 7\n\u003e\u003e\u003e x\n7\n"
+    },
+    {
+      "id": "9fef8a6ffb42",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "The first time we display x, its value is 5; the second time, its value is 7."
+        }
+      ]
+    },
+    {
+      "id": "146f6560dcb3",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Figure 7.1 shows what reassignment looks like in a state diagram."
+        }
+      ]
+    },
+    {
+      "id": "7d22dbe2dc1c",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "At this point I want to address a common source of confusion. Because Python uses the equal sign (=) for assignment, it is tempting to interpret a statement like a = b as a mathematical proposition of equality; that is, the claim that a and b are equal. But this interpretation is wrong."
+        }
+      ]
+    },
+    {
+      "id": "6c2e55d7957f",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "First, equality is a symmetric relationship and assignment is not. For example, in mathematics, if a = 7 then 7 = a. But in Python, the statement a = 7 is legal and 7 = a is not."
+        }
+      ]
+    },
+    {
+      "id": "25b825b60a6b",
+      "kind": "paragraph",
+      "page": 1,
+      "content": [
+        {
+          "text": "Also, in mathematics, a proposition of equality is either true or false for all time. If a = b now, then a will always equal b. In Python, an assignment statement can make two variables equal, but they don't have to stay that way:"
+        }
+      ]
+    },
+    {
+      "id": "1ba3fe05bc76",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "Figure 7.1: State diagram."
+        }
+      ]
+    },
+    {
+      "id": "31d1fe4eb5e8",
+      "kind": "code",
+      "page": 2,
+      "text": "\u003e\u003e\u003e a = 5\n\u003e\u003e\u003e b = a    # a and b are now equal\n\u003e\u003e\u003e a = 3    # a and b are no longer equal\n\u003e\u003e\u003e b\n5\n"
+    },
+    {
+      "id": "11bce457ebcf",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "The third line changes the value of a but does not change the value of b, so they are no longer equal."
+        }
+      ]
+    },
+    {
+      "id": "7164768a3552",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "Reassigning variables is often useful, but you should use it with caution. If the values of variables change frequently, it can make the code difficult to read and debug."
+        }
+      ]
+    },
+    {
+      "id": "c498fffed123",
+      "kind": "heading",
+      "page": 2,
+      "level": 2,
+      "content": [
+        {
+          "text": "7.2 Updating variables"
+        }
+      ]
+    },
+    {
+      "id": "cb0de48dc8b0",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "A common kind of reassignment is an update, where the new value of the variable depends on the old."
+        }
+      ]
+    },
+    {
+      "id": "70bf3d70681b",
+      "kind": "code",
+      "page": 2,
+      "text": "\u003e\u003e\u003e x = x + 1\n"
+    },
+    {
+      "id": "8f93ab812afb",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "This means \"get the current value of x, add one, and then update x with the new value.\""
+        }
+      ]
+    },
+    {
+      "id": "d5223a1c633d",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "If you try to update a variable that doesn't exist, you get an error, because Python evaluates the right side before it assigns a value to x:"
+        }
+      ]
+    },
+    {
+      "id": "c06b316019d1",
+      "kind": "code",
+      "page": 2,
+      "text": "\u003e\u003e\u003e x = x + 1\nNameError: name 'x' is not defined\n"
+    },
+    {
+      "id": "0dda49d0be88",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "Before you can update a variable, you have to initialize it, usually with a simple assignment:"
+        }
+      ]
+    },
+    {
+      "id": "4cf83a870df4",
+      "kind": "code",
+      "page": 2,
+      "text": "\u003e\u003e\u003e x = 0\n\u003e\u003e\u003e x = x + 1\n"
+    },
+    {
+      "id": "7e732ab53b90",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "Updating a variable by adding 1 is called an increment; subtracting 1 is called a decrement."
+        }
+      ]
+    },
+    {
+      "id": "bf59257a66f7",
+      "kind": "heading",
+      "page": 2,
+      "level": 2,
+      "content": [
+        {
+          "text": "7.3 The while statement"
+        }
+      ]
+    },
+    {
+      "id": "7c80a70bb44d",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "Computers are often used to automate repetitive tasks. Repeating identical or similar tasks without making errors is something that computers do well and people do poorly. In a computer program, repetition is also called iteration."
+        }
+      ]
+    },
+    {
+      "id": "9cc09d3a27a9",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "We have already seen two functions, countdown and print _ n, that iterate using recursion. Because iteration is so common, Python provides language features to make it easier. One is the for statement we saw in Section 4.2. We'll get back to that later."
+        }
+      ]
+    },
+    {
+      "id": "afcdf8222e70",
+      "kind": "paragraph",
+      "page": 2,
+      "content": [
+        {
+          "text": "Another is the while statement. Here is a version of countdown that uses a while statement:"
+        }
+      ]
+    },
+    {
+      "id": "4398d141fb8e",
+      "kind": "code",
+      "page": 3,
+      "text": "def countdown(n):\n    while n \u003e 0:\n        print(n)\n        n = n - 1\n    print('Blastoff!')\n"
+    },
+    {
+      "id": "7eea266d7185",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "You can almost read the while statement as if it were English. It means, \"While n is greater than 0, display the value of n and then decrement n. When you get to 0, display the word Blastoff!\""
+        }
+      ]
+    },
+    {
+      "id": "5fd97bd50e4f",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "More formally, here is the flow of execution for a while statement:"
+        }
+      ]
+    },
+    {
+      "id": "97f69d01cbe3",
+      "kind": "list",
+      "page": 3,
+      "ordered": true,
+      "items": [
+        {
+          "children": [
+            {
+              "id": "ec55fa02cc69",
+              "kind": "paragraph",
+              "page": 3,
+              "content": [
+                {
+                  "text": "Determine whether the condition is true or false."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "58058f607a7e",
+              "kind": "paragraph",
+              "page": 3,
+              "content": [
+                {
+                  "text": "If false, exit the while statement and continue execution at the next statement."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "id": "eff36f434258",
+              "kind": "paragraph",
+              "page": 3,
+              "content": [
+                {
+                  "text": "If the condition is true, run the body and then go back to step 1."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1c47c9015079",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "This type of flow is called a loop because the third step loops back around to the top."
+        }
+      ]
+    },
+    {
+      "id": "a36506661b73",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "The body of the loop should change the value of one or more variables so that the condition becomes false eventually and the loop terminates. Otherwise the loop will repeat forever, which is called an infinite loop. An endless source of amusement for computer scientists is the observation that the directions on shampoo, \"Lather, rinse, repeat\", are an infinite loop."
+        }
+      ]
+    },
+    {
+      "id": "4f2edb68a04b",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "In the case of countdown, we can prove that the loop terminates: if n is zero or negative, the loop never runs. Otherwise, n gets smaller each time through the loop, so eventually we have to get to 0."
+        }
+      ]
+    },
+    {
+      "id": "b529bf0d1e61",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "For some other loops, it is not so easy to tell. For example:"
+        }
+      ]
+    },
+    {
+      "id": "e06545ef21a4",
+      "kind": "code",
+      "page": 3,
+      "text": "def sequence(n):\n    while n != 1:\n        print(n)\n        if n % 2 == 0:        # n is even\n            n = n / 2\n        else:                 # n is odd\n            n = n*3 + 1\n"
+    },
+    {
+      "id": "e659b18e3d0a",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "The condition for this loop is n != 1, so the loop will continue until n is 1, which makes the condition false."
+        }
+      ]
+    },
+    {
+      "id": "a1d3842cce95",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "Each time through the loop, the program outputs the value of n and then checks whether it is even or odd. If it is even, n is divided by 2. If it is odd, the value of n is replaced with n*3 + 1. For example, if the argument passed to sequence is 3, the resulting values of n are 3, 10, 5, 16, 8, 4, 2, 1."
+        }
+      ]
+    },
+    {
+      "id": "a5cbfbfb77ac",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "Since n sometimes increases and sometimes decreases, there is no obvious proof that n will ever reach 1, or that the program terminates. For some particular values of n, we can prove termination. For example, if the starting value is a power of two, n will be even every time through the loop until it reaches 1. The previous example ends with such a sequence, starting with 16."
+        }
+      ]
+    },
+    {
+      "id": "b9dabe34da8b",
+      "kind": "paragraph",
+      "page": 3,
+      "content": [
+        {
+          "text": "The hard question is whether we can prove that this program terminates for all positive values of n. So far, no one has been able to prove it or disprove it! (See http: //en.wikipedia.org/wiki/Collatz _ conjecture.)"
+        }
+      ]
+    },
+    {
+      "id": "b79fe6a6a627",
+      "kind": "paragraph",
+      "page": 4,
+      "content": [
+        {
+          "text": "As an exercise, rewrite the function print _ n from Section 5.8 using iteration instead of recursion."
+        }
+      ]
+    },
+    {
+      "id": "e96586d3b621",
+      "kind": "heading",
+      "page": 4,
+      "level": 2,
+      "content": [
+        {
+          "text": "7.4 break"
+        }
+      ]
+    },
+    {
+      "id": "642170431093",
+      "kind": "paragraph",
+      "page": 4,
+      "content": [
+        {
+          "text": "Sometimes you don't know it's time to end a loop until you get half way through the body. In that case you can use the break statement to jump out of the loop."
+        }
+      ]
+    },
+    {
+      "id": "790c99dd2432",
+      "kind": "paragraph",
+      "page": 4,
+      "content": [
+        {
+          "text": "For example, suppose you want to take input from the user until they type done. You could write:"
+        }
+      ]
+    },
+    {
+      "id": "d026fa9ec937",
+      "kind": "code",
+      "page": 4,
+      "text": "while True:\n    line = input('\u003e ')\n    if line == 'done':\n        break\n    print(line)\n\nprint('Done!')\n"
+    },
+    {
+      "id": "3d0c2994baf3",
+      "kind": "paragraph",
+      "page": 4,
+      "content": [
+        {
+          "text": "The loop condition is True, which is always true, so the loop runs until it hits the break statement."
+        }
+      ]
+    },
+    {
+      "id": "ddef75d909a9",
+      "kind": "paragraph",
+      "page": 4,
+      "content": [
+        {
+          "text": "Each time through, it prompts the user with an angle bracket. If the user types done, the break statement exits the loop. Otherwise the program echoes whatever the user types and goes back to the top of the loop. Here's a sample run:"
+        }
+      ]
+    },
+    {
+      "id": "93914f42c456",
+      "kind": "code",
+      "page": 4,
+      "text": "\u003e not done\nnot done\n\u003e done\nDone!\n"
+    },
+    {
+      "id": "1f7bb84a6c77",
+      "kind": "paragraph",
+      "page": 4,
+      "content": [
+        {
+          "text": "This way of writing while loops is common because you can check the condition anywhere in the loop (not just at the top) and you can express the stop condition affirmatively (\"stop when this happens\") rather than negatively (\"keep going until that happens\")."
+        }
+      ]
+    },
+    {
+      "id": "e1508ae5b9e0",
+      "kind": "heading",
+      "page": 4,
+      "level": 2,
+      "content": [
+        {
+          "text": "7.5 Square roots"
+        }
+      ]
+    },
+    {
+      "id": "81b1c73280b7",
+      "kind": "paragraph",
+      "page": 4,
+      "content": [
+        {
+          "text": "Loops are often used in programs that compute numerical results by starting with an approximate answer and iteratively improving it."
+        }
+      ]
+    },
+    {
+      "id": "6dc4b809bd91",
+      "kind": "paragraph",
+      "page": 4,
+      "content": [
+        {
+          "text": "For example, one way of computing square roots is Newton's method. Suppose that you want to know the square root of a. If you start with almost any estimate, x, you can compute a better estimate with the following formula:"
+        }
+      ]
+    },
+    {
+      "id": "a88fb65c7c7b",
+      "kind": "paragraph",
+      "page": 4,
+      "content": [
+        {
+          "text": "For example, if a is 4 and x is 3:"
+        }
+      ]
+    },
+    {
+      "id": "a58b875ae632",
+      "kind": "code",
+      "page": 4,
+      "text": "\u003e\u003e\u003e a = 4\n\u003e\u003e\u003e x = 3\n\u003e\u003e\u003e y = (x + a/x) / 2\n\u003e\u003e\u003e y\n"
+    },
+    {
+      "id": "9957e0cf4b5d",
+      "kind": "code",
+      "page": 4,
+      "text": "2.16666666667\n"
+    },
+    {
+      "id": "f6047e2ba257",
+      "kind": "paragraph",
+      "page": 5,
+      "content": [
+        {
+          "text": "The result is closer to the correct answer (√4 = 2). If we repeat the process with the new estimate, it gets even closer:"
+        }
+      ]
+    },
+    {
+      "id": "4c748ca2771c",
+      "kind": "code",
+      "page": 5,
+      "text": "\u003e\u003e\u003e x = y\n\u003e\u003e\u003e y = (x + a/x) / 2\n\u003e\u003e\u003e y\n"
+    },
+    {
+      "id": "cc18c2143f92",
+      "kind": "code",
+      "page": 5,
+      "text": "2.00641025641\n"
+    },
+    {
+      "id": "2ff9107048a3",
+      "kind": "paragraph",
+      "page": 5,
+      "content": [
+        {
+          "text": "After a fewmore updates, the estimate is almost exact:"
+        }
+      ]
+    },
+    {
+      "id": "91c648aab7bb",
+      "kind": "code",
+      "page": 5,
+      "text": "\u003e\u003e\u003e x = y\n\u003e\u003e\u003e y = (x + a/x) / 2\n\u003e\u003e\u003e y\n2.00001024003\n\u003e\u003e\u003e x = y\n\u003e\u003e\u003e y = (x + a/x) / 2\n\u003e\u003e\u003e y\n2.00000000003\n"
+    },
+    {
+      "id": "4a897de81d75",
+      "kind": "paragraph",
+      "page": 5,
+      "content": [
+        {
+          "text": "In general we don't know ahead of time how many steps it takes to get to the right answer, but we know when we get there because the estimate stops changing:"
+        }
+      ]
+    },
+    {
+      "id": "ab1a99f9903c",
+      "kind": "code",
+      "page": 5,
+      "text": "\u003e\u003e\u003e x = y\n\u003e\u003e\u003e y = (x + a/x) / 2\n\u003e\u003e\u003e y\n2.0\n\u003e\u003e\u003e x = y\n\u003e\u003e\u003e y = (x + a/x) / 2\n\u003e\u003e\u003e y\n2.0\n"
+    },
+    {
+      "id": "61f4fd69aa63",
+      "kind": "paragraph",
+      "page": 5,
+      "content": [
+        {
+          "text": "When y == x, we can stop. Here is a loop that starts with an initial estimate, x, and improves it until it stops changing:"
+        }
+      ]
+    },
+    {
+      "id": "5ad890216aa6",
+      "kind": "code",
+      "page": 5,
+      "text": "while True:\n    print(x)\n    y = (x + a/x) / 2\n    if y == x:\n        break\n    x = y\n"
+    },
+    {
+      "id": "32b2767b9501",
+      "kind": "paragraph",
+      "page": 5,
+      "content": [
+        {
+          "text": "For most values of a this works fine, but in general it is dangerous to test float equality. Floating-point values are only approximately right: most rational numbers, like 1/3, and irrational numbers, like √2, can't be represented exactly with a float."
+        }
+      ]
+    },
+    {
+      "id": "3123816e3a61",
+      "kind": "paragraph",
+      "page": 5,
+      "content": [
+        {
+          "text": "Rather than checking whether x and y are exactly equal, it is safer to use the built-in function abs to compute the absolute value, or magnitude, of the difference between them:"
+        }
+      ]
+    },
+    {
+      "id": "566065283084",
+      "kind": "code",
+      "page": 5,
+      "text": "if abs(y-x) \u003c epsilon:\n    break\n"
+    },
+    {
+      "id": "89999337efa8",
+      "kind": "paragraph",
+      "page": 5,
+      "content": [
+        {
+          "text": "Where epsilon has a value like 0.0000001 that determines how close is close enough."
+        }
+      ]
+    },
+    {
+      "id": "b2da733f0ef1",
+      "kind": "heading",
+      "page": 5,
+      "level": 2,
+      "content": [
+        {
+          "text": "7.6 Algorithms"
+        }
+      ]
+    },
+    {
+      "id": "294f6f54fb4d",
+      "kind": "paragraph",
+      "page": 5,
+      "content": [
+        {
+          "text": "Newton's method is an example of an algorithm: it is a mechanical process for solving a category of problems (in this case, computing square roots)."
+        }
+      ]
+    },
+    {
+      "id": "fdf3d262d763",
+      "kind": "paragraph",
+      "page": 6,
+      "content": [
+        {
+          "text": "To understand what an algorithm is, it might help to start with something that is not an algorithm. When you learned to multiply single-digit numbers, you probably memorized the multiplication table. In effect, you memorized 100 specific solutions. That kind of knowledge is not algorithmic."
+        }
+      ]
+    },
+    {
+      "id": "a08fa45b46fb",
+      "kind": "paragraph",
+      "page": 6,
+      "content": [
+        {
+          "text": "But if you were \"lazy\", you might have learned a few tricks. For example, to find the product of n and 9, you can write n - 1 as the first digit and 10 - n as the second digit. This trick is a general solution for multiplying any single-digit number by 9. That's an algorithm!"
+        }
+      ]
+    },
+    {
+      "id": "8e63ebca3765",
+      "kind": "paragraph",
+      "page": 6,
+      "content": [
+        {
+          "text": "Similarly, the techniques you learned for addition with carrying, subtraction with borrowing, and long division are all algorithms. One of the characteristics of algorithms is that they do not require any intelligence to carry out. They are mechanical processes where each step follows from the last according to a simple set of rules."
+        }
+      ]
+    },
+    {
+      "id": "c025ac062370",
+      "kind": "paragraph",
+      "page": 6,
+      "content": [
+        {
+          "text": "Executing algorithms is boring, but designing them is interesting, intellectually challenging, and a central part of computer science."
+        }
+      ]
+    },
+    {
+      "id": "5bce585ae0c0",
+      "kind": "paragraph",
+      "page": 6,
+      "content": [
+        {
+          "text": "Some of the things that people do naturally, without difficulty or conscious thought, are the hardest to express algorithmically. Understanding natural language is a good example. We all do it, but so far no one has been able to explain how we do it, at least not in the form of an algorithm."
+        }
+      ]
+    },
+    {
+      "id": "19d66d85c79f",
+      "kind": "heading",
+      "page": 6,
+      "level": 2,
+      "content": [
+        {
+          "text": "7.7 Debugging"
+        }
+      ]
+    },
+    {
+      "id": "8e038bc7a756",
+      "kind": "paragraph",
+      "page": 6,
+      "content": [
+        {
+          "text": "As you start writing bigger programs, you might find yourself spending more time debugging. More code means more chances to make an error and more places for bugs to hide."
+        }
+      ]
+    },
+    {
+      "id": "74bcc4aa6677",
+      "kind": "paragraph",
+      "page": 6,
+      "content": [
+        {
+          "text": "One way to cut your debugging time is \"debugging by bisection\". For example, if there are 100 lines in your program and you check them one at a time, it would take 100 steps."
+        }
+      ]
+    },
+    {
+      "id": "ea3e22ae494b",
+      "kind": "paragraph",
+      "page": 6,
+      "content": [
+        {
+          "text": "Instead, try to break the problem in half. Look at the middle of the program, or near it, for an intermediate value you can check. Add a print statement (or something else that has a verifiable effect) and run the program."
+        }
+      ]
+    },
+    {
+      "id": "17f2e54ae338",
+      "kind": "paragraph",
+      "page": 6,
+      "content": [
+        {
+          "text": "If the mid-point check is incorrect, there must be a problem in the first half of the program. If it is correct, the problem is in the second half."
+        }
+      ]
+    },
+    {
+      "id": "abd5a352ce4b",
+      "kind": "paragraph",
+      "page": 6,
+      "content": [
+        {
+          "text": "Every time you perform a check like this, you halve the number of lines you have to search. After six steps (which is fewer than 100), you would be down to one or two lines of code, at least in theory."
+        }
+      ]
+    },
+    {
+      "id": "736bb9160fc4",
+      "kind": "paragraph",
+      "page": 6,
+      "content": [
+        {
+          "text": "In practice it is not always clear what the \"middle of the program\" is and not always possible to check it. It doesn't make sense to count lines and find the exact midpoint. Instead, think about places in the program where there might be errors and places where it is easy to put a check. Then choose a spot where you think the chances are about the same that the bug is before or after the check."
+        }
+      ]
+    },
+    {
+      "id": "e26daabe0967",
+      "kind": "heading",
+      "page": 6,
+      "level": 2,
+      "content": [
+        {
+          "text": "7.8 Glossary"
+        }
+      ]
+    },
+    {
+      "id": "6913354f3da1",
+      "kind": "paragraph",
+      "page": 6,
+      "content": [
+        {
+          "text": "reassignment: Assigning a new value to a variable that already exists."
+        }
+      ]
+    },
+    {
+      "id": "e309d7a86be9",
+      "kind": "paragraph",
+      "page": 7,
+      "content": [
+        {
+          "text": "update: An assignment where the new value of the variable depends on the old."
+        }
+      ]
+    },
+    {
+      "id": "babe0f17c87b",
+      "kind": "paragraph",
+      "page": 7,
+      "content": [
+        {
+          "text": "initialization: An assignment that gives an initial value to a variable that will be updated."
+        }
+      ]
+    },
+    {
+      "id": "5f9c29e478ad",
+      "kind": "paragraph",
+      "page": 7,
+      "content": [
+        {
+          "text": "increment: An update that increases the value of a variable (often by one)."
+        }
+      ]
+    },
+    {
+      "id": "ef63792ef86f",
+      "kind": "paragraph",
+      "page": 7,
+      "content": [
+        {
+          "text": "decrement: An update that decreases the value of a variable."
+        }
+      ]
+    },
+    {
+      "id": "7624c5d06d49",
+      "kind": "paragraph",
+      "page": 7,
+      "content": [
+        {
+          "text": "iteration: Repeated execution of a set of statements using either a recursive function call or a loop."
+        }
+      ]
+    },
+    {
+      "id": "9adae3e5c3d6",
+      "kind": "paragraph",
+      "page": 7,
+      "content": [
+        {
+          "text": "infinite loop: A loop in which the terminating condition is never satisfied."
+        }
+      ]
+    },
+    {
+      "id": "f6836e2e5fae",
+      "kind": "paragraph",
+      "page": 7,
+      "content": [
+        {
+          "text": "algorithm: A general process for solving a category of problems."
+        }
+      ]
+    },
+    {
+      "id": "f31460a01ed0",
+      "kind": "heading",
+      "page": 7,
+      "level": 2,
+      "content": [
+        {
+          "text": "7.9 Exercises"
+        }
+      ]
+    },
+    {
+      "id": "14792617adc5",
+      "kind": "paragraph",
+      "page": 7,
+      "content": [
+        {
+          "text": "Exercise 7.1. Copy the loop from Section 7.5 and encapsulate it in a function called mysqrt that takes a as a parameter, chooses a reasonable value of x, and returns an estimate of the square root of a."
+        }
+      ]
+    },
+    {
+      "id": "5de918f4e7c7",
+      "kind": "paragraph",
+      "page": 7,
+      "content": [
+        {
+          "text": "To test it, write a function named test _ square _ root that prints a table like this:"
+        }
+      ]
+    },
+    {
+      "id": "9c1217abc83f",
+      "kind": "code",
+      "page": 7,
+      "text": "a   mysqrt(a)     math.sqrt(a)  diff\n-   ---------     ------------  ----\n1.0 1.0           1.0           0.0\n2.0 1.41421356237 1.41421356237 2.22044604925e-16\n3.0 1.73205080757 1.73205080757 0.0\n4.0 2.0           2.0           0.0\n5.0 2.2360679775  2.2360679775  0.0\n6.0 2.44948974278 2.44948974278 0.0\n7.0 2.64575131106 2.64575131106 0.0\n8.0 2.82842712475 2.82842712475 4.4408920985e-16\n9.0 3.0           3.0           0.0\n"
+    },
+    {
+      "id": "234bcc9aeecf",
+      "kind": "paragraph",
+      "page": 7,
+      "content": [
+        {
+          "text": "The first column is a number, a; the second column is the square root of a computed with mysqrt; the third column is the square root computed by math.sqrt; the fourth column is the absolute value of the difference between the two estimates."
+        }
+      ]
+    },
+    {
+      "id": "ac32f7f2c4ef",
+      "kind": "paragraph",
+      "page": 7,
+      "content": [
+        {
+          "text": "Exercise 7.2. The built-in function eval takes a string and evaluates it using the Python interpreter. For example:"
+        }
+      ]
+    },
+    {
+      "id": "35a13835d9b9",
+      "kind": "code",
+      "page": 7,
+      "text": "\u003e\u003e\u003e eval('1 + 2 * 3')\n7\n\u003e\u003e\u003e import math\n\u003e\u003e\u003e eval('math.sqrt(5)')\n2.2360679774997898\n\u003e\u003e\u003e eval('type(math.pi)')\n\u003cclass 'float'\u003e\n"
+    },
+    {
+      "id": "156de7330aba",
+      "kind": "paragraph",
+      "page": 7,
+      "content": [
+        {
+          "text": "Write a function called eval _ loop that iteratively prompts the user, takes the resulting input and evaluates it using eval, and prints the result."
+        }
+      ]
+    },
+    {
+      "id": "21a0b4dc2db6",
+      "kind": "paragraph",
+      "page": 7,
+      "content": [
+        {
+          "text": "It should continue until the user enters 'done', and then return the value of the last expression it evaluated."
+        }
+      ]
+    },
+    {
+      "id": "e17f0d0ba254",
+      "kind": "paragraph",
+      "page": 8,
+      "content": [
+        {
+          "text": "Exercise 7.3. The mathematician Srinivasa Ramanujan found an infinite series that can be used to generate a numerical approximation of 1/π:"
+        }
+      ]
+    },
+    {
+      "id": "72ffb4facfed",
+      "kind": "paragraph",
+      "page": 8,
+      "content": [
+        {
+          "text": "Write a function called estimate _pi that uses this formula to compute and return an estimate of π. It should use a while loop to compute terms of the summation until the last term is smaller than 1e-15 (which is Python notation for 10-15 ). You can check the result by comparing it to math.pi."
+        }
+      ]
+    },
+    {
+      "id": "efc0709c84e5",
+      "kind": "paragraph",
+      "page": 8,
+      "content": [
+        {
+          "text": "Solution: https://thinkpython.com/code/pi.py ."
+        }
+      ]
+    }
+  ],
+  "warnings": [
+    {
+      "code": "figures_omitted",
+      "message": "1 figures from the PDF are not shown.",
+      "count": 1
+    }
+  ]
+}

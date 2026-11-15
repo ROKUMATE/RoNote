@@ -14,7 +14,7 @@ Out of scope for v1: site crawling, AI summaries, handwritten OCR, pseudocode co
 
 | Path | Holds |
 |---|---|
-| `cmd/` | `api`, `worker`; dev tools `extract`, `eval`, `fakeidp`, `fakeembed`, `fakellm` |
+| `cmd/` | `api`, `worker`; dev tools `extract`, `eval`, `fakeidp`, `fakeembed`, `fakellm`, `fakedocling` |
 | `internal/<pkg>/` | Go packages, one concern each |
 | `internal/jobs/` | the jobs port (docs/adr/0009-jobs-port.md); only `riverjobs` may import River |
 | `migrations/` | goose migrations; goose owns all schema, River's included |
@@ -48,7 +48,8 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make web-build` | production build and bundle budgets |
 | `make web-e2e` | Playwright and axe against the full stack (`make dev-up` first) |
 | `make run-api` / `run-worker` | the API on `127.0.0.1:8080` / the job worker |
-| `make run-idp` / `run-llm` | the fake GitHub sign-in on `127.0.0.1:8090` / the fake chat model on `:8094` (`web-dev` starts both) |
+| `make run-idp` / `run-llm` / `run-docling` | the fake GitHub sign-in on `127.0.0.1:8090` / chat model on `:8094` / docling and pdftext on `:5001`, `:5002` (`web-dev` starts all) |
+| `make pdf-fixtures` / `pdf-record` | print the PDF fixtures / record real docling's answers, goldens and the verbatim report |
 | `make stop` | end what the `run-*` targets and `web-dev` started |
 | `make dev-up` / `dev-down` | start / stop the dev stack (Postgres) |
 | `make doctor` | check the container VM's clock, and that the pinned embedding model answers |

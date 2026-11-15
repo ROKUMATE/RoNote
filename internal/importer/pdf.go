@@ -169,8 +169,8 @@ func (s *Service) enqueueBlobDeletion(ctx context.Context, tx pgx.Tx, args BlobA
 }
 
 // PDFWorker runs PDF import jobs: inspect the PDF, convert it with docling,
-// read its code from the text layer, map it to IR, and keep it as the
-// owner's document.
+// read its code, prose and pictures from the text layer, map it to IR, and
+// keep it as the owner's document.
 type PDFWorker struct {
 	store  *store.Store
 	blobs  blob.Store
@@ -237,7 +237,7 @@ func (w *PDFWorker) Handle(ctx context.Context, d jobs.Delivery) (err error) {
 	}
 	doc, err := docling.Map(converted.doc, docling.PDF{
 		Filename: imp.Filename, SHA256: imp.PDFSHA256, ConvertedAt: time.Now(), Docling: w.docling,
-	}, converted.code)
+	}, converted.layer)
 	if err != nil {
 		code, err := pdfOutcome(err, d.Attempt)
 		fail(ctx, w.store, w.logger, owner, id, code)
@@ -280,12 +280,12 @@ func (w *PDFWorker) read(ctx context.Context, key string) ([]byte, error) {
 }
 
 type converted struct {
-	doc  *docling.Document
-	code map[string]string
+	doc   *docling.Document
+	layer map[string][]docling.Line
 }
 
-// convert inspects the PDF, has docling convert it, and reads its code
-// blocks from the text layer.
+// convert inspects the PDF, has docling convert it, and reads its code,
+// prose and pictures from the text layer.
 func (w *PDFWorker) convert(ctx context.Context, imp store.Import, pdf []byte) (converted, error) {
 	if _, err := w.client.Inspect(ctx, pdf); err != nil {
 		return converted{}, err
@@ -294,16 +294,16 @@ func (w *PDFWorker) convert(ctx context.Context, imp store.Import, pdf []byte) (
 	if err != nil {
 		return converted{}, err
 	}
-	boxes := docling.CodeBoxes(doc)
-	blocks, err := w.client.Code(ctx, pdf, boxes)
+	boxes := docling.LayerBoxes(doc)
+	blocks, err := w.client.Lines(ctx, pdf, boxes)
 	if err != nil {
 		return converted{}, err
 	}
-	code, err := docling.CodeText(boxes, blocks)
+	layer, err := docling.Layer(boxes, blocks)
 	if err != nil {
 		return converted{}, err
 	}
-	return converted{doc: doc, code: code}, nil
+	return converted{doc: doc, layer: layer}, nil
 }
 
 // pdfOutcome says what an error from converting or mapping a PDF means on

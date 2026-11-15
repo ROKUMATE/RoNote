@@ -1,0 +1,2974 @@
+{
+ "sha256": "9953f5803d0c106b75c8d2275f079f4a81f73f5e510ca67a63855b3559a02d26",
+ "seconds": 3.08,
+ "pages": 3,
+ "inspect": {
+  "status": 200,
+  "body": {
+   "pages": 3,
+   "chars": 5498
+  }
+ },
+ "result": {
+  "status": 200,
+  "body": {
+   "document": {
+    "filename": "godev-getting-started.pdf",
+    "md_content": null,
+    "json_content": {
+     "schema_name": "DoclingDocument",
+     "version": "1.10.0",
+     "name": "godev-getting-started",
+     "origin": {
+      "mimetype": "application/pdf",
+      "binary_hash": 7171238266352446758,
+      "filename": "godev-getting-started.pdf",
+      "uri": null
+     },
+     "furniture": {
+      "self_ref": "#/furniture",
+      "parent": null,
+      "children": [],
+      "content_layer": "furniture",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "body": {
+      "self_ref": "#/body",
+      "parent": null,
+      "children": [
+       {
+        "$ref": "#/texts/0"
+       },
+       {
+        "$ref": "#/groups/0"
+       },
+       {
+        "$ref": "#/texts/5"
+       },
+       {
+        "$ref": "#/texts/6"
+       },
+       {
+        "$ref": "#/groups/1"
+       },
+       {
+        "$ref": "#/texts/12"
+       },
+       {
+        "$ref": "#/texts/13"
+       },
+       {
+        "$ref": "#/groups/2"
+       },
+       {
+        "$ref": "#/texts/17"
+       },
+       {
+        "$ref": "#/texts/18"
+       },
+       {
+        "$ref": "#/texts/19"
+       },
+       {
+        "$ref": "#/texts/20"
+       },
+       {
+        "$ref": "#/groups/3"
+       },
+       {
+        "$ref": "#/texts/22"
+       },
+       {
+        "$ref": "#/texts/23"
+       },
+       {
+        "$ref": "#/texts/24"
+       },
+       {
+        "$ref": "#/texts/25"
+       },
+       {
+        "$ref": "#/groups/4"
+       },
+       {
+        "$ref": "#/texts/27"
+       },
+       {
+        "$ref": "#/texts/28"
+       },
+       {
+        "$ref": "#/groups/5"
+       },
+       {
+        "$ref": "#/texts/30"
+       },
+       {
+        "$ref": "#/texts/31"
+       },
+       {
+        "$ref": "#/texts/32"
+       },
+       {
+        "$ref": "#/texts/33"
+       },
+       {
+        "$ref": "#/texts/34"
+       },
+       {
+        "$ref": "#/groups/6"
+       },
+       {
+        "$ref": "#/texts/37"
+       },
+       {
+        "$ref": "#/texts/38"
+       },
+       {
+        "$ref": "#/groups/7"
+       },
+       {
+        "$ref": "#/texts/43"
+       },
+       {
+        "$ref": "#/texts/44"
+       },
+       {
+        "$ref": "#/texts/45"
+       },
+       {
+        "$ref": "#/texts/46"
+       },
+       {
+        "$ref": "#/texts/47"
+       },
+       {
+        "$ref": "#/groups/8"
+       },
+       {
+        "$ref": "#/texts/53"
+       },
+       {
+        "$ref": "#/groups/9"
+       },
+       {
+        "$ref": "#/texts/55"
+       },
+       {
+        "$ref": "#/texts/56"
+       },
+       {
+        "$ref": "#/groups/10"
+       },
+       {
+        "$ref": "#/texts/58"
+       },
+       {
+        "$ref": "#/texts/59"
+       },
+       {
+        "$ref": "#/groups/11"
+       },
+       {
+        "$ref": "#/texts/61"
+       },
+       {
+        "$ref": "#/texts/62"
+       },
+       {
+        "$ref": "#/texts/63"
+       },
+       {
+        "$ref": "#/texts/64"
+       },
+       {
+        "$ref": "#/texts/65"
+       },
+       {
+        "$ref": "#/texts/66"
+       }
+      ],
+      "content_layer": "body",
+      "meta": null,
+      "name": "_root_",
+      "label": "unspecified"
+     },
+     "groups": [
+      {
+       "self_ref": "#/groups/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/1"
+        },
+        {
+         "$ref": "#/texts/2"
+        },
+        {
+         "$ref": "#/texts/3"
+        },
+        {
+         "$ref": "#/texts/4"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/1",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/7"
+        },
+        {
+         "$ref": "#/texts/8"
+        },
+        {
+         "$ref": "#/texts/9"
+        },
+        {
+         "$ref": "#/texts/10"
+        },
+        {
+         "$ref": "#/texts/11"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/2",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/14"
+        },
+        {
+         "$ref": "#/texts/15"
+        },
+        {
+         "$ref": "#/texts/16"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/3",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/21"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/4",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/26"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/5",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/29"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/6",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/35"
+        },
+        {
+         "$ref": "#/texts/36"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/7",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/39"
+        },
+        {
+         "$ref": "#/texts/40"
+        },
+        {
+         "$ref": "#/texts/41"
+        },
+        {
+         "$ref": "#/texts/42"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/8",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/48"
+        },
+        {
+         "$ref": "#/texts/49"
+        },
+        {
+         "$ref": "#/texts/50"
+        },
+        {
+         "$ref": "#/texts/51"
+        },
+        {
+         "$ref": "#/texts/52"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/9",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/54"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/10",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/57"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      },
+      {
+       "self_ref": "#/groups/11",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [
+        {
+         "$ref": "#/texts/60"
+        }
+       ],
+       "content_layer": "body",
+       "meta": null,
+       "name": "list",
+       "label": "list"
+      }
+     ],
+     "texts": [
+      {
+       "self_ref": "#/texts/0",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "furniture",
+       "meta": null,
+       "label": "page_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 792.4600802258301,
+          "r": 62.66601302891601,
+          "b": 784.1983618200684,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "Go",
+       "text": "Go",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/1",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 766.8194562941894,
+          "r": 102.6621052024121,
+          "b": 758.6983628825684,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          4
+         ]
+        }
+       ],
+       "orig": "Docs",
+       "text": "Docs",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/2",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 741.5596917216797,
+          "r": 151.98046250748047,
+          "b": 733.1983639450684,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "1. Documentation",
+       "text": "Documentation",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "1."
+      },
+      {
+       "self_ref": "#/texts/3",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 728.1065672822266,
+          "r": 120.9081981021582,
+          "b": 719.6983645075684,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          12
+         ]
+        }
+       ],
+       "orig": "2. Tutorials",
+       "text": "Tutorials",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "2."
+      },
+      {
+       "self_ref": "#/texts/4",
+       "parent": {
+        "$ref": "#/groups/0"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 714.6065678447266,
+          "r": 216.88475666313477,
+          "b": 706.1983650700683,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          32
+         ]
+        }
+       ],
+       "orig": "3. Tutorial: Get started with Go",
+       "text": "Tutorial: Get started with Go",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "3."
+      },
+      {
+       "self_ref": "#/texts/5",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 682.4620379340821,
+          "r": 348.42186018242194,
+          "b": 665.422976144043,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          29
+         ]
+        }
+       ],
+       "orig": "Tutorial: Get started with Go",
+       "text": "Tutorial: Get started with Go",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 1
+      },
+      {
+       "self_ref": "#/texts/6",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 641.1065709072266,
+          "r": 484.658185135908,
+          "b": 630.255008859375,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          93
+         ]
+        }
+       ],
+       "orig": "In this tutorial, you'll get a brief introduction to Go programming. Along the way, you will:",
+       "text": "In this tutorial, you'll get a brief introduction to Go programming. Along the way, you will:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/7",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 615.6065719697266,
+          "r": 243.43944305668947,
+          "b": 604.7550099218751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          36
+         ]
+        }
+       ],
+       "orig": "Install Go (if you haven't already).",
+       "text": "Install Go (if you haven't already).",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/8",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 602.1065725322266,
+          "r": 270.2753796785254,
+          "b": 591.2667292338867,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          38
+         ]
+        }
+       ],
+       "orig": "Write some simple \"Hello, world\" code.",
+       "text": "Write some simple \"Hello, world\" code.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/9",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 588.5714168461914,
+          "r": 264.33397343608397,
+          "b": 577.7550110468751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          36
+         ]
+        }
+       ],
+       "orig": "Use the go command to run your code.",
+       "text": "Use the go command to run your code.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/10",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 575.1065736572266,
+          "r": 475.89255909114246,
+          "b": 564.2550116093751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          80
+         ]
+        }
+       ],
+       "orig": "Use the Go package discovery tool to find packages you can use in your own code.",
+       "text": "Use the Go package discovery tool to find packages you can use in your own code.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/11",
+       "parent": {
+        "$ref": "#/groups/1"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 561.6065742197266,
+          "r": 256.61717698761714,
+          "b": 553.1807933208008,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          37
+         ]
+        }
+       ],
+       "orig": "Call functions of an external module.",
+       "text": "Call functions of an external module.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/12",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 536.1710284045411,
+          "r": 235.66405268066407,
+          "b": 526.1690756962892,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          41
+         ]
+        }
+       ],
+       "orig": "Note: For other tutorials, see Tutorials.",
+       "text": "Note: For other tutorials, see Tutorials.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/13",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 505.81653748181157,
+          "r": 148.3359317393359,
+          "b": 489.67103034204104,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          13
+         ]
+        }
+       ],
+       "orig": "Prerequisites",
+       "text": "Prerequisites",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/14",
+       "parent": {
+        "$ref": "#/groups/2"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 471.71204671533206,
+          "r": 542.8183370425683,
+          "b": 449.6983757575684,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          108
+         ]
+        }
+       ],
+       "orig": "Some programming experience. The code here is pretty simple, but it helps to know something about functions.",
+       "text": "Some programming experience. The code here is pretty simple, but it helps to know something about functions.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/15",
+       "parent": {
+        "$ref": "#/groups/2"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 444.67103221704104,
+          "r": 531.7382593642383,
+          "b": 420.26673635888676,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          177
+         ]
+        }
+       ],
+       "orig": "A tool to edit your code. Any text editor you have will work fine. Most text editors have good support for Go. The most popular are VSCode (free), GoLand (paid), and Vim (free).",
+       "text": "A tool to edit your code. Any text editor you have will work fine. Most text editors have good support for Go. The most popular are VSCode (free), GoLand (paid), and Vim (free).",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/16",
+       "parent": {
+        "$ref": "#/groups/2"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 417.671033342041,
+          "r": 543.6093563696091,
+          "b": 395.6983780075684,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          107
+         ]
+        }
+       ],
+       "orig": "A command terminal. Go works well using any terminal on Linux and Mac, and on PowerShell or cmd in Windows.",
+       "text": "A command terminal. Go works well using any terminal on Linux and Mac, and on PowerShell or cmd in Windows.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/17",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 373.81654298181155,
+          "r": 124.51757289176757,
+          "b": 361.0372466392823,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          10
+         ]
+        }
+       ],
+       "orig": "Install Go",
+       "text": "Install Go",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/18",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 339.6065834697266,
+          "r": 238.9921776619922,
+          "b": 328.7667401713867,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          40
+         ]
+        }
+       ],
+       "orig": "Just use the Download and install steps.",
+       "text": "Just use the Download and install steps.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/19",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 310.0665456380615,
+          "r": 175.63475853188476,
+          "b": 297.33119460620117,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          15
+         ]
+        }
+       ],
+       "orig": "Write some code",
+       "text": "Write some code",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/20",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 47.999998,
+          "t": 275.8565861259766,
+          "r": 192.79686729679688,
+          "b": 265.9190865400391,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          30
+         ]
+        }
+       ],
+       "orig": "Get started with Hello, World.",
+       "text": "Get started with Hello, World.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/21",
+       "parent": {
+        "$ref": "#/groups/3"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 250.32143093994148,
+          "r": 350.4785028967284,
+          "b": 239.5050251406251,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          55
+         ]
+        }
+       ],
+       "orig": "1. Open a command prompt and cd to your home directory.",
+       "text": "Open a command prompt and cd to your home directory.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "1."
+      },
+      {
+       "self_ref": "#/texts/22",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 224.80971325292978,
+          "r": 164.98241504573238,
+          "b": 216.44838547631844,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          16
+         ]
+        }
+       ],
+       "orig": "On Linux or Mac:",
+       "text": "On Linux or Mac:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/23",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 200.10254992781734,
+          "r": 86.39836035591085,
+          "b": 195.54460827205276,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          2
+         ]
+        }
+       ],
+       "orig": "cd",
+       "text": "cd",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/24",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 179.82143387744145,
+          "r": 144.31054126706053,
+          "b": 171.4483873513184,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          11
+         ]
+        }
+       ],
+       "orig": "On Windows:",
+       "text": "On Windows:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/25",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 155.1025518028173,
+          "r": 132.58934530628636,
+          "b": 150.5241096598454,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          13
+         ]
+        }
+       ],
+       "orig": "cd %HOMEPATH%",
+       "text": "cd %HOMEPATH%",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/26",
+       "parent": {
+        "$ref": "#/groups/4"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 139.3565918134766,
+          "r": 335.2441269114941,
+          "b": 128.50502976562507,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          58
+         ]
+        }
+       ],
+       "orig": "2. Create a hello directory for your first Go source code.",
+       "text": "Create a hello directory for your first Go source code.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "2."
+      },
+      {
+       "self_ref": "#/texts/27",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 113.85659287597662,
+          "r": 285.9609257649609,
+          "b": 103.0167495776368,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          40
+         ]
+        }
+       ],
+       "orig": "For example, use the following commands:",
+       "text": "For example, use the following commands:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/28",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 89.3314766599658,
+          "r": 124.19098440621809,
+          "b": 77.04461320955284,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          20
+         ]
+        }
+       ],
+       "orig": "mkdir hello cd hello",
+       "text": "mkdir hello cd hello",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/29",
+       "parent": {
+        "$ref": "#/groups/5"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 1,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 66.6065948447266,
+          "r": 284.57811338257807,
+          "b": 55.75503279687507,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          44
+         ]
+        }
+       ],
+       "orig": "3. Enable dependency tracking for your code.",
+       "text": "Enable dependency tracking for your code.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "3."
+      },
+      {
+       "self_ref": "#/texts/30",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 798.6065643447266,
+          "r": 547.0136512277636,
+          "b": 747.255003984375,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          295
+         ]
+        }
+       ],
+       "orig": "When your code imports packages contained in other modules, you manage those dependencies through your code's own module. That module is defined by a go.mod file that tracks the modules that provide those packages. That go.mod file stays with your code, including in your source code repository.",
+       "text": "When your code imports packages contained in other modules, you manage those dependencies through your code's own module. That module is defined by a go.mod file that tracks the modules that provide those packages. That go.mod file stays with your code, including in your source code repository.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/31",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 732.6065670947266,
+          "r": 524.7198271716734,
+          "b": 694.7667249213868,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          192
+         ]
+        }
+       ],
+       "orig": "To enable dependency tracking for your code by creating a go.mod file, run the go mod init command, giving it the name of the module your code will be in. The name is the module's module path.",
+       "text": "To enable dependency tracking for your code by creating a go.mod file, run the go mod init command, giving it the name of the module your code will be in. The name is the module's module path.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/32",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 680.1065692822266,
+          "r": 543.5859149705859,
+          "b": 615.2667282338867,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          389
+         ]
+        }
+       ],
+       "orig": "In actual development, the module path will typically be the repository location where your source code will be kept. For example, the module path might be github.com/mymodule. If you plan to publish your module for others to use, the module path must be a location from which Go tools can download your module. For more about naming a module with a module path, see Managing dependencies.",
+       "text": "In actual development, the module path will typically be the repository location where your source code will be kept. For example, the module path might be github.com/mymodule. If you plan to publish your module for others to use, the module path must be a location from which Go tools can download your module. For more about naming a module with a module path, see Managing dependencies.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/33",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 600.6065725947266,
+          "r": 353.3906102753906,
+          "b": 589.755010546875,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          58
+         ]
+        }
+       ],
+       "orig": "For the purposes of this tutorial, just use example/hello.",
+       "text": "For the purposes of this tutorial, just use example/hello.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/34",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 576.2727942593176,
+          "r": 266.9631197073788,
+          "b": 562.5167292257121,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          73
+         ]
+        }
+       ],
+       "orig": "$ go mod init example/hello go: creating new go.mod: module example/hello",
+       "text": "$ go mod init example/hello go: creating new go.mod: module example/hello",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/35",
+       "parent": {
+        "$ref": "#/groups/6"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 548.1065747822266,
+          "r": 406.08982745958974,
+          "b": 537.2550127343751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          75
+         ]
+        }
+       ],
+       "orig": "4. In your text editor, create a file hello.go in which to write your code.",
+       "text": "In your text editor, create a file hello.go in which to write your code.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "4."
+      },
+      {
+       "self_ref": "#/texts/36",
+       "parent": {
+        "$ref": "#/groups/6"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 522.6241539689943,
+          "r": 386.9413903974413,
+          "b": 511.7550137968751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          70
+         ]
+        }
+       ],
+       "orig": "5. Paste the following code into your hello.go file and save the file.",
+       "text": "Paste the following code into your hello.go file and save the file.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "5."
+      },
+      {
+       "self_ref": "#/texts/37",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 498.08145962871595,
+          "r": 212.37377385693497,
+          "b": 447.10556948277736,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          70
+         ]
+        }
+       ],
+       "orig": "package main import \"fmt\" func main() { fmt.Println(\"Hello, World!\") }",
+       "text": "package main import \"fmt\" func main() { fmt.Println(\"Hello, World!\") }",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/38",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 432.5714233461915,
+          "r": 267.9726452344726,
+          "b": 421.755017546875,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          40
+         ]
+        }
+       ],
+       "orig": "This is your Go code. In this code, you:",
+       "text": "This is your Go code. In this code, you:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/39",
+       "parent": {
+        "$ref": "#/groups/7"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 107.99999549999998,
+          "t": 407.1065806572267,
+          "r": 539.7538843902538,
+          "b": 382.7550191718751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          120
+         ]
+        }
+       ],
+       "orig": "Declare a main package (a package is a way to group functions, and it's made up of all the files in the same directory).",
+       "text": "Declare a main package (a package is a way to group functions, and it's made up of all the files in the same directory).",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/40",
+       "parent": {
+        "$ref": "#/groups/7"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 107.99999549999998,
+          "t": 380.1065817822266,
+          "r": 541.0077939780078,
+          "b": 342.255020859375,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          196
+         ]
+        }
+       ],
+       "orig": "Import the popular fmt package, which contains functions for formatting text, including printing to the console. This package is one of the standard library packages you got when you installed Go.",
+       "text": "Import the popular fmt package, which contains functions for formatting text, including printing to the console. This package is one of the standard library packages you got when you installed Go.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/41",
+       "parent": {
+        "$ref": "#/groups/7"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 107.99999549999998,
+          "t": 339.6065834697265,
+          "r": 539.4199033441699,
+          "b": 315.25502198437516,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          127
+         ]
+        }
+       ],
+       "orig": "Implement a main function to print a message to the console. A main function executes by default when you run the main package.",
+       "text": "Implement a main function to print a message to the console. A main function executes by default when you run the main package.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": false,
+       "marker": ""
+      },
+      {
+       "self_ref": "#/texts/42",
+       "parent": {
+        "$ref": "#/groups/7"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 300.58314759570317,
+          "r": 242.2851464247851,
+          "b": 289.75502304687507,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          37
+         ]
+        }
+       ],
+       "orig": "6. Run your code to see the greeting.",
+       "text": "Run your code to see the greeting.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "6."
+      },
+      {
+       "self_ref": "#/texts/43",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 276.0404679043013,
+          "r": 132.58934530628636,
+          "b": 262.7798313115395,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          24
+         ]
+        }
+       ],
+       "orig": "$ go run . Hello, World!",
+       "text": "$ go run . Hello, World!",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/44",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 248.10658728222666,
+          "r": 532.9218568749217,
+          "b": 223.7667445463867,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          139
+         ]
+        }
+       ],
+       "orig": "The go run command is one of many go commands you'll use to get things done with Go. Use the following command to get a list of the others:",
+       "text": "The go run command is one of many go commands you'll use to get things done with Go. Use the following command to get a list of the others:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/45",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 210.04047065430132,
+          "r": 115.7926235061498,
+          "b": 204.01674416321202,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          9
+         ]
+        }
+       ],
+       "orig": "$ go help",
+       "text": "$ go help",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/46",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 184.81655085681155,
+          "r": 297.4863156847364,
+          "b": 168.6446765306398,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          32
+         ]
+        }
+       ],
+       "orig": "Call code in an external package",
+       "text": "Call code in an external package",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 2
+      },
+      {
+       "self_ref": "#/texts/47",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 47.999998,
+          "t": 150.60659134472667,
+          "r": 529.5468536555469,
+          "b": 126.2550298593751,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          161
+         ]
+        }
+       ],
+       "orig": "When you need your code to do something that might have been implemented by someone else, you can look for a package that has functions you can use in your code.",
+       "text": "When you need your code to do something that might have been implemented by someone else, you can look for a package that has functions you can use in your code.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/48",
+       "parent": {
+        "$ref": "#/groups/8"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 111.60659296972653,
+          "r": 525.5331816627832,
+          "b": 100.755030921875,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          95
+         ]
+        }
+       ],
+       "orig": "1. Make your printed message a little more interesting with a function from an external module.",
+       "text": "Make your printed message a little more interesting with a function from an external module.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "1."
+      },
+      {
+       "self_ref": "#/texts/49",
+       "parent": {
+        "$ref": "#/groups/8"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 95.999996,
+          "t": 98.07143728369147,
+          "r": 351.0117078745115,
+          "b": 87.2667502338868,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          53
+         ]
+        }
+       ],
+       "orig": "1. Visit pkg.go.dev and search for a \"quote\" package.",
+       "text": "Visit pkg.go.dev and search for a \"quote\" package.",
+       "formatting": null,
+       "hyperlink": "https://pkg.go.dev/search?q=quote",
+       "enumerated": true,
+       "marker": "1."
+      },
+      {
+       "self_ref": "#/texts/50",
+       "parent": {
+        "$ref": "#/groups/8"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 2,
+         "bbox": {
+          "l": 95.999996,
+          "t": 84.60659409472669,
+          "r": 541.7636532465136,
+          "b": 60.25503260937512,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          154
+         ]
+        }
+       ],
+       "orig": "2. In the search results, locate and click on the v1 of the rsc.io/quote package (it should be listed with the \"Other major versions\" of rsc.io/quote/v4).",
+       "text": "In the search results, locate and click on the v1 of the rsc.io/quote package (it should be listed with the \"Other major versions\" of rsc.io/quote/v4).",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "2."
+      },
+      {
+       "self_ref": "#/texts/51",
+       "parent": {
+        "$ref": "#/groups/8"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 95.999996,
+          "t": 798.6710174670409,
+          "r": 529.9277161796775,
+          "b": 774.2550028593748,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          129
+         ]
+        }
+       ],
+       "orig": "3. In the Documentation section, under Index, note the list of functions you can call from your code. You'll use the Go function.",
+       "text": "In the Documentation section, under Index, note the list of functions you can call from your code. You'll use the Go function.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "3."
+      },
+      {
+       "self_ref": "#/texts/52",
+       "parent": {
+        "$ref": "#/groups/8"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 95.999996,
+          "t": 771.6065654697263,
+          "r": 537.7441182339942,
+          "b": 760.7667221713866,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          91
+         ]
+        }
+       ],
+       "orig": "4. At the top of this page, note that package quote is included in the rsc.io/quote module.",
+       "text": "At the top of this page, note that package quote is included in the rsc.io/quote module.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "4."
+      },
+      {
+       "self_ref": "#/texts/53",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 746.1065665322265,
+          "r": 532.207009824707,
+          "b": 694.7550061718748,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          312
+         ]
+        }
+       ],
+       "orig": "You can use the pkg.go.dev site to find published modules whose packages have functions you can use in your own code. Packages are published in modules -- like rsc.io/quote -- where others can use them. Modules are improved with new versions over time, and you can upgrade your code to use the improved versions.",
+       "text": "You can use the pkg.go.dev site to find published modules whose packages have functions you can use in your own code. Packages are published in modules -- like rsc.io/quote -- where others can use them. Modules are improved with new versions over time, and you can upgrade your code to use the improved versions.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/54",
+       "parent": {
+        "$ref": "#/groups/9"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 680.1065692822265,
+          "r": 484.1659991864158,
+          "b": 669.2550072343747,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          86
+         ]
+        }
+       ],
+       "orig": "2. In your Go code, import the rsc.io/quote package and add a call to its Go function.",
+       "text": "In your Go code, import the rsc.io/quote package and add a call to its Go function.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "2."
+      },
+      {
+       "self_ref": "#/texts/55",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 654.6065703447264,
+          "r": 437.59568508684566,
+          "b": 643.7550082968748,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          75
+         ]
+        }
+       ],
+       "orig": "After adding the highlighted lines, your code should include the following:",
+       "text": "After adding the highlighted lines, your code should include the following:",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/56",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 630.0814541287157,
+          "r": 191.3858366064324,
+          "b": 564.1055646077768,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          87
+         ]
+        }
+       ],
+       "orig": "package main import \"fmt\" import \"rsc.io/quote\" func main() { fmt.Println(quote.Go()) }",
+       "text": "package main import \"fmt\" import \"rsc.io/quote\" func main() { fmt.Println(quote.Go()) }",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/57",
+       "parent": {
+        "$ref": "#/groups/10"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 554.8565745009764,
+          "r": 277.2949106060449,
+          "b": 544.0167312026365,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          40
+         ]
+        }
+       ],
+       "orig": "3. Add new module requirements and sums.",
+       "text": "Add new module requirements and sums.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "3."
+      },
+      {
+       "self_ref": "#/texts/58",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 529.3565755634763,
+          "r": 542.4843567164842,
+          "b": 505.0167328276366,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          175
+         ]
+        }
+       ],
+       "orig": "Go will add the quote module as a requirement, as well as a go.sum file for use in authenticating the module. For more, see Authenticating modules in the Go Modules Reference.",
+       "text": "Go will add the quote module as a requirement, as well as a go.sum file for use in authenticating the module. For more, see Authenticating modules in the Go Modules Reference.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/59",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 491.3314599099656,
+          "r": 266.9631197073788,
+          "b": 470.2667330694619,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          103
+         ]
+        }
+       ],
+       "orig": "$ go mod tidy go: finding module for package rsc.io/quote go: found rsc.io/quote in rsc.io/quote v1.5.2",
+       "text": "$ go mod tidy go: finding module for package rsc.io/quote go: found rsc.io/quote in rsc.io/quote v1.5.2",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/60",
+       "parent": {
+        "$ref": "#/groups/11"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "list_item",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 65.99999724999999,
+          "t": 460.3565784384764,
+          "r": 437.0449043097947,
+          "b": 449.50501639062486,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          77
+         ]
+        }
+       ],
+       "orig": "4. Run your code to see the message generated by the function you're calling.",
+       "text": "Run your code to see the message generated by the function you're calling.",
+       "formatting": null,
+       "hyperlink": null,
+       "enumerated": true,
+       "marker": "4."
+      },
+      {
+       "self_ref": "#/texts/61",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "code",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 441.0404610293008,
+          "r": 359.3450896081298,
+          "b": 427.5167348507118,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          78
+         ]
+        }
+       ],
+       "orig": "$ go run . Don't communicate by sharing memory, share memory by communicating.",
+       "text": "$ go run . Don't communicate by sharing memory, share memory by communicating.",
+       "formatting": null,
+       "hyperlink": null,
+       "captions": [],
+       "references": [],
+       "footnotes": [],
+       "image": null,
+       "code_language": "unknown"
+      },
+      {
+       "self_ref": "#/texts/62",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 413.1065804072264,
+          "r": 520.5761505293261,
+          "b": 402.25501835937484,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          91
+         ]
+        }
+       ],
+       "orig": "Notice that your code calls the Go function, printing a clever message about communication.",
+       "text": "Notice that your code calls the Go function, printing a clever message about communication.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/63",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 77.99999675,
+          "t": 387.6065814697265,
+          "r": 539.501930780752,
+          "b": 363.25501998437494,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          171
+         ]
+        }
+       ],
+       "orig": "When you ran go mod tidy, it located and downloaded the rsc.io/quote module that contains the package you imported. By default, it downloaded the latest version -- v1.5.2.",
+       "text": "When you ran go mod tidy, it located and downloaded the rsc.io/quote module that contains the package you imported. By default, it downloaded the latest version -- v1.5.2.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/64",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "section_header",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 343.81654423181135,
+          "r": 176.30272716405275,
+          "b": 331.08119319995103,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          15
+         ]
+        }
+       ],
+       "orig": "Write more code",
+       "text": "Write more code",
+       "formatting": null,
+       "hyperlink": null,
+       "level": 3
+      },
+      {
+       "self_ref": "#/texts/65",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 309.60658471972647,
+          "r": 538.7050557539551,
+          "b": 286.1690856962889,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          164
+         ]
+        }
+       ],
+       "orig": "With this quick introduction, you got Go installed and learned some of the basics. To write some more code with another tutorial, take a look at Create a Go module.",
+       "text": "With this quick introduction, you got Go installed and learned some of the basics. To write some more code with another tutorial, take a look at Create a Go module.",
+       "formatting": null,
+       "hyperlink": null
+      },
+      {
+       "self_ref": "#/texts/66",
+       "parent": {
+        "$ref": "#/body"
+       },
+       "children": [],
+       "content_layer": "body",
+       "meta": null,
+       "label": "text",
+       "prov": [
+        {
+         "page_no": 3,
+         "bbox": {
+          "l": 47.999998,
+          "t": 270.5714300961913,
+          "r": 98.3203083433203,
+          "b": 262.198383570068,
+          "coord_origin": "BOTTOMLEFT"
+         },
+         "charspan": [
+          0,
+          11
+         ]
+        }
+       ],
+       "orig": "Site footer",
+       "text": "Site footer",
+       "formatting": null,
+       "hyperlink": null
+      }
+     ],
+     "pictures": [],
+     "tables": [],
+     "key_value_items": [],
+     "form_items": [],
+     "pages": {
+      "1": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 1
+      },
+      "2": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 2
+      },
+      "3": {
+       "size": {
+        "width": 595.91998,
+        "height": 842.88
+       },
+       "image": null,
+       "page_no": 3
+      }
+     }
+    },
+    "html_content": null,
+    "text_content": null,
+    "doctags_content": null,
+    "doclang_content": null
+   },
+   "status": "success",
+   "errors": [],
+   "processing_time": 2.6783475549996183,
+   "timings": {},
+   "confidence": {
+    "parse_score": 1.0,
+    "layout_score": 0.9117436936450384,
+    "table_score": null,
+    "ocr_score": null,
+    "mean_score": 0.9558718468225192,
+    "low_score": 0.9161565089627864,
+    "mean_grade": "excellent",
+    "low_grade": "excellent",
+    "pages": {
+     "1": {
+      "parse_score": 1.0,
+      "layout_score": 0.8744139571984609,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9372069785992305,
+      "low_score": 0.8806932593385379,
+      "mean_grade": "excellent",
+      "low_grade": "good",
+      "pages": {}
+     },
+     "3": {
+      "parse_score": 1.0,
+      "layout_score": 0.9270376712083817,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9635188356041908,
+      "low_score": 0.9306857876479626,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     },
+     "2": {
+      "parse_score": 1.0,
+      "layout_score": 0.9337794525282723,
+      "table_score": null,
+      "ocr_score": null,
+      "mean_score": 0.9668897262641362,
+      "low_score": 0.9370904799018587,
+      "mean_grade": "excellent",
+      "low_grade": "excellent",
+      "pages": {}
+     }
+    }
+   }
+  }
+ },
+ "lines": {
+  "status": 200,
+  "body": {
+   "blocks": [
+    [
+     {
+      "text": "In this tutorial, you'll get a brief introduction to Go programming. Along the way, you will:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Note: For other tutorials, see Tutorials.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Just use the Download and install steps.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Get started with Hello, World.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "On Linux or Mac:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "cd",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "On Windows:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "cd %HOMEPATH%",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "For example, use the following commands:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "mkdir hello",
+      "mono": true
+     },
+     {
+      "text": "cd hello",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "When your code imports packages contained in other modules, you manage those dependencies",
+      "mono": false
+     },
+     {
+      "text": "through your code's own module. That module is defined by a go.mod file that tracks the modules",
+      "mono": false
+     },
+     {
+      "text": "that provide those packages. That go.mod file stays with your code, including in your source code",
+      "mono": false
+     },
+     {
+      "text": "repository.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "To enable dependency tracking for your code by creating a go.mod file, run the go mod init",
+      "mono": false
+     },
+     {
+      "text": "command, giving it the name of the module your code will be in. The name is the module's",
+      "mono": false
+     },
+     {
+      "text": "module path.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "In actual development, the module path will typically be the repository location where your",
+      "mono": false
+     },
+     {
+      "text": "source code will be kept. For example, the module path might be github.com/mymodule. If you",
+      "mono": false
+     },
+     {
+      "text": "plan to publish your module for others to use, the module path must be a location from which Go",
+      "mono": false
+     },
+     {
+      "text": "tools can download your module. For more about naming a module with a module path, see",
+      "mono": false
+     },
+     {
+      "text": "Managing dependencies.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "For the purposes of this tutorial, just use example/hello.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "$ go mod init example/hello",
+      "mono": true
+     },
+     {
+      "text": "go: creating new go.mod: module example/hello",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "package main",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "import \"fmt\"",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "func main() {",
+      "mono": true
+     },
+     {
+      "text": "    fmt.Println(\"Hello, World!\")",
+      "mono": true
+     },
+     {
+      "text": "}",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "This is your Go code. In this code, you:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "$ go run .",
+      "mono": true
+     },
+     {
+      "text": "Hello, World!",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "The go run command is one of many go commands you'll use to get things done with Go. Use",
+      "mono": false
+     },
+     {
+      "text": "the following command to get a list of the others:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "$ go help",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "When you need your code to do something that might have been implemented by someone else, you",
+      "mono": false
+     },
+     {
+      "text": "can look for a package that has functions you can use in your code.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "You can use the pkg.go.dev site to find published modules whose packages have functions you",
+      "mono": false
+     },
+     {
+      "text": "can use in your own code. Packages are published in modules -- like rsc.io/quote -- where",
+      "mono": false
+     },
+     {
+      "text": "others can use them. Modules are improved with new versions over time, and you can upgrade",
+      "mono": false
+     },
+     {
+      "text": "your code to use the improved versions.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "After adding the highlighted lines, your code should include the following:",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "package main",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "import \"fmt\"",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "import \"rsc.io/quote\"",
+      "mono": true
+     },
+     {
+      "text": "",
+      "mono": true
+     },
+     {
+      "text": "func main() {",
+      "mono": true
+     },
+     {
+      "text": "    fmt.Println(quote.Go())",
+      "mono": true
+     },
+     {
+      "text": "}",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Go will add the quote module as a requirement, as well as a go.sum file for use in authenticating",
+      "mono": false
+     },
+     {
+      "text": "the module. For more, see Authenticating modules in the Go Modules Reference.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "$ go mod tidy",
+      "mono": true
+     },
+     {
+      "text": "go: finding module for package rsc.io/quote",
+      "mono": true
+     },
+     {
+      "text": "go: found rsc.io/quote in rsc.io/quote v1.5.2",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "$ go run .",
+      "mono": true
+     },
+     {
+      "text": "Don't communicate by sharing memory, share memory by communicating.",
+      "mono": true
+     }
+    ],
+    [
+     {
+      "text": "Notice that your code calls the Go function, printing a clever message about communication.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "When you ran go mod tidy, it located and downloaded the rsc.io/quote module that contains",
+      "mono": false
+     },
+     {
+      "text": "the package you imported. By default, it downloaded the latest version -- v1.5.2.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "With this quick introduction, you got Go installed and learned some of the basics. To write some more",
+      "mono": false
+     },
+     {
+      "text": "code with another tutorial, take a look at Create a Go module.",
+      "mono": false
+     }
+    ],
+    [
+     {
+      "text": "Site footer",
+      "mono": false
+     }
+    ]
+   ]
+  }
+ }
+}

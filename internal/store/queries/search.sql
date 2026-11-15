@@ -5,6 +5,13 @@
 -- top 50 by words and the top 50 by meaning, each read through the owner's
 -- rows alone, merged by reciprocal rank fusion. A null query vector leaves
 -- the meaning half out; use_words false leaves the words half out.
+--
+-- Chunks that tie, as the copies of one page in two documents do, are
+-- ordered by document, oldest first (ids are UUIDv7), then by place in the
+-- document, in every ranking and the last one. Not by chunk id: indexing a
+-- document again makes new ones, which would put its chunks after another
+-- document's. So the order never rests on the query plan or on an edit
+-- (docs/adr/0011-retrieval.md).
 WITH q AS (
     -- Words alone OR the English terms, so a question in a student's words
     -- still finds chunks with some of them, ranked by how many and how
@@ -20,31 +27,31 @@ WITH q AS (
         || CASE WHEN sqlc.arg(ident_query)::text = '' THEN ''::tsquery ELSE sqlc.arg(ident_query)::text::tsquery END AS query
 ),
 words AS (
-    SELECT c.id, ts_rank_cd(c.tsv, q.query) AS rank
+    SELECT c.id, c.document_id AS doc, c.position AS place, ts_rank_cd(c.tsv, q.query) AS rank
     FROM chunks c, q
     WHERE sqlc.arg(use_words)::boolean
       AND c.owner_id = sqlc.arg(owner_id)
       AND (sqlc.narg(document_id)::uuid IS NULL OR c.document_id = sqlc.narg(document_id)::uuid)
       AND c.tsv @@ q.query
-    ORDER BY rank DESC, c.id
+    ORDER BY rank DESC, doc, place
     LIMIT 50
 ),
 meaning AS (
-    SELECT c.id, c.embedding <=> sqlc.narg(query_vector)::halfvec AS distance
+    SELECT c.id, c.document_id AS doc, c.position AS place, c.embedding <=> sqlc.narg(query_vector)::halfvec AS distance
     FROM chunks c
     WHERE sqlc.narg(query_vector)::halfvec IS NOT NULL
       AND c.owner_id = sqlc.arg(owner_id)
       AND (sqlc.narg(document_id)::uuid IS NULL OR c.document_id = sqlc.narg(document_id)::uuid)
       AND c.model = sqlc.arg(model)
       AND c.embedding IS NOT NULL
-    ORDER BY distance, c.id
+    ORDER BY distance, doc, place
     LIMIT 50
 ),
 fused AS (
     SELECT coalesce(w.id, m.id) AS id, w.r AS words_rank, m.r AS meaning_rank, m.distance,
         coalesce(1.0 / (sqlc.arg(k)::int + w.r), 0) + coalesce(1.0 / (sqlc.arg(k)::int + m.r), 0) AS score
-    FROM (SELECT id, row_number() OVER (ORDER BY rank DESC, id) AS r FROM words) w
-    FULL JOIN (SELECT id, distance, row_number() OVER (ORDER BY distance, id) AS r FROM meaning) m ON w.id = m.id
+    FROM (SELECT id, row_number() OVER (ORDER BY rank DESC, doc, place) AS r FROM words) w
+    FULL JOIN (SELECT id, distance, row_number() OVER (ORDER BY distance, doc, place) AS r FROM meaning) m ON w.id = m.id
 )
 SELECT c.id, c.document_id, d.title, c.block_ids, c.block_texts, c.heading_path, c.kind,
     -- 0 and -1 mean the half didn't find the chunk.
@@ -59,5 +66,5 @@ FROM fused f
 JOIN chunks c ON c.id = f.id AND c.owner_id = sqlc.arg(owner_id)
 JOIN documents d ON d.id = c.document_id AND d.owner_id = c.owner_id
 CROSS JOIN q
-ORDER BY f.score DESC, c.id
+ORDER BY f.score DESC, c.document_id, c.position
 LIMIT sqlc.arg(max_results);

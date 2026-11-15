@@ -149,6 +149,10 @@ func proxy(t *testing.T, w http.ResponseWriter, r *http.Request, body []byte, fi
 		return
 	}
 	req.Header = r.Header.Clone()
+	// The adapter's own Accept-Encoding would make the transport hand back
+	// the gzipped body, and record that; without it, Go asks for gzip
+	// itself and records the events as they decode.
+	req.Header.Del("Accept-Encoding")
 	res, err := http.DefaultClient.Do(req) //nolint:gosec // only ever Anthropic's API, with -record
 	if err != nil {
 		t.Error(err)

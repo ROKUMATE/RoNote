@@ -112,3 +112,22 @@ test("closing the dialog leaves the import running in the library", async ({ pag
   ).toBeVisible();
   expect(new URL(page.url()).pathname).toBe("/");
 });
+
+test("deleting a document takes it out of the library, and its address finds nothing", async ({
+  page,
+}) => {
+  const fixture = "vitepress-vite-guide";
+  await page.goto("/");
+  const path = await importPage(page, fixtureURL("pages", fixture));
+
+  await page.getByRole("button", { name: "Delete document" }).click();
+  await page
+    .getByRole("dialog", { name: "Delete this document?" })
+    .getByRole("button", { name: "Delete", exact: true })
+    .click();
+
+  await expect(page.getByRole("heading", { level: 1, name: "Library" })).toBeVisible();
+  await expect(page.getByRole("main").locator(`a[href="${path}"]`)).toHaveCount(0);
+  await page.goto(path);
+  await expect(page.getByText("There's no document here.")).toBeVisible();
+});

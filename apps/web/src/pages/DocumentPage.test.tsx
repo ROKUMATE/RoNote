@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { expect, test } from "vitest";
 import type { IrWarning } from "../api/schema";
 import { apiError, json, stubApi } from "../test/api";
@@ -92,4 +92,59 @@ test("shows the title itself when the document does not open with it", async () 
 
   expect(await main.findByRole("heading", { level: 1, name: "Effective Go" })).toBeDefined();
   expect(main.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+});
+
+test("deletes the document after asking, then shows the library", async () => {
+  let deleted = 0;
+  const requests = stubApi({
+    "GET /documents": () => json({ documents: [] }),
+    "GET /documents/doc-1": () => json(documentWith()),
+    "DELETE /documents/doc-1": () => {
+      deleted++;
+      return new Response(null, { status: 204 });
+    },
+  });
+  const app = renderApp("/");
+  await app.router.navigate({ to: "/doc/$id", params: { id: "doc-1" } });
+  const main = within(await screen.findByRole("main"));
+
+  fireEvent.click(await main.findByRole("button", { name: "Delete document" }));
+  const dialog = await screen.findByRole("dialog", { name: "Delete this document?" });
+  fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  expect(deleted).toBe(0);
+
+  fireEvent.click(main.getByRole("button", { name: "Delete document" }));
+  fireEvent.click(
+    within(await screen.findByRole("dialog", { name: "Delete this document?" })).getByRole(
+      "button",
+      { name: "Delete" },
+    ),
+  );
+
+  await waitFor(() => expect(app.router.state.location.pathname).toBe("/"));
+  expect(deleted).toBe(1);
+  expect(requests.filter((r) => r.method === "DELETE")).toHaveLength(1);
+});
+
+test("says when a delete fails, and stays on the document", async () => {
+  stubApi({
+    "GET /documents": () => json({ documents: [] }),
+    "GET /documents/doc-1": () => json(documentWith()),
+    "DELETE /documents/doc-1": () => apiError(500, "internal_error"),
+  });
+  const app = renderApp("/");
+  await app.router.navigate({ to: "/doc/$id", params: { id: "doc-1" } });
+  const main = within(await screen.findByRole("main"));
+
+  fireEvent.click(await main.findByRole("button", { name: "Delete document" }));
+  fireEvent.click(
+    within(await screen.findByRole("dialog", { name: "Delete this document?" })).getByRole(
+      "button",
+      { name: "Delete" },
+    ),
+  );
+
+  expect(await main.findByRole("alert")).toBeDefined();
+  expect(app.router.state.location.pathname).toBe("/doc/doc-1");
 });

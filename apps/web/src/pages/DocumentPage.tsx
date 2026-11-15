@@ -1,12 +1,13 @@
 import { ArrowSquareOutIcon } from "@phosphor-icons/react/ArrowSquareOut";
 import { InfoIcon } from "@phosphor-icons/react/Info";
-import { useQuery } from "@tanstack/react-query";
-import { Link, useParams, useRouterState, useSearch } from "@tanstack/react-router";
+import { TrashIcon } from "@phosphor-icons/react/Trash";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useParams, useRouterState, useSearch } from "@tanstack/react-router";
 import type { Editor } from "@tiptap/core";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { ApiError } from "../api/client";
-import { requestErrorMessages } from "../api/messages";
-import { documentQuery, linkTargets } from "../api/queries";
+import { requestErrorMessage, requestErrorMessages } from "../api/messages";
+import { chatKey, deleteDocument, documentQuery, documentsKey, linkTargets } from "../api/queries";
 import type { Document, IrWarning } from "../api/schema";
 import { CodeLangsContext } from "../document/codeLangs";
 import { blockCounts } from "../document/counts";
@@ -22,6 +23,7 @@ import { useFollow } from "../document/useFollow";
 import { useScrollAnchor } from "../document/useScrollAnchor";
 import { formatDate, hostOf } from "../format";
 import { buttonClass } from "../ui/button";
+import { Confirm } from "../ui/Confirm";
 import { PageTitle } from "../ui/PageTitle";
 
 // The highlight controls load once the editor is up (ADR 0007).
@@ -138,6 +140,7 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
             <RunSessions />
             <div ref={setListSlot} />
             <SaveState status={status} />
+            <DeleteDocument id={doc.id} />
           </header>
           {fallback && (
             <p role="note" className="mt-6 flex gap-2 border-rule border-l-2 pl-3 text-ui-lg">
@@ -172,6 +175,56 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
         </article>
       </RunScopeProvider>
     </CodeLangsContext>
+  );
+}
+
+/**
+ * Deletes the document, after asking, and goes to the library. Its notes
+ * and the conversations about it go with it.
+ */
+function DeleteDocument({ id }: { id: string }) {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [asking, setAsking] = useState(false);
+  const [failed, setFailed] = useState<string>();
+  const remove = async () => {
+    setAsking(false);
+    try {
+      await deleteDocument(id);
+    } catch (error) {
+      setFailed(requestErrorMessage(error));
+      return;
+    }
+    // Leave first, so nothing on this page asks for the document again.
+    await navigate({ to: "/" });
+    queryClient.removeQueries({ queryKey: documentQuery(id).queryKey });
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: documentsKey }),
+      queryClient.invalidateQueries({ queryKey: chatKey }),
+    ]);
+  };
+  return (
+    <>
+      <button type="button" onClick={() => setAsking(true)} className={`${buttonClass} mt-1`}>
+        <TrashIcon size={16} aria-hidden />
+        Delete document
+      </button>
+      {failed && (
+        <p role="alert" className="mt-2 text-ui-lg">
+          {failed}
+        </p>
+      )}
+      {asking && (
+        <Confirm
+          title="Delete this document?"
+          action="Delete"
+          onConfirm={() => void remove()}
+          onCancel={() => setAsking(false)}
+        >
+          <p>Your highlights, notes and the conversations about it are deleted too.</p>
+        </Confirm>
+      )}
+    </>
   );
 }
 

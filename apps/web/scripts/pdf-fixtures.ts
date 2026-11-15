@@ -56,7 +56,10 @@ try {
   }
 
   // Docling refuses this one by page count.
-  const many = Array.from({ length: 301 }, (_, i) => `<p style="break-after: page">Page ${i + 1}</p>`);
+  const many = Array.from(
+    { length: 301 },
+    (_, i) => `<p style="break-after: page">Page ${i + 1}</p>`,
+  );
   await print(page, many.join(""), "pages-301.pdf");
 
   // A scan: the page as a picture, with no text layer.
@@ -64,14 +67,24 @@ try {
     "<h1>Chapter 1</h1><pre>for i in range(3):\n    print(i)</pre><p>A page that was scanned.</p>",
   );
   const picture = (await page.screenshot({ type: "png" })).toString("base64");
-  await print(page, `<img src="data:image/png;base64,${picture}" style="width: 100%">`, "image-only.pdf");
+  await print(
+    page,
+    `<img src="data:image/png;base64,${picture}" style="width: 100%">`,
+    "image-only.pdf",
+  );
 
   // Recorded with a tiny docling timeout, so its answer is docling's own.
-  const slow = readFileSync(join(repo, "testdata", "golden", "mdbook-v04-reading-files", "input.html"), "utf8");
+  const slow = readFileSync(
+    join(repo, "testdata", "golden", "mdbook-v04-reading-files", "input.html"),
+    "utf8",
+  );
   await print(page, slow, "timeout.pdf");
 } finally {
   await browser.close();
 }
 
 // A web page saved with a .pdf name: refused before docling sees it.
-writeFileSync(join(out, "not-a-pdf.pdf"), "<!doctype html><title>Not a PDF</title><p>This is HTML.</p>\n");
+writeFileSync(
+  join(out, "not-a-pdf.pdf"),
+  "<!doctype html><title>Not a PDF</title><p>This is HTML.</p>\n",
+);

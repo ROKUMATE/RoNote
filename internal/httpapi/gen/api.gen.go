@@ -11,6 +11,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"time"
 
@@ -175,7 +177,9 @@ const (
 	ErrorCodeInvalidRequest      ErrorCode = "invalid_request"
 	ErrorCodeInvalidURL          ErrorCode = "invalid_url"
 	ErrorCodeMethodNotAllowed    ErrorCode = "method_not_allowed"
+	ErrorCodeNotAPdf             ErrorCode = "not_a_pdf"
 	ErrorCodeNotFound            ErrorCode = "not_found"
+	ErrorCodePdfTooLarge         ErrorCode = "pdf_too_large"
 	ErrorCodeQuotaExceeded       ErrorCode = "quota_exceeded"
 	ErrorCodeQuoteMismatch       ErrorCode = "quote_mismatch"
 	ErrorCodeRateLimited         ErrorCode = "rate_limited"
@@ -219,7 +223,11 @@ func (e ErrorCode) Valid() bool {
 		return true
 	case ErrorCodeMethodNotAllowed:
 		return true
+	case ErrorCodeNotAPdf:
+		return true
 	case ErrorCodeNotFound:
+		return true
+	case ErrorCodePdfTooLarge:
 		return true
 	case ErrorCodeQuotaExceeded:
 		return true
@@ -246,23 +254,46 @@ func (e ErrorCode) Valid() bool {
 	}
 }
 
+// Defines values for ImportKind.
+const (
+	Pdf ImportKind = "pdf"
+	Web ImportKind = "web"
+)
+
+// Valid indicates whether the value is a known member of the ImportKind enum.
+func (e ImportKind) Valid() bool {
+	switch e {
+	case Pdf:
+		return true
+	case Web:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ImportErrorCode.
 const (
-	ImportErrorCodeBlockedAddress     ImportErrorCode = "blocked_address"
-	ImportErrorCodeDisallowedByRobots ImportErrorCode = "disallowed_by_robots"
-	ImportErrorCodeExtractFailed      ImportErrorCode = "extract_failed"
-	ImportErrorCodeHTTPError          ImportErrorCode = "http_error"
-	ImportErrorCodeInternalError      ImportErrorCode = "internal_error"
-	ImportErrorCodeInvalidURL         ImportErrorCode = "invalid_url"
-	ImportErrorCodeNetworkError       ImportErrorCode = "network_error"
-	ImportErrorCodeNotFound           ImportErrorCode = "not_found"
-	ImportErrorCodeRateLimited        ImportErrorCode = "rate_limited"
-	ImportErrorCodeRobotsUnavailable  ImportErrorCode = "robots_unavailable"
-	ImportErrorCodeTimeout            ImportErrorCode = "timeout"
-	ImportErrorCodeTooLarge           ImportErrorCode = "too_large"
-	ImportErrorCodeTooManyRedirects   ImportErrorCode = "too_many_redirects"
-	ImportErrorCodeUnsupportedType    ImportErrorCode = "unsupported_type"
-	ImportErrorCodeUpstreamError      ImportErrorCode = "upstream_error"
+	ImportErrorCodeBlockedAddress           ImportErrorCode = "blocked_address"
+	ImportErrorCodeDisallowedByRobots       ImportErrorCode = "disallowed_by_robots"
+	ImportErrorCodeExtractFailed            ImportErrorCode = "extract_failed"
+	ImportErrorCodeHTTPError                ImportErrorCode = "http_error"
+	ImportErrorCodeInternalError            ImportErrorCode = "internal_error"
+	ImportErrorCodeInvalidURL               ImportErrorCode = "invalid_url"
+	ImportErrorCodeNetworkError             ImportErrorCode = "network_error"
+	ImportErrorCodeNotFound                 ImportErrorCode = "not_found"
+	ImportErrorCodePdfConversionFailed      ImportErrorCode = "pdf_conversion_failed"
+	ImportErrorCodePdfConversionUnavailable ImportErrorCode = "pdf_conversion_unavailable"
+	ImportErrorCodePdfPasswordProtected     ImportErrorCode = "pdf_password_protected"
+	ImportErrorCodePdfTooManyPages          ImportErrorCode = "pdf_too_many_pages"
+	ImportErrorCodeRateLimited              ImportErrorCode = "rate_limited"
+	ImportErrorCodeRobotsUnavailable        ImportErrorCode = "robots_unavailable"
+	ImportErrorCodeScannedPdfUnsupported    ImportErrorCode = "scanned_pdf_unsupported"
+	ImportErrorCodeTimeout                  ImportErrorCode = "timeout"
+	ImportErrorCodeTooLarge                 ImportErrorCode = "too_large"
+	ImportErrorCodeTooManyRedirects         ImportErrorCode = "too_many_redirects"
+	ImportErrorCodeUnsupportedType          ImportErrorCode = "unsupported_type"
+	ImportErrorCodeUpstreamError            ImportErrorCode = "upstream_error"
 )
 
 // Valid indicates whether the value is a known member of the ImportErrorCode enum.
@@ -284,9 +315,19 @@ func (e ImportErrorCode) Valid() bool {
 		return true
 	case ImportErrorCodeNotFound:
 		return true
+	case ImportErrorCodePdfConversionFailed:
+		return true
+	case ImportErrorCodePdfConversionUnavailable:
+		return true
+	case ImportErrorCodePdfPasswordProtected:
+		return true
+	case ImportErrorCodePdfTooManyPages:
+		return true
 	case ImportErrorCodeRateLimited:
 		return true
 	case ImportErrorCodeRobotsUnavailable:
+		return true
+	case ImportErrorCodeScannedPdfUnsupported:
 		return true
 	case ImportErrorCodeTimeout:
 		return true
@@ -305,6 +346,7 @@ func (e ImportErrorCode) Valid() bool {
 
 // Defines values for ImportStatus.
 const (
+	ImportStatusConverting ImportStatus = "converting"
 	ImportStatusDone       ImportStatus = "done"
 	ImportStatusExtracting ImportStatus = "extracting"
 	ImportStatusFailed     ImportStatus = "failed"
@@ -315,6 +357,8 @@ const (
 // Valid indicates whether the value is a known member of the ImportStatus enum.
 func (e ImportStatus) Valid() bool {
 	switch e {
+	case ImportStatusConverting:
+		return true
 	case ImportStatusDone:
 		return true
 	case ImportStatusExtracting:
@@ -587,6 +631,12 @@ type CreateImportRequest struct {
 	URL string `json:"url"`
 }
 
+// CreatePdfImportRequest defines model for CreatePdfImportRequest.
+type CreatePdfImportRequest struct {
+	// File The PDF, at most 25 MB.
+	File openapi_types.File `json:"file"`
+}
+
 // DeleteAccountRequest defines model for DeleteAccountRequest.
 type DeleteAccountRequest struct {
 	// Confirm The user's GitHub login, typed to confirm.
@@ -604,8 +654,9 @@ type Document struct {
 	Content   DocContent         `json:"content"`
 	CreatedAt time.Time          `json:"created_at"`
 	ID        openapi_types.UUID `json:"id"`
+	Pdf       *IRPDF             `json:"pdf,omitempty"`
 
-	// SourceURL The canonical URL of the page the document came from.
+	// SourceURL The canonical URL of the page the document came from; empty for a PDF.
 	SourceURL string    `json:"source_url"`
 	Title     string    `json:"title"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -634,8 +685,9 @@ type DocumentResponse struct {
 type DocumentSummary struct {
 	CreatedAt time.Time          `json:"created_at"`
 	ID        openapi_types.UUID `json:"id"`
+	Pdf       *IRPDF             `json:"pdf,omitempty"`
 
-	// SourceURL The canonical URL of the page the document came from.
+	// SourceURL The canonical URL of the page the document came from; empty for a PDF.
 	SourceURL string    `json:"source_url"`
 	Title     string    `json:"title"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -663,7 +715,9 @@ type ErrorCode string
 // ExistingImportResponse defines model for ExistingImportResponse.
 type ExistingImportResponse struct {
 	Document DocumentSummary `json:"document"`
-	Import   Import          `json:"import"`
+
+	// Import An import of a web page (kind web: requested_url and canonical_url) or of an uploaded PDF (kind pdf: filename).
+	Import Import `json:"import"`
 }
 
 // IRBlock One block. kind decides which other fields may be set: heading has level, anchor and content; paragraph content; list ordered and items; tabs items with labels; code lang, title, title_link and text; table head and rows; callout variant, title and children; quote children; image src, alt and caption; divider nothing.
@@ -696,9 +750,9 @@ type IRSource = ir.Source
 // IRWarning defines model for IRWarning.
 type IRWarning = ir.Warning
 
-// Import defines model for Import.
+// Import An import of a web page (kind web: requested_url and canonical_url) or of an uploaded PDF (kind pdf: filename).
 type Import struct {
-	CanonicalURL string    `json:"canonical_url"`
+	CanonicalURL *string   `json:"canonical_url,omitempty"`
 	CreatedAt    time.Time `json:"created_at"`
 
 	// DocumentID Set when status is done, unless the document has since been deleted.
@@ -706,11 +760,16 @@ type Import struct {
 
 	// ErrorCode Why an import failed; set when its status is failed.
 	ErrorCode    *ImportErrorCode   `json:"error_code,omitempty"`
+	Filename     *string            `json:"filename,omitempty"`
 	ID           openapi_types.UUID `json:"id"`
-	RequestedURL string             `json:"requested_url"`
+	Kind         ImportKind         `json:"kind"`
+	RequestedURL *string            `json:"requested_url,omitempty"`
 	Status       ImportStatus       `json:"status"`
 	UpdatedAt    time.Time          `json:"updated_at"`
 }
+
+// ImportKind defines model for Import.Kind.
+type ImportKind string
 
 // ImportErrorCode Why an import failed; set when its status is failed.
 type ImportErrorCode string
@@ -726,6 +785,7 @@ type ImportEvent struct {
 
 // ImportResponse defines model for ImportResponse.
 type ImportResponse struct {
+	// Import An import of a web page (kind web: requested_url and canonical_url) or of an uploaded PDF (kind pdf: filename).
 	Import Import `json:"import"`
 }
 
@@ -973,6 +1033,9 @@ type ReanchorAnnotationsJSONRequestBody = ReanchorRequest
 // CreateImportJSONRequestBody defines body for CreateImport for application/json ContentType.
 type CreateImportJSONRequestBody = CreateImportRequest
 
+// CreatePdfImportMultipartRequestBody defines body for CreatePdfImport for multipart/form-data ContentType.
+type CreatePdfImportMultipartRequestBody = CreatePdfImportRequest
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// DeleteAnnotation Remove an annotation
@@ -1023,9 +1086,15 @@ type ServerInterface interface {
 	// RevertBlock Put a source block back as it was extracted
 	// (POST /documents/{id}/blocks/{blockId}/revert)
 	RevertBlock(w http.ResponseWriter, r *http.Request, id ID, blockID string)
+	// GetDocumentOriginal Get the PDF a document was made from
+	// (GET /documents/{id}/original)
+	GetDocumentOriginal(w http.ResponseWriter, r *http.Request, id ID)
 	// CreateImport Import a page
 	// (POST /imports)
 	CreateImport(w http.ResponseWriter, r *http.Request)
+	// CreatePdfImport Import a PDF
+	// (POST /imports/pdf)
+	CreatePdfImport(w http.ResponseWriter, r *http.Request)
 	// GetImport Get an import
 	// (GET /imports/{id})
 	GetImport(w http.ResponseWriter, r *http.Request, id ID)
@@ -1487,11 +1556,51 @@ func (siw *ServerInterfaceWrapper) RevertBlock(w http.ResponseWriter, r *http.Re
 	handler.ServeHTTP(w, r)
 }
 
+// GetDocumentOriginal operation middleware
+func (siw *ServerInterfaceWrapper) GetDocumentOriginal(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id ID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetDocumentOriginal(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // CreateImport operation middleware
 func (siw *ServerInterfaceWrapper) CreateImport(w http.ResponseWriter, r *http.Request) {
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CreateImport(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreatePdfImport operation middleware
+func (siw *ServerInterfaceWrapper) CreatePdfImport(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreatePdfImport(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1723,11 +1832,13 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/me", wrapper.GetMe)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/search", wrapper.Search)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/imports", wrapper.CreateImport)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/imports/pdf", wrapper.CreatePdfImport)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/imports/{id}", wrapper.GetImport)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/documents", wrapper.ListDocuments)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/documents/{id}", wrapper.DeleteDocument)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/documents/{id}", wrapper.GetDocument)
 	m.HandleFunc(http.MethodPatch+" "+options.BaseURL+"/documents/{id}", wrapper.SaveDocument)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/documents/{id}/original", wrapper.GetDocumentOriginal)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/documents/resolve", wrapper.ResolveDocuments)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/documents/{id}/blocks/{blockId}/revert", wrapper.RevertBlock)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/documents/{id}/annotations", wrapper.ListAnnotations)
@@ -3618,6 +3729,121 @@ func (response RevertBlock500JSONResponse) VisitRevertBlockResponse(w http.Respo
 	return err
 }
 
+type GetDocumentOriginalRequestObject struct {
+	ID ID `json:"id"`
+}
+
+type GetDocumentOriginalResponseObject interface {
+	VisitGetDocumentOriginalResponse(w http.ResponseWriter) error
+}
+
+type GetDocumentOriginal200ResponseHeaders struct {
+	ContentDisposition    *string
+	ContentSecurityPolicy *string
+	XContentTypeOptions   *string
+}
+
+type GetDocumentOriginal200ApplicationPdfResponse struct {
+	Body          io.Reader
+	Headers       GetDocumentOriginal200ResponseHeaders
+	ContentLength int64
+}
+
+func (response GetDocumentOriginal200ApplicationPdfResponse) VisitGetDocumentOriginalResponse(w http.ResponseWriter) error {
+
+	w.Header().Set("Content-Type", "application/pdf")
+	if response.ContentLength != 0 {
+		w.Header().Set("Content-Length", fmt.Sprint(response.ContentLength))
+	}
+	if response.Headers.ContentDisposition != nil {
+		w.Header().Set("Content-Disposition", fmt.Sprint(*response.Headers.ContentDisposition))
+	}
+	if response.Headers.ContentSecurityPolicy != nil {
+		w.Header().Set("Content-Security-Policy", fmt.Sprint(*response.Headers.ContentSecurityPolicy))
+	}
+	if response.Headers.XContentTypeOptions != nil {
+		w.Header().Set("X-Content-Type-Options", fmt.Sprint(*response.Headers.XContentTypeOptions))
+	}
+	w.WriteHeader(200)
+
+	if closer, ok := response.Body.(io.ReadCloser); ok {
+		defer closer.Close()
+	}
+	_, err := io.Copy(w, response.Body)
+	return err
+}
+
+type GetDocumentOriginal400JSONResponse struct{ InvalidParameterJSONResponse }
+
+func (response GetDocumentOriginal400JSONResponse) VisitGetDocumentOriginalResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetDocumentOriginal401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response GetDocumentOriginal401JSONResponse) VisitGetDocumentOriginalResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetDocumentOriginal404JSONResponse struct{ NotFoundJSONResponse }
+
+func (response GetDocumentOriginal404JSONResponse) VisitGetDocumentOriginalResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetDocumentOriginal429JSONResponse struct{ RateLimitedJSONResponse }
+
+func (response GetDocumentOriginal429JSONResponse) VisitGetDocumentOriginalResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Retry-After", fmt.Sprint(response.Headers.RetryAfter))
+	w.WriteHeader(429)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetDocumentOriginal500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response GetDocumentOriginal500JSONResponse) VisitGetDocumentOriginalResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type CreateImportRequestObject struct {
 	Body *CreateImportJSONRequestBody
 }
@@ -3730,6 +3956,129 @@ func (response CreateImport429JSONResponse) VisitCreateImportResponse(w http.Res
 type CreateImport500JSONResponse struct{ InternalErrorJSONResponse }
 
 func (response CreateImport500JSONResponse) VisitCreateImportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreatePdfImportRequestObject struct {
+	Body *multipart.Reader
+}
+
+type CreatePdfImportResponseObject interface {
+	VisitCreatePdfImportResponse(w http.ResponseWriter) error
+}
+
+type CreatePdfImport200JSONResponse ExistingImportResponse
+
+func (response CreatePdfImport200JSONResponse) VisitCreatePdfImportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreatePdfImport202JSONResponse ImportResponse
+
+func (response CreatePdfImport202JSONResponse) VisitCreatePdfImportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(202)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreatePdfImport400JSONResponse Error
+
+func (response CreatePdfImport400JSONResponse) VisitCreatePdfImportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreatePdfImport401JSONResponse struct{ UnauthenticatedJSONResponse }
+
+func (response CreatePdfImport401JSONResponse) VisitCreatePdfImportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreatePdfImport403JSONResponse struct{ CrossOriginJSONResponse }
+
+func (response CreatePdfImport403JSONResponse) VisitCreatePdfImportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreatePdfImport413JSONResponse Error
+
+func (response CreatePdfImport413JSONResponse) VisitCreatePdfImportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(413)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreatePdfImport429JSONResponse struct{ TooManyImportsJSONResponse }
+
+func (response CreatePdfImport429JSONResponse) VisitCreatePdfImportResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if response.Headers.RetryAfter != nil {
+		w.Header().Set("Retry-After", fmt.Sprint(*response.Headers.RetryAfter))
+	}
+	w.WriteHeader(429)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreatePdfImport500JSONResponse struct{ InternalErrorJSONResponse }
+
+func (response CreatePdfImport500JSONResponse) VisitCreatePdfImportResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -4027,9 +4376,15 @@ type StrictServerInterface interface {
 	// RevertBlock Put a source block back as it was extracted
 	// (POST /documents/{id}/blocks/{blockId}/revert)
 	RevertBlock(ctx context.Context, request RevertBlockRequestObject) (RevertBlockResponseObject, error)
+	// GetDocumentOriginal Get the PDF a document was made from
+	// (GET /documents/{id}/original)
+	GetDocumentOriginal(ctx context.Context, request GetDocumentOriginalRequestObject) (GetDocumentOriginalResponseObject, error)
 	// CreateImport Import a page
 	// (POST /imports)
 	CreateImport(ctx context.Context, request CreateImportRequestObject) (CreateImportResponseObject, error)
+	// CreatePdfImport Import a PDF
+	// (POST /imports/pdf)
+	CreatePdfImport(ctx context.Context, request CreatePdfImportRequestObject) (CreatePdfImportResponseObject, error)
 	// GetImport Get an import
 	// (GET /imports/{id})
 	GetImport(ctx context.Context, request GetImportRequestObject) (GetImportResponseObject, error)
@@ -4535,6 +4890,32 @@ func (sh *strictHandler) RevertBlock(w http.ResponseWriter, r *http.Request, id 
 	}
 }
 
+// GetDocumentOriginal operation middleware
+func (sh *strictHandler) GetDocumentOriginal(w http.ResponseWriter, r *http.Request, id ID) {
+	var request GetDocumentOriginalRequestObject
+
+	request.ID = id
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetDocumentOriginal(ctx, request.(GetDocumentOriginalRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetDocumentOriginal")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetDocumentOriginalResponseObject); ok {
+		if err := validResponse.VisitGetDocumentOriginalResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // CreateImport operation middleware
 func (sh *strictHandler) CreateImport(w http.ResponseWriter, r *http.Request) {
 	var request CreateImportRequestObject
@@ -4559,6 +4940,37 @@ func (sh *strictHandler) CreateImport(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(CreateImportResponseObject); ok {
 		if err := validResponse.VisitCreateImportResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreatePdfImport operation middleware
+func (sh *strictHandler) CreatePdfImport(w http.ResponseWriter, r *http.Request) {
+	var request CreatePdfImportRequestObject
+
+	if reader, err := r.MultipartReader(); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode multipart body: %w", err))
+		return
+	} else {
+		request.Body = reader
+	}
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreatePdfImport(ctx, request.(CreatePdfImportRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreatePdfImport")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreatePdfImportResponseObject); ok {
+		if err := validResponse.VisitCreatePdfImportResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

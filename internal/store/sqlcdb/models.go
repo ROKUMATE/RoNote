@@ -27,22 +27,16 @@ type Annotation struct {
 type Import struct {
 	ID           uuid.UUID
 	OwnerID      uuid.UUID
-	RequestedURL string
-	CanonicalURL string
+	RequestedURL pgtype.Text
+	CanonicalURL pgtype.Text
 	Status       string
 	ErrorCode    pgtype.Text
 	DocumentID   uuid.NullUUID
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
-}
-
-type SourceSnapshot struct {
-	ID          uuid.UUID
-	SourceID    uuid.UUID
-	BodySHA256  string
-	BodyGzip    []byte
-	ContentType string
-	FetchedAt   time.Time
+	Kind         string
+	Filename     pgtype.Text
+	PDFSHA256    pgtype.Text
 }
 
 type User struct {

@@ -7,10 +7,10 @@ SELECT d.id
 FROM documents d
 WHERE d.owner_id = sqlc.arg(owner_id)
   AND (
-    d.source_id IN (SELECT s.id FROM sources s WHERE s.canonical_url = sqlc.arg(url) OR s.final_url = sqlc.arg(url))
+    d.source_id IN (SELECT s.id FROM sources s WHERE s.canonical_url = sqlc.arg(url)::text OR s.final_url = sqlc.arg(url)::text)
     OR d.id IN (
       SELECT i.document_id FROM imports i
-      WHERE i.owner_id = sqlc.arg(owner_id) AND i.canonical_url = sqlc.arg(url) AND i.document_id IS NOT NULL
+      WHERE i.owner_id = sqlc.arg(owner_id) AND i.canonical_url = sqlc.arg(url)::text AND i.document_id IS NOT NULL
     )
   )
 ORDER BY d.created_at, d.id
@@ -25,9 +25,11 @@ ON CONFLICT ON CONSTRAINT documents_owner_source_key DO UPDATE SET owner_id = EX
 RETURNING id, (xmax = 0)::boolean AS created;
 
 -- name: GetDocument :one
--- The document, with the warnings of the extraction it was made from.
-SELECT d.id, d.title, s.canonical_url AS source_url, d.version, d.created_at, d.updated_at, d.content,
-    COALESCE(e.ir -> 'warnings', '[]'::jsonb)::jsonb AS warnings
+-- The document, with the warnings of the extraction it was made from. A
+-- web page's source is its URL; a PDF's, its file (source.pdf in the IR).
+SELECT d.id, d.title, COALESCE(s.canonical_url, '')::text AS source_url, d.version, d.created_at, d.updated_at, d.content,
+    COALESCE(e.ir -> 'warnings', '[]'::jsonb)::jsonb AS warnings,
+    (e.ir -> 'source' -> 'pdf')::jsonb AS pdf
 FROM documents d
 JOIN sources s ON s.id = d.source_id
 JOIN extractions e ON e.id = d.extraction_id
@@ -35,9 +37,11 @@ WHERE d.owner_id = $1 AND d.id = $2;
 
 -- name: ListDocuments :many
 -- The owner's documents, newest first, after the (created_at, id) cursor.
-SELECT d.id, d.title, s.canonical_url AS source_url, d.version, d.created_at, d.updated_at
+SELECT d.id, d.title, COALESCE(s.canonical_url, '')::text AS source_url, d.version, d.created_at, d.updated_at,
+    (e.ir -> 'source' -> 'pdf')::jsonb AS pdf
 FROM documents d
 JOIN sources s ON s.id = d.source_id
+JOIN extractions e ON e.id = d.extraction_id
 WHERE d.owner_id = sqlc.arg(owner_id)
   AND (d.created_at, d.id) < (sqlc.arg(before_created_at)::timestamptz, sqlc.arg(before_id)::uuid)
 ORDER BY d.created_at DESC, d.id DESC
@@ -117,8 +121,38 @@ DELETE FROM conversations
 WHERE owner_id = $1 AND document_id = $2
 RETURNING id;
 
--- name: DeleteDocument :execrows
+-- name: DeleteDocument :one
 -- Deletes the owner's document; its annotations and chunks go with it, and
--- the imports that made it keep their row without it.
+-- the imports that made it keep their row without it. Returns its source.
 DELETE FROM documents
-WHERE owner_id = $1 AND id = $2;
+WHERE owner_id = $1 AND id = $2
+RETURNING source_id;
+
+-- name: DeletePDFSource :many
+-- Deletes the owner's PDF source once no document of theirs uses it, with
+-- its snapshots and extractions, and returns its snapshots' blob keys.
+WITH gone AS (
+    DELETE FROM sources s
+    WHERE s.id = sqlc.arg(source_id) AND s.kind = 'pdf' AND s.owner_id = sqlc.arg(owner_id)::uuid
+      AND NOT EXISTS (SELECT 1 FROM documents d WHERE d.source_id = s.id AND d.owner_id = sqlc.arg(owner_id)::uuid)
+    RETURNING s.id
+)
+SELECT snap.blob_key::text AS blob_key
+FROM source_snapshots snap
+WHERE snap.source_id IN (SELECT id FROM gone) AND snap.blob_key IS NOT NULL;
+
+-- name: FindOwnerPDFDocument :one
+-- The owner's document made from the PDF with this SHA-256.
+SELECT d.id
+FROM documents d
+JOIN sources s ON s.id = d.source_id
+WHERE d.owner_id = sqlc.arg(owner_id)::uuid AND s.kind = 'pdf' AND s.owner_id = sqlc.arg(owner_id)::uuid
+  AND s.pdf_sha256 = sqlc.arg(pdf_sha256)::text;
+
+-- name: DocumentOriginal :one
+-- The blob key and filename of the PDF the owner's document was made from.
+SELECT snap.blob_key::text AS blob_key, (e.ir -> 'source' -> 'pdf' ->> 'filename')::text AS filename
+FROM documents d
+JOIN extractions e ON e.id = d.extraction_id
+JOIN source_snapshots snap ON snap.id = e.snapshot_id
+WHERE d.owner_id = $1 AND d.id = $2 AND snap.blob_key IS NOT NULL;

@@ -1,9 +1,10 @@
 import { importErrorMessages, lostMessage } from "../api/messages";
-import type { steps, TrackedImport } from "./state";
+import type { Step, TrackedImport } from "./state";
 
-export const stepLabels: Record<(typeof steps)[number], string> = {
+export const stepLabels: Record<Step, string> = {
   queued: "Queued",
   fetching: "Fetching the page",
+  converting: "Converting the PDF",
   extracting: "Extracting the content",
   done: "Done",
 };

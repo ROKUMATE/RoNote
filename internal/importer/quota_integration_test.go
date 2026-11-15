@@ -11,6 +11,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/rokumate/ronote/internal/blob/memblob"
 	"github.com/rokumate/ronote/internal/jobs"
 	"github.com/rokumate/ronote/internal/jobs/riverjobs"
 	"github.com/rokumate/ronote/internal/store"
@@ -30,7 +31,7 @@ func quotaService(t *testing.T, quota Quota) (*Service, *store.Store, uuid.UUID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return NewService(st, queue, quota), st, u.ID
+	return NewService(st, queue, quota, memblob.New()), st, u.ID
 }
 
 func pageURL(n int) string { return fmt.Sprintf("https://docs.example.com/page-%d", n) }

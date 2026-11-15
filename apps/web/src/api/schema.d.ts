@@ -157,6 +157,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/imports/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import a PDF
+         * @description Uploads one PDF, at most 25 MB, and queues its import
+         *     (docs/adr/0013-pdf-import.md). If the user already has a document
+         *     from the same file, nothing is queued and the answer is 200 with the
+         *     import that made it and the document's summary. Its progress has a
+         *     converting step: queued, converting, extracting, done.
+         */
+        post: operations["createPdfImport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/imports/{id}": {
         parameters: {
             query?: never;
@@ -247,6 +271,28 @@ export interface paths {
          *     quote, callout and divider.
          */
         patch: operations["saveDocument"];
+        trace?: never;
+    };
+    "/documents/{id}/original": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the PDF a document was made from
+         * @description The original file, to its owner only: anyone else, and any document
+         *     not made from a PDF, gets 404. It is served so a browser shows it and
+         *     runs nothing in it; #page=N opens it at page N.
+         */
+        get: operations["getDocumentOriginal"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/documents/resolve": {
@@ -477,7 +523,7 @@ export interface components {
          * @description Why a request failed. Each response lists the codes it can carry.
          * @enum {string}
          */
-        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unknown_block" | "quote_mismatch" | "annotation_limit" | "unauthenticated" | "cross_origin" | "rate_limited" | "quota_exceeded" | "body_too_large" | "chat_disabled" | "conversation_busy" | "internal_error";
+        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unknown_block" | "quote_mismatch" | "annotation_limit" | "unauthenticated" | "cross_origin" | "rate_limited" | "quota_exceeded" | "body_too_large" | "not_a_pdf" | "pdf_too_large" | "chat_disabled" | "conversation_busy" | "internal_error";
         Me: {
             /** Format: uuid */
             id: string;
@@ -531,17 +577,21 @@ export interface components {
             url: string;
         };
         /** @enum {string} */
-        ImportStatus: "queued" | "fetching" | "extracting" | "done" | "failed";
+        ImportStatus: "queued" | "fetching" | "converting" | "extracting" | "done" | "failed";
         /**
          * @description Why an import failed; set when its status is failed.
          * @enum {string}
          */
-        ImportErrorCode: "invalid_url" | "blocked_address" | "disallowed_by_robots" | "too_large" | "unsupported_type" | "too_many_redirects" | "not_found" | "http_error" | "extract_failed" | "timeout" | "rate_limited" | "upstream_error" | "robots_unavailable" | "network_error" | "internal_error";
+        ImportErrorCode: "invalid_url" | "blocked_address" | "disallowed_by_robots" | "too_large" | "unsupported_type" | "too_many_redirects" | "not_found" | "http_error" | "extract_failed" | "timeout" | "rate_limited" | "upstream_error" | "robots_unavailable" | "network_error" | "pdf_password_protected" | "pdf_too_many_pages" | "scanned_pdf_unsupported" | "pdf_conversion_failed" | "pdf_conversion_unavailable" | "internal_error";
+        /** @description An import of a web page (kind web: requested_url and canonical_url) or of an uploaded PDF (kind pdf: filename). */
         Import: {
             /** Format: uuid */
             id: string;
-            requested_url: string;
-            canonical_url: string;
+            /** @enum {string} */
+            kind: "web" | "pdf";
+            requested_url?: string;
+            canonical_url?: string;
+            filename?: string;
             status: components["schemas"]["ImportStatus"];
             error_code?: components["schemas"]["ImportErrorCode"];
             /**
@@ -553,6 +603,13 @@ export interface components {
             created_at: string;
             /** Format: date-time */
             updated_at: string;
+        };
+        CreatePdfImportRequest: {
+            /**
+             * Format: binary
+             * @description The PDF, at most 25 MB.
+             */
+            file: string;
         };
         ImportResponse: {
             import: components["schemas"]["Import"];
@@ -571,8 +628,9 @@ export interface components {
             /** Format: uuid */
             id: string;
             title: string;
-            /** @description The canonical URL of the page the document came from. */
+            /** @description The canonical URL of the page the document came from; empty for a PDF. */
             source_url: string;
+            pdf?: components["schemas"]["IRPDF"];
             /** @description Counts edits, for optimistic concurrency; starts at 1. */
             version: number;
             /** Format: date-time */
@@ -1034,6 +1092,7 @@ export type CreateImportRequest = components['schemas']['CreateImportRequest'];
 export type ImportStatus = components['schemas']['ImportStatus'];
 export type ImportErrorCode = components['schemas']['ImportErrorCode'];
 export type Import = components['schemas']['Import'];
+export type CreatePdfImportRequest = components['schemas']['CreatePdfImportRequest'];
 export type ImportResponse = components['schemas']['ImportResponse'];
 export type ExistingImportResponse = components['schemas']['ExistingImportResponse'];
 export type ImportEvent = components['schemas']['ImportEvent'];
@@ -1324,6 +1383,61 @@ export interface operations {
             500: components["responses"]["InternalError"];
         };
     };
+    createPdfImport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["CreatePdfImportRequest"];
+            };
+        };
+        responses: {
+            /** @description The user already has a document from this file. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExistingImportResponse"];
+                };
+            };
+            /** @description The import is queued. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportResponse"];
+                };
+            };
+            /** @description The request is not one PDF file, or the file is not a PDF. Codes: invalid_request, not_a_pdf. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
+            /** @description The PDF is larger than 25 MB. Code: pdf_too_large. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            429: components["responses"]["TooManyImports"];
+            500: components["responses"]["InternalError"];
+        };
+    };
     getImport: {
         parameters: {
             query?: never;
@@ -1528,6 +1642,39 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            429: components["responses"]["RateLimited"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    getDocumentOriginal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The PDF. */
+            200: {
+                headers: {
+                    /** @description inline, with the uploaded filename made safe. */
+                    "Content-Disposition"?: string;
+                    /** @description sandbox; default-src 'none' */
+                    "Content-Security-Policy"?: string;
+                    /** @description nosniff */
+                    "X-Content-Type-Options"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            400: components["responses"]["InvalidParameter"];
+            401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["NotFound"];
             429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];
         };

@@ -16,6 +16,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/rokumate/ronote/internal/auth"
+	"github.com/rokumate/ronote/internal/blob/memblob"
 	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/embed"
 	"github.com/rokumate/ronote/internal/fetch"
@@ -103,7 +104,7 @@ func TestAPIImportsEndToEnd(t *testing.T) {
 			t.Errorf("stop River: %v", err)
 		}
 	})
-	backend := integrationBackend{Store: st, Service: importer.NewService(st, queue, importer.Quota{ImportsPerDay: 1000, Documents: 1000})}
+	backend := integrationBackend{Store: st, Service: importer.NewService(st, queue, importer.Quota{ImportsPerDay: 1000, Documents: 1000}, memblob.New())}
 	searcher := search.NewSearcher(st, embed.Fake{}, discardLogger)
 	adaAPI := signedInAs(t, st, Options{Logger: discardLogger, DB: db.Pool, Backend: backend, Searcher: searcher}, ada.ID)
 	graceAPI := signedInAs(t, st, Options{Logger: discardLogger, DB: db.Pool, Backend: backend, Searcher: searcher}, grace.ID)

@@ -11,7 +11,7 @@ import { createImport } from "../api/queries";
 import type { ErrorCode } from "../api/schema";
 import { buttonClass } from "../ui/button";
 import { endingMessage, stepLabels } from "./describe";
-import { stepState, steps, type TrackedImport } from "./state";
+import { stepState, stepsOf, type TrackedImport } from "./state";
 import { useImportTracker, useTrackedImports } from "./tracker";
 
 /** CreateImportRequest.url's maxLength in api/openapi.yaml. */
@@ -190,9 +190,9 @@ function Progress({ state, onRetry }: { state: TrackedImport; onRetry: () => voi
   }
   return (
     <div className="mt-4">
-      <p className="truncate text-ink-2 text-ui">{state.url}</p>
+      <p className="truncate text-ink-2 text-ui">{state.name}</p>
       <ol aria-label="Progress" className="mt-3 space-y-2">
-        {steps.map((step) => {
+        {stepsOf(state.kind).map((step) => {
           const progress = stepState(state, step);
           return (
             <li

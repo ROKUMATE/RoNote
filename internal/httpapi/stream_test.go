@@ -101,7 +101,7 @@ const (
 )
 
 func queuedImport() store.Import {
-	return store.Import{ID: uuid.New(), OwnerID: testUser, Status: store.ImportQueued}
+	return store.Import{Kind: store.ImportWeb, ID: uuid.New(), OwnerID: testUser, Status: store.ImportQueued}
 }
 
 func TestStreamSendsChangesInOrderUntilDone(t *testing.T) {

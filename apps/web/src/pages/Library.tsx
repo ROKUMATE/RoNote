@@ -92,7 +92,7 @@ function PendingRow({ imp }: { imp: TrackedImport }) {
   return (
     <li className={row} data-import={imp.id}>
       <div className="min-w-0">
-        <p className="truncate font-medium text-ui-lg">{imp.url}</p>
+        <p className="truncate font-medium text-ui-lg">{imp.name}</p>
         <p className="text-ink-2 text-ui">
           {ending ?? (imp.status === "failed" ? "" : `${stepLabels[imp.status]}…`)}
         </p>

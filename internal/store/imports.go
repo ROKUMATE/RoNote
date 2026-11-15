@@ -17,6 +17,7 @@ type ImportStatus string
 const (
 	ImportQueued     ImportStatus = "queued"
 	ImportFetching   ImportStatus = "fetching"
+	ImportConverting ImportStatus = "converting"
 	ImportExtracting ImportStatus = "extracting"
 	ImportDone       ImportStatus = "done"
 	ImportFailed     ImportStatus = "failed"
@@ -27,15 +28,27 @@ func (s ImportStatus) Terminal() bool {
 	return s == ImportDone || s == ImportFailed
 }
 
-// Import is one user's request to import a URL. Every status change notifies
-// the import_status channel when its transaction commits.
+// Import kinds: a web page or a PDF.
+const (
+	ImportWeb = "web"
+	ImportPDF = "pdf"
+)
+
+// Import is one user's request to import a URL or an uploaded PDF. Every
+// status change notifies the import_status channel when its transaction
+// commits.
 type Import struct {
-	ID           uuid.UUID
-	OwnerID      uuid.UUID
+	ID      uuid.UUID
+	OwnerID uuid.UUID
+	Kind    string
+	// RequestedURL and CanonicalURL, the requested URL canonicalized, are
+	// a web import's.
 	RequestedURL string
-	// CanonicalURL is the requested URL, canonicalized.
 	CanonicalURL string
-	Status       ImportStatus
+	// Filename and PDFSHA256, the file's hex SHA-256, are a PDF import's.
+	Filename  string
+	PDFSHA256 string
+	Status    ImportStatus
 	// ErrorCode is set when Status is failed.
 	ErrorCode string
 	// DocumentID is set when Status is done, unless the document has since
@@ -49,8 +62,11 @@ func importFrom(row sqlcdb.Import) Import {
 	return Import{
 		ID:           row.ID,
 		OwnerID:      row.OwnerID,
-		RequestedURL: row.RequestedURL,
-		CanonicalURL: row.CanonicalURL,
+		Kind:         row.Kind,
+		RequestedURL: row.RequestedURL.String,
+		CanonicalURL: row.CanonicalURL.String,
+		Filename:     row.Filename.String,
+		PDFSHA256:    row.PDFSHA256.String,
 		Status:       ImportStatus(row.Status),
 		ErrorCode:    row.ErrorCode.String,
 		DocumentID:   row.DocumentID.UUID,
@@ -66,6 +82,26 @@ func (s *Store) CreateImport(ctx context.Context, owner uuid.UUID, requestedURL,
 		return Import{}, mapErr("create import", err)
 	}
 	return importFrom(row), nil
+}
+
+// CreatePDFImport records a queued import of the PDF filename, whose hex
+// SHA-256 is sha, for owner.
+func (s *Store) CreatePDFImport(ctx context.Context, owner uuid.UUID, filename, sha string) (Import, error) {
+	row, err := s.q.CreatePDFImport(ctx, sqlcdb.CreatePDFImportParams{OwnerID: owner, Filename: filename, PDFSHA256: sha})
+	if err != nil {
+		return Import{}, mapErr("create PDF import", err)
+	}
+	return importFrom(row), nil
+}
+
+// BlobKeysInUse returns those of keys that a PDF snapshot holds or an
+// unfinished PDF import will read.
+func (s *Store) BlobKeysInUse(ctx context.Context, keys []string) ([]string, error) {
+	used, err := s.q.BlobKeysInUse(ctx, keys)
+	if err != nil {
+		return nil, mapErr("blob keys in use", err)
+	}
+	return used, nil
 }
 
 // GetImport returns owner's import id, or ErrNotFound, also when it belongs

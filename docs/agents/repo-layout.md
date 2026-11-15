@@ -18,7 +18,7 @@ Where things live, in full. AGENTS.md keeps the short version.
 | `internal/ir/` | the document model every importer produces (docs/adr/0004-ir-and-links.md) |
 | `internal/doccontent/` | a user's document: IR blocks marked source or user, and the rules a save must keep (docs/adr/0006-editor-and-doc-content.md) |
 | `internal/annotation/` | a user's highlights and notes: selectors into one block's plain text, in UTF-16 code units, and the rules a write must keep (docs/adr/0007-annotations-and-anchoring.md) |
-| `internal/importer/` | the import pipeline: the job handler that fetches, extracts and stores a document, and the service the API enqueues imports with |
+| `internal/importer/` | the import pipeline: the job handlers that fetch and extract a page or convert a PDF, and store a document; the service the API enqueues imports and uploads with; blob deletion and the daily sweep of leftover blobs |
 | `internal/jobs/` | the jobs port: enqueue in the caller's transaction, deliver at least once (docs/adr/0009-jobs-port.md); `riverjobs` runs it on River and is the only package that imports River, `memjobs` in memory for unit tests, `jobstest` is the suite both pass |
 | `internal/search/` | retrieval: chunking documents and notes, indexing them on the jobs port, hybrid search (docs/adr/0011-retrieval.md) |
 | `internal/embed/` | embedders: the OpenAI-compatible client, a deterministic fake, and the eval's replay of recorded vectors |

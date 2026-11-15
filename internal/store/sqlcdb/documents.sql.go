@@ -67,9 +67,10 @@ func (q *Queries) CreateDocumentIfAbsent(ctx context.Context, arg CreateDocument
 	return i, err
 }
 
-const deleteDocument = `-- name: DeleteDocument :execrows
+const deleteDocument = `-- name: DeleteDocument :one
 DELETE FROM documents
 WHERE owner_id = $1 AND id = $2
+RETURNING source_id
 `
 
 type DeleteDocumentParams struct {
@@ -78,13 +79,12 @@ type DeleteDocumentParams struct {
 }
 
 // Deletes the owner's document; its annotations and chunks go with it, and
-// the imports that made it keep their row without it.
-func (q *Queries) DeleteDocument(ctx context.Context, arg DeleteDocumentParams) (int64, error) {
-	result, err := q.db.Exec(ctx, deleteDocument, arg.OwnerID, arg.ID)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected(), nil
+// the imports that made it keep their row without it. Returns its source.
+func (q *Queries) DeleteDocument(ctx context.Context, arg DeleteDocumentParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, deleteDocument, arg.OwnerID, arg.ID)
+	var source_id uuid.UUID
+	err := row.Scan(&source_id)
+	return source_id, err
 }
 
 const deleteDocumentConversations = `-- name: DeleteDocumentConversations :many
@@ -120,6 +120,45 @@ func (q *Queries) DeleteDocumentConversations(ctx context.Context, arg DeleteDoc
 	return items, nil
 }
 
+const deletePDFSource = `-- name: DeletePDFSource :many
+WITH gone AS (
+    DELETE FROM sources s
+    WHERE s.id = $1 AND s.kind = 'pdf' AND s.owner_id = $2::uuid
+      AND NOT EXISTS (SELECT 1 FROM documents d WHERE d.source_id = s.id AND d.owner_id = $2::uuid)
+    RETURNING s.id
+)
+SELECT snap.blob_key::text AS blob_key
+FROM source_snapshots snap
+WHERE snap.source_id IN (SELECT id FROM gone) AND snap.blob_key IS NOT NULL
+`
+
+type DeletePDFSourceParams struct {
+	SourceID uuid.UUID
+	OwnerID  uuid.UUID
+}
+
+// Deletes the owner's PDF source once no document of theirs uses it, with
+// its snapshots and extractions, and returns its snapshots' blob keys.
+func (q *Queries) DeletePDFSource(ctx context.Context, arg DeletePDFSourceParams) ([]string, error) {
+	rows, err := q.db.Query(ctx, deletePDFSource, arg.SourceID, arg.OwnerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var blob_key string
+		if err := rows.Scan(&blob_key); err != nil {
+			return nil, err
+		}
+		items = append(items, blob_key)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const documentExtraction = `-- name: DocumentExtraction :one
 SELECT e.ir
 FROM documents d
@@ -138,6 +177,32 @@ func (q *Queries) DocumentExtraction(ctx context.Context, arg DocumentExtraction
 	var ir []byte
 	err := row.Scan(&ir)
 	return ir, err
+}
+
+const documentOriginal = `-- name: DocumentOriginal :one
+SELECT snap.blob_key::text AS blob_key, (e.ir -> 'source' -> 'pdf' ->> 'filename')::text AS filename
+FROM documents d
+JOIN extractions e ON e.id = d.extraction_id
+JOIN source_snapshots snap ON snap.id = e.snapshot_id
+WHERE d.owner_id = $1 AND d.id = $2 AND snap.blob_key IS NOT NULL
+`
+
+type DocumentOriginalParams struct {
+	OwnerID uuid.UUID
+	ID      uuid.UUID
+}
+
+type DocumentOriginalRow struct {
+	BlobKey  string
+	Filename string
+}
+
+// The blob key and filename of the PDF the owner's document was made from.
+func (q *Queries) DocumentOriginal(ctx context.Context, arg DocumentOriginalParams) (DocumentOriginalRow, error) {
+	row := q.db.QueryRow(ctx, documentOriginal, arg.OwnerID, arg.ID)
+	var i DocumentOriginalRow
+	err := row.Scan(&i.BlobKey, &i.Filename)
+	return i, err
 }
 
 const documentVersion = `-- name: DocumentVersion :one
@@ -207,10 +272,10 @@ SELECT d.id
 FROM documents d
 WHERE d.owner_id = $1
   AND (
-    d.source_id IN (SELECT s.id FROM sources s WHERE s.canonical_url = $2 OR s.final_url = $2)
+    d.source_id IN (SELECT s.id FROM sources s WHERE s.canonical_url = $2::text OR s.final_url = $2::text)
     OR d.id IN (
       SELECT i.document_id FROM imports i
-      WHERE i.owner_id = $1 AND i.canonical_url = $2 AND i.document_id IS NOT NULL
+      WHERE i.owner_id = $1 AND i.canonical_url = $2::text AND i.document_id IS NOT NULL
     )
   )
 ORDER BY d.created_at, d.id
@@ -232,9 +297,31 @@ func (q *Queries) FindOwnerDocumentForURL(ctx context.Context, arg FindOwnerDocu
 	return id, err
 }
 
+const findOwnerPDFDocument = `-- name: FindOwnerPDFDocument :one
+SELECT d.id
+FROM documents d
+JOIN sources s ON s.id = d.source_id
+WHERE d.owner_id = $1::uuid AND s.kind = 'pdf' AND s.owner_id = $1::uuid
+  AND s.pdf_sha256 = $2::text
+`
+
+type FindOwnerPDFDocumentParams struct {
+	OwnerID   uuid.UUID
+	PDFSHA256 string
+}
+
+// The owner's document made from the PDF with this SHA-256.
+func (q *Queries) FindOwnerPDFDocument(ctx context.Context, arg FindOwnerPDFDocumentParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, findOwnerPDFDocument, arg.OwnerID, arg.PDFSHA256)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const getDocument = `-- name: GetDocument :one
-SELECT d.id, d.title, s.canonical_url AS source_url, d.version, d.created_at, d.updated_at, d.content,
-    COALESCE(e.ir -> 'warnings', '[]'::jsonb)::jsonb AS warnings
+SELECT d.id, d.title, COALESCE(s.canonical_url, '')::text AS source_url, d.version, d.created_at, d.updated_at, d.content,
+    COALESCE(e.ir -> 'warnings', '[]'::jsonb)::jsonb AS warnings,
+    (e.ir -> 'source' -> 'pdf')::jsonb AS pdf
 FROM documents d
 JOIN sources s ON s.id = d.source_id
 JOIN extractions e ON e.id = d.extraction_id
@@ -255,9 +342,11 @@ type GetDocumentRow struct {
 	UpdatedAt time.Time
 	Content   []byte
 	Warnings  []byte
+	PDF       []byte
 }
 
-// The document, with the warnings of the extraction it was made from.
+// The document, with the warnings of the extraction it was made from. A
+// web page's source is its URL; a PDF's, its file (source.pdf in the IR).
 func (q *Queries) GetDocument(ctx context.Context, arg GetDocumentParams) (GetDocumentRow, error) {
 	row := q.db.QueryRow(ctx, getDocument, arg.OwnerID, arg.ID)
 	var i GetDocumentRow
@@ -270,6 +359,7 @@ func (q *Queries) GetDocument(ctx context.Context, arg GetDocumentParams) (GetDo
 		&i.UpdatedAt,
 		&i.Content,
 		&i.Warnings,
+		&i.PDF,
 	)
 	return i, err
 }
@@ -305,9 +395,11 @@ func (q *Queries) GetIndexState(ctx context.Context, arg GetIndexStateParams) (G
 }
 
 const listDocuments = `-- name: ListDocuments :many
-SELECT d.id, d.title, s.canonical_url AS source_url, d.version, d.created_at, d.updated_at
+SELECT d.id, d.title, COALESCE(s.canonical_url, '')::text AS source_url, d.version, d.created_at, d.updated_at,
+    (e.ir -> 'source' -> 'pdf')::jsonb AS pdf
 FROM documents d
 JOIN sources s ON s.id = d.source_id
+JOIN extractions e ON e.id = d.extraction_id
 WHERE d.owner_id = $1
   AND (d.created_at, d.id) < ($2::timestamptz, $3::uuid)
 ORDER BY d.created_at DESC, d.id DESC
@@ -328,6 +420,7 @@ type ListDocumentsRow struct {
 	Version   int32
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	PDF       []byte
 }
 
 // The owner's documents, newest first, after the (created_at, id) cursor.
@@ -352,6 +445,7 @@ func (q *Queries) ListDocuments(ctx context.Context, arg ListDocumentsParams) ([
 			&i.Version,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.PDF,
 		); err != nil {
 			return nil, err
 		}

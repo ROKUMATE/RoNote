@@ -49,7 +49,36 @@ type Config struct {
 	Embed Embed
 	// Chat is the model chat answers with.
 	Chat Chat
+	// Blob is where uploaded PDFs are kept, and PDF what converts them.
+	Blob Blob
+	PDF  PDF
 }
+
+// Blob is an S3-compatible store (docs/adr/0013-pdf-import.md).
+type Blob struct {
+	Endpoint  string
+	Region    string
+	Bucket    string
+	AccessKey string
+	SecretKey string
+}
+
+// PDF is docling-serve, which converts PDFs, and pdftext, which reads their
+// code from the text layer, each with its API key
+// (docs/adr/0013-pdf-import.md).
+type PDF struct {
+	DoclingURL string
+	DoclingKey string
+	TextURL    string
+	TextKey    string
+}
+
+// The dev stack's blob store, docling and pdftext (deploy/compose.dev.yml):
+// dev and test fall back to them, staging and prod must say where theirs are.
+var (
+	devBlob = Blob{Endpoint: "http://127.0.0.1:8333", Region: "us-east-1", Bucket: "ronote", AccessKey: "ronote", SecretKey: "ronote-dev-secret"} //nolint:gosec // the dev stack's own key, never a deployment's
+	devPDF  = PDF{DoclingURL: "http://127.0.0.1:5001", DoclingKey: "ronote-dev-docling", TextURL: "http://127.0.0.1:5002", TextKey: "ronote-dev-pdftext"}
+)
 
 // The embedder by default: Ollama on this machine, with the pinned model
 // (docs/adr/0011-retrieval.md).
@@ -169,6 +198,8 @@ func Load(getenv func(string) string) (Config, error) {
 	check("RONOTE_EMBED_URL", validateHTTPURL(embed.URL))
 	chat, chatErrs := parseChat(getenv, env)
 	errs = append(errs, chatErrs...)
+	blobStore, pdf, pdfErrs := parsePDF(getenv, env)
+	errs = append(errs, pdfErrs...)
 	var limits Limits
 	for _, l := range []struct {
 		name     string
@@ -202,7 +233,49 @@ func Load(getenv func(string) string) (Config, error) {
 		Limits:                    limits,
 		Embed:                     embed,
 		Chat:                      chat,
+		Blob:                      blobStore,
+		PDF:                       pdf,
 	}, nil
+}
+
+// parsePDF reads where PDFs are kept and what converts them. Dev and test
+// default to the dev stack; staging and prod set every one, so a deployment
+// never talks to a store or a converter with a known key.
+func parsePDF(getenv func(string) string, env Env) (Blob, PDF, []error) {
+	var errs []error
+	read := func(name, dev string) string {
+		v := getenv(name)
+		if v == "" && !env.Deployed() {
+			v = dev
+		}
+		if err := required(v); err != nil {
+			errs = append(errs, fmt.Errorf("%s: %w; staging and prod set it", name, err))
+		}
+		return v
+	}
+	b := Blob{
+		Endpoint:  strings.TrimSuffix(read("RONOTE_BLOB_ENDPOINT", devBlob.Endpoint), "/"),
+		Region:    read("RONOTE_BLOB_REGION", devBlob.Region),
+		Bucket:    read("RONOTE_BLOB_BUCKET", devBlob.Bucket),
+		AccessKey: read("RONOTE_BLOB_ACCESS_KEY", devBlob.AccessKey),
+		SecretKey: read("RONOTE_BLOB_SECRET_KEY", devBlob.SecretKey),
+	}
+	p := PDF{
+		DoclingURL: strings.TrimSuffix(read("RONOTE_DOCLING_URL", devPDF.DoclingURL), "/"),
+		DoclingKey: read("RONOTE_DOCLING_API_KEY", devPDF.DoclingKey),
+		TextURL:    strings.TrimSuffix(read("RONOTE_PDFTEXT_URL", devPDF.TextURL), "/"),
+		TextKey:    read("RONOTE_PDFTEXT_API_KEY", devPDF.TextKey),
+	}
+	for name, u := range map[string]string{"RONOTE_BLOB_ENDPOINT": b.Endpoint, "RONOTE_DOCLING_URL": p.DoclingURL, "RONOTE_PDFTEXT_URL": p.TextURL} {
+		if u == "" {
+			continue
+		}
+		if err := validateHTTPURL(u); err != nil {
+			errs = append(errs, fmt.Errorf("%s: %w", name, err))
+		}
+	}
+	slices.SortFunc(errs, func(a, b error) int { return strings.Compare(a.Error(), b.Error()) })
+	return b, p, errs
 }
 
 // parseChat reads the chat model's settings. Anthropic's API needs a key;

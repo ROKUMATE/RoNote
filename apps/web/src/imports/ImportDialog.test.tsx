@@ -9,6 +9,7 @@ vi.mock("../api/events", () => import("../test/events"));
 
 const queued = {
   id: "imp-1",
+  kind: "web",
   requested_url: "https://docs.example.com/guide",
   canonical_url: "https://docs.example.com/guide",
   status: "queued",
@@ -132,7 +133,7 @@ describe("a new import", () => {
   test.each([
     ["not_found", "The site says that page doesn't exist."],
     ["disallowed_by_robots", "This site doesn't allow RoNote to fetch its pages."],
-    ["unsupported_type", "That link isn't a web page. PDF import comes later."],
+    ["unsupported_type", "That link isn't a web page; to import a PDF, upload the file."],
   ] as const)("that fails with %s says why", async (code, sentence) => {
     stubApi({
       "POST /imports": () => json({ import: queued }, 202),

@@ -99,8 +99,14 @@ func bodyLimit(r *http.Request) int64 {
 		return maxDocumentBody
 	case r.Method == http.MethodPost && strings.HasSuffix(p, "/annotations/reanchor"):
 		return maxReanchorBody
+	case isPDFUpload(r):
+		return maxPDFBody
 	}
 	return maxBody
+}
+
+func isPDFUpload(r *http.Request) bool {
+	return r.Method == http.MethodPost && r.URL.Path == "/api/v1/imports/pdf"
 }
 
 // limitBody refuses a body larger than its route takes: at once when it
@@ -109,6 +115,10 @@ func limitBody(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		limit := bodyLimit(r)
 		if r.ContentLength > limit {
+			if isPDFUpload(r) {
+				writeError(w, r, http.StatusRequestEntityTooLarge, gen.ErrorCodePdfTooLarge, "the PDF is larger than 25 MB")
+				return
+			}
 			writeError(w, r, http.StatusRequestEntityTooLarge, gen.ErrorCodeBodyTooLarge, "the request body is too large")
 			return
 		}

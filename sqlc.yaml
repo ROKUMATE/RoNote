@@ -21,6 +21,8 @@ sql:
           ir: IR
           ir_version: IRVersion
           block_ids: BlockIDs
+          pdf_sha256: PDFSHA256
+          pdf: PDF
         overrides:
           - db_type: halfvec
             go_type:

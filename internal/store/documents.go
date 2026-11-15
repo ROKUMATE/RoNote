@@ -21,8 +21,11 @@ import (
 type DocumentSummary struct {
 	ID    uuid.UUID
 	Title string
-	// SourceURL is the canonical URL of the page the document came from.
+	// SourceURL is the canonical URL of the page the document came from,
+	// or "" for a PDF.
 	SourceURL string
+	// PDF is the file a document from a PDF came from.
+	PDF *ir.PDF
 	// Version counts edits, for optimistic concurrency; it starts at 1.
 	Version   int
 	CreatedAt time.Time
@@ -110,9 +113,13 @@ func (s *Store) GetDocument(ctx context.Context, owner, id uuid.UUID) (Document,
 	if err := json.Unmarshal(row.Warnings, &warnings); err != nil {
 		return Document{}, fmt.Errorf("document %s warnings: %w", row.ID, err)
 	}
+	pdf, err := pdfOf(row.PDF)
+	if err != nil {
+		return Document{}, fmt.Errorf("document %s: %w", row.ID, err)
+	}
 	return Document{
 		DocumentSummary: DocumentSummary{
-			ID: row.ID, Title: row.Title, SourceURL: row.SourceURL, Version: int(row.Version),
+			ID: row.ID, Title: row.Title, SourceURL: row.SourceURL, PDF: pdf, Version: int(row.Version),
 			CreatedAt: row.CreatedAt, UpdatedAt: row.UpdatedAt,
 		},
 		Content:  &content,
@@ -136,8 +143,12 @@ func (s *Store) ListDocuments(ctx context.Context, owner uuid.UUID, after *Docum
 	}
 	docs := make([]DocumentSummary, len(rows))
 	for i, r := range rows {
+		pdf, err := pdfOf(r.PDF)
+		if err != nil {
+			return nil, fmt.Errorf("document %s: %w", r.ID, err)
+		}
 		docs[i] = DocumentSummary{
-			ID: r.ID, Title: r.Title, SourceURL: r.SourceURL, Version: int(r.Version),
+			ID: r.ID, Title: r.Title, SourceURL: r.SourceURL, PDF: pdf, Version: int(r.Version),
 			CreatedAt: r.CreatedAt, UpdatedAt: r.UpdatedAt,
 		}
 	}
@@ -299,28 +310,76 @@ func (s *Store) AddDocument(ctx context.Context, owner uuid.UUID, url string, do
 	return id, err
 }
 
-// DeleteDocument deletes owner's document id, with its annotations, chunks
-// and conversations, in one transaction. It returns the conversations it
-// deleted, so their answers can be stopped, or ErrNotFound.
-func (s *Store) DeleteDocument(ctx context.Context, owner, id uuid.UUID) ([]uuid.UUID, error) {
-	var conversations []uuid.UUID
+// pdfOf reads an extraction's source.pdf, nil for a web page.
+func pdfOf(raw []byte) (*ir.PDF, error) {
+	if len(raw) == 0 || string(raw) == "null" {
+		return nil, nil
+	}
+	var pdf ir.PDF
+	if err := json.Unmarshal(raw, &pdf); err != nil {
+		return nil, fmt.Errorf("source.pdf: %w", err)
+	}
+	return &pdf, nil
+}
+
+// Deleted is what deleting a document removed besides it: the
+// conversations about it, whose answers should stop, and the blobs of its
+// PDF, which blob storage still holds.
+type Deleted struct {
+	Conversations []uuid.UUID
+	BlobKeys      []string
+}
+
+// RemoveDocument deletes owner's document id, with its annotations, chunks
+// and conversations, and a PDF's source, snapshot and extraction, in s's
+// transaction or a new one. It returns ErrNotFound for a document that
+// isn't owner's.
+func (s *Store) RemoveDocument(ctx context.Context, owner, id uuid.UUID) (Deleted, error) {
+	var d Deleted
 	err := s.inTx(ctx, func(tx *Store) error {
 		var err error
-		conversations, err = tx.q.DeleteDocumentConversations(ctx, sqlcdb.DeleteDocumentConversationsParams{OwnerID: owner, DocumentID: uuid.NullUUID{UUID: id, Valid: true}})
+		d.Conversations, err = tx.q.DeleteDocumentConversations(ctx, sqlcdb.DeleteDocumentConversationsParams{OwnerID: owner, DocumentID: uuid.NullUUID{UUID: id, Valid: true}})
 		if err != nil {
 			return mapErr("delete document's conversations", err)
 		}
-		n, err := tx.q.DeleteDocument(ctx, sqlcdb.DeleteDocumentParams{OwnerID: owner, ID: id})
+		source, err := tx.q.DeleteDocument(ctx, sqlcdb.DeleteDocumentParams{OwnerID: owner, ID: id})
 		if err != nil {
 			return mapErr("delete document", err)
 		}
-		if n == 0 {
-			return fmt.Errorf("delete document: %w", ErrNotFound)
+		d.BlobKeys, err = tx.q.DeletePDFSource(ctx, sqlcdb.DeletePDFSourceParams{OwnerID: owner, SourceID: source})
+		if err != nil {
+			return mapErr("delete PDF source", err)
 		}
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return Deleted{}, err
 	}
-	return conversations, nil
+	return d, nil
+}
+
+// FindOwnerPDFDocument returns the ID of owner's document made from the PDF
+// whose hex SHA-256 is sha, or ErrNotFound.
+func (s *Store) FindOwnerPDFDocument(ctx context.Context, owner uuid.UUID, sha string) (uuid.UUID, error) {
+	id, err := s.q.FindOwnerPDFDocument(ctx, sqlcdb.FindOwnerPDFDocumentParams{OwnerID: owner, PDFSHA256: sha})
+	if err != nil {
+		return uuid.Nil, mapErr("find PDF document", err)
+	}
+	return id, nil
+}
+
+// Original is where the PDF a document was made from is kept.
+type Original struct {
+	BlobKey  string
+	Filename string
+}
+
+// DocumentOriginal returns the PDF owner's document id was made from, or
+// ErrNotFound when the document isn't owner's or isn't from a PDF.
+func (s *Store) DocumentOriginal(ctx context.Context, owner, id uuid.UUID) (Original, error) {
+	row, err := s.q.DocumentOriginal(ctx, sqlcdb.DocumentOriginalParams{OwnerID: owner, ID: id})
+	if err != nil {
+		return Original{}, mapErr("document original", err)
+	}
+	return Original{BlobKey: row.BlobKey, Filename: row.Filename}, nil
 }

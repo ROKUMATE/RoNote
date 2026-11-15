@@ -2,11 +2,16 @@
 
 -- name: CreateImport :one
 INSERT INTO imports (owner_id, requested_url, canonical_url)
-VALUES ($1, $2, $3)
-RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at;
+VALUES (sqlc.arg(owner_id), sqlc.arg(requested_url)::text, sqlc.arg(canonical_url)::text)
+RETURNING *;
+
+-- name: CreatePDFImport :one
+INSERT INTO imports (owner_id, kind, filename, pdf_sha256)
+VALUES (sqlc.arg(owner_id), 'pdf', sqlc.arg(filename)::text, sqlc.arg(pdf_sha256)::text)
+RETURNING *;
 
 -- name: GetImport :one
-SELECT id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at
+SELECT *
 FROM imports
 WHERE owner_id = $1 AND id = $2;
 
@@ -15,7 +20,7 @@ WHERE owner_id = $1 AND id = $2;
 UPDATE imports
 SET status = sqlc.arg(status), updated_at = now()
 WHERE owner_id = sqlc.arg(owner_id) AND id = sqlc.arg(id) AND status NOT IN ('done', 'failed')
-RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at;
+RETURNING *;
 
 -- name: FinishImport :one
 -- Marks an import done with its document. Finishing it again with the same
@@ -24,17 +29,17 @@ UPDATE imports
 SET status = 'done', document_id = sqlc.arg(document_id), updated_at = now()
 WHERE owner_id = sqlc.arg(owner_id) AND id = sqlc.arg(id)
   AND (status NOT IN ('done', 'failed') OR (status = 'done' AND document_id = sqlc.arg(document_id)))
-RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at;
+RETURNING *;
 
 -- name: FailImport :one
 -- Marks an import that has not finished as failed with a stable error code.
 UPDATE imports
 SET status = 'failed', error_code = sqlc.arg(error_code), updated_at = now()
 WHERE owner_id = sqlc.arg(owner_id) AND id = sqlc.arg(id) AND status NOT IN ('done', 'failed')
-RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at;
+RETURNING *;
 
 -- name: LatestImportForDocument :one
-SELECT id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at
+SELECT *
 FROM imports
 WHERE owner_id = $1 AND document_id = $2
 ORDER BY created_at DESC, id DESC
@@ -57,3 +62,15 @@ SELECT
         + count(*) FILTER (WHERE status NOT IN ('done', 'failed')))::int AS documents
 FROM imports
 WHERE owner_id = sqlc.arg(owner_id);
+
+-- name: BlobKeysInUse :many
+-- The keys among keys that a PDF snapshot holds, or that an unfinished PDF
+-- import of its owner will read.
+SELECT k::text AS key
+FROM unnest(sqlc.arg(keys)::text[]) AS k
+WHERE EXISTS (SELECT 1 FROM source_snapshots s WHERE s.blob_key = k)
+   OR EXISTS (
+        SELECT 1 FROM imports i
+        WHERE i.kind = 'pdf' AND i.status NOT IN ('done', 'failed')
+          AND 'pdf/' || i.owner_id::text || '/' || i.pdf_sha256 = k
+   );

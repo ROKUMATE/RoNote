@@ -12,11 +12,44 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const blobKeysInUse = `-- name: BlobKeysInUse :many
+SELECT k::text AS key
+FROM unnest($1::text[]) AS k
+WHERE EXISTS (SELECT 1 FROM source_snapshots s WHERE s.blob_key = k)
+   OR EXISTS (
+        SELECT 1 FROM imports i
+        WHERE i.kind = 'pdf' AND i.status NOT IN ('done', 'failed')
+          AND 'pdf/' || i.owner_id::text || '/' || i.pdf_sha256 = k
+   )
+`
+
+// The keys among keys that a PDF snapshot holds, or that an unfinished PDF
+// import of its owner will read.
+func (q *Queries) BlobKeysInUse(ctx context.Context, keys []string) ([]string, error) {
+	rows, err := q.db.Query(ctx, blobKeysInUse, keys)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var key string
+		if err := rows.Scan(&key); err != nil {
+			return nil, err
+		}
+		items = append(items, key)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const createImport = `-- name: CreateImport :one
 
 INSERT INTO imports (owner_id, requested_url, canonical_url)
-VALUES ($1, $2, $3)
-RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at
+VALUES ($1, $2::text, $3::text)
+RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
 `
 
 type CreateImportParams struct {
@@ -39,6 +72,41 @@ func (q *Queries) CreateImport(ctx context.Context, arg CreateImportParams) (Imp
 		&i.DocumentID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Kind,
+		&i.Filename,
+		&i.PDFSHA256,
+	)
+	return i, err
+}
+
+const createPDFImport = `-- name: CreatePDFImport :one
+INSERT INTO imports (owner_id, kind, filename, pdf_sha256)
+VALUES ($1, 'pdf', $2::text, $3::text)
+RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
+`
+
+type CreatePDFImportParams struct {
+	OwnerID   uuid.UUID
+	Filename  string
+	PDFSHA256 string
+}
+
+func (q *Queries) CreatePDFImport(ctx context.Context, arg CreatePDFImportParams) (Import, error) {
+	row := q.db.QueryRow(ctx, createPDFImport, arg.OwnerID, arg.Filename, arg.PDFSHA256)
+	var i Import
+	err := row.Scan(
+		&i.ID,
+		&i.OwnerID,
+		&i.RequestedURL,
+		&i.CanonicalURL,
+		&i.Status,
+		&i.ErrorCode,
+		&i.DocumentID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Kind,
+		&i.Filename,
+		&i.PDFSHA256,
 	)
 	return i, err
 }
@@ -47,7 +115,7 @@ const failImport = `-- name: FailImport :one
 UPDATE imports
 SET status = 'failed', error_code = $1, updated_at = now()
 WHERE owner_id = $2 AND id = $3 AND status NOT IN ('done', 'failed')
-RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at
+RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
 `
 
 type FailImportParams struct {
@@ -70,6 +138,9 @@ func (q *Queries) FailImport(ctx context.Context, arg FailImportParams) (Import,
 		&i.DocumentID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Kind,
+		&i.Filename,
+		&i.PDFSHA256,
 	)
 	return i, err
 }
@@ -79,7 +150,7 @@ UPDATE imports
 SET status = 'done', document_id = $1, updated_at = now()
 WHERE owner_id = $2 AND id = $3
   AND (status NOT IN ('done', 'failed') OR (status = 'done' AND document_id = $1))
-RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at
+RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
 `
 
 type FinishImportParams struct {
@@ -103,12 +174,15 @@ func (q *Queries) FinishImport(ctx context.Context, arg FinishImportParams) (Imp
 		&i.DocumentID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Kind,
+		&i.Filename,
+		&i.PDFSHA256,
 	)
 	return i, err
 }
 
 const getImport = `-- name: GetImport :one
-SELECT id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at
+SELECT id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
 FROM imports
 WHERE owner_id = $1 AND id = $2
 `
@@ -131,12 +205,15 @@ func (q *Queries) GetImport(ctx context.Context, arg GetImportParams) (Import, e
 		&i.DocumentID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Kind,
+		&i.Filename,
+		&i.PDFSHA256,
 	)
 	return i, err
 }
 
 const latestImportForDocument = `-- name: LatestImportForDocument :one
-SELECT id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at
+SELECT id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
 FROM imports
 WHERE owner_id = $1 AND document_id = $2
 ORDER BY created_at DESC, id DESC
@@ -161,6 +238,9 @@ func (q *Queries) LatestImportForDocument(ctx context.Context, arg LatestImportF
 		&i.DocumentID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Kind,
+		&i.Filename,
+		&i.PDFSHA256,
 	)
 	return i, err
 }
@@ -212,7 +292,7 @@ const setImportStatus = `-- name: SetImportStatus :one
 UPDATE imports
 SET status = $1, updated_at = now()
 WHERE owner_id = $2 AND id = $3 AND status NOT IN ('done', 'failed')
-RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at
+RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
 `
 
 type SetImportStatusParams struct {
@@ -235,6 +315,9 @@ func (q *Queries) SetImportStatus(ctx context.Context, arg SetImportStatusParams
 		&i.DocumentID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Kind,
+		&i.Filename,
+		&i.PDFSHA256,
 	)
 	return i, err
 }

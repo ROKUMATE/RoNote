@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/google/uuid"
 
+	"github.com/rokumate/ronote/internal/blob"
 	"github.com/rokumate/ronote/internal/chat"
 	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/httpapi/gen"
@@ -26,6 +28,8 @@ const (
 // tests can run without a database.
 type Backend interface {
 	Request(ctx context.Context, owner uuid.UUID, rawURL string) (importer.Requested, error)
+	RequestPDF(ctx context.Context, owner uuid.UUID, filename string, file io.ReadSeeker, size int64) (importer.Requested, error)
+	Original(ctx context.Context, owner, id uuid.UUID) (string, *blob.Object, error)
 	GetImport(ctx context.Context, owner, id uuid.UUID) (store.Import, error)
 	GetDocument(ctx context.Context, owner, id uuid.UUID) (store.Document, error)
 	DocumentExtraction(ctx context.Context, owner, id uuid.UUID) (*ir.Doc, error)
@@ -292,7 +296,7 @@ func (s apiServer) ResolveDocuments(ctx context.Context, req gen.ResolveDocument
 func documentJSON(doc store.Document) gen.Document {
 	sum := summaryJSON(doc.DocumentSummary)
 	return gen.Document{
-		ID: sum.ID, Title: sum.Title, SourceURL: sum.SourceURL, Version: sum.Version,
+		ID: sum.ID, Title: sum.Title, SourceURL: sum.SourceURL, Pdf: sum.Pdf, Version: sum.Version,
 		CreatedAt: sum.CreatedAt, UpdatedAt: sum.UpdatedAt, Content: *doc.Content,
 		Warnings: append([]ir.Warning{}, doc.Warnings...),
 	}
@@ -336,8 +340,13 @@ func (s apiServer) ListDocuments(ctx context.Context, req gen.ListDocumentsReque
 // process's local zone, and the API always answers in UTC.
 func importJSON(imp store.Import) gen.Import {
 	out := gen.Import{
-		ID: imp.ID, RequestedURL: imp.RequestedURL, CanonicalURL: imp.CanonicalURL,
+		ID: imp.ID, Kind: gen.ImportKind(imp.Kind),
 		Status: gen.ImportStatus(imp.Status), CreatedAt: imp.CreatedAt.UTC(), UpdatedAt: imp.UpdatedAt.UTC(),
+	}
+	if imp.Kind == store.ImportPDF {
+		out.Filename = &imp.Filename
+	} else {
+		out.RequestedURL, out.CanonicalURL = &imp.RequestedURL, &imp.CanonicalURL
 	}
 	if imp.ErrorCode != "" {
 		code := gen.ImportErrorCode(imp.ErrorCode)
@@ -351,6 +360,6 @@ func importJSON(imp store.Import) gen.Import {
 
 func summaryJSON(d store.DocumentSummary) gen.DocumentSummary {
 	return gen.DocumentSummary{
-		ID: d.ID, Title: d.Title, SourceURL: d.SourceURL, Version: d.Version, CreatedAt: d.CreatedAt.UTC(), UpdatedAt: d.UpdatedAt.UTC(),
+		ID: d.ID, Title: d.Title, SourceURL: d.SourceURL, Pdf: d.PDF, Version: d.Version, CreatedAt: d.CreatedAt.UTC(), UpdatedAt: d.UpdatedAt.UTC(),
 	}
 }

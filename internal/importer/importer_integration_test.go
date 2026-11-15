@@ -21,6 +21,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 
+	"github.com/rokumate/ronote/internal/blob/memblob"
 	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/fetch"
 	"github.com/rokumate/ronote/internal/jobs"
@@ -141,7 +142,8 @@ func (s *site) hitTimes(path string) []time.Time {
 	return append([]time.Time(nil), s.hits["docs.test:"+port+path]...)
 }
 
-// harness runs a real worker on River against the test database and site.
+// harness runs a real worker on River against the test database and site,
+// and, for PDFs, a memory blob store and a fake docling and pdftext.
 type harness struct {
 	t          *testing.T
 	store      *store.Store
@@ -150,6 +152,9 @@ type harness struct {
 	stop       func()
 	site       *site
 	ada, grace store.User
+	blobs      *memblob.Store
+	converter  *fakeConverter
+	cleaner    *Blobs
 }
 
 func newHarness(t *testing.T, ttl time.Duration) *harness {
@@ -178,9 +183,13 @@ func newHarness(t *testing.T, ttl time.Duration) *harness {
 		t.Fatal(err)
 	}
 	h.queue.Handle(Kind, worker.Handle, JobOptions)
+	h.blobs, h.converter = memblob.New(), newFakeConverter(t)
+	h.queue.Handle(PDFKind, NewPDFWorker(h.store, h.blobs, h.converter.client(), "1.38.2", discard).Handle, PDFJobOptions)
+	h.cleaner = NewBlobs(h.store, h.blobs, h.queue, discard)
+	h.queue.Handle(DeleteBlobsKind, h.cleaner.HandleDelete, BlobJobOptions)
 	h.start()
 	t.Cleanup(func() { h.stop() })
-	h.service = NewService(h.store, h.queue, Quota{ImportsPerDay: 1000, Documents: 1000})
+	h.service = NewService(h.store, h.queue, Quota{ImportsPerDay: 1000, Documents: 1000}, h.blobs)
 	return h
 }
 

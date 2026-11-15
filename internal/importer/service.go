@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 
+	"github.com/rokumate/ronote/internal/blob"
 	"github.com/rokumate/ronote/internal/canon"
 	"github.com/rokumate/ronote/internal/jobs"
 	"github.com/rokumate/ronote/internal/store"
@@ -51,12 +52,13 @@ type Service struct {
 	store *store.Store
 	queue jobs.Enqueuer
 	quota Quota
+	blobs blob.Store
 }
 
 // NewService returns a Service that records imports in s, within quota,
-// and enqueues their jobs on queue.
-func NewService(s *store.Store, queue jobs.Enqueuer, quota Quota) *Service {
-	return &Service{store: s, queue: queue, quota: quota}
+// keeps uploaded PDFs in blobs, and enqueues jobs on queue.
+func NewService(s *store.Store, queue jobs.Enqueuer, quota Quota, blobs blob.Store) *Service {
+	return &Service{store: s, queue: queue, quota: quota, blobs: blobs}
 }
 
 // Requested is what Request did.

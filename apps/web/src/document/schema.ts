@@ -77,6 +77,9 @@ const BlockIdentity = Extension.create({
             parseHTML: () => null,
           },
           sourceBlockId: { default: null, rendered: false },
+          // The PDF page a block starts on (IR 2); a split's new half
+          // is the user's, on no page.
+          page: { default: null, rendered: false, keepOnSplit: false },
         },
       },
     ];

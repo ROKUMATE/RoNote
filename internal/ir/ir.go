@@ -5,8 +5,10 @@ package ir
 
 import "time"
 
-// Version is the IR version this package reads and writes.
-const Version = 1
+// Version is the IR version this package reads and writes. Version 2 added
+// page anchors and PDF sources (docs/adr/0013-pdf-import.md); a version 1
+// document is a valid version 2 one.
+const Version = 2
 
 // Kind names a block type. The set is closed: Validate rejects other kinds.
 type Kind string
@@ -83,6 +85,9 @@ const (
 	// extractor has an adapter for, but did not have the structure the
 	// adapter expects, so the generic rules were used.
 	WarningAdapterFallback WarningCode = "adapter_fallback"
+	// WarningFiguresOmitted means a PDF had pictures, which are left out; the
+	// warning's Count says how many.
+	WarningFiguresOmitted WarningCode = "figures_omitted"
 )
 
 // Doc is one imported page.
@@ -95,7 +100,9 @@ type Doc struct {
 	Warnings  []Warning `json:"warnings,omitempty"`
 }
 
-// Source records where and when the page was fetched.
+// Source records where and when the page was fetched, or which PDF the
+// document was converted from. A PDF's source has no URLs; its BodySHA256 is
+// the file's.
 type Source struct {
 	URL          string    `json:"url"`
 	FinalURL     string    `json:"final_url"`
@@ -104,6 +111,13 @@ type Source struct {
 	BodySHA256   string    `json:"body_sha256"`
 	ETag         string    `json:"etag,omitempty"`
 	LastModified string    `json:"last_modified,omitempty"`
+	PDF          *PDF      `json:"pdf,omitempty"`
+}
+
+// PDF describes an uploaded PDF.
+type PDF struct {
+	Filename string `json:"filename"`
+	Pages    int    `json:"pages"`
 }
 
 // Extractor names the code that produced the blocks.
@@ -116,6 +130,8 @@ type Extractor struct {
 type Warning struct {
 	Code    WarningCode `json:"code"`
 	Message string      `json:"message"`
+	// Count is how many things the warning is about, for figures_omitted.
+	Count int `json:"count,omitempty"`
 }
 
 // Block is one block of content. Kind decides which fields may be set; see
@@ -124,6 +140,9 @@ type Warning struct {
 type Block struct {
 	ID   string `json:"id"`
 	Kind Kind   `json:"kind"`
+	// Page is the 1-based page of a PDF the block starts on, and 0 for a
+	// block from a web page.
+	Page int `json:"page,omitempty"`
 
 	// heading
 	Level  int    `json:"level,omitempty"`

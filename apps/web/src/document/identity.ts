@@ -10,7 +10,7 @@ import { uuidv7 } from "./uuid";
  * - a top-level source block the user changes becomes edited;
  * - every block has an id, unique in the document. When a split copies an
  *   id, the new half gets a fresh one, and at the top level becomes a user
- *   block: only the original half stays the page's.
+ *   block, on no PDF page: only the original half stays the page's.
  * - code, tables, tabs and images are never pasted: they only come from the
  *   page, where each has its place.
  * An edited source block gets a widget before it: an "edited" label and a
@@ -97,7 +97,14 @@ export const BlockIdentityPlugin = Extension.create<{ onRevert: (blockId: string
             if (!id || seen.has(id)) {
               const fresh = uuidv7();
               attrs = top
-                ? { ...attrs, blockId: fresh, origin: "user", edited: null, sourceBlockId: null }
+                ? {
+                    ...attrs,
+                    blockId: fresh,
+                    origin: "user",
+                    edited: null,
+                    sourceBlockId: null,
+                    page: null,
+                  }
                 : { ...attrs, blockId: fresh };
             } else if (top && attrs.origin === "source") {
               // Edited means not as loaded. A block that loaded edited has

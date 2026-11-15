@@ -43,6 +43,33 @@ describe("every golden fixture", () => {
   }
 });
 
+test("pages survive the editor, on nested and locked blocks too", () => {
+  const content = asSource(
+    Object.values(goldens)
+      .flatMap((g) => g.blocks)
+      .map((b, i) => onPage(b, 1 + (i % 7))),
+  );
+
+  expect(throughEditor(content)).toEqual(content);
+});
+
+/** b and every block inside it on page. */
+function onPage(b: IrBlock, page: number): IrBlock {
+  return {
+    ...b,
+    page,
+    ...(b.children ? { children: b.children.map((c) => onPage(c, page)) } : {}),
+    ...(b.items
+      ? {
+          items: b.items.map((item) => ({
+            ...item,
+            children: item.children.map((c) => onPage(c, page)),
+          })),
+        }
+      : {}),
+  };
+}
+
 describe("blocks read from the editor", () => {
   const paragraph = (id: string, text: string): IrBlock => ({
     id,
@@ -85,6 +112,27 @@ describe("blocks read from the editor", () => {
     ]);
 
     expect(throughEditor(content, originals)).toEqual(content);
+  });
+
+  test("an edited source block keeps its page; a user block has none", () => {
+    const content: DocContent = {
+      doc_version: 1,
+      blocks: [
+        {
+          ...paragraph("p1", "Changed"),
+          page: 4,
+          origin: "source",
+          edited: true,
+          source_block_id: "p1",
+        },
+        { ...paragraph(uuidv7(), "Mine"), page: 4, origin: "user" },
+      ],
+    };
+
+    const [edited, mine] = throughEditor(content).blocks;
+
+    expect(edited).toMatchObject({ page: 4 });
+    expect(mine).not.toHaveProperty("page");
   });
 
   test("blocks emptied by editing are dropped", () => {

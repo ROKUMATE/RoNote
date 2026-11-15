@@ -809,6 +809,8 @@ export interface components {
             id: string;
             /** @enum {string} */
             kind: "heading" | "paragraph" | "list" | "code" | "table" | "callout" | "image" | "quote" | "divider" | "tabs";
+            /** @description The PDF page the block starts on; only blocks from a PDF have one. */
+            page?: number;
             level?: number;
             anchor?: string;
             content?: components["schemas"]["IRInline"][];
@@ -829,13 +831,14 @@ export interface components {
         };
         IRDocument: {
             /** @enum {integer} */
-            ir_version: 1;
+            ir_version: 2;
             title: string;
             source: components["schemas"]["IRSource"];
             extractor: components["schemas"]["IRExtractor"];
             blocks: components["schemas"]["IRBlock"][];
             warnings?: components["schemas"]["IRWarning"][];
         };
+        /** @description Where the page was fetched from, or for a PDF (pdf set) which file it was converted from; a PDF's URLs are empty and body_sha256 is the file's. */
         IRSource: {
             url: string;
             final_url: string;
@@ -845,6 +848,11 @@ export interface components {
             body_sha256: string;
             etag?: string;
             last_modified?: string;
+            pdf?: components["schemas"]["IRPDF"];
+        };
+        IRPDF: {
+            filename: string;
+            pages: number;
         };
         IRExtractor: {
             name: string;
@@ -852,14 +860,18 @@ export interface components {
         };
         IRWarning: {
             /** @enum {string} */
-            code: "low_confidence" | "parse_failed" | "adapter_fallback";
+            code: "low_confidence" | "parse_failed" | "adapter_fallback" | "figures_omitted";
             message: string;
+            /** @description How many figures figures_omitted left out. */
+            count?: number;
         };
         /** @description One block. kind decides which other fields may be set: heading has level, anchor and content; paragraph content; list ordered and items; tabs items with labels; code lang, title, title_link and text; table head and rows; callout variant, title and children; quote children; image src, alt and caption; divider nothing. */
         IRBlock: {
             id: string;
             /** @enum {string} */
             kind: "heading" | "paragraph" | "list" | "code" | "table" | "callout" | "image" | "quote" | "divider" | "tabs";
+            /** @description The PDF page the block starts on; only blocks from a PDF have one. */
+            page?: number;
             level?: number;
             anchor?: string;
             content?: components["schemas"]["IRInline"][];
@@ -1056,6 +1068,7 @@ export type UserBlockKind = components['schemas']['UserBlockKind'];
 export type DocBlock = components['schemas']['DocBlock'];
 export type IrDocument = components['schemas']['IRDocument'];
 export type IrSource = components['schemas']['IRSource'];
+export type Irpdf = components['schemas']['IRPDF'];
 export type IrExtractor = components['schemas']['IRExtractor'];
 export type IrWarning = components['schemas']['IRWarning'];
 export type IrBlock = components['schemas']['IRBlock'];

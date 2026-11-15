@@ -1,5 +1,5 @@
 {
-  "ir_version": 1,
+  "ir_version": 2,
   "title": "Closures",
   "source": {
     "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures",

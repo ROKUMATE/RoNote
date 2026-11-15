@@ -1,5 +1,5 @@
 {
-  "ir_version": 1,
+  "ir_version": 2,
   "title": "Greeting button",
   "source": {
     "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Greeting",

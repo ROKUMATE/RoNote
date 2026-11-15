@@ -131,6 +131,58 @@ func TestOwnerIsolation(t *testing.T) {
 	}
 }
 
+// TestEqualChunksKeepTheirOrder imports one page twice, so every chunk has an
+// identical twin with the same words and the same vector, and checks the
+// older document's chunk always comes first, in every mode. Re-indexing the
+// older document, as every edit and note does, must not change that: its
+// chunks get new ids, so the order can't rest on them.
+func TestEqualChunksKeepTheirOrder(t *testing.T) {
+	testDB.Reset(t)
+	st := store.New(testDB.Pool)
+	ctx := t.Context()
+	ada := newUser(t, st)
+	page := fixture(t, "real-python-controlflow")
+	older, newer := indexed(t, st, ada, page), indexed(t, st, ada, page)
+	if older.String() >= newer.String() {
+		t.Fatalf("document ids %v then %v aren't in import order", older, newer)
+	}
+	s := NewSearcher(st, embed.Fake{}, discard)
+
+	check := func(when string) {
+		t.Helper()
+		for _, mode := range []Mode{WordsOnly, MeaningOnly, Hybrid} {
+			res, err := s.Search(ctx, Request{Owner: ada, Query: "for statement", Limit: 50, Mode: mode})
+			if err != nil {
+				t.Fatal(err)
+			}
+			at := map[uuid.UUID]map[string]int{older: {}, newer: {}}
+			for i, h := range res.Hits {
+				at[h.DocumentID][strings.Join(h.BlockIDs, ",")] = i
+			}
+			twins := 0
+			for blocks, i := range at[older] {
+				j, ok := at[newer][blocks]
+				if !ok {
+					continue
+				}
+				twins++
+				if i > j {
+					t.Errorf("%s, mode %d: the older document's chunk %s is result %d, after its twin at %d", when, mode, blocks, i+1, j+1)
+				}
+			}
+			if twins == 0 {
+				t.Errorf("%s, mode %d: no chunk was found in both documents, so nothing was compared", when, mode)
+			}
+		}
+	}
+	check("as imported")
+
+	if _, err := NewIndexer(st, embed.Fake{}, discard).Index(ctx, ada, older); err != nil {
+		t.Fatal(err)
+	}
+	check("after the older document was indexed again")
+}
+
 func TestDegradedSearch(t *testing.T) {
 	testDB.Reset(t)
 	st := store.New(testDB.Pool)

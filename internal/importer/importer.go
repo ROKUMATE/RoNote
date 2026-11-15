@@ -39,6 +39,10 @@ var JobOptions = jobs.Options{MaxAttempts: maxAttempts, Concurrency: 4, Timeout:
 // docling converts two at once, and ten minutes each, for 300 pages on CPU.
 var PDFJobOptions = jobs.Options{MaxAttempts: maxAttempts, Concurrency: 2, Timeout: 10 * time.Minute}
 
+// Kinds are the kinds Service enqueues, with their options: the API, which
+// only enqueues, declares them to River.
+var Kinds = map[string]jobs.Options{Kind: JobOptions, PDFKind: PDFJobOptions, DeleteBlobsKind: BlobJobOptions}
+
 // BlobJobOptions say how blob deletions and sweeps run.
 var BlobJobOptions = jobs.Options{MaxAttempts: 5, Concurrency: 1, Timeout: 10 * time.Minute}
 

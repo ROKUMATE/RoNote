@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"net"
 	"net/http"
 	"os"
@@ -57,10 +58,9 @@ func run() error {
 
 	// The API only enqueues jobs; the worker process runs them. River keeps
 	// a job's attempt limit with it, so the kinds are declared here too.
-	queue, err := riverjobs.New(pool, riverjobs.Options{
-		Logger: logger,
-		Kinds:  map[string]jobs.Options{importer.Kind: importer.JobOptions, search.JobKind: search.JobOptions},
-	})
+	kinds := map[string]jobs.Options{search.JobKind: search.JobOptions}
+	maps.Copy(kinds, importer.Kinds)
+	queue, err := riverjobs.New(pool, riverjobs.Options{Logger: logger, Kinds: kinds})
 	if err != nil {
 		return err
 	}

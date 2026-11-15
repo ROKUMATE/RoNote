@@ -3,6 +3,7 @@
 package importer
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -427,4 +428,54 @@ func (h *harness) idle() {
 func sha(s string) string {
 	sum := sha256.Sum256([]byte(s))
 	return hex.EncodeToString(sum[:])
+}
+
+// recordingQueue notes the kind of every job enqueued through it.
+type recordingQueue struct {
+	jobs.Enqueuer
+	mu    sync.Mutex
+	kinds []string
+}
+
+func (q *recordingQueue) EnqueueTx(ctx context.Context, tx pgx.Tx, j jobs.Job) error {
+	q.mu.Lock()
+	q.kinds = append(q.kinds, j.Kind)
+	q.mu.Unlock()
+	return q.Enqueuer.EnqueueTx(ctx, tx, j)
+}
+
+// TestServiceKindsAreDeclared: the API only enqueues, and River refuses a
+// kind its process didn't declare, so every kind the service enqueues must
+// be among the Kinds the API declares.
+func TestServiceKindsAreDeclared(t *testing.T) {
+	h := newHarness(t, time.Hour)
+	q := &recordingQueue{Enqueuer: h.queue}
+	svc := NewService(h.store, q, Quota{ImportsPerDay: 100, Documents: 100}, h.blobs)
+	ctx := t.Context()
+
+	if _, err := svc.Request(ctx, h.ada.ID, h.site.url("docs.test", "/kinds")); err != nil {
+		t.Fatal(err)
+	}
+	req, err := svc.RequestPDF(ctx, h.ada.ID, "a.pdf", strings.NewReader("%PDF-1.7 ok"), 11)
+	if err != nil {
+		t.Fatal(err)
+	}
+	imp := h.wait(h.ada, req.Import.ID)
+	if _, err := svc.DeleteDocument(ctx, h.ada.ID, imp.DocumentID); err != nil {
+		t.Fatal(err)
+	}
+	if err := svc.DeleteUser(ctx, h.grace.ID); err != nil {
+		t.Fatal(err)
+	}
+
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	for _, kind := range q.kinds {
+		if _, ok := Kinds[kind]; !ok {
+			t.Errorf("the service enqueues %q, which Kinds doesn't declare", kind)
+		}
+	}
+	if len(q.kinds) < 4 {
+		t.Errorf("enqueued %v, want a page, a PDF and two blob deletions", q.kinds)
+	}
 }

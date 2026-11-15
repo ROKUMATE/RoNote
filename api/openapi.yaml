@@ -255,6 +255,57 @@ paths:
           $ref: "#/components/responses/TooManyImports"
         "500":
           $ref: "#/components/responses/InternalError"
+  /imports/pdf:
+    post:
+      operationId: createPdfImport
+      summary: Import a PDF
+      description: |
+        Uploads one PDF, at most 25 MB, and queues its import
+        (docs/adr/0013-pdf-import.md). If the user already has a document
+        from the same file, nothing is queued and the answer is 200 with the
+        import that made it and the document's summary. Its progress has a
+        converting step: queued, converting, extracting, done.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreatePdfImportRequest"
+      responses:
+        "200":
+          description: The user already has a document from this file.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExistingImportResponse"
+        "202":
+          description: The import is queued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResponse"
+        "400":
+          description: >-
+            The request is not one PDF file, or the file is not a PDF. Codes:
+            invalid_request, not_a_pdf.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/CrossOrigin"
+        "413":
+          description: "The PDF is larger than 25 MB. Code: pdf_too_large."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          $ref: "#/components/responses/TooManyImports"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /imports/{id}:
     get:
       operationId: getImport
@@ -448,6 +499,47 @@ paths:
           $ref: "#/components/responses/Unauthenticated"
         "403":
           $ref: "#/components/responses/CrossOrigin"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /documents/{id}/original:
+    get:
+      operationId: getDocumentOriginal
+      summary: Get the PDF a document was made from
+      description: |
+        The original file, to its owner only: anyone else, and any document
+        not made from a PDF, gets 404. It is served so a browser shows it and
+        runs nothing in it; #page=N opens it at page N.
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200":
+          description: The PDF.
+          headers:
+            Content-Disposition:
+              description: inline, with the uploaded filename made safe.
+              schema:
+                type: string
+            Content-Security-Policy:
+              description: "sandbox; default-src 'none'"
+              schema:
+                type: string
+            X-Content-Type-Options:
+              description: nosniff
+              schema:
+                type: string
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/InvalidParameter"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
         "404":
           $ref: "#/components/responses/NotFound"
         "429":
@@ -1098,6 +1190,8 @@ components:
         - rate_limited
         - quota_exceeded
         - body_too_large
+        - not_a_pdf
+        - pdf_too_large
         - chat_disabled
         - conversation_busy
         - internal_error
@@ -1205,7 +1299,7 @@ components:
           maxLength: 2048
     ImportStatus:
       type: string
-      enum: [queued, fetching, extracting, done, failed]
+      enum: [queued, fetching, converting, extracting, done, failed]
     ImportErrorCode:
       type: string
       description: >-
@@ -1225,17 +1319,30 @@ components:
         - upstream_error
         - robots_unavailable
         - network_error
+        - pdf_password_protected
+        - pdf_too_many_pages
+        - scanned_pdf_unsupported
+        - pdf_conversion_failed
+        - pdf_conversion_unavailable
         - internal_error
     Import:
       type: object
-      required: [id, requested_url, canonical_url, status, created_at, updated_at]
+      required: [id, kind, status, created_at, updated_at]
+      description: >-
+        An import of a web page (kind web: requested_url and canonical_url)
+        or of an uploaded PDF (kind pdf: filename).
       properties:
         id:
           type: string
           format: uuid
+        kind:
+          type: string
+          enum: [web, pdf]
         requested_url:
           type: string
         canonical_url:
+          type: string
+        filename:
           type: string
         status:
           $ref: "#/components/schemas/ImportStatus"
@@ -1251,6 +1358,14 @@ components:
         updated_at:
           type: string
           format: date-time
+    CreatePdfImportRequest:
+      type: object
+      required: [file]
+      properties:
+        file:
+          type: string
+          format: binary
+          description: The PDF, at most 25 MB.
     ImportResponse:
       type: object
       required: [import]
@@ -1287,7 +1402,9 @@ components:
           type: string
         source_url:
           type: string
-          description: The canonical URL of the page the document came from.
+          description: The canonical URL of the page the document came from; empty for a PDF.
+        pdf:
+          $ref: "#/components/schemas/IRPDF"
         version:
           type: integer
           description: Counts edits, for optimistic concurrency; starts at 1.

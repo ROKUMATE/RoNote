@@ -10,7 +10,10 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/rokumate/ronote/internal/annotation"
+	"github.com/rokumate/ronote/internal/blob/memblob"
+	"github.com/rokumate/ronote/internal/importer"
 	"github.com/rokumate/ronote/internal/ir"
+	"github.com/rokumate/ronote/internal/jobs/riverjobs"
 	"github.com/rokumate/ronote/internal/pgtest"
 	"github.com/rokumate/ronote/internal/store"
 )
@@ -60,7 +63,12 @@ func TestDeleteDocumentThroughAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	o := Options{Logger: discardLogger, DB: db.Pool, Backend: integrationBackend{Store: st}}
+	queue, err := riverjobs.New(db.Pool, riverjobs.Options{Logger: discardLogger})
+	if err != nil {
+		t.Fatal(err)
+	}
+	imports := importer.NewService(st, queue, importer.Quota{ImportsPerDay: 1000, Documents: 1000}, memblob.New())
+	o := Options{Logger: discardLogger, DB: db.Pool, Backend: integrationBackend{Store: st, Service: imports}}
 	adaAPI, graceAPI := signedInAs(t, st, o, ada.ID), signedInAs(t, st, o, grace.ID)
 	target := "/api/v1/documents/" + doc.String()
 	status := func(h http.Handler, method, target string) int {

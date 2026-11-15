@@ -16,7 +16,7 @@ export const importErrorMessages: Record<ImportErrorCode, string> = {
   blocked_address: "That link points to a private network, which RoNote doesn't fetch from.",
   disallowed_by_robots: "This site doesn't allow RoNote to fetch its pages.",
   too_large: "That page is larger than RoNote imports (5 MB).",
-  unsupported_type: "That link isn't a web page. PDF import comes later.",
+  unsupported_type: "That link isn't a web page; to import a PDF, upload the file.",
   too_many_redirects: "That link redirects too many times.",
   not_found: "The site says that page doesn't exist.",
   http_error: "The site answered with an error.",
@@ -26,6 +26,11 @@ export const importErrorMessages: Record<ImportErrorCode, string> = {
   upstream_error: "The site is having trouble right now. Try again later.",
   robots_unavailable: "The site couldn't say whether RoNote may fetch its pages. Try again later.",
   network_error: "RoNote couldn't connect to the site.",
+  pdf_password_protected: "That PDF needs a password, so RoNote can't open it.",
+  pdf_too_many_pages: "That PDF has more than 300 pages, the most RoNote imports.",
+  scanned_pdf_unsupported: "That PDF is scanned pages without text, which RoNote can't read yet.",
+  pdf_conversion_failed: "RoNote couldn't read that PDF.",
+  pdf_conversion_unavailable: "RoNote's PDF reader isn't answering, so try again later.",
   internal_error: "Something went wrong on RoNote's side. Try again.",
 };
 
@@ -62,6 +67,8 @@ export const requestErrorMessages: Record<ErrorCode, string> = {
   quota_exceeded:
     "You've reached a daily limit: 60 imports, 50 chat questions, or 500 documents in your library.",
   body_too_large: "That change is too large to save in one go.",
+  not_a_pdf: "That file isn't a PDF.",
+  pdf_too_large: "That PDF is larger than 25 MB, the most RoNote imports.",
   chat_disabled: "Chat is turned off right now.",
   conversation_busy: "An answer is still being written here. Wait for it, or stop it.",
   internal_error: "Something went wrong on RoNote's side. Try again.",

@@ -53,7 +53,7 @@ func (w *Worker) Handle(ctx context.Context, d jobs.Delivery) (err error) {
 	defer func() {
 		// Whatever went wrong on the last attempt, the import must end.
 		if err != nil && d.Attempt >= maxAttempts {
-			w.fail(context.WithoutCancel(ctx), owner, id, codeInternal)
+			fail(context.WithoutCancel(ctx), w.store, w.logger, owner, id, codeInternal)
 		}
 	}()
 
@@ -75,14 +75,14 @@ func (w *Worker) Handle(ctx context.Context, d jobs.Delivery) (err error) {
 		return err
 	}
 
-	if done, err := w.advance(ctx, imp, store.ImportFetching); done || err != nil {
+	if done, err := advance(ctx, w.store, imp, store.ImportFetching); done || err != nil {
 		return err
 	}
 	pg, err := w.load(ctx, imp)
 	if err != nil {
 		return w.failed(ctx, d.Attempt, imp, err)
 	}
-	if done, err := w.advance(ctx, imp, store.ImportExtracting); done || err != nil {
+	if done, err := advance(ctx, w.store, imp, store.ImportExtracting); done || err != nil {
 		return err
 	}
 	doc, canonical, err := extractPage(imp, pg)
@@ -125,8 +125,8 @@ func complete(ctx context.Context, tx *store.Store, imp store.Import, doc uuid.U
 
 // advance moves the import to status. done is true when the import has
 // already finished, as when a duplicate job got there first.
-func (w *Worker) advance(ctx context.Context, imp store.Import, status store.ImportStatus) (done bool, err error) {
-	_, err = w.store.SetImportStatus(ctx, imp.OwnerID, imp.ID, status)
+func advance(ctx context.Context, st *store.Store, imp store.Import, status store.ImportStatus) (done bool, err error) {
+	_, err = st.SetImportStatus(ctx, imp.OwnerID, imp.ID, status)
 	if errors.Is(err, store.ErrNotFound) {
 		return true, nil
 	}
@@ -215,7 +215,7 @@ func extractPage(imp store.Import, pg page) (*ir.Doc, string, error) {
 func (w *Worker) failed(ctx context.Context, attempt int, imp store.Import, cause error) error {
 	code, err := outcome(cause, attempt)
 	if code != "" {
-		w.fail(ctx, imp.OwnerID, imp.ID, code)
+		fail(ctx, w.store, w.logger, imp.OwnerID, imp.ID, code)
 	}
 	return err
 }
@@ -241,8 +241,8 @@ func outcome(cause error, attempt int) (code string, err error) {
 
 // fail marks an unfinished import failed with code; one that has already
 // finished keeps its result.
-func (w *Worker) fail(ctx context.Context, owner, id uuid.UUID, code string) {
-	if _, err := w.store.FailImport(ctx, owner, id, code); err != nil && !errors.Is(err, store.ErrNotFound) {
-		w.logger.ErrorContext(ctx, "could not mark import failed", "import_id", id.String(), "code", code, "error", err)
+func fail(ctx context.Context, st *store.Store, logger *slog.Logger, owner, id uuid.UUID, code string) {
+	if _, err := st.FailImport(ctx, owner, id, code); err != nil && !errors.Is(err, store.ErrNotFound) {
+		logger.ErrorContext(ctx, "could not mark import failed", "import_id", id.String(), "code", code, "error", err)
 	}
 }

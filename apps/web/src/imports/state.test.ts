@@ -1,9 +1,10 @@
 import { describe, expect, test } from "vitest";
 import type { ImportEvent } from "../api/schema";
-import { applyEvent, markLost, stepState, steps, type TrackedImport, tracked } from "./state";
+import { applyEvent, markLost, stepState, stepsOf, type TrackedImport, tracked } from "./state";
 
 const queued = tracked({
   id: "imp-1",
+  kind: "web",
   requested_url: "https://go.dev/doc/",
   canonical_url: "https://go.dev/doc/",
   status: "queued",
@@ -16,8 +17,30 @@ function play(...events: ImportEvent[]): TrackedImport {
 }
 
 function progress(state: TrackedImport) {
-  return steps.map((step) => stepState(state, step));
+  return stepsOf(state.kind).map((step) => stepState(state, step));
 }
+
+describe("a PDF import", () => {
+  const pdf = tracked({
+    id: "imp-2",
+    kind: "pdf",
+    filename: "Lecture 3.pdf",
+    status: "queued",
+    created_at: "2026-11-03T09:00:00Z",
+    updated_at: "2026-11-03T09:00:00Z",
+  });
+
+  test("is named by its file, and converts where a page is fetched", () => {
+    expect(pdf.name).toBe("Lecture 3.pdf");
+    expect(stepsOf("pdf")).toEqual(["queued", "converting", "extracting", "done"]);
+    expect(progress(applyEvent(pdf, { status: "converting" }))).toEqual([
+      "complete",
+      "current",
+      "waiting",
+      "waiting",
+    ]);
+  });
+});
 
 describe("an import's state", () => {
   test("moves through the steps to done", () => {
@@ -76,6 +99,7 @@ describe("an import's state", () => {
   test("a duplicate import starts from the status the API gave", () => {
     const done = tracked({
       id: "imp-2",
+      kind: "web",
       requested_url: "https://go.dev/doc/",
       canonical_url: "https://go.dev/doc/",
       status: "done",

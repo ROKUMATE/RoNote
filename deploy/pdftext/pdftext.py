@@ -6,6 +6,11 @@ the text layer, and each glyph at the column its position puts it in, so
 indentation drawn as space survives. It runs beside docling, from the same
 image and as sandboxed; it never runs a model.
 
+POST /v1/inspect (X-Api-Key): multipart "file". Answers {"pages", "chars"},
+the page count and how many characters the text layer has, or 422 with
+{"error": "password"} for a password-protected PDF and {"error":
+"unreadable"} for one pdfium can't open.
+
 POST /v1/code (X-Api-Key): multipart "file" (the PDF) and "boxes", a JSON
 list of {"page", "l", "t", "r", "b"} in PDF points, origin bottom left.
 Answers {"blocks": [[line, ...], ...]}, one list of lines per box.
@@ -92,6 +97,26 @@ def render(lines):
     return out
 
 
+# pdfium's error code for a password it wasn't given.
+PASSWORD_ERROR = 4
+
+
+def inspect(pdf):
+    """The PDF's page count and text-layer character count, or the error
+    "password" or "unreadable"."""
+    import pypdfium2 as pdfium
+
+    try:
+        doc = pdfium.PdfDocument(pdf)
+    except pdfium.PdfiumError as err:
+        return {"error": "password" if getattr(err, "err_code", None) == PASSWORD_ERROR else "unreadable"}
+    try:
+        chars = sum(doc[i].get_textpage().count_chars() for i in range(len(doc)))
+        return {"pages": len(doc), "chars": chars}
+    finally:
+        doc.close()
+
+
 def code_blocks(pdf, boxes):
     import pypdfium2 as pdfium
 
@@ -113,7 +138,7 @@ class Handler(BaseHTTPRequestHandler):
         self.answer(404, {"error": "not found"})
 
     def do_POST(self):
-        if self.path != "/v1/code":
+        if self.path not in ("/v1/code", "/v1/inspect"):
             return self.answer(404, {"error": "not found"})
         key = os.environ.get("PDFTEXT_API_KEY", "")
         if not key or not hmac.compare_digest(self.headers.get("X-Api-Key", ""), key):
@@ -126,8 +151,13 @@ class Handler(BaseHTTPRequestHandler):
             b"Content-Type: " + self.headers.get("Content-Type", "").encode() + b"\r\n\r\n" + body
         )
         parts = {p.get_param("name", header="content-disposition"): p.get_payload(decode=True) for p in msg.iter_parts()}
-        if "file" not in parts or "boxes" not in parts:
-            return self.answer(400, {"error": "file and boxes are required"})
+        if "file" not in parts:
+            return self.answer(400, {"error": "file is required"})
+        if self.path == "/v1/inspect":
+            found = inspect(parts["file"])
+            return self.answer(422 if "error" in found else 200, found)
+        if "boxes" not in parts:
+            return self.answer(400, {"error": "boxes are required"})
         try:
             blocks = code_blocks(parts["file"], json.loads(parts["boxes"]))
         except Exception as err:  # a PDF pdfium can't read, or bad boxes

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/rokumate/ronote/internal/blob"
 	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/httpapi/gen"
 	"github.com/rokumate/ronote/internal/importer"
@@ -42,6 +44,16 @@ type fakeBackend struct {
 	asked    []string
 	// annotations are every document's annotations.
 	annotations []store.Annotation
+	// requestPDF answers PDF uploads; originals are the PDFs documents were
+	// made from, each its owner's.
+	requestPDF func(filename string, data []byte) (importer.Requested, error)
+	originals  []original
+}
+
+type original struct {
+	id, owner uuid.UUID
+	filename  string
+	data      string
 }
 
 func (f *fakeBackend) ResolveDocuments(_ context.Context, owner uuid.UUID, urls []string) (map[string]uuid.UUID, error) {
@@ -59,6 +71,28 @@ func (f *fakeBackend) ResolveDocuments(_ context.Context, owner uuid.UUID, urls 
 func (f *fakeBackend) Request(_ context.Context, owner uuid.UUID, url string) (importer.Requested, error) {
 	f.owners = append(f.owners, owner)
 	return f.request(url)
+}
+
+func (f *fakeBackend) RequestPDF(_ context.Context, owner uuid.UUID, filename string, file io.ReadSeeker, size int64) (importer.Requested, error) {
+	f.owners = append(f.owners, owner)
+	if f.requestPDF == nil {
+		return importer.Requested{}, errors.New("no PDF import expected")
+	}
+	data, err := io.ReadAll(file)
+	if err != nil || int64(len(data)) != size {
+		return importer.Requested{}, fmt.Errorf("read %d bytes of %d: %w", len(data), size, err)
+	}
+	return f.requestPDF(filename, data)
+}
+
+func (f *fakeBackend) Original(_ context.Context, owner, id uuid.UUID) (string, *blob.Object, error) {
+	f.owners = append(f.owners, owner)
+	for _, o := range f.originals {
+		if o.id == id && o.owner == owner {
+			return o.filename, &blob.Object{Body: io.NopCloser(strings.NewReader(o.data)), Size: int64(len(o.data))}, nil
+		}
+	}
+	return "", nil, store.ErrNotFound
 }
 
 func (f *fakeBackend) GetImport(_ context.Context, owner, id uuid.UUID) (store.Import, error) {
@@ -188,7 +222,7 @@ func TestAPIRequiresAUser(t *testing.T) {
 
 func TestCreateImport(t *testing.T) {
 	t.Parallel()
-	queued := store.Import{ID: uuid.New(), RequestedURL: "https://go.dev/doc#x", CanonicalURL: "https://go.dev/doc", Status: store.ImportQueued, CreatedAt: t0, UpdatedAt: t0}
+	queued := store.Import{Kind: store.ImportWeb, ID: uuid.New(), RequestedURL: "https://go.dev/doc#x", CanonicalURL: "https://go.dev/doc", Status: store.ImportQueued, CreatedAt: t0, UpdatedAt: t0}
 	doc := testDoc(1)
 	done := queued
 	done.Status, done.DocumentID = store.ImportDone, doc.ID
@@ -248,7 +282,7 @@ func TestCreateImport(t *testing.T) {
 func TestGetImportAndDocument(t *testing.T) {
 	t.Parallel()
 	doc := testDoc(1)
-	imp := store.Import{ID: uuid.New(), Status: store.ImportFailed, ErrorCode: "not_found", CreatedAt: t0, UpdatedAt: t0}
+	imp := store.Import{Kind: store.ImportWeb, ID: uuid.New(), Status: store.ImportFailed, ErrorCode: "not_found", CreatedAt: t0, UpdatedAt: t0}
 	b := &fakeBackend{imports: map[uuid.UUID]store.Import{imp.ID: imp}, docs: []store.Document{doc}}
 	h := signedIn(Options{Logger: discardLogger, DB: dbUp, Backend: b})
 
@@ -358,7 +392,7 @@ func TestTimestampsAreUTC(t *testing.T) {
 	ist := time.FixedZone("IST", 5*3600+1800)
 	doc := testDoc(1)
 	doc.CreatedAt, doc.UpdatedAt = doc.CreatedAt.In(ist), doc.UpdatedAt.In(ist)
-	imp := store.Import{ID: uuid.New(), Status: store.ImportDone, DocumentID: doc.ID, CreatedAt: t0.In(ist), UpdatedAt: t0.In(ist)}
+	imp := store.Import{Kind: store.ImportWeb, ID: uuid.New(), Status: store.ImportDone, DocumentID: doc.ID, CreatedAt: t0.In(ist), UpdatedAt: t0.In(ist)}
 	existing := true
 	b := &fakeBackend{
 		imports: map[uuid.UUID]store.Import{imp.ID: imp},

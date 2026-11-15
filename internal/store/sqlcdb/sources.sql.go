@@ -13,10 +13,10 @@ import (
 )
 
 const findSourceForURL = `-- name: FindSourceForURL :one
-SELECT id, canonical_url, final_url, etag, last_modified, last_fetched_at
+SELECT id, canonical_url::text, final_url::text, etag, last_modified, last_fetched_at
 FROM sources
-WHERE canonical_url = $1 OR final_url = $1
-ORDER BY canonical_url = $1 DESC
+WHERE kind = 'web' AND (canonical_url = $1::text OR final_url = $1::text)
+ORDER BY canonical_url = $1::text DESC
 LIMIT 1
 `
 
@@ -29,7 +29,7 @@ type FindSourceForURLRow struct {
 	LastFetchedAt time.Time
 }
 
-// The source whose canonical URL, or else whose final URL, is url.
+// The web source whose canonical URL, or else whose final URL, is url.
 func (q *Queries) FindSourceForURL(ctx context.Context, url string) (FindSourceForURLRow, error) {
 	row := q.db.QueryRow(ctx, findSourceForURL, url)
 	var i FindSourceForURLRow
@@ -47,14 +47,24 @@ func (q *Queries) FindSourceForURL(ctx context.Context, url string) (FindSourceF
 const newestSnapshot = `-- name: NewestSnapshot :one
 SELECT id, source_id, body_sha256, body_gzip, content_type, fetched_at
 FROM source_snapshots
-WHERE source_id = $1
+WHERE source_id = $1 AND body_gzip IS NOT NULL
 ORDER BY fetched_at DESC, id DESC
 LIMIT 1
 `
 
-func (q *Queries) NewestSnapshot(ctx context.Context, sourceID uuid.UUID) (SourceSnapshot, error) {
+type NewestSnapshotRow struct {
+	ID          uuid.UUID
+	SourceID    uuid.UUID
+	BodySHA256  string
+	BodyGzip    []byte
+	ContentType string
+	FetchedAt   time.Time
+}
+
+// The newest snapshot of a web source, whose body Postgres holds.
+func (q *Queries) NewestSnapshot(ctx context.Context, sourceID uuid.UUID) (NewestSnapshotRow, error) {
 	row := q.db.QueryRow(ctx, newestSnapshot, sourceID)
-	var i SourceSnapshot
+	var i NewestSnapshotRow
 	err := row.Scan(
 		&i.ID,
 		&i.SourceID,
@@ -99,6 +109,34 @@ func (q *Queries) SaveExtraction(ctx context.Context, arg SaveExtractionParams) 
 	var i SaveExtractionRow
 	err := row.Scan(&i.ID, &i.IR)
 	return i, err
+}
+
+const savePDFSnapshot = `-- name: SavePDFSnapshot :one
+INSERT INTO source_snapshots (source_id, body_sha256, blob_key, content_type, fetched_at)
+VALUES ($1, $2, $3::text, 'application/pdf', $4)
+ON CONFLICT (source_id, body_sha256) DO UPDATE SET body_sha256 = EXCLUDED.body_sha256
+RETURNING id
+`
+
+type SavePDFSnapshotParams struct {
+	SourceID   uuid.UUID
+	BodySHA256 string
+	BlobKey    string
+	FetchedAt  time.Time
+}
+
+// The snapshot of a PDF source: its blob, not its body. The no-op update
+// makes RETURNING see an existing row.
+func (q *Queries) SavePDFSnapshot(ctx context.Context, arg SavePDFSnapshotParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, savePDFSnapshot,
+		arg.SourceID,
+		arg.BodySHA256,
+		arg.BlobKey,
+		arg.FetchedAt,
+	)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const saveSnapshot = `-- name: SaveSnapshot :one
@@ -147,15 +185,38 @@ func (q *Queries) TouchSource(ctx context.Context, arg TouchSourceParams) error 
 	return err
 }
 
+const upsertPDFSource = `-- name: UpsertPDFSource :one
+INSERT INTO sources (kind, owner_id, pdf_sha256, last_fetched_at)
+VALUES ('pdf', $1::uuid, $2::text, $3)
+ON CONFLICT (owner_id, pdf_sha256) WHERE kind = 'pdf' DO UPDATE
+SET last_fetched_at = greatest(sources.last_fetched_at, EXCLUDED.last_fetched_at)
+RETURNING id
+`
+
+type UpsertPDFSourceParams struct {
+	OwnerID     uuid.UUID
+	PDFSHA256   string
+	ConvertedAt time.Time
+}
+
+// The owner's source for the PDF with this SHA-256, created the first time.
+// A PDF's source is never shared (docs/adr/0013-pdf-import.md).
+func (q *Queries) UpsertPDFSource(ctx context.Context, arg UpsertPDFSourceParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, upsertPDFSource, arg.OwnerID, arg.PDFSHA256, arg.ConvertedAt)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
 const upsertSource = `-- name: UpsertSource :one
 INSERT INTO sources (canonical_url, final_url, etag, last_modified, last_fetched_at)
-VALUES ($1, $2, $3, $4, $5)
+VALUES ($1::text, $2::text, $3, $4, $5)
 ON CONFLICT (canonical_url) DO UPDATE
 SET final_url = EXCLUDED.final_url,
     etag = EXCLUDED.etag,
     last_modified = EXCLUDED.last_modified,
     last_fetched_at = greatest(sources.last_fetched_at, EXCLUDED.last_fetched_at)
-RETURNING id, canonical_url, final_url, etag, last_modified, last_fetched_at
+RETURNING id, canonical_url::text, final_url::text, etag, last_modified, last_fetched_at
 `
 
 type UpsertSourceParams struct {

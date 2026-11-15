@@ -40,6 +40,7 @@ const doc = {
 
 const queued = {
   id: "imp-c",
+  kind: "web",
   requested_url: notImported,
   canonical_url: notImported,
   status: "queued",
@@ -107,7 +108,9 @@ test("a page that cannot be imported says why, and offers the original", async (
   send({ status: "failed", error_code: "unsupported_type" });
 
   const alert = main.getByRole("alert");
-  expect(alert.textContent).toContain("That link isn't a web page. PDF import comes later.");
+  expect(alert.textContent).toContain(
+    "That link isn't a web page; to import a PDF, upload the file.",
+  );
   const original = within(alert).getByRole("link", { name: "Open original" });
   expect([
     original.getAttribute("href"),

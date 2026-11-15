@@ -180,3 +180,32 @@ func gunzip(b []byte) ([]byte, error) {
 	}
 	return out, zr.Close()
 }
+
+// PDFSource is a PDF one owner uploaded: a source of theirs alone, keyed by
+// the file's hex SHA-256 (docs/adr/0013-pdf-import.md).
+type PDFSource struct {
+	OwnerID     uuid.UUID
+	SHA256      string
+	BlobKey     string
+	ConvertedAt time.Time
+}
+
+// SavePDFSource records owner's PDF as a source with one snapshot, its
+// blob, creating them the first time, and returns the snapshot's ID.
+func (s *Store) SavePDFSource(ctx context.Context, p PDFSource) (source, snapshot uuid.UUID, err error) {
+	err = s.inTx(ctx, func(tx *Store) error {
+		var err error
+		source, err = tx.q.UpsertPDFSource(ctx, sqlcdb.UpsertPDFSourceParams{OwnerID: p.OwnerID, PDFSHA256: p.SHA256, ConvertedAt: p.ConvertedAt})
+		if err != nil {
+			return mapErr("upsert PDF source", err)
+		}
+		snapshot, err = tx.q.SavePDFSnapshot(ctx, sqlcdb.SavePDFSnapshotParams{
+			SourceID: source, BodySHA256: p.SHA256, BlobKey: p.BlobKey, FetchedAt: p.ConvertedAt,
+		})
+		if err != nil {
+			return mapErr("save PDF snapshot", err)
+		}
+		return nil
+	})
+	return source, snapshot, err
+}

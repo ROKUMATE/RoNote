@@ -9,6 +9,7 @@ afterEach(() => {
 
 const anImport = {
   id: "0192f1c4-7d3e-7c5a-9b1e-3f2a6d4c8e10",
+  kind: "web",
   requested_url: "https://go.dev/doc/",
   canonical_url: "https://go.dev/doc/",
   status: "queued",

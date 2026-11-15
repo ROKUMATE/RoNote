@@ -12,7 +12,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/rokumate/ronote/internal/auth"
+	"github.com/rokumate/ronote/internal/blob/s3blob"
 	"github.com/rokumate/ronote/internal/chat"
 	"github.com/rokumate/ronote/internal/chat/anthropic"
 	"github.com/rokumate/ronote/internal/config"
@@ -90,15 +93,16 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("listen: %w", err)
 	}
+	imports := importer.NewService(st, queue, importer.Quota{
+		ImportsPerDay: cfg.Limits.ImportsPerDay, Documents: cfg.Limits.Documents,
+	}, s3blob.New(s3blob.Config(cfg.Blob)))
 	srv := httpapi.NewServer(httpapi.New(httpapi.Options{
-		Logger: logger,
-		DB:     pool,
-		Backend: backend{Store: st, Service: importer.NewService(st, queue, importer.Quota{
-			ImportsPerDay: cfg.Limits.ImportsPerDay, Documents: cfg.Limits.Documents,
-		})},
+		Logger:    logger,
+		DB:        pool,
+		Backend:   backend{Store: st, Service: imports},
 		Events:    broker,
 		Done:      streamsDone,
-		Accounts:  st,
+		Accounts:  accounts{Store: st, imports: imports},
 		Cookies:   auth.Cookies{Secure: cfg.Env.Deployed()},
 		PublicURL: cfg.PublicURL,
 		Limits:    httpapi.Limits{APIPerMinute: cfg.Limits.APIPerMinute, AuthPerMinute: cfg.Limits.AuthPerMinute},
@@ -151,4 +155,14 @@ func run() error {
 type backend struct {
 	*store.Store
 	*importer.Service
+}
+
+// accounts are the store's, but deleting one also deletes its blobs.
+type accounts struct {
+	*store.Store
+	imports *importer.Service
+}
+
+func (a accounts) DeleteUser(ctx context.Context, user uuid.UUID) error {
+	return a.imports.DeleteUser(ctx, user)
 }

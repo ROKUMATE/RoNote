@@ -30,9 +30,31 @@ func validEnv(overrides map[string]string) map[string]string {
 		"RONOTE_GITHUB_CLIENT_ID":     "client",
 		"RONOTE_GITHUB_CLIENT_SECRET": leakMarker,
 		"ANTHROPIC_API_KEY":           leakMarker,
+		"RONOTE_BLOB_ENDPOINT":        "https://s3.example.com",
+		"RONOTE_BLOB_REGION":          "eu-central-1",
+		"RONOTE_BLOB_BUCKET":          "ronote-pdfs",
+		"RONOTE_BLOB_ACCESS_KEY":      "access",
+		"RONOTE_BLOB_SECRET_KEY":      leakMarker,
+		"RONOTE_DOCLING_URL":          "http://docling.internal:5001",
+		"RONOTE_DOCLING_API_KEY":      leakMarker,
+		"RONOTE_PDFTEXT_URL":          "http://pdftext.internal:5002",
+		"RONOTE_PDFTEXT_API_KEY":      leakMarker,
 	}
 	maps.Copy(env, overrides)
 	return env
+}
+
+// blobSet and pdfSet are the blob store and converters validEnv names; a
+// case that leaves Blob and PDF out of its want expects them.
+var (
+	blobSet = Blob{Endpoint: "https://s3.example.com", Region: "eu-central-1", Bucket: "ronote-pdfs", AccessKey: "access", SecretKey: leakMarker}
+	pdfSet  = PDF{DoclingURL: "http://docling.internal:5001", DoclingKey: leakMarker, TextURL: "http://pdftext.internal:5002", TextKey: leakMarker}
+)
+
+// noPDFSettings unsets every blob store and converter variable.
+var noPDFSettings = map[string]string{
+	"RONOTE_BLOB_ENDPOINT": "", "RONOTE_BLOB_REGION": "", "RONOTE_BLOB_BUCKET": "", "RONOTE_BLOB_ACCESS_KEY": "", "RONOTE_BLOB_SECRET_KEY": "",
+	"RONOTE_DOCLING_URL": "", "RONOTE_DOCLING_API_KEY": "", "RONOTE_PDFTEXT_URL": "", "RONOTE_PDFTEXT_API_KEY": "",
 }
 
 // github is the OAuth app validEnv configures.
@@ -371,6 +393,31 @@ func TestLoad(t *testing.T) {
 			wantErr: []string{`RONOTE_EMBED_URL: "127.0.0.1:11434" is not an http or https URL`},
 		},
 		{
+			name: "dev falls back to the dev stack's store and converters",
+			env:  with(validEnv(nil), noPDFSettings),
+			want: Config{
+				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
+				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault,
+				Blob: devBlob, PDF: devPDF,
+			},
+		},
+		{
+			name: "prod names its own store and converters",
+			env:  with(validEnv(map[string]string{"RONOTE_ENV": "prod"}), noPDFSettings),
+			wantErr: []string{
+				"RONOTE_BLOB_ENDPOINT: not set; staging and prod set it",
+				"RONOTE_BLOB_SECRET_KEY: not set",
+				"RONOTE_DOCLING_URL: not set",
+				"RONOTE_DOCLING_API_KEY: not set",
+				"RONOTE_PDFTEXT_API_KEY: not set",
+			},
+		},
+		{
+			name:    "a converter URL that isn't one",
+			env:     validEnv(map[string]string{"RONOTE_DOCLING_URL": "docling:5001"}),
+			wantErr: []string{`RONOTE_DOCLING_URL: "docling:5001" is not an http or https URL`},
+		},
+		{
 			name: "every bad variable reported",
 			env: map[string]string{
 				"RONOTE_ENV":          "qa",
@@ -396,6 +443,9 @@ func TestLoad(t *testing.T) {
 			if len(tt.wantErr) == 0 {
 				if err != nil {
 					t.Fatalf("Load() error = %v, want nil", err)
+				}
+				if tt.want.Blob == (Blob{}) && tt.want.PDF == (PDF{}) {
+					tt.want.Blob, tt.want.PDF = blobSet, pdfSet
 				}
 				if got != tt.want {
 					t.Errorf("Load() = %+v, want %+v", got, tt.want)

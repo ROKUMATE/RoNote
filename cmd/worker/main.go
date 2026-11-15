@@ -1,18 +1,22 @@
-// Command worker runs background jobs: imports, through the jobs port on
-// River (docs/adr/0009-jobs-port.md).
+// Command worker runs background jobs: imports of pages and PDFs, blob
+// cleanup and indexing, through the jobs port on River
+// (docs/adr/0009-jobs-port.md).
 package main
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/rokumate/ronote/internal/blob/s3blob"
 	"github.com/rokumate/ronote/internal/config"
 	"github.com/rokumate/ronote/internal/db"
+	"github.com/rokumate/ronote/internal/docling"
 	"github.com/rokumate/ronote/internal/embed"
 	"github.com/rokumate/ronote/internal/fetch"
 	"github.com/rokumate/ronote/internal/importer"
@@ -56,10 +60,26 @@ func run() error {
 	fetcher := fetch.New(fetch.Options{AllowPrivateNetworks: cfg.FetchAllowPrivateNetworks})
 	worker := importer.NewWorker(st, fetcher, cfg.SourceTTL, logger)
 	queue.Handle(importer.Kind, worker.Handle, importer.JobOptions)
+	blobs := s3blob.New(s3blob.Config(cfg.Blob))
+	converter := &docling.Client{
+		Docling:   docling.Service{URL: cfg.PDF.DoclingURL, Key: cfg.PDF.DoclingKey},
+		PDFText:   docling.Service{URL: cfg.PDF.TextURL, Key: cfg.PDF.TextKey},
+		HTTP:      &http.Client{Timeout: 2 * time.Minute},
+		PollEvery: time.Second,
+	}
+	queue.Handle(importer.PDFKind, importer.NewPDFWorker(st, blobs, converter, docling.ServeVersion, logger).Handle, importer.PDFJobOptions)
+	cleaner := importer.NewBlobs(st, blobs, queue, logger)
+	queue.Handle(importer.DeleteBlobsKind, cleaner.HandleDelete, importer.BlobJobOptions)
+	queue.Handle(importer.SweepBlobsKind, cleaner.HandleSweep, importer.BlobJobOptions)
 	indexer := search.NewIndexer(st, embed.NewClient(cfg.Embed.URL, cfg.Embed.Model), logger)
 	queue.Handle(search.JobKind, indexer.Handle, search.JobOptions)
-	logger.Info("worker started", "kinds", []string{importer.Kind, search.JobKind}, "env", cfg.Env,
-		"source_ttl", cfg.SourceTTL.String(), "embed_model", cfg.Embed.Model)
+	logger.Info("worker started", "kinds", []string{importer.Kind, importer.PDFKind, importer.DeleteBlobsKind, importer.SweepBlobsKind, search.JobKind},
+		"env", cfg.Env, "source_ttl", cfg.SourceTTL.String(), "embed_model", cfg.Embed.Model)
+
+	// Leftover blobs are swept now, then daily.
+	if err := cleaner.ScheduleSweep(ctx, 0); err != nil {
+		return fmt.Errorf("schedule blob sweep: %w", err)
+	}
 
 	// Documents from before indexing, behind it, or of another model, five
 	// a second.

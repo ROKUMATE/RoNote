@@ -94,7 +94,7 @@ func TestRepeatImportReturnsTheFullImport(t *testing.T) {
 	}
 	required := spec.Components.Schemas["Import"].Value.Required
 	doc := testDoc(1)
-	queued := store.Import{ID: uuid.New(), RequestedURL: "https://docs.example.com/1", CanonicalURL: "https://docs.example.com/1", Status: store.ImportQueued, CreatedAt: t0, UpdatedAt: t0}
+	queued := store.Import{Kind: store.ImportWeb, ID: uuid.New(), RequestedURL: "https://docs.example.com/1", CanonicalURL: "https://docs.example.com/1", Status: store.ImportQueued, CreatedAt: t0, UpdatedAt: t0}
 	done := queued
 	done.Status, done.DocumentID = store.ImportDone, doc.ID
 

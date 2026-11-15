@@ -110,6 +110,7 @@ test("keeps its empty state", async () => {
 describe("imports from this session", () => {
   const imp = {
     id: "imp-1",
+    kind: "web" as const,
     requested_url: "https://docs.example.com/new",
     canonical_url: "https://docs.example.com/new",
     status: "queued" as const,

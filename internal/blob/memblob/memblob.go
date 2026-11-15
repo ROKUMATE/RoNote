@@ -84,3 +84,13 @@ func (s *Store) List(_ context.Context, prefix string) iter.Seq2[blob.Info, erro
 		}
 	}
 }
+
+// Age makes every blob d older, for tests of what happens to old blobs.
+func (s *Store) Age(d time.Duration) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for key, b := range s.blobs {
+		b.modified = b.modified.Add(-d)
+		s.blobs[key] = b
+	}
+}

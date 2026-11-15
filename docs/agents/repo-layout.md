@@ -25,6 +25,8 @@ Where things live, in full. AGENTS.md keeps the short version.
 | `internal/chat/` | chat over a library (docs/adr/0012-chat.md): the `Model` port, the service that grounds, streams, validates citations, budgets and saves answers, and the `search_library` tool |
 | `internal/chat/anthropic/` | the port's adapter to Anthropic's Messages API; the only package that imports the SDK (depguard); `testdata/` holds its streams and request goldens |
 | `internal/fakellm/` | the fake Messages API `cmd/fakellm` serves: the subset chat uses, answering deterministically from the search results it is sent |
+| `internal/blob/` | the blob port, file storage for PDFs (docs/adr/0013-pdf-import.md): `s3blob` adapts any S3-compatible store and is the only package that imports the AWS SDK (depguard), `memblob` in memory for unit tests, `blobtest` the suite both pass |
+| `internal/s3test/` | a throwaway SeaweedFS for integration tests, like `internal/pgtest` |
 | `internal/devserver/` | runs a dev stand-in until it is interrupted |
 | `internal/ratelimit/` | per-key fixed-window counting, in memory, for the API's rate limits |
 | `testdata/retrieval/` | the eval's corpus, queries, recorded vectors and baseline, with `SOURCES.md` |

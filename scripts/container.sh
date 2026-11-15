@@ -53,7 +53,7 @@ run_tests() {
   status=0
   "$@" || status=$?
 
-  leaked=$("$rt" ps -aq --filter label=ronote.pgtest=true)
+  leaked=$("$rt" ps -aq --filter label=ronote.pgtest=true; "$rt" ps -aq --filter label=ronote.s3test=true)
   if [ -n "$leaked" ]; then
     die "tests left these containers behind; run \"make test-clean\":
 $leaked"

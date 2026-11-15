@@ -16,4 +16,8 @@ export const stack = {
   embed: "http://127.0.0.1:18093",
   // The fake chat model (cmd/fakellm): no test reaches a real one.
   llm: "http://127.0.0.1:18094",
+  // The fake docling and pdftext (cmd/fakedocling), replaying the PDF
+  // fixtures' recordings: the docling image is never pulled.
+  docling: "http://127.0.0.1:18095",
+  pdftext: "http://127.0.0.1:18096",
 } as const;

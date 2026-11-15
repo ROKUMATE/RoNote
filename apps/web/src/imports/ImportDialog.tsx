@@ -3,11 +3,20 @@ import { CircleIcon } from "@phosphor-icons/react/Circle";
 import { CircleHalfIcon } from "@phosphor-icons/react/CircleHalf";
 import { FilePlusIcon } from "@phosphor-icons/react/FilePlus";
 import { XIcon } from "@phosphor-icons/react/X";
+import * as Tabs from "@radix-ui/react-tabs";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { type FormEvent, type RefObject, useEffect, useId, useRef, useState } from "react";
+import {
+  type DragEvent,
+  type FormEvent,
+  type RefObject,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import { requestErrorMessage, requestErrorMessages } from "../api/messages";
-import { createImport } from "../api/queries";
+import { type CreatedImport, createImport, maxPdfBytes, uploadPdf } from "../api/queries";
 import type { ErrorCode } from "../api/schema";
 import { buttonClass } from "../ui/button";
 import { endingMessage, stepLabels } from "./describe";
@@ -34,6 +43,17 @@ function urlProblem(raw: string): ErrorCode | undefined {
   return parsed.hostname ? undefined : "invalid_url";
 }
 
+/**
+ * Checks a file the way the API will: a PDF, by its type or its name, of at
+ * most 25 MB. The API stays the authority: it reads the file's first bytes.
+ */
+function pdfProblem(file: File): ErrorCode | undefined {
+  if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+    return "not_a_pdf";
+  }
+  return file.size > maxPdfBytes ? "pdf_too_large" : undefined;
+}
+
 /** The "Import page" button and the dialog it opens. */
 export function ImportButton() {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -48,19 +68,27 @@ export function ImportButton() {
   );
 }
 
+const tabClass =
+  "rounded-sm px-3 py-1 text-ui-lg text-ink-2 hover:text-ink aria-selected:bg-paper-2 aria-selected:text-ink";
+
 /**
- * Asks for a URL and follows the import. Closing it never cancels: the
- * tracker keeps following, and the library shows the import until it ends.
+ * Asks for a URL, or a PDF to upload, and follows the import. Closing it
+ * never cancels: the tracker keeps following, and the library shows the
+ * import until it ends.
  */
 function ImportDialog({ dialog }: { dialog: RefObject<HTMLDialogElement | null> }) {
   const titleId = useId();
   const inputId = useId();
+  const fileId = useId();
   const problemId = useId();
   const navigate = useNavigate();
   const tracker = useImportTracker();
   const imports = useTrackedImports();
   const create = useMutation({ mutationFn: createImport });
+  const upload = useMutation({ mutationFn: uploadPdf });
   const [url, setUrl] = useState("");
+  const [file, setFile] = useState<File>();
+  const [dragging, setDragging] = useState(false);
   const [problem, setProblem] = useState<string>();
   const [followingId, setFollowingId] = useState<string>();
   const following = imports.find((i) => i.id === followingId);
@@ -80,8 +108,27 @@ function ImportDialog({ dialog }: { dialog: RefObject<HTMLDialogElement | null> 
     }
     setFollowingId(undefined);
     setUrl("");
+    setFile(undefined);
     setProblem(undefined);
     create.reset();
+    upload.reset();
+  };
+
+  const started = {
+    onSuccess: (created: CreatedImport) => {
+      if (created.existing) {
+        dialog.current?.close();
+        void navigate({
+          to: "/doc/$id",
+          params: { id: created.document.id },
+          state: { notice: "existing" },
+        });
+        return;
+      }
+      tracker.track(created.import);
+      setFollowingId(created.import.id);
+    },
+    onError: (error: unknown) => setProblem(requestErrorMessage(error)),
   };
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -92,23 +139,40 @@ function ImportDialog({ dialog }: { dialog: RefObject<HTMLDialogElement | null> 
       return;
     }
     setProblem(undefined);
-    create.mutate(url.trim(), {
-      onSuccess: (created) => {
-        if (created.existing) {
-          dialog.current?.close();
-          void navigate({
-            to: "/doc/$id",
-            params: { id: created.document.id },
-            state: { notice: "existing" },
-          });
-          return;
-        }
-        tracker.track(created.import);
-        setFollowingId(created.import.id);
-      },
-      onError: (error) => setProblem(requestErrorMessage(error)),
-    });
+    create.mutate(url.trim(), started);
   };
+
+  const choose = (chosen: File | undefined) => {
+    setFile(chosen);
+    setProblem(undefined);
+  };
+
+  const submitPdf = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!file) {
+      setProblem("Choose a PDF to upload.");
+      return;
+    }
+    const code = pdfProblem(file);
+    if (code) {
+      setProblem(requestErrorMessages[code]);
+      return;
+    }
+    setProblem(undefined);
+    upload.mutate(file, started);
+  };
+
+  const drop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setDragging(false);
+    choose(event.dataTransfer.files[0]);
+  };
+
+  const problemText = problem && (
+    <p id={problemId} className="mt-2 text-ui-lg">
+      {problem}
+    </p>
+  );
 
   return (
     <dialog
@@ -123,37 +187,95 @@ function ImportDialog({ dialog }: { dialog: RefObject<HTMLDialogElement | null> 
       {following ? (
         <Progress state={following} onRetry={reset} />
       ) : (
-        <form noValidate onSubmit={submit} className="mt-4">
-          <label htmlFor={inputId} className="block text-ui-lg">
-            Page URL
-          </label>
-          <input
-            id={inputId}
-            type="url"
-            name="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            autoComplete="off"
-            spellCheck={false}
-            placeholder="https://"
-            aria-invalid={problem ? true : undefined}
-            aria-describedby={problem ? problemId : undefined}
-            className="mt-1 w-full rounded-sm border border-rule bg-paper px-2 py-1.5 text-ui-lg aria-invalid:border-accent"
-          />
-          {problem && (
-            <p id={problemId} className="mt-2 text-ui-lg">
-              {problem}
-            </p>
-          )}
-          <div className="mt-4 flex gap-2">
-            <button type="submit" disabled={create.isPending} className={buttonClass}>
-              Import
-            </button>
-            <button type="button" onClick={() => dialog.current?.close()} className={buttonClass}>
-              Cancel
-            </button>
-          </div>
-        </form>
+        <Tabs.Root defaultValue="web" onValueChange={() => setProblem(undefined)} className="mt-4">
+          <Tabs.List aria-label="Import from" className="flex gap-1 border-rule border-b pb-2">
+            <Tabs.Trigger value="web" className={tabClass}>
+              Web page
+            </Tabs.Trigger>
+            <Tabs.Trigger value="pdf" className={tabClass}>
+              Upload PDF
+            </Tabs.Trigger>
+          </Tabs.List>
+          <Tabs.Content value="web">
+            <form noValidate onSubmit={submit} className="mt-4">
+              <label htmlFor={inputId} className="block text-ui-lg">
+                Page URL
+              </label>
+              <input
+                id={inputId}
+                type="url"
+                name="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                autoComplete="off"
+                spellCheck={false}
+                placeholder="https://"
+                aria-invalid={problem ? true : undefined}
+                aria-describedby={problem ? problemId : undefined}
+                className="mt-1 w-full rounded-sm border border-rule bg-paper px-2 py-1.5 text-ui-lg aria-invalid:border-accent"
+              />
+              {problemText}
+              <div className="mt-4 flex gap-2">
+                <button type="submit" disabled={create.isPending} className={buttonClass}>
+                  Import
+                </button>
+                <button
+                  type="button"
+                  onClick={() => dialog.current?.close()}
+                  className={buttonClass}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </Tabs.Content>
+          <Tabs.Content value="pdf">
+            <form noValidate onSubmit={submitPdf} className="mt-4">
+              {/* biome-ignore lint/a11y/noStaticElementInteractions: a drop target for dragged files; the file picker inside it is the keyboard's way in */}
+              <div
+                data-testid="pdf-drop"
+                data-dragging={dragging || undefined}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragging(true);
+                }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={drop}
+                className="flex flex-col items-center gap-2 rounded-md border border-rule border-dashed px-4 py-6 text-center text-ui-lg data-dragging:border-accent data-dragging:bg-paper-2"
+              >
+                <p className="text-ink-2">Drop a PDF here, up to 25 MB, or</p>
+                <input
+                  id={fileId}
+                  type="file"
+                  accept="application/pdf,.pdf"
+                  onChange={(e) => choose(e.target.files?.[0])}
+                  aria-describedby={problem ? problemId : undefined}
+                  className="peer sr-only"
+                />
+                <label
+                  htmlFor={fileId}
+                  className={`${buttonClass} cursor-pointer peer-focus-visible:outline-2 peer-focus-visible:outline-accent`}
+                >
+                  Choose a PDF
+                </label>
+                {file && <p className="max-w-full truncate">{file.name}</p>}
+              </div>
+              {problemText}
+              <div className="mt-4 flex gap-2">
+                <button type="submit" disabled={upload.isPending} className={buttonClass}>
+                  Upload
+                </button>
+                <button
+                  type="button"
+                  onClick={() => dialog.current?.close()}
+                  className={buttonClass}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </Tabs.Content>
+        </Tabs.Root>
       )}
       <button
         type="button"
@@ -183,7 +305,7 @@ function Progress({ state, onRetry }: { state: TrackedImport; onRetry: () => voi
           {ending}
         </p>
         <button type="button" onClick={onRetry} className={`mt-4 ${buttonClass}`}>
-          Try another link
+          {state.kind === "pdf" ? "Try another file" : "Try another link"}
         </button>
       </div>
     );

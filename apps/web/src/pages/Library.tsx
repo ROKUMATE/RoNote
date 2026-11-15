@@ -2,7 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { documentPages } from "../api/queries";
 import type { DocumentSummary } from "../api/schema";
-import { formatDate, hostOf } from "../format";
+import { formatDate, sourceOf } from "../format";
 import { endingMessage, stepLabels } from "../imports/describe";
 import { ImportButton } from "../imports/ImportDialog";
 import type { TrackedImport } from "../imports/state";
@@ -74,11 +74,10 @@ function DocumentRow({ doc }: { doc: DocumentSummary }) {
           params={{ id: doc.id }}
           className="block truncate font-medium text-ui-lg hover:underline"
         >
-          {doc.title || hostOf(doc.source_url)}
+          {doc.title || sourceOf(doc)}
         </Link>
         <p className="text-ink-2 text-ui">
-          {hostOf(doc.source_url)} ·{" "}
-          <time dateTime={doc.created_at}>{formatDate(doc.created_at)}</time>
+          {sourceOf(doc)} · <time dateTime={doc.created_at}>{formatDate(doc.created_at)}</time>
         </p>
       </div>
     </li>

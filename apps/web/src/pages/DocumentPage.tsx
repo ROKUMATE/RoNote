@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams, useRouterState, useSearch } from "@tanstack/react-router";
 import type { Editor } from "@tiptap/core";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { ApiError } from "../api/client";
+import { ApiError, apiBase } from "../api/client";
 import { requestErrorMessage, requestErrorMessages } from "../api/messages";
 import { chatKey, deleteDocument, documentQuery, documentsKey, linkTargets } from "../api/queries";
 import type { Document, IrWarning } from "../api/schema";
@@ -14,6 +14,7 @@ import { blockCounts } from "../document/counts";
 import { landOn } from "../document/landOn";
 import { sameDomainHrefs } from "../document/links";
 import { Outline } from "../document/Outline";
+import { PageLink } from "../document/PageLink";
 import { Reader } from "../document/Reader";
 import { RunScopeProvider, RunSessions } from "../document/run/RunArea";
 import type { SaveStatus } from "../document/save";
@@ -21,7 +22,7 @@ import { useAnnotations } from "../document/useAnnotations";
 import { useEditing } from "../document/useEditing";
 import { useFollow } from "../document/useFollow";
 import { useScrollAnchor } from "../document/useScrollAnchor";
-import { formatDate, hostOf } from "../format";
+import { formatDate, hostOf, sourceOf } from "../format";
 import { buttonClass } from "../ui/button";
 import { Confirm } from "../ui/Confirm";
 import { PageTitle } from "../ui/PageTitle";
@@ -87,8 +88,16 @@ function opensWithTitle(doc: Document): boolean {
   );
 }
 
+/** How many of a PDF's figures were left out, in a sentence. */
+function figuresLeftOut(count: number): string {
+  return count === 1
+    ? "1 figure from the PDF isn't shown."
+    : `${count} figures from the PDF aren't shown.`;
+}
+
 function Header({ doc, existing }: { doc: Document; existing: boolean }) {
   const fallback = doc.warnings.some((w) => genericWarnings.has(w.code));
+  const figures = doc.warnings.find((w) => w.code === "figures_omitted")?.count;
   const { status, onEditor, revert, codeLangs, saving } = useEditing(doc);
   const [editor, setEditor] = useState<Editor>();
   const annotations = useAnnotations(doc.id, doc.content, editor, saving);
@@ -113,21 +122,22 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
             </p>
           )}
           <header>
-            {!opensWithTitle(doc) && <PageTitle>{doc.title || hostOf(doc.source_url)}</PageTitle>}
+            {!opensWithTitle(doc) && <PageTitle>{doc.title || sourceOf(doc)}</PageTitle>}
             <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-ink-2 text-ui-lg">
               <span>
                 From{" "}
                 <a
-                  href={doc.source_url}
+                  href={doc.pdf ? `${apiBase}/documents/${doc.id}/original` : doc.source_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-ink underline underline-offset-2"
                 >
-                  {hostOf(doc.source_url)}
+                  {doc.pdf ? doc.pdf.filename : hostOf(doc.source_url)}
                   <ArrowSquareOutIcon size={16} aria-hidden />
                   <span className="sr-only">(opens in a new tab)</span>
                 </a>
               </span>
+              {doc.pdf && <span>{doc.pdf.pages === 1 ? "1 page" : `${doc.pdf.pages} pages`}</span>}
               <span>
                 Imported <time dateTime={doc.created_at}>{formatDate(doc.created_at)}</time>
               </span>
@@ -142,6 +152,12 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
             <SaveState status={status} />
             <DeleteDocument id={doc.id} />
           </header>
+          {figures !== undefined && (
+            <p role="note" className="mt-6 flex gap-2 border-rule border-l-2 pl-3 text-ui-lg">
+              <InfoIcon size={16} aria-hidden className="mt-0.5 shrink-0 text-ink-2" />
+              {figuresLeftOut(figures)}
+            </p>
+          )}
           {fallback && (
             <p role="note" className="mt-6 flex gap-2 border-rule border-l-2 pl-3 text-ui-lg">
               <InfoIcon size={16} aria-hidden className="mt-0.5 shrink-0 text-ink-2" />
@@ -161,6 +177,9 @@ function Header({ doc, existing }: { doc: Document; existing: boolean }) {
               following={following}
             />
             {editor && <Outline editor={editor} />}
+            {editor && frame && doc.pdf && (
+              <PageLink editor={editor} frame={frame} documentId={doc.id} />
+            )}
             {editor && frame && listSlot && (
               <Suspense fallback={null}>
                 <AnnotationsUI

@@ -148,3 +148,63 @@ test("says when a delete fails, and stays on the document", async () => {
   expect(await main.findByRole("alert")).toBeDefined();
   expect(app.router.state.location.pathname).toBe("/doc/doc-1");
 });
+
+function pdfDocument(warnings: IrWarning[] = []) {
+  const doc = documentWith(warnings);
+  return {
+    ...doc,
+    title: "Iteration",
+    source_url: "",
+    pdf: { filename: "think-python-iteration.pdf", pages: 8 },
+    content: {
+      doc_version: 1,
+      blocks: [
+        { id: "p1", kind: "paragraph", page: 1, content: [{ text: "First page." }] },
+        { id: "c1", kind: "code", page: 3, text: "while n > 0:\n    n -= 1\n" },
+      ].map((b) => ({ ...b, origin: "source", edited: false, source_block_id: b.id })),
+    },
+  };
+}
+
+test("a PDF's source is its file, which opens in a new tab", async () => {
+  const main = await openDocument(json(pdfDocument()));
+
+  const file = await main.findByRole("link", { name: /think-python-iteration\.pdf/ });
+  expect(file.getAttribute("href")).toBe("/api/v1/documents/doc-1/original");
+  expect(file.getAttribute("target")).toBe("_blank");
+  expect(main.getByText("8 pages")).toBeDefined();
+});
+
+test.each([
+  [3, "3 figures from the PDF aren't shown."],
+  [1, "1 figure from the PDF isn't shown."],
+])("says %i figures were left out", async (count, sentence) => {
+  const main = await openDocument(
+    json(pdfDocument([{ code: "figures_omitted", message: "x", count }])),
+  );
+
+  expect((await main.findByRole("note")).textContent).toBe(sentence);
+});
+
+test("a block from a PDF offers its page, where the pointer or the caret is", async () => {
+  const main = await openDocument(json(pdfDocument()));
+  const code = (await main.findByText(/while n > 0/)).closest("[data-block-id]");
+  if (!code) throw new Error("no code block");
+
+  fireEvent.mouseOver(code);
+
+  const link = await main.findByRole("link", { name: /^View page 3/ });
+  expect(link.getAttribute("href")).toBe("/api/v1/documents/doc-1/original#page=3");
+  expect(link.getAttribute("target")).toBe("_blank");
+  expect(link.getAttribute("rel")).toBe("noopener noreferrer");
+
+  fireEvent.mouseOver(main.getByText("First page."));
+  expect(await main.findByRole("link", { name: /^View page 1/ })).toBeDefined();
+});
+
+test("a web page's blocks offer no page", async () => {
+  const main = await openDocument(json(documentWith()));
+  fireEvent.mouseOver(await main.findByText("Effective Go"));
+
+  expect(main.queryByRole("link", { name: /View page/ })).toBeNull();
+});

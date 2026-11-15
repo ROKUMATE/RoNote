@@ -59,10 +59,6 @@ type Options struct {
 	Registration bool
 }
 
-// firstRegisteredID is the id of the first registered user, clear of the
-// listed users', which the dev and e2e files number from 1 and 2000.
-const firstRegisteredID = 10000
-
 // codeLifetime is how long an authorization code may wait for its exchange.
 const codeLifetime = 10 * time.Minute
 
@@ -79,13 +75,18 @@ type provider struct {
 
 	mu     sync.Mutex
 	users  []User // the listed users, then the registered ones
+	nextID int64  // the id of the next registered user
 	codes  map[string]grant
 	tokens map[string]User
 }
 
 // New returns the provider's handler.
 func New(o Options) http.Handler {
-	p := &provider{opts: o, users: slices.Clone(o.Users), codes: map[string]grant{}, tokens: map[string]User{}}
+	// Registered ids count up from the start time in microseconds: RoNote
+	// keys users by the provider's id, and its database outlives the
+	// provider, so a later run must not give a new user an earlier one's id.
+	// The listed users' are small numbers, clear of these.
+	p := &provider{opts: o, users: slices.Clone(o.Users), nextID: time.Now().UnixMicro(), codes: map[string]grant{}, tokens: map[string]User{}}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) { _, _ = w.Write([]byte("ok\n")) })
 	mux.HandleFunc("GET /login/oauth/authorize", p.authorizePage)
@@ -223,15 +224,14 @@ func (p *provider) register(w http.ResponseWriter, r *http.Request) {
 	}
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	id := int64(firstRegisteredID)
 	for _, u := range p.users {
 		if strings.EqualFold(u.Login, in.Login) || strings.EqualFold(u.Email, in.Email) {
 			http.Error(w, "that login or email is already a user's", http.StatusConflict)
 			return
 		}
-		id = max(id, u.ID+1)
 	}
-	u := User{ID: id, Login: in.Login, Name: in.Name, Email: in.Email, Verified: true}
+	u := User{ID: p.nextID, Login: in.Login, Name: in.Name, Email: in.Email, Verified: true}
+	p.nextID++
 	p.users = append(p.users, u)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)

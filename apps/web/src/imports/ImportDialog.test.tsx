@@ -63,6 +63,10 @@ describe("a new import", () => {
     });
     const { dialog, queryClient, router } = await openDialog();
     const invalidate = vi.spyOn(queryClient, "invalidateQueries");
+    // The document route is a lazy chunk (src/router.tsx): the first import
+    // of the reader and editor is slow while cold, and a findBy below would
+    // wait for it inside one second. Await it here, where it is the point.
+    await import("../pages/DocumentPage");
 
     submit(dialog, "  https://docs.example.com/guide ");
 
@@ -97,7 +101,10 @@ describe("a new import", () => {
     expect(invalidate).toHaveBeenCalledWith({ queryKey: documentsKey });
     await waitFor(() => expect(router.state.location.pathname).toBe("/doc/doc-1"));
     expect(dialog).toHaveProperty("open", false);
-    expect(await screen.findByRole("heading", { level: 1, name: "Guide" })).toBeDefined();
+    // The document is on screen once its title is; asking for its role
+    // is a second, slow query, so ask once, not in findBy's one-second poll.
+    await screen.findByText("Guide");
+    expect(screen.getByRole("heading", { level: 1, name: "Guide" })).toBeDefined();
     expect(screen.queryByText("Already in your library")).toBeNull();
   });
 

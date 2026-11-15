@@ -14,19 +14,31 @@ beforeEach(() => {
 const library = { "GET /documents": () => json({ documents: [] }) };
 
 /**
+ * The button with the user's name. The async boundary is GET /me resolving
+ * and the shell redrawing with it, so wait for the name with a text query,
+ * which is cheap, and ask for the role once. findByRole polls its query
+ * inside one second, and the first role query in a file takes most of that
+ * while cold under load, so it can time out before the button can be seen.
+ */
+async function accountButton() {
+  await screen.findByText(me.display_name);
+  return screen.getByRole("button", { name: me.display_name });
+}
+
+/**
  * Opens the account menu, as a click on the user's name does. jsdom doesn't
  * open popovers, so the menu's items stay hidden to role queries, which pass
  * hidden: true; Playwright covers the popover itself.
  */
 async function openMenu() {
-  fireEvent.click(await screen.findByRole("button", { name: me.display_name }));
+  fireEvent.click(await accountButton());
 }
 
 test("shows who is signed in, with no avatar", async () => {
   stubApi(library);
   renderApp("/");
 
-  const button = await screen.findByRole("button", { name: me.display_name });
+  const button = await accountButton();
   await openMenu();
 
   expect(button.querySelector("img")).toBeNull();

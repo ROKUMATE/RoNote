@@ -146,6 +146,14 @@ func (s *Service) Stop(ctx context.Context, owner, id uuid.UUID) error {
 	return nil
 }
 
+// StopAll ends the answers being written in owner's conversations, as when
+// the document they are about is deleted with them.
+func (s *Service) StopAll(owner uuid.UUID, conversations []uuid.UUID) {
+	for _, id := range conversations {
+		s.cancel(owner, id, errStopped)
+	}
+}
+
 // MessagesLeft is how many questions owner may still ask in the window.
 func (s *Service) MessagesLeft(ctx context.Context, owner uuid.UUID) (int, error) {
 	u, err := s.o.Store.ChatUsage(ctx, owner, quotaWindow)

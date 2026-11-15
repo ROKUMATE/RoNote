@@ -38,7 +38,8 @@ type Import struct {
 	Status       ImportStatus
 	// ErrorCode is set when Status is failed.
 	ErrorCode string
-	// DocumentID is set when Status is done.
+	// DocumentID is set when Status is done, unless the document has since
+	// been deleted.
 	DocumentID uuid.UUID
 	CreatedAt  time.Time
 	UpdatedAt  time.Time

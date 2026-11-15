@@ -108,6 +108,17 @@ func (f *fakeBackend) SaveDocument(_ context.Context, owner, id uuid.UUID, conte
 	return 0, store.ErrNotFound
 }
 
+func (f *fakeBackend) DeleteDocument(_ context.Context, owner, id uuid.UUID) ([]uuid.UUID, error) {
+	f.owners = append(f.owners, owner)
+	for i, d := range f.docs {
+		if d.ID == id {
+			f.docs = append(f.docs[:i], f.docs[i+1:]...)
+			return nil, nil
+		}
+	}
+	return nil, store.ErrNotFound
+}
+
 func (f *fakeBackend) ListDocuments(_ context.Context, owner uuid.UUID, after *store.DocumentCursor, limit int) ([]store.DocumentSummary, error) {
 	f.owners = append(f.owners, owner)
 	f.after = after
@@ -268,8 +279,8 @@ func TestGetImportAndDocument(t *testing.T) {
 	if rec := apiRequest(t, h, http.MethodGet, "/api/v1/nope", ""); rec.Code != http.StatusNotFound || decodeError(t, rec).Code != "not_found" {
 		t.Errorf("unknown API path = %d %s, want the 404 envelope", rec.Code, rec.Body)
 	}
-	if rec := apiRequest(t, h, http.MethodDelete, "/api/v1/documents/"+doc.ID.String(), ""); rec.Code != http.StatusMethodNotAllowed {
-		t.Errorf("DELETE document = %d, want 405", rec.Code)
+	if rec := apiRequest(t, h, http.MethodPut, "/api/v1/documents/"+doc.ID.String(), ""); rec.Code != http.StatusMethodNotAllowed {
+		t.Errorf("PUT document = %d, want 405", rec.Code)
 	}
 	b.fail = errors.New("db down")
 	if rec := apiRequest(t, h, http.MethodGet, "/api/v1/imports/"+imp.ID.String(), ""); rec.Code != http.StatusInternalServerError || decodeError(t, rec).Code != "internal_error" {

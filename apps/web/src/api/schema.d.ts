@@ -226,7 +226,14 @@ export interface paths {
         get: operations["getDocument"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete a document
+         * @description Deletes the document with its highlights, notes and the
+         *     conversations about it; an answer being written in one stops. The
+         *     imports that made it stay in the import history, without it, and
+         *     still count toward the import quota.
+         */
+        delete: operations["deleteDocument"];
         options?: never;
         head?: never;
         /**
@@ -539,7 +546,7 @@ export interface components {
             error_code?: components["schemas"]["ImportErrorCode"];
             /**
              * Format: uuid
-             * @description Set when status is done.
+             * @description Set when status is done, unless the document has since been deleted.
              */
             document_id?: string;
             /** Format: date-time */
@@ -1435,6 +1442,32 @@ export interface operations {
             };
             400: components["responses"]["InvalidParameter"];
             401: components["responses"]["Unauthenticated"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            500: components["responses"]["InternalError"];
+        };
+    };
+    deleteDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["InvalidParameter"];
+            401: components["responses"]["Unauthenticated"];
+            403: components["responses"]["CrossOrigin"];
             404: components["responses"]["NotFound"];
             429: components["responses"]["RateLimited"];
             500: components["responses"]["InternalError"];

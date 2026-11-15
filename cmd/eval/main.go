@@ -63,13 +63,18 @@ func main() {
 	updateBaseline := flag.Bool("update-baseline", false, "write this run's hybrid metrics as the baseline")
 	reviewOnly := flag.Bool("review", false, "print the queries marked for review with their expected blocks and hybrid's top 5, and write nothing")
 	chatOnly := flag.Bool("chat", false, "ask the queries through chat, and report how its answers cite")
+	chatLimit := flag.Int("chat-limit", 0, "with -chat, ask only the first N queries (0 asks all); a part writes no report")
+	chatBudget := flag.Float64("chat-budget", 1.50, "with -chat, ask no further question once the answers have cost this many dollars")
 	flag.Parse()
 	if (*reviewOnly || *chatOnly) && (*record || *updateBaseline) || *reviewOnly && *chatOnly {
 		fmt.Fprintln(os.Stderr, "eval: -review and -chat each run alone, without -record or -update-baseline")
 		os.Exit(2)
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	err := run(ctx, options{record: *record, updateBaseline: *updateBaseline, review: *reviewOnly, chat: *chatOnly})
+	err := run(ctx, options{
+		record: *record, updateBaseline: *updateBaseline, review: *reviewOnly, chat: *chatOnly,
+		chatRun: chatRun{limit: *chatLimit, budget: int64(*chatBudget * 1e6)},
+	})
 	stop()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "eval:", err)
@@ -102,6 +107,7 @@ var metricNames = []string{"recall@5", "recall@10", "mrr@10", "ndcg@10"}
 
 type options struct {
 	record, updateBaseline, review, chat bool
+	chatRun                              chatRun
 }
 
 func run(ctx context.Context, opts options) error {
@@ -171,7 +177,7 @@ func run(ctx context.Context, opts options) error {
 		return review(ctx, st, search.NewSearcher(st, embedder, discard), user.ID, docs, ids, queries)
 	}
 	if opts.chat {
-		return chatEval(ctx, st, user.ID, embedder, queries)
+		return chatEval(ctx, st, user.ID, embedder, queries, opts.chatRun)
 	}
 	if opts.record {
 		inputs := make([]string, len(queries))

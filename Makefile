@@ -224,7 +224,7 @@ web-browsers: ## Install Playwright's Chromium (WITH_DEPS=1 adds its system pack
 check-node-version: ## Print the Node version; fail unless it is the one .nvmrc pins
 	@$(node_required); echo "Node $$(node --version), as pinned in .nvmrc"
 
-web-dev: ## Run the web dev server (styleguide at /_styleguide), the runner, the fake sign-in and the fake chat model; make stop ends them
+web-dev: ## Run the web dev server (styleguide at /_styleguide), the runner, the fake sign-in, chat model and docling; make stop ends them
 	@$(node_required)
 	sh scripts/run.sh web sh -c 'go run ./cmd/fakeidp & idp=$$!; go run ./cmd/fakellm & llm=$$!; go run ./cmd/fakedocling & docling=$$!; $(WEB) runner & runner=$$!; $(WEB) dev; kill $$idp $$llm $$docling $$runner'
 
@@ -238,7 +238,7 @@ web-build: ## Build the web app and the runner; fails if dev-only code ships or 
 web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromium); locally needs make dev-up
 	@$(node_required)
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" sh scripts/e2e-db.sh
-	go build -o bin/e2e/ ./cmd/api ./cmd/worker ./cmd/fakeidp ./cmd/fakeembed ./cmd/fakellm
+	go build -o bin/e2e/ ./cmd/api ./cmd/worker ./cmd/fakeidp ./cmd/fakeembed ./cmd/fakellm ./cmd/fakedocling
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" $(WEB) e2e
 
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp run-llm run-docling pdf-fixtures pdf-record extract lint lint-go lint-web fmt

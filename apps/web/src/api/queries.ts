@@ -253,6 +253,26 @@ export async function createImport(url: string): Promise<CreatedImport> {
     : { existing: false, import: created.import };
 }
 
+/** The largest PDF the API takes (docs/adr/0013-pdf-import.md). */
+export const maxPdfBytes = 25 * 1024 * 1024;
+
+/** Uploads a PDF to import it, or finds the document the user has from it. */
+export async function uploadPdf(file: File): Promise<CreatedImport> {
+  const form = new FormData();
+  form.append("file", file);
+  const created = dataOrThrow(
+    await api.POST("/imports/pdf", {
+      // The spec calls the file a binary string; the browser sends the
+      // FormData itself, with its boundary.
+      body: { file: "" },
+      bodySerializer: () => form,
+    }),
+  );
+  return "document" in created
+    ? { existing: true, import: created.import, document: created.document }
+    : { existing: false, import: created.import };
+}
+
 /**
  * The app's query client. A client error (4xx) will not change on retry, so
  * only server and network failures are retried, once.

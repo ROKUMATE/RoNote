@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { lazy, type ReactNode, Suspense, useEffect, useId, useState } from "react";
 import { recentDocuments } from "../api/queries";
+import { sourceOf } from "../format";
 import { Account } from "./Account";
 import { Settings } from "./Settings";
 
@@ -160,7 +161,7 @@ function RecentDocuments() {
         {recent.data.map((doc) => (
           <li key={doc.id}>
             <Link to="/doc/$id" params={{ id: doc.id }} className={navLink}>
-              <span className="truncate">{doc.title || doc.source_url}</span>
+              <span className="truncate">{doc.title || sourceOf(doc)}</span>
             </Link>
           </li>
         ))}

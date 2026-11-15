@@ -217,3 +217,117 @@ describe("the URL field", () => {
     ).toBeDefined();
   });
 });
+
+describe("a PDF upload", () => {
+  const pdfQueued = {
+    id: "imp-2",
+    kind: "pdf",
+    filename: "Lecture 3.pdf",
+    status: "queued",
+    created_at: "2026-11-03T09:00:00Z",
+    updated_at: "2026-11-03T09:00:00Z",
+  };
+
+  function pdf(name = "Lecture 3.pdf", type = "application/pdf", size = 9) {
+    const file = new File(["%PDF-1.7"], name, { type });
+    if (size !== 9) Object.defineProperty(file, "size", { value: size });
+    return file;
+  }
+
+  async function openUpload() {
+    const opened = await openDialog();
+    // Radix Tabs switch on the mouse button going down, as a click starts.
+    fireEvent.mouseDown(within(opened.dialog).getByRole("tab", { name: "Upload PDF" }));
+    return opened;
+  }
+
+  test("sends the file and shows a PDF's steps", async () => {
+    const requests = stubApi({
+      "POST /imports/pdf": () => json({ import: pdfQueued }, 202),
+      "GET /documents": () => json({ documents: [] }),
+    });
+    const { dialog } = await openUpload();
+
+    fireEvent.change(within(dialog).getByLabelText("Choose a PDF"), { target: { files: [pdf()] } });
+    expect(within(dialog).getByText(/Lecture 3\.pdf/)).toBeDefined();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Upload" }));
+
+    await within(dialog).findByRole("list", { name: "Progress" });
+    const sent = requests.find((r) => r.method === "POST");
+    // jsdom's File isn't Node's, so the part's content is checked end to
+    // end (e2e/pdf.spec.ts); here, that the form has its one file part.
+    expect(sent?.headers.get("content-type")).toMatch(/^multipart\/form-data; boundary=/);
+    expect(await sent?.text()).toContain('name="file"');
+    expect(progress(dialog)).toEqual([
+      "queued:current",
+      "converting:waiting",
+      "extracting:waiting",
+      "done:waiting",
+    ]);
+    send({ status: "converting" });
+    expect(await within(dialog).findByRole("status")).toHaveProperty(
+      "textContent",
+      "Converting the PDF",
+    );
+  });
+
+  test("takes a file dropped on it", async () => {
+    stubApi({ "GET /documents": () => json({ documents: [] }) });
+    const { dialog } = await openUpload();
+
+    fireEvent.drop(within(dialog).getByTestId("pdf-drop"), {
+      dataTransfer: { files: [pdf("Dropped.pdf")] },
+    });
+
+    expect(within(dialog).getByText(/Dropped\.pdf/)).toBeDefined();
+  });
+
+  test.each([
+    ["a file that isn't a PDF", pdf("notes.txt", "text/plain"), "That file isn't a PDF."],
+    [
+      "a PDF over 25 MB",
+      pdf("big.pdf", "application/pdf", 25 * 1024 * 1024 + 1),
+      "That PDF is larger than 25 MB, the most RoNote imports.",
+    ],
+  ])("refuses %s before sending it", async (_, file, sentence) => {
+    const requests = stubApi({ "GET /documents": () => json({ documents: [] }) });
+    const { dialog } = await openUpload();
+
+    fireEvent.change(within(dialog).getByLabelText("Choose a PDF"), { target: { files: [file] } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Upload" }));
+
+    expect(await within(dialog).findByText(sentence)).toBeDefined();
+    expect(requests.filter((r) => r.method === "POST")).toHaveLength(0);
+  });
+
+  test("says why the server refused it", async () => {
+    stubApi({
+      "POST /imports/pdf": () => apiError(400, "not_a_pdf"),
+      "GET /documents": () => json({ documents: [] }),
+    });
+    const { dialog } = await openUpload();
+
+    fireEvent.change(within(dialog).getByLabelText("Choose a PDF"), { target: { files: [pdf()] } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Upload" }));
+
+    expect(await within(dialog).findByText("That file isn't a PDF.")).toBeDefined();
+  });
+
+  test("a scan says why it can't be imported", async () => {
+    stubApi({
+      "POST /imports/pdf": () => json({ import: pdfQueued }, 202),
+      "GET /documents": () => json({ documents: [] }),
+    });
+    const { dialog } = await openUpload();
+    fireEvent.change(within(dialog).getByLabelText("Choose a PDF"), { target: { files: [pdf()] } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Upload" }));
+    await within(dialog).findByRole("list", { name: "Progress" });
+
+    send({ status: "failed", error_code: "scanned_pdf_unsupported" });
+
+    expect((await within(dialog).findByRole("alert")).textContent).toBe(
+      "That PDF is scanned pages without text, which RoNote can't read yet.",
+    );
+    expect(within(dialog).getByRole("button", { name: "Try another file" })).toBeDefined();
+  });
+});

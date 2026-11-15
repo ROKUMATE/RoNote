@@ -19,5 +19,85 @@ services:
       timeout: 3s
       retries: 30
 
+  seaweedfs:
+    # SeaweedFS 4.53, the S3-compatible store PDFs are kept in
+    # (docs/adr/0013-pdf-import.md). The digest covers arm64 and amd64. Its
+    # key is the dev default of RONOTE_BLOB_ACCESS_KEY and _SECRET_KEY.
+    image: chrislusf/seaweedfs:4.53@sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0
+    command: ["server", "-s3", "-s3.config=/etc/seaweedfs/s3.json", "-dir=/data"]
+    ports:
+      - "127.0.0.1:8333:8333"
+    volumes:
+      - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+      - blobdata:/data
+    healthcheck:
+      # Healthy once the bucket exists: the check makes it the first time.
+      test: ["CMD-SHELL", "echo 's3.bucket.create -name ronote' | weed shell 2>&1 | grep -q -E 'created bucket|already exists'"]
+      interval: 3s
+      timeout: 10s
+      retries: 40
+
+  # docling and pdftext convert PDFs (docs/adr/0013-pdf-import.md). Only
+  # make dev-up-docling starts them: the image is 5 GB and converting wants
+  # 6 GB of memory; the end-to-end tests and CI use cmd/fakedocling. Both sit
+  # on an internal network with no way out; converters-gate alone reaches
+  # them, and publishes their ports on this machine.
+  docling:
+    profiles: [docling]
+    image: quay.io/docling-project/docling-serve-cpu:v1.38.2@sha256:7a480a1604fa3b42efeddc7db9527690d9f9bc903226136013e2bfe6b1a4dfb0
+    environment:
+      DOCLING_SERVE_API_KEY: ronote-dev-docling
+      DOCLING_SERVE_MAX_NUM_PAGES: "300"
+      DOCLING_SERVE_MAX_FILE_SIZE: "26214400"
+      DOCLING_SERVE_MAX_DOCUMENT_TIMEOUT: "540"
+      DOCLING_SERVE_SINGLE_USE_RESULTS: "true"
+      DOCLING_SERVE_ENG_LOC_NUM_WORKERS: "2"
+      # The image carries its models; nothing is downloaded.
+      HF_HUB_OFFLINE: "1"
+    networks: [converters]
+    cpus: 2
+    mem_limit: 6g
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5001/health', timeout=2)"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
+  pdftext:
+    profiles: [docling]
+    image: quay.io/docling-project/docling-serve-cpu:v1.38.2@sha256:7a480a1604fa3b42efeddc7db9527690d9f9bc903226136013e2bfe6b1a4dfb0
+    entrypoint: ["python", "/app/pdftext.py"]
+    environment:
+      PDFTEXT_API_KEY: ronote-dev-pdftext
+    volumes:
+      - ./pdftext/pdftext.py:/app/pdftext.py:ro
+    networks: [converters]
+    cpus: 1
+    mem_limit: 1g
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5002/health', timeout=2)"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  converters-gate:
+    profiles: [docling]
+    image: alpine/socat:1.8.1.1@sha256:7f9a06753033f2b7de18edc2353f2c15153413d95a039163c6db270fc7a6c3b0
+    entrypoint: ["sh", "-c", "socat TCP-LISTEN:5001,fork,reuseaddr TCP:docling:5001 & exec socat TCP-LISTEN:5002,fork,reuseaddr TCP:pdftext:5002"]
+    networks: [default, converters]
+    ports:
+      - "127.0.0.1:5001:5001"
+      - "127.0.0.1:5002:5002"
+    depends_on:
+      docling:
+        condition: service_healthy
+      pdftext:
+        condition: service_healthy
+
+networks:
+  converters:
+    internal: true
+
 volumes:
   pgdata:
+  blobdata:

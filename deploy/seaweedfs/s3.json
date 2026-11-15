@@ -1,0 +1,9 @@
+{
+  "identities": [
+    {
+      "name": "ronote",
+      "credentials": [{ "accessKey": "ronote", "secretKey": "ronote-dev-secret" }],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    }
+  ]
+}

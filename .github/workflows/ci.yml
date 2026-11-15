@@ -182,6 +182,11 @@ jobs:
           key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ steps.versions.outputs.playwright }}
       - name: Install Chromium and its system packages
         run: make web-browsers WITH_DEPS=1
+      # The dev stack's SeaweedFS (deploy/compose.dev.yml), with its bucket:
+      # a service container can't take its command. PDFs convert through
+      # cmd/fakedocling, which the tests start: CI never pulls docling.
+      - name: Start the blob store
+        run: docker compose -f deploy/compose.dev.yml up -d --wait seaweedfs
       - name: Run end-to-end tests against the full stack
         run: make web-e2e
       - name: Upload the Playwright report

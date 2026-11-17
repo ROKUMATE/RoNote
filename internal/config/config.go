@@ -281,8 +281,7 @@ func parsePDF(getenv func(string) string, env Env) (Blob, PDF, []error) {
 // parseChat reads the chat model's settings. Anthropic's API needs a key;
 // any other URL is the fake model, which only dev and test may use. Chat is
 // on by default in dev and test, and off in staging and prod until
-// RONOTE_CHAT_ENABLED=true says otherwise: it has not run against the real
-// model yet (docs/adr/0012-chat.md).
+// RONOTE_CHAT_ENABLED=true says otherwise (docs/adr/0012-chat.md).
 func parseChat(getenv func(string) string, env Env) (Chat, []error) {
 	var errs []error
 	c := Chat{

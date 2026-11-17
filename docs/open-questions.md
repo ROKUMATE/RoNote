@@ -9,8 +9,8 @@ entry when a phase settles it; add one when a phase leaves something open.
 - After macOS sleeps, the podman VM's clock can lag for a few minutes. Jobs no longer wait on it (P12), but tests that compare a database time with the app's, such as a user's `created_at` "about now", still fail meanwhile. `make doctor` says so and prints the fix.
 - Code in a runner worker can post a false "done", which stops its run's clock while it keeps running. The next run then waits behind it and is interrupted at its own limit, so the waste lasts until the reader runs something or leaves.
 - Safari isn't cross-origin isolated (no COEP `credentialless`), so Stop there ends the session; the e2e tests run Chromium only, so that path is covered by unit tests alone.
-- Pyodide is 6.3 MB with gzip; a cold start took 0.75 s on fresh browsers here in P13b (P13a measured 4.2 s). The production runner (P18) should serve it compressed and cacheable.
-- P18's host must serve the JavaScript worker's script (`javascript.worker.*`) with its own policy, `'unsafe-eval'` added, and every other file without it, as `headersFor` does.
+- Pyodide is 6.3 MB with gzip; a cold start took 0.75 s on fresh browsers here in P13b (P13a measured 4.2 s). The production runner should serve it compressed and cacheable.
+- The runner's production host must serve the JavaScript worker's script (`javascript.worker.*`) with its own policy, `'unsafe-eval'` added, and every other file without it, as `headersFor` does.
 - In dev, open the app at `127.0.0.1:5173`: the runner answers only the origins in `RONOTE_APP_ORIGINS`. At `localhost:5173` the app still loads, and a Run says the code runner didn't answer.
 - JavaScript blocks are read on their own: one that uses a name another block imports (VitePress's `postcssIsolateStyles({...})`) offers Run, and fails with a `ReferenceError`.
 - A JavaScript `setInterval` never cleared keeps its run going until Stop or the 30 s limit, as a Node script would. Output Python prints after its run has ended (from an asyncio task) is dropped.
@@ -35,22 +35,20 @@ entry when a phase settles it; add one when a phase leaves something open.
 - A rate-limited sign-in (`/api/v1/auth/github/*`) answers the JSON envelope to a browser navigation; a person sees raw JSON. Rare at 20 a minute per IP.
 - An import job already queued when its user deletes the account ends as permanent (its import is gone) and logs at error level.
 - The e2e users file holds 16 worker users; more Playwright workers than that fail at sign-in with a message saying so.
-- Search: queries with no answer score a best cosine similarity of up to 0.60, and answerable ones as low as 0.29, so no threshold can say "I don't know". P17 leaves it to the model, told to say so; how often it does, rightly and wrongly, is what `make eval-chat` measures, and it hasn't run against the real model yet (no API billing).
-- Chat: the adapter's stream fixtures were written from Anthropic's documented format, not recorded; `go test ./internal/chat/anthropic -record` records them once there is a key. Until then the adapter has met only fixtures and the fake model.
+- Search: queries with no answer score a best cosine similarity of up to 0.60, and answerable ones as low as 0.29, so no threshold can say "I don't know". P17 leaves it to the model, told to say so. On the real model (`testdata/retrieval/chat-report.md`) it refused 7 of the 8 unanswerable eval questions and none of the 72 answerable ones; the one it answered (n04, with 2 citations) is not yet reviewed.
 - Chat: which answers are being written is known per API process, so Stop reaches only answers its process started; a second API process needs a shared signal first, as the rate limits need a shared store. One answer per conversation holds across processes: it is checked in Postgres.
+- Chat: its hit rate (a cited block among the expected ones) is 0.64, how-to questions 0.47, against search's recall@10 of 0.96. Which misses are valid other answers, and whether the eval's labels should grow, is not yet reviewed.
 - Chat: the panel lists the 30 latest conversations, with no paging yet.
 - Chat: a citation chip focused while its answer streams loses focus when the saved answer replaces the streamed one.
-- Chat answers in one model's words; Haiku 5.5 may think within its 1,024 output tokens at effort low, which could cut a long answer short (`max_tokens`). The eval will show whether it does.
+- Chat answers in one model's words; Haiku 5.5 may think within its 1,024 output tokens at effort low, which could cut a long answer short (`max_tokens`). All 80 of the chat eval's answers finished.
 - Search: identifiers, errors and how-to questions are at recall@10 1.0 on the eval; paraphrases (0.85) and questions across two documents (0.90) are where it misses. The eval's 80 queries were written by the agent; 20 are marked for review.
 - The fake embedder (`cmd/fakeembed`) matches by shared words, so end-to-end tests check the plumbing of search by meaning, not its quality; `make eval` checks that.
 - A search result lands on its chunk's first block; a result whose words are further into the chunk lands a little above them.
 - Effective Go never names `ServeMux`: searching it finds `ServeHTTP` and `HandlerFunc` code by meaning, not an exact match.
-
-
 - PDFs: scans need OCR (later phase). docling's figures are dropped and counted; a figure that is a picture of code drawn as an image (not text) is lost.
 - PDFs: docling normalizes prose: curly quotes made straight, a space now and then before punctuation (`print _ n` for `print_n`). Code is read from the text layer and keeps neither change; prose has no such reader yet.
 - PDFs: a document set wholly in a monospace font would map to code throughout; no fixture is.
 - PDFs: slides lay notes over code; where they share a box, the note comes out among the code's lines (MIT 6.0001 lecture 3).
 - PDFs: code language comes from the picker; docling's code enrichment would guess it with a model, at CPU cost, and its text would be generated. Off.
 - PDFs: conversion takes about 1 s a page on 2 CPUs: a 300-page book is five minutes, inside the 10-minute attempt. Two run at once.
-- Chat: with its tools turned off (`tool_choice: none`, a turn's last call after three searches), Haiku 5.5 at effort low once thought and ended its turn with no text at all; such an answer shows as "Not found in your library". The chat eval counts how often turns end that way.
+- Chat: with its tools turned off (`tool_choice: none`, a turn's last call after three searches), Haiku 5.5 at effort low once thought and ended its turn with no text at all; such an answer shows as "Not found in your library". The chat eval counts it as a refusal, so it can't tell the two apart; none of the 72 answerable questions was refused.

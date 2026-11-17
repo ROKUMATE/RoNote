@@ -4,17 +4,19 @@ The project's state, in at most 80 lines and 6 KB (`make lint` checks). Rewrite 
 
 ## Current milestone
 
-P18, printed PDF import (ADR 0013): built, recorded and run against the real docling in Chrome.
-- **Upload:** `POST /api/v1/imports/pdf` (25 MB, `%PDF-`, the daily import quota), the same `Import` and event stream with a `converting` step. The same file twice is the same document.
-- **Convert:** docling-serve 1.38.2 (CPU image by digest, no egress, an API key) lays out the PDF; pdftext (`deploy/pdftext`, docling's image) reads the text layer in docling's boxes: code by glyph columns, and monospace prose or pictures as code, prose labels out of code boxes. pdftext inspects first: password, unreadable, over 300 pages and scans fail at once with stable codes.
-- **IR 2:** every PDF block records its page; `source.pdf` (filename, pages); `figures_omitted` with a count. Migration 00014 upgraded stored extractions; DocContent stays 1.
-- **Storage:** a blob port (`internal/blob`: S3 via aws-sdk-go-v2, memory for tests), SeaweedFS in dev and CI, keys `pdf/<owner>/<sha256>`. PDF sources are their owner's alone.
-- **Original:** `GET /api/v1/documents/{id}/original`, owner only (404), sandboxed CSP, nosniff, safe filename. Chrome 157 shows it and `#page=N` lands.
-- **Deletion:** `DELETE /api/v1/documents/{id}` (and in the web app) takes notes, document conversations and a PDF's blob; account deletion takes `pdf/<owner>/`; a sweep removes leftovers.
-- **Web:** Upload PDF in the import dialog (picker, drop, client checks), filename and pages as the source, "View page N" beside the block under the pointer or caret, the figures notice.
-- **Verbatim report** (`testdata/pdf/report.md`): 56 code blocks of 5 printed golden pages, 46 exact, 10 whitespace only (a final newline, a space after an emoji), none other or missing. About 1 s a page.
-- **Deliberate break:** `/original` without the owner check: `TestOriginalIsTheOwners` and the e2e 404 test caught it.
-- **Checks:** `make check`, `make test-integration`, `make web-e2e`, `make eval` pass.
+P18.1, cleanup after P18 and the chat eval.
+- **Chat has run against the real model** (Claude Haiku 5.5, 2026-11-15, $0.074 in all). The adapter's streams are recorded from the real API; `make eval-chat` asked all 80 queries (`testdata/retrieval/chat-report.md`):
+  - citations: 216 of 216 valid;
+  - hit rate (an expected block cited): 0.64, how-to 0.47, against search's recall@10 of 0.96;
+  - no false refusals; 7 of 8 unanswerable questions refused;
+  - first token p50 2.9 s, total p50 4.2 s; about $0.001 a question.
+- **Chat stays off by default in staging and prod**, on in dev and test; P19 turns it on with `RONOTE_CHAT_ENABLED=true` (ADR 0012).
+- **Links inside highlights** pass axe in both themes: the dark accent is `#e6946d` and the dark highlight `#483c12` (4.6:1), and the styleguide and an e2e test have such a link.
+- **P18, printed PDF import** (ADR 0013), built before this:
+  - docling converts the PDF and pdftext reads its text layer into code; every PDF block records its page (IR 2, `source.pdf`);
+  - a blob port (S3 in dev and CI, memory in tests) stores the original, shown at `/api/v1/documents/{id}/original` (owner only, sandboxed), and documents can be deleted;
+  - the web app uploads PDFs and links "View page N";
+  - the verbatim report (`testdata/pdf/report.md`): 56 code blocks, 46 exact, 10 differing in whitespace only.
 
 ## What exists
 
@@ -33,13 +35,9 @@ P18, printed PDF import (ADR 0013): built, recorded and run against the real doc
   - 0007 annotations, 0008 in-browser code execution, 0009 the jobs port;
   - 0010 sign-in and sessions, 0011 retrieval, 0012 chat, 0013 PDF import.
 
-## Waiting on billing
-
-Recording the chat adapter's streams (`go test ./internal/chat/anthropic -record`), `make eval-chat` and its report, the real model's answers in the browser. Chat stays off in staging and prod until then.
-
 ## Next step
 
-Add API billing and run what waits on it; then the runner's deployment, and P19, proxy headers.
+P19: proxy headers, the runner's deployment, and chat on by env in staging and prod. First, review which of chat's eval misses are valid other answers (docs/open-questions.md).
 
 ## Quarantined tests
 

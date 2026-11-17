@@ -171,7 +171,11 @@ function SampleDocument() {
         counts running goroutines. Since Go 1.25 the <code>Go</code> method starts a goroutine and
         tracks it in one call, so there is no separate <code>Add</code> to forget.{" "}
         <mark>The function below never returns partial results</mark>: it reports the first error it
-        finds instead.
+        finds instead.{" "}
+        <mark>
+          See the <a href="https://pkg.go.dev/sync">sync package</a>
+        </mark>{" "}
+        for the rest.
       </p>
 
       <h2>Fetching in parallel</h2>

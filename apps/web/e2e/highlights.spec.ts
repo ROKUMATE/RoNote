@@ -397,6 +397,21 @@ test.describe("accessibility", () => {
     });
   }
 
+  // The accent on the highlight colour is the tightest pair for a link.
+  for (const theme of ["light", "dark"] as const) {
+    test(`a link inside a highlight has no axe violations in ${theme}`, async ({ page }) => {
+      await chooseTheme(page, theme);
+      await openLinkedPage(page);
+      await select(page, "Continue with", "part B of the guide");
+
+      await highlightSelection(page);
+
+      await expect(marks(page)).toHaveText(["part B of the guide"]);
+      await expect(page.locator(".reader mark.hl a, .reader a mark.hl")).toHaveCount(1);
+      await expectNoAxeViolations(page);
+    });
+  }
+
   test.describe("at 375px", () => {
     test.use({ viewport: { width: 375, height: 800 } });
 

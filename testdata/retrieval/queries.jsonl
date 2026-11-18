@@ -55,7 +55,7 @@
 {"id": "h10", "category": "howto", "query": "how do I change the user agent my python requests send", "expect": ["305348fac765"]}
 {"id": "h11", "category": "howto", "query": "how do I make a 2d grid in go", "expect": ["9d62e8cea780", "a69d34f954ee"]}
 {"id": "h12", "category": "howto", "query": "how do I check whether a key is in a go map", "expect": ["07fbca0ad571", "2cbdfe05e5b8"], "review": true}
-{"id": "h13", "category": "howto", "query": "how do I remove an item from a map in go", "expect": ["2cbdfe05e5b8"]}
+{"id": "h13", "category": "howto", "query": "how do I remove an item from a map in go", "expect": ["3cd11c3ed391", "9efb3751f3df"]}
 {"id": "h14", "category": "howto", "query": "how do I loop over a python list and get the position too", "expect": ["ce1ebfd11cbc", "4215ea9c2af7"], "review": true}
 {"id": "h15", "category": "howto", "query": "how do I only get rows that match a condition in postgres", "expect": ["cad356f26b5f"]}
 {"id": "h16", "category": "howto", "query": "how do I sort query results by a column", "expect": ["d3ec0f15caa3", "9585993209f3"]}

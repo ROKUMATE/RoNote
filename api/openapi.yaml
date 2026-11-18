@@ -1557,7 +1557,9 @@ components:
       description: >-
         A question, or an answer: generated text, never part of a document
         (docs/adr/0012-chat.md). A not_found answer is the model saying the
-        library doesn't answer, with not_found saying what is missing.
+        library doesn't answer, with not_found saying what is missing; an
+        unsourced one has text and no citation, so it can't be checked
+        against the library.
       required: [id, role, status, segments, citations, created_at]
       properties:
         id:
@@ -1569,9 +1571,10 @@ components:
         status:
           type: string
           description: >-
-            An answer streams until it is done, stopped, failed or not_found
-            (the library doesn't answer); a question is done.
-          enum: [streaming, done, stopped, failed, not_found]
+            An answer streams until it is done, stopped, failed, not_found
+            (the library doesn't answer) or unsourced (it cites nothing); a
+            question is done.
+          enum: [streaming, done, stopped, failed, not_found, unsourced]
         segments:
           type: array
           items:

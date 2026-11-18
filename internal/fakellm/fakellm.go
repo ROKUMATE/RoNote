@@ -8,9 +8,11 @@
 //
 // It answers from the search results it is sent: it cites the first block,
 // in request order, that holds one of the question's longer words, and
-// otherwise says the library doesn't cover the question. Two phrases steer
-// it: "search for X" first calls the search_library tool with X, and
-// "slowly" streams the answer a word at a time, slowly enough to stop.
+// otherwise says the library doesn't cover the question: it calls
+// not_in_library when it is offered the tool, and answers in text when not.
+// Three phrases steer it: "search for X" first calls the search_library tool
+// with X, "no sources" answers with text that cites nothing, and "slowly"
+// streams the answer a word at a time, slowly enough to stop.
 package fakellm
 
 import (
@@ -319,6 +321,9 @@ var searchFor = regexp.MustCompile(`(?i)\bsearch for\s+(.+?)[?.!]*$`)
 
 func answer(t turn) reply {
 	slow := strings.Contains(strings.ToLower(t.question), "slowly")
+	if strings.Contains(strings.ToLower(t.question), "no sources") {
+		return reply{slow: slow, stop: "end_turn", blocks: []out{{kind: "text", text: "Goroutines are cheap to start."}}}
+	}
 	if m := searchFor.FindStringSubmatch(t.question); m != nil && !t.searched && t.canSearch {
 		var blocks []out
 		if t.thinking {

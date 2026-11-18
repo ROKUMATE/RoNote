@@ -57,6 +57,10 @@ const (
 	// MessageNotFound is an answer that said the library doesn't answer: the
 	// model called not_in_library, and Content.NotFound says what's missing.
 	MessageNotFound MessageStatus = "not_found"
+	// MessageUnsourced is an answer with text and no valid citation, and
+	// without a not_in_library call: it can't be checked against the
+	// library.
+	MessageUnsourced MessageStatus = "unsourced"
 )
 
 // MessageContent is what a message says: text in segments and, for an
@@ -112,6 +116,9 @@ type MessageUsage struct {
 	// InvalidCitations counts citations dropped as pointing at nothing
 	// the model was sent.
 	InvalidCitations int
+	// SelfMarkers counts citation markers the model wrote into its text,
+	// such as [1] or [2-3]: the text is never rewritten.
+	SelfMarkers int
 }
 
 // Message is one question or answer.
@@ -268,7 +275,7 @@ func (s *Store) FinishMessage(ctx context.Context, owner, id uuid.UUID, status M
 		InputTokens: clamp32(u.InputTokens), OutputTokens: clamp32(u.OutputTokens),
 		CacheCreationInputTokens: clamp32(u.CacheCreationInputTokens), CacheReadInputTokens: clamp32(u.CacheReadInputTokens),
 		CostMicrousd: u.CostMicroUSD, FirstTokenMs: clamp32(u.FirstTokenMS), LatencyMs: clamp32(u.LatencyMS),
-		ToolRounds: clamp32(u.ToolRounds), InvalidCitations: clamp32(u.InvalidCitations),
+		ToolRounds: clamp32(u.ToolRounds), InvalidCitations: clamp32(u.InvalidCitations), SelfMarkers: clamp32(u.SelfMarkers),
 	})
 	if err != nil {
 		return Message{}, mapErr("finish message", err)
@@ -309,7 +316,7 @@ func messageFrom(row sqlcdb.ListMessagesRow) (Message, error) {
 			Model: row.Model, InputTokens: int(row.InputTokens), OutputTokens: int(row.OutputTokens),
 			CacheCreationInputTokens: int(row.CacheCreationInputTokens), CacheReadInputTokens: int(row.CacheReadInputTokens),
 			CostMicroUSD: row.CostMicrousd, FirstTokenMS: int(row.FirstTokenMs), LatencyMS: int(row.LatencyMs),
-			ToolRounds: int(row.ToolRounds), InvalidCitations: int(row.InvalidCitations),
+			ToolRounds: int(row.ToolRounds), InvalidCitations: int(row.InvalidCitations), SelfMarkers: int(row.SelfMarkers),
 		},
 		CreatedAt: row.CreatedAt,
 	}, nil

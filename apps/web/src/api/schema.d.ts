@@ -713,17 +713,17 @@ export interface components {
         SendMessageRequest: {
             text: string;
         };
-        /** @description A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). A not_found answer is the model saying the library doesn't answer, with not_found saying what is missing. */
+        /** @description A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). A not_found answer is the model saying the library doesn't answer, with not_found saying what is missing; an unsourced one has text and no citation, so it can't be checked against the library. */
         Message: {
             /** Format: uuid */
             id: string;
             /** @enum {string} */
             role: "user" | "assistant";
             /**
-             * @description An answer streams until it is done, stopped, failed or not_found (the library doesn't answer); a question is done.
+             * @description An answer streams until it is done, stopped, failed, not_found (the library doesn't answer) or unsourced (it cites nothing); a question is done.
              * @enum {string}
              */
-            status: "streaming" | "done" | "stopped" | "failed" | "not_found";
+            status: "streaming" | "done" | "stopped" | "failed" | "not_found" | "unsourced";
             segments: components["schemas"]["MessageSegment"][];
             citations: components["schemas"]["Citation"][];
             error?: components["schemas"]["ChatErrorCode"];

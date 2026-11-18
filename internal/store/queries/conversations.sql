@@ -55,7 +55,7 @@ INSERT INTO messages (conversation_id, owner_id, role, status, content)
 VALUES (sqlc.arg(conversation_id), sqlc.arg(owner_id), sqlc.arg(role), sqlc.arg(status), sqlc.arg(content))
 RETURNING id, conversation_id, role, status, content, model, input_tokens, output_tokens,
     cache_creation_input_tokens, cache_read_input_tokens, cost_microusd, first_token_ms, latency_ms,
-    tool_rounds, invalid_citations, created_at;
+    tool_rounds, invalid_citations, self_markers, created_at;
 
 -- name: ListMessages :many
 -- A conversation's messages in order. An answer still streaming after
@@ -64,7 +64,7 @@ SELECT id, conversation_id, role,
     CASE WHEN status = 'streaming' AND created_at <= now() - make_interval(secs => sqlc.arg(running_for_seconds)::double precision)
         THEN 'failed' ELSE status END::text AS status,
     content, model, input_tokens, output_tokens, cache_creation_input_tokens, cache_read_input_tokens,
-    cost_microusd, first_token_ms, latency_ms, tool_rounds, invalid_citations, created_at
+    cost_microusd, first_token_ms, latency_ms, tool_rounds, invalid_citations, self_markers, created_at
 FROM messages
 WHERE owner_id = sqlc.arg(owner_id) AND conversation_id = sqlc.arg(conversation_id)
 ORDER BY created_at, id;
@@ -77,11 +77,12 @@ SET status = sqlc.arg(status), content = sqlc.arg(content), model = sqlc.arg(mod
     cache_creation_input_tokens = sqlc.arg(cache_creation_input_tokens),
     cache_read_input_tokens = sqlc.arg(cache_read_input_tokens), cost_microusd = sqlc.arg(cost_microusd),
     first_token_ms = sqlc.arg(first_token_ms), latency_ms = sqlc.arg(latency_ms),
-    tool_rounds = sqlc.arg(tool_rounds), invalid_citations = sqlc.arg(invalid_citations), finished_at = now()
+    tool_rounds = sqlc.arg(tool_rounds), invalid_citations = sqlc.arg(invalid_citations),
+    self_markers = sqlc.arg(self_markers), finished_at = now()
 WHERE owner_id = sqlc.arg(owner_id) AND id = sqlc.arg(id) AND status = 'streaming'
 RETURNING id, conversation_id, role, status, content, model, input_tokens, output_tokens,
     cache_creation_input_tokens, cache_read_input_tokens, cost_microusd, first_token_ms, latency_ms,
-    tool_rounds, invalid_citations, created_at;
+    tool_rounds, invalid_citations, self_markers, created_at;
 
 -- name: ChatUsage :one
 -- What counts against the owner's chat quotas within the window: questions

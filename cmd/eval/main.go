@@ -177,7 +177,11 @@ func run(ctx context.Context, opts options) error {
 		return review(ctx, st, search.NewSearcher(st, embedder, discard), user.ID, docs, ids, queries)
 	}
 	if opts.chat {
-		return chatEval(ctx, st, user.ID, embedder, queries, opts.chatRun)
+		idx, err := indexCorpus(ctx, st, user.ID, ids)
+		if err != nil {
+			return err
+		}
+		return chatEval(ctx, st, user.ID, embedder, idx, queries, opts.chatRun)
 	}
 	if opts.record {
 		inputs := make([]string, len(queries))

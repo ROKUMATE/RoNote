@@ -399,6 +399,7 @@ const (
 	MessageStatusNotFound  MessageStatus = "not_found"
 	MessageStatusStopped   MessageStatus = "stopped"
 	MessageStatusStreaming MessageStatus = "streaming"
+	MessageStatusUnsourced MessageStatus = "unsourced"
 )
 
 // Valid indicates whether the value is a known member of the MessageStatus enum.
@@ -413,6 +414,8 @@ func (e MessageStatus) Valid() bool {
 	case MessageStatusStopped:
 		return true
 	case MessageStatusStreaming:
+		return true
+	case MessageStatusUnsourced:
 		return true
 	default:
 		return false
@@ -545,7 +548,7 @@ type ChatDelta struct {
 
 // ChatDone defines model for ChatDone.
 type ChatDone struct {
-	// Message A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). A not_found answer is the model saying the library doesn't answer, with not_found saying what is missing.
+	// Message A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). A not_found answer is the model saying the library doesn't answer, with not_found saying what is missing; an unsourced one has text and no citation, so it can't be checked against the library.
 	Message           Message `json:"message"`
 	MessagesLeftToday int     `json:"messages_left_today"`
 }
@@ -814,7 +817,7 @@ type Me struct {
 	Login string `json:"login"`
 }
 
-// Message A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). A not_found answer is the model saying the library doesn't answer, with not_found saying what is missing.
+// Message A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). A not_found answer is the model saying the library doesn't answer, with not_found saying what is missing; an unsourced one has text and no citation, so it can't be checked against the library.
 type Message struct {
 	Citations []Citation `json:"citations"`
 	CreatedAt time.Time  `json:"created_at"`
@@ -828,7 +831,7 @@ type Message struct {
 	Role     MessageRole      `json:"role"`
 	Segments []MessageSegment `json:"segments"`
 
-	// Status An answer streams until it is done, stopped, failed or not_found (the library doesn't answer); a question is done.
+	// Status An answer streams until it is done, stopped, failed, not_found (the library doesn't answer) or unsourced (it cites nothing); a question is done.
 	Status MessageStatus `json:"status"`
 
 	// Usage What an answer cost, across its calls to the model.
@@ -838,7 +841,7 @@ type Message struct {
 // MessageRole defines model for Message.Role.
 type MessageRole string
 
-// MessageStatus An answer streams until it is done, stopped, failed or not_found (the library doesn't answer); a question is done.
+// MessageStatus An answer streams until it is done, stopped, failed, not_found (the library doesn't answer) or unsourced (it cites nothing); a question is done.
 type MessageStatus string
 
 // MessageSegment A run of a message's Markdown, and the numbers of the citations that back it.

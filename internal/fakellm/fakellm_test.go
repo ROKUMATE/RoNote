@@ -185,6 +185,13 @@ func TestCallsNotInLibraryWhenItCan(t *testing.T) {
 	}
 }
 
+func TestAnswersWithoutSourcesWhenAsked(t *testing.T) {
+	blocks, stop := assemble(t, streamed(t, ask(user(append(library, text("How do goroutines communicate, with no sources?"))...))))
+	if stop != "end_turn" || len(blocks) != 1 || blocks[0].text != "Goroutines are cheap to start." || len(blocks[0].citations) != 0 {
+		t.Errorf("blocks = %+v, stop %q; want one text that cites nothing", blocks, stop)
+	}
+}
+
 func TestSearchesWhenAsked(t *testing.T) {
 	question := user(append(library, text("Search for comparable keys"))...)
 	blocks, stop := assemble(t, streamed(t, ask(question)))

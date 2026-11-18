@@ -3,7 +3,7 @@ import { expect, test } from "vitest";
 import type { ChatDone, Citation, Conversation, Message } from "../api/schema";
 import { apiError, json, stubApi } from "../test/api";
 import { renderApp } from "../test/render";
-import { notFoundLabel } from "./Conversation";
+import { notFoundLabel, unsourcedLabel, unsourcedNote } from "./Conversation";
 
 const created = "2026-11-14T09:00:00Z";
 const conversation: Conversation = {
@@ -146,6 +146,43 @@ test("a not_found answer says what the library lacks and what to import", async 
   expect(within(panel).getByText("The library has nothing on ServeMux.")).toBeTruthy();
   expect(within(panel).getByText("To find it, import Go's net/http page.")).toBeTruthy();
   expect(within(panel).queryByRole("button", { name: /^Source/ })).toBeNull();
+});
+
+test("an answer with text and no citations says it has no sources", async () => {
+  const unsourced = answer({
+    status: "unsourced",
+    segments: [{ text: "Goroutines use channels ([1]).", citations: [] }],
+    citations: [],
+  });
+  stubApi({
+    "GET /documents": () => json({ documents: [] }),
+    "GET /conversations": () => json({ conversations: [], messages_left_today: 50 }),
+    "POST /conversations": () => json(conversation, 201),
+    "POST /conversations/c1/messages": () => answered(unsourced),
+    "GET /conversations/c1": () => json({ conversation, messages: [question, unsourced] }),
+  });
+  renderApp("/");
+  const panel = await openChat();
+  await ask(panel, "How do goroutines talk?");
+  expect(await within(panel).findByText(unsourcedLabel)).toBeTruthy();
+  expect(within(panel).getByText(unsourcedNote)).toBeTruthy();
+  expect(within(panel).getByText("Goroutines use channels ([1]).")).toBeTruthy();
+  expect(within(panel).queryByText(notFoundLabel)).toBeNull();
+});
+
+test("an answer whose text is empty and cites nothing still says it has no sources", async () => {
+  const empty = answer({ status: "unsourced", segments: [], citations: [] });
+  stubApi({
+    "GET /documents": () => json({ documents: [] }),
+    "GET /conversations": () => json({ conversations: [], messages_left_today: 50 }),
+    "POST /conversations": () => json(conversation, 201),
+    "POST /conversations/c1/messages": () => answered(empty),
+    "GET /conversations/c1": () => json({ conversation, messages: [question, empty] }),
+  });
+  renderApp("/");
+  const panel = await openChat();
+  await ask(panel, "How do goroutines talk?");
+  expect(await within(panel).findByText(unsourcedNote)).toBeTruthy();
 });
 
 test("Stop asks the server to stop, and the answer shows as stopped", async () => {

@@ -235,8 +235,8 @@ func TestChatOverHTTP(t *testing.T) {
 		rec := apiRequest(t, adaAPI, http.MethodGet, "/api/v1/conversations/"+conv.ID.String(), "")
 		detail := decodeJSON[gen.ConversationDetail](t, rec)
 		last := detail.Messages[len(detail.Messages)-1]
-		if last.Status != gen.MessageStatusDone || last.Segments[0].Text != "Saved anyway." {
-			t.Errorf("answer = %+v, want it saved whole", last)
+		if last.Status != gen.MessageStatusUnsourced || last.Segments[0].Text != "Saved anyway." {
+			t.Errorf("answer = %+v, want it saved whole, unsourced for citing nothing", last)
 		}
 	})
 

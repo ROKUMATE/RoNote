@@ -469,6 +469,10 @@ func (s *Service) finish(ctx context.Context, t *turn, owner, conversation uuid.
 		status, code = store.MessageFailed, CodeModelRefused
 	case err == nil && t.notFound != nil:
 		status = store.MessageNotFound
+	case err == nil && len(t.cite.cited) == 0:
+		// Text with no valid citation, or none at all: it can't be checked
+		// against the library, which is not the same as saying it isn't there.
+		status = store.MessageUnsourced
 	case err == nil:
 	case errors.Is(err, ErrUnavailable) || errors.Is(err, context.DeadlineExceeded):
 		status, code = store.MessageFailed, CodeModelUnavailable
@@ -489,7 +493,7 @@ func (s *Service) finish(ctx context.Context, t *turn, owner, conversation uuid.
 		Model: s.o.ModelName, InputTokens: t.usage.InputTokens, OutputTokens: t.usage.OutputTokens,
 		CacheCreationInputTokens: t.usage.CacheCreationInputTokens, CacheReadInputTokens: t.usage.CacheReadInputTokens,
 		CostMicroUSD: s.price.Cost(t.usage), FirstTokenMS: int(t.firstText.Milliseconds()), LatencyMS: int(time.Since(t.start).Milliseconds()),
-		ToolRounds: t.rounds, InvalidCitations: t.cite.invalid,
+		ToolRounds: t.rounds, InvalidCitations: t.cite.invalid, SelfMarkers: countMarkers(text(content)),
 	}
 	msg, err := s.o.Store.FinishMessage(saveCtx, owner, t.answer.MessageID, status, content, usage)
 	if err != nil {
@@ -513,12 +517,12 @@ func (s *Service) finish(ctx context.Context, t *turn, owner, conversation uuid.
 }
 
 // exchanges are the earlier questions with an answer to send again: one
-// done, stopped or not found, with text.
+// done, stopped, not found or unsourced, with text.
 func exchanges(msgs []store.Message) []exchange {
 	var out []exchange
 	for i := 0; i+1 < len(msgs); i++ {
 		q, a := msgs[i], msgs[i+1]
-		if q.Role != store.RoleUser || a.Role != store.RoleAssistant || (a.Status != store.MessageDone && a.Status != store.MessageStopped && a.Status != store.MessageNotFound) {
+		if q.Role != store.RoleUser || a.Role != store.RoleAssistant || !slices.Contains([]store.MessageStatus{store.MessageDone, store.MessageStopped, store.MessageNotFound, store.MessageUnsourced}, a.Status) {
 			continue
 		}
 		if answer := answerText(a); answer != "" {

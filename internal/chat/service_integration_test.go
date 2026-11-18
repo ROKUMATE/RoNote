@@ -422,8 +422,8 @@ func TestAnAnswerOutlivesItsListener(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if answer := msgs[1]; answer.Status != store.MessageDone || text(answer.Content) != "Written to the end." {
-		t.Errorf("answer = %+v, want it saved whole", answer)
+	if answer := msgs[1]; answer.Status != store.MessageUnsourced || text(answer.Content) != "Written to the end." {
+		t.Errorf("answer = %+v, want it saved whole, unsourced for citing nothing", answer)
 	}
 }
 
@@ -652,5 +652,50 @@ func TestNotInLibraryOnTheLastCall(t *testing.T) {
 	msg := done(t, collect(t, a)).Message
 	if msg.Status != store.MessageNotFound || msg.Usage.ToolRounds != maxToolRounds {
 		t.Errorf("answer = %s after %d rounds, want not_found after %d searches", msg.Status, msg.Usage.ToolRounds, maxToolRounds)
+	}
+}
+
+// A reply with text and no valid citation, and no not_in_library call, is
+// shown as what it is: unsourced, not "not found". The markers the model
+// wrote itself are counted, and the text is left as it is.
+func TestATextReplyWithoutCitationsIsUnsourced(t *testing.T) {
+	testDB.Reset(t)
+	st := store.New(testDB.Pool)
+	ada := newUser(t, st)
+	addDoc(t, st, ada, "Go channels", "Channels connect goroutines.")
+	const said = "Channels connect goroutines ([1-2]) and `a[3]` stays code.[4]"
+	svc := newService(t, st, ModelFunc(func(_ context.Context, req Request, on func(Event)) (Reply, error) {
+		say(on, req, -1, said)
+		return Reply{Stop: StopEndTurn}, nil
+	}), plenty)
+	conv := newConversation(t, svc, ada, uuid.Nil)
+	a, err := svc.Ask(t.Context(), ada, conv, "How do goroutines talk?")
+	if err != nil {
+		t.Fatal(err)
+	}
+	msg := done(t, collect(t, a)).Message
+	if msg.Status != store.MessageUnsourced || len(msg.Content.Citations) != 0 {
+		t.Errorf("status %s with %d citations, want unsourced and none", msg.Status, len(msg.Content.Citations))
+	}
+	if msg.Usage.SelfMarkers != 2 || text(msg.Content) != said {
+		t.Errorf("%d markers, text %q; want 2 counted and the text untouched", msg.Usage.SelfMarkers, text(msg.Content))
+	}
+}
+
+func TestAnEmptyReplyIsUnsourced(t *testing.T) {
+	testDB.Reset(t)
+	st := store.New(testDB.Pool)
+	ada := newUser(t, st)
+	addDoc(t, st, ada, "Go channels", "Channels connect goroutines.")
+	svc := newService(t, st, ModelFunc(func(context.Context, Request, func(Event)) (Reply, error) {
+		return Reply{Stop: StopEndTurn}, nil
+	}), plenty)
+	conv := newConversation(t, svc, ada, uuid.Nil)
+	a, err := svc.Ask(t.Context(), ada, conv, "How do goroutines talk?")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if msg := done(t, collect(t, a)).Message; msg.Status != store.MessageUnsourced {
+		t.Errorf("status %s, want unsourced for a turn with no text and no call", msg.Status)
 	}
 }

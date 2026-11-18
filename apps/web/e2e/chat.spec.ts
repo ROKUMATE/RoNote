@@ -9,8 +9,8 @@ import { stack } from "./stack";
 import { expect, ownUserTest as test } from "./test";
 
 // The fake model (cmd/fakellm) cites the first block it is sent holding one
-// of the question's longer words, and says the library doesn't cover a
-// question none of them is in. Each test asks about one document, so other
+// of the question's longer words, and calls not_in_library for a question
+// none of them is in. "no sources" gets an answer that cites nothing. Each test asks about one document, so other
 // tests' imports in the worker's library never answer it.
 
 // axe measures contrast as it finds it; without motion nothing on the page
@@ -73,6 +73,18 @@ test("a question the document doesn't answer is not found in the library", async
   await expect(panel.getByRole("button", { name: /^Source/ })).toHaveCount(0);
 });
 
+test("an answer that cites nothing says it has no sources", async ({ page }) => {
+  const { panel } = await chatAboutControlFlow(page);
+  await ask(panel, "How do for statements iterate, with no sources?");
+  await expect(panel.getByText("No sources", { exact: true })).toBeVisible();
+  await expect(
+    panel.getByText("This answer couldn't be checked against your library."),
+  ).toBeVisible();
+  await expect(panel.getByText("Goroutines are cheap to start.")).toBeVisible();
+  await expect(panel.getByText("Not found in your library")).toHaveCount(0);
+  await expect(panel.getByRole("button", { name: /^Source/ })).toHaveCount(0);
+});
+
 test("Stop ends an answer, which is saved as stopped", async ({ page }) => {
   const { panel } = await chatAboutControlFlow(page);
   // "slowly" makes the fake model stream a word at a time.
@@ -113,6 +125,17 @@ test("past the day's questions, the chat says so", async ({ page }) => {
 });
 
 for (const theme of ["light", "dark"] as const) {
+  test(`the not found and no sources answers pass axe in ${theme}`, async ({ page }) => {
+    await chooseTheme(page, theme);
+    const { panel } = await chatAboutControlFlow(page);
+    await ask(panel, "How do I configure ServeMux routes?");
+    await expect(panel.getByText("Not found in your library")).toBeVisible();
+    await ask(panel, "How do for statements iterate, with no sources?");
+    await expect(panel.getByText("No sources", { exact: true })).toBeVisible();
+    await expect(panel.getByRole("button", { name: "Ask" })).toBeVisible();
+    await expectNoAxeViolations(page);
+  });
+
   test(`the chat passes axe in ${theme}, and is a full sheet at 375px`, async ({ page }) => {
     await chooseTheme(page, theme);
     // Over the library: the document pages' own contrast is the reader's.

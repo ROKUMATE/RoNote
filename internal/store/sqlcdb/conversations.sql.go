@@ -122,11 +122,12 @@ SET status = $1, content = $2, model = $3,
     cache_creation_input_tokens = $6,
     cache_read_input_tokens = $7, cost_microusd = $8,
     first_token_ms = $9, latency_ms = $10,
-    tool_rounds = $11, invalid_citations = $12, finished_at = now()
-WHERE owner_id = $13 AND id = $14 AND status = 'streaming'
+    tool_rounds = $11, invalid_citations = $12,
+    self_markers = $13, finished_at = now()
+WHERE owner_id = $14 AND id = $15 AND status = 'streaming'
 RETURNING id, conversation_id, role, status, content, model, input_tokens, output_tokens,
     cache_creation_input_tokens, cache_read_input_tokens, cost_microusd, first_token_ms, latency_ms,
-    tool_rounds, invalid_citations, created_at
+    tool_rounds, invalid_citations, self_markers, created_at
 `
 
 type FinishMessageParams struct {
@@ -142,6 +143,7 @@ type FinishMessageParams struct {
 	LatencyMs                int32
 	ToolRounds               int32
 	InvalidCitations         int32
+	SelfMarkers              int32
 	OwnerID                  uuid.UUID
 	ID                       uuid.UUID
 }
@@ -162,6 +164,7 @@ type FinishMessageRow struct {
 	LatencyMs                int32
 	ToolRounds               int32
 	InvalidCitations         int32
+	SelfMarkers              int32
 	CreatedAt                time.Time
 }
 
@@ -180,6 +183,7 @@ func (q *Queries) FinishMessage(ctx context.Context, arg FinishMessageParams) (F
 		arg.LatencyMs,
 		arg.ToolRounds,
 		arg.InvalidCitations,
+		arg.SelfMarkers,
 		arg.OwnerID,
 		arg.ID,
 	)
@@ -200,6 +204,7 @@ func (q *Queries) FinishMessage(ctx context.Context, arg FinishMessageParams) (F
 		&i.LatencyMs,
 		&i.ToolRounds,
 		&i.InvalidCitations,
+		&i.SelfMarkers,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -245,7 +250,7 @@ INSERT INTO messages (conversation_id, owner_id, role, status, content)
 VALUES ($1, $2, $3, $4, $5)
 RETURNING id, conversation_id, role, status, content, model, input_tokens, output_tokens,
     cache_creation_input_tokens, cache_read_input_tokens, cost_microusd, first_token_ms, latency_ms,
-    tool_rounds, invalid_citations, created_at
+    tool_rounds, invalid_citations, self_markers, created_at
 `
 
 type InsertMessageParams struct {
@@ -272,6 +277,7 @@ type InsertMessageRow struct {
 	LatencyMs                int32
 	ToolRounds               int32
 	InvalidCitations         int32
+	SelfMarkers              int32
 	CreatedAt                time.Time
 }
 
@@ -300,6 +306,7 @@ func (q *Queries) InsertMessage(ctx context.Context, arg InsertMessageParams) (I
 		&i.LatencyMs,
 		&i.ToolRounds,
 		&i.InvalidCitations,
+		&i.SelfMarkers,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -370,7 +377,7 @@ SELECT id, conversation_id, role,
     CASE WHEN status = 'streaming' AND created_at <= now() - make_interval(secs => $1::double precision)
         THEN 'failed' ELSE status END::text AS status,
     content, model, input_tokens, output_tokens, cache_creation_input_tokens, cache_read_input_tokens,
-    cost_microusd, first_token_ms, latency_ms, tool_rounds, invalid_citations, created_at
+    cost_microusd, first_token_ms, latency_ms, tool_rounds, invalid_citations, self_markers, created_at
 FROM messages
 WHERE owner_id = $2 AND conversation_id = $3
 ORDER BY created_at, id
@@ -398,6 +405,7 @@ type ListMessagesRow struct {
 	LatencyMs                int32
 	ToolRounds               int32
 	InvalidCitations         int32
+	SelfMarkers              int32
 	CreatedAt                time.Time
 }
 
@@ -428,6 +436,7 @@ func (q *Queries) ListMessages(ctx context.Context, arg ListMessagesParams) ([]L
 			&i.LatencyMs,
 			&i.ToolRounds,
 			&i.InvalidCitations,
+			&i.SelfMarkers,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err

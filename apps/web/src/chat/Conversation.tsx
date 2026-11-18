@@ -21,6 +21,10 @@ const maxQuestion = 2000;
 /** What an answer says when the model said the library doesn't answer (ADR 0012). */
 export const notFoundLabel = "Not found in your library";
 
+/** What an answer says when it has text and cites nothing: it was not checked. */
+export const unsourcedLabel = "No sources";
+export const unsourcedNote = "This answer couldn't be checked against your library.";
+
 /** An answer as it streams in, before it is saved. */
 type Live = {
   question: string;
@@ -291,20 +295,22 @@ function Answer({ message, onLand }: { message: Message; onLand: (c: Citation) =
       </Generated>
     );
   }
-  const missing = message.status === "not_found";
-  const notFound = missing || (message.status === "done" && message.citations.length === 0);
+  const notFound = message.status === "not_found";
+  const unsourced = message.status === "unsourced";
   return (
-    <Generated muted={notFound}>
+    <Generated muted={notFound || unsourced}>
       {notFound && <p className="mt-1 font-semibold">{notFoundLabel}</p>}
-      {missing && message.not_found && (
+      {unsourced && <p className="mt-1 font-semibold">{unsourcedLabel}</p>}
+      {notFound && message.not_found && (
         <>
           <p className="my-2">{message.not_found.missing}</p>
           <p className="my-2">To find it, import {message.not_found.suggest}.</p>
         </>
       )}
-      {said && !missing && (
+      {said && !notFound && (
         <Markdown segments={message.segments} citations={message.citations} onLand={onLand} />
       )}
+      {unsourced && <p className="my-2 text-ink-2 text-ui">{unsourcedNote}</p>}
       {message.status === "stopped" && <p className="my-2 text-ink-2 text-ui">Stopped.</p>}
       {message.status === "failed" && (
         <p className="my-2 text-ui-lg">{chatErrorMessages[message.error ?? "internal_error"]}</p>

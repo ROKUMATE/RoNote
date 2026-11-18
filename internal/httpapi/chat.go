@@ -245,6 +245,9 @@ func messageJSON(m store.Message) gen.Message {
 		code := gen.ChatErrorCode(m.Content.Error)
 		out.Error = &code
 	}
+	if n := m.Content.NotFound; n != nil {
+		out.NotFound = &gen.ChatNotFound{Missing: n.Missing, Suggest: n.Suggest}
+	}
 	if m.Role == store.RoleAssistant && m.Status != store.MessageStreaming {
 		u := m.Usage
 		out.Usage = &gen.ChatUsage{

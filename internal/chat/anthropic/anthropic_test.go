@@ -49,6 +49,14 @@ var (
 		},
 		Required: []string{"query"},
 	}
+	notFoundTool = chat.Tool{
+		Name: "not_in_library", Description: "Call this instead of answering when the student's library doesn't answer.",
+		Properties: map[string]any{
+			"missing": map[string]any{"type": "string"},
+			"suggest": map[string]any{"type": "string"},
+		},
+		Required: []string{"missing", "suggest"},
+	}
 )
 
 func ask(question string, results ...chat.Result) chat.Request {
@@ -267,6 +275,25 @@ func TestAnswerTheResultsDontHold(t *testing.T) {
 	checkCitations(t, h, []chat.Result{channels, unbuffered})
 }
 
+// TestNotInLibrary offers only not_in_library, as a turn's last call does,
+// with passages that don't hold the answer: the model calls it, saying what
+// is missing and what to import.
+func TestNotInLibrary(t *testing.T) {
+	req := ask("How do I configure ServeMux routes?", channels, unbuffered)
+	req.Tools = []chat.Tool{notFoundTool}
+	reply, err := replay(t, "not_in_library").Stream(t.Context(), req, func(chat.Event) {})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reply.Stop != chat.StopToolUse || len(reply.ToolUses) != 1 || reply.ToolUses[0].Name != "not_in_library" {
+		t.Fatalf("reply = %+v, want one call of not_in_library", reply)
+	}
+	var in struct{ Missing, Suggest string }
+	if err := json.Unmarshal(reply.ToolUses[0].Input, &in); err != nil || in.Missing == "" || in.Suggest == "" {
+		t.Errorf("tool input %s (%v), want missing and suggest", reply.ToolUses[0].Input, err)
+	}
+}
+
 func TestToolRound(t *testing.T) {
 	first := ask("Search my library for using a buffered channel as a semaphore", channels)
 	var h heard
@@ -385,10 +412,10 @@ func TestAgainstTheFakeModel(t *testing.T) {
 		t.Errorf("cited = %+v, want the tool's result", h.cited)
 	}
 
-	// With no results, the tool answers in text; and with tools off, the
+	// With no results, the tool answers in text; and with no tools, the
 	// model answers.
 	third := first
-	third.ToolsOff = true
+	third.Tools = nil
 	third.Messages = append(third.Messages,
 		chat.Message{Role: chat.Assistant, Blocks: reply.Content},
 		chat.Message{Role: chat.User, Blocks: []chat.Block{chat.ToolResult{ToolUseID: reply.ToolUses[0].ID, Text: "No results found."}}},

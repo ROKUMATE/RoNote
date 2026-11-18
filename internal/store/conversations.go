@@ -54,6 +54,9 @@ const (
 	MessageDone      MessageStatus = "done"
 	MessageStopped   MessageStatus = "stopped"
 	MessageFailed    MessageStatus = "failed"
+	// MessageNotFound is an answer that said the library doesn't answer: the
+	// model called not_in_library, and Content.NotFound says what's missing.
+	MessageNotFound MessageStatus = "not_found"
 )
 
 // MessageContent is what a message says: text in segments and, for an
@@ -63,6 +66,16 @@ type MessageContent struct {
 	Citations []Citation `json:"citations"`
 	// Error is why a failed answer failed, as the API names it.
 	Error string `json:"error,omitempty"`
+	// NotFound is what the model said the library lacks, on a not_found
+	// answer.
+	NotFound *NotFound `json:"not_found,omitempty"`
+}
+
+// NotFound is the model's own account of why the library doesn't answer: one
+// sentence on what it lacks, and the kind of page to import.
+type NotFound struct {
+	Missing string `json:"missing"`
+	Suggest string `json:"suggest"`
 }
 
 // Segment is a run of a message's text and the numbers of the citations

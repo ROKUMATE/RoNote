@@ -339,10 +339,15 @@ type turn struct {
 	// firstText is how long the first text took.
 	firstText time.Duration
 	refused   bool
+	// notFound is what the model said the library lacks, when it called
+	// not_in_library.
+	notFound *store.NotFound
 }
 
 // converse grounds the question in the conversation's library and calls
-// the model until it answers, with up to maxToolRounds searches between.
+// the model until it answers or says the library doesn't, with up to
+// maxToolRounds searches between. The call after the last search offers
+// only not_in_library, so the model answers with what it has or says so.
 func (s *Service) converse(ctx context.Context, t *turn, earlier []exchange, question string) error {
 	passages, err := t.lib.search(ctx, question, false)
 	if err != nil {
@@ -355,7 +360,7 @@ func (s *Service) converse(ctx context.Context, t *turn, earlier []exchange, que
 	}
 	req := Request{
 		System:    systemPrompt,
-		Tools:     []Tool{searchTool},
+		Tools:     libraryTools,
 		Messages:  append(history(earlier, historyRoom(question, passages)), Message{Role: User, Blocks: append(asked, Text{Text: question})}),
 		MaxTokens: maxTokens,
 	}
@@ -364,7 +369,11 @@ func (s *Service) converse(ctx context.Context, t *turn, earlier []exchange, que
 		if next > inputCap {
 			return fmt.Errorf("a call of about %d input tokens would pass the cap of %d", next, inputCap)
 		}
-		req.ToolsOff = t.rounds >= maxToolRounds
+		last := t.rounds >= maxToolRounds
+		req.Tools = libraryTools
+		if last {
+			req.Tools = []Tool{notFoundTool}
+		}
 		reply, err := s.o.Model.Stream(ctx, req, t.hear)
 		t.usage = t.usage.Add(reply.Usage)
 		if err != nil {
@@ -374,7 +383,21 @@ func (s *Service) converse(ctx context.Context, t *turn, earlier []exchange, que
 			t.refused = true
 			return nil
 		}
-		if reply.Stop != StopToolUse || len(reply.ToolUses) == 0 || req.ToolsOff {
+		// A valid not_in_library call ends the turn, whatever else the reply
+		// calls; an invalid one is told why.
+		unshown := map[string]string{}
+		for _, use := range reply.ToolUses {
+			if use.Name != notFoundName {
+				continue
+			}
+			nf, why := parseNotFound(use)
+			if why == "" {
+				t.notFound = &nf
+				return nil
+			}
+			unshown[use.ID] = why
+		}
+		if reply.Stop != StopToolUse || len(reply.ToolUses) == 0 || last {
 			return nil
 		}
 		t.rounds++
@@ -383,6 +406,12 @@ func (s *Service) converse(ctx context.Context, t *turn, earlier []exchange, que
 		// again, then the results.
 		next = reply.Usage.InputTokens + reply.Usage.CacheCreationInputTokens + reply.Usage.CacheReadInputTokens + reply.Usage.OutputTokens
 		for _, use := range reply.ToolUses {
+			if why, bad := unshown[use.ID]; bad {
+				result := ToolResult{ToolUseID: use.ID, Text: why, IsError: true}
+				results = append(results, result)
+				next += blockTokens(result)
+				continue
+			}
 			if q := queryOf(use); q != "" {
 				t.answer.send(SearchUpdate{Query: q})
 			}
@@ -438,6 +467,8 @@ func (s *Service) finish(ctx context.Context, t *turn, owner, conversation uuid.
 		status = store.MessageStopped
 	case err == nil && t.refused:
 		status, code = store.MessageFailed, CodeModelRefused
+	case err == nil && t.notFound != nil:
+		status = store.MessageNotFound
 	case err == nil:
 	case errors.Is(err, ErrUnavailable) || errors.Is(err, context.DeadlineExceeded):
 		status, code = store.MessageFailed, CodeModelUnavailable
@@ -451,6 +482,9 @@ func (s *Service) finish(ctx context.Context, t *turn, owner, conversation uuid.
 	saveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), saveTimeout)
 	defer cancel()
 	content := store.MessageContent{Segments: t.segments, Citations: t.cite.cited, Error: code}
+	if status == store.MessageNotFound {
+		content.NotFound = t.notFound
+	}
 	usage := store.MessageUsage{
 		Model: s.o.ModelName, InputTokens: t.usage.InputTokens, OutputTokens: t.usage.OutputTokens,
 		CacheCreationInputTokens: t.usage.CacheCreationInputTokens, CacheReadInputTokens: t.usage.CacheReadInputTokens,
@@ -479,19 +513,28 @@ func (s *Service) finish(ctx context.Context, t *turn, owner, conversation uuid.
 }
 
 // exchanges are the earlier questions with an answer to send again: one
-// done or stopped, with text.
+// done, stopped or not found, with text.
 func exchanges(msgs []store.Message) []exchange {
 	var out []exchange
 	for i := 0; i+1 < len(msgs); i++ {
 		q, a := msgs[i], msgs[i+1]
-		if q.Role != store.RoleUser || a.Role != store.RoleAssistant || (a.Status != store.MessageDone && a.Status != store.MessageStopped) {
+		if q.Role != store.RoleUser || a.Role != store.RoleAssistant || (a.Status != store.MessageDone && a.Status != store.MessageStopped && a.Status != store.MessageNotFound) {
 			continue
 		}
-		if answer := text(a.Content); answer != "" {
+		if answer := answerText(a); answer != "" {
 			out = append(out, exchange{question: text(q.Content), answer: answer})
 		}
 	}
 	return out
+}
+
+// answerText is what a later turn is told an answer said: for a not_found
+// answer, what the model said the library lacks.
+func answerText(a store.Message) string {
+	if a.Status == store.MessageNotFound && a.Content.NotFound != nil {
+		return notFoundText(*a.Content.NotFound)
+	}
+	return text(a.Content)
 }
 
 func text(c store.MessageContent) string {

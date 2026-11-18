@@ -125,35 +125,26 @@ test("Mod+J opens the chat; an answer streams with a citation that lands on its 
   await waitFor(() => expect(app.router.state.location.href).toBe("/doc/doc-go?block=b-channels"));
 });
 
-test("an answer citing nothing says it isn't in the library", async () => {
+test("a not_found answer says what the library lacks and what to import", async () => {
+  const notFound = answer({
+    status: "not_found",
+    segments: [],
+    citations: [],
+    not_found: { missing: "The library has nothing on ServeMux.", suggest: "Go's net/http page" },
+  });
   stubApi({
     "GET /documents": () => json({ documents: [] }),
     "GET /conversations": () => json({ conversations: [], messages_left_today: 50 }),
     "POST /conversations": () => json(conversation, 201),
-    "POST /conversations/c1/messages": () =>
-      answered(
-        answer({
-          segments: [{ text: "Import Go's net/http docs to ask about ServeMux.", citations: [] }],
-          citations: [],
-        }),
-      ),
-    "GET /conversations/c1": () =>
-      json({
-        conversation,
-        messages: [
-          question,
-          answer({
-            segments: [{ text: "Import Go's net/http docs to ask about ServeMux.", citations: [] }],
-            citations: [],
-          }),
-        ],
-      }),
+    "POST /conversations/c1/messages": () => answered(notFound),
+    "GET /conversations/c1": () => json({ conversation, messages: [question, notFound] }),
   });
   renderApp("/");
   const panel = await openChat();
   await ask(panel, "How do I configure ServeMux routes?");
   expect(await within(panel).findByText(notFoundLabel)).toBeTruthy();
-  expect(within(panel).getByText("Import Go's net/http docs to ask about ServeMux.")).toBeTruthy();
+  expect(within(panel).getByText("The library has nothing on ServeMux.")).toBeTruthy();
+  expect(within(panel).getByText("To find it, import Go's net/http page.")).toBeTruthy();
   expect(within(panel).queryByRole("button", { name: /^Source/ })).toBeNull();
 });
 

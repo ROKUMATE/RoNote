@@ -18,7 +18,7 @@ import { Markdown } from "./markdown";
 /** The most a question may say, as the API allows. */
 const maxQuestion = 2000;
 
-/** What a reply with no citations says it is (ADR 0012). */
+/** What an answer says when the model said the library doesn't answer (ADR 0012). */
 export const notFoundLabel = "Not found in your library";
 
 /** An answer as it streams in, before it is saved. */
@@ -291,11 +291,18 @@ function Answer({ message, onLand }: { message: Message; onLand: (c: Citation) =
       </Generated>
     );
   }
-  const notFound = message.status === "done" && message.citations.length === 0;
+  const missing = message.status === "not_found";
+  const notFound = missing || (message.status === "done" && message.citations.length === 0);
   return (
     <Generated muted={notFound}>
       {notFound && <p className="mt-1 font-semibold">{notFoundLabel}</p>}
-      {said && (
+      {missing && message.not_found && (
+        <>
+          <p className="my-2">{message.not_found.missing}</p>
+          <p className="my-2">To find it, import {message.not_found.suggest}.</p>
+        </>
+      )}
+      {said && !missing && (
         <Markdown segments={message.segments} citations={message.citations} onLand={onLand} />
       )}
       {message.status === "stopped" && <p className="my-2 text-ink-2 text-ui">Stopped.</p>}

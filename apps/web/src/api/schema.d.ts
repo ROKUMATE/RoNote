@@ -713,23 +713,31 @@ export interface components {
         SendMessageRequest: {
             text: string;
         };
-        /** @description A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). An answer with no citations didn't find its answer in the library. */
+        /** @description A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). A not_found answer is the model saying the library doesn't answer, with not_found saying what is missing. */
         Message: {
             /** Format: uuid */
             id: string;
             /** @enum {string} */
             role: "user" | "assistant";
             /**
-             * @description An answer streams until it is done, stopped or failed; a question is done.
+             * @description An answer streams until it is done, stopped, failed or not_found (the library doesn't answer); a question is done.
              * @enum {string}
              */
-            status: "streaming" | "done" | "stopped" | "failed";
+            status: "streaming" | "done" | "stopped" | "failed" | "not_found";
             segments: components["schemas"]["MessageSegment"][];
             citations: components["schemas"]["Citation"][];
             error?: components["schemas"]["ChatErrorCode"];
+            not_found?: components["schemas"]["ChatNotFound"];
             usage?: components["schemas"]["ChatUsage"];
             /** Format: date-time */
             created_at: string;
+        };
+        /** @description What the model said the library lacks, on a not_found answer. */
+        ChatNotFound: {
+            /** @description One sentence on what the library lacks. */
+            missing: string;
+            /** @description The kind of page to import, never a URL. */
+            suggest: string;
         };
         /** @description A run of a message's Markdown, and the numbers of the citations that back it. */
         MessageSegment: {
@@ -1111,6 +1119,7 @@ export type ConversationDetail = components['schemas']['ConversationDetail'];
 export type CreateConversationRequest = components['schemas']['CreateConversationRequest'];
 export type SendMessageRequest = components['schemas']['SendMessageRequest'];
 export type Message = components['schemas']['Message'];
+export type ChatNotFound = components['schemas']['ChatNotFound'];
 export type MessageSegment = components['schemas']['MessageSegment'];
 export type Citation = components['schemas']['Citation'];
 export type ChatUsage = components['schemas']['ChatUsage'];

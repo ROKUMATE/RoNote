@@ -168,6 +168,23 @@ func TestSaysWhenTheLibraryDoesNotCoverIt(t *testing.T) {
 	}
 }
 
+func TestCallsNotInLibraryWhenItCan(t *testing.T) {
+	body := ask(user(append(library, text("How do I configure ServeMux routes?"))...))
+	body["tools"] = []map[string]any{
+		{"name": "search_library", "description": "Search.", "input_schema": map[string]any{"type": "object"}},
+		{"name": "not_in_library", "description": "Say so.", "input_schema": map[string]any{"type": "object"}},
+	}
+	blocks, stop := assemble(t, streamed(t, body))
+	if stop != "tool_use" || len(blocks) != 2 || blocks[0].kind != "thinking" || blocks[1].kind != "tool_use" {
+		t.Fatalf("blocks = %+v, stop %q; want thinking, then a tool use", blocks, stop)
+	}
+	var input map[string]string
+	if err := json.Unmarshal([]byte(blocks[1].input), &input); err != nil ||
+		input["missing"] != "Your library doesn't cover this." || input["suggest"] != "a page about configure and servemux" {
+		t.Errorf("tool input = %s (%v), want what is missing and what to import", blocks[1].input, err)
+	}
+}
+
 func TestSearchesWhenAsked(t *testing.T) {
 	question := user(append(library, text("Search for comparable keys"))...)
 	blocks, stop := assemble(t, streamed(t, ask(question)))

@@ -29,8 +29,10 @@ import (
 )
 
 const (
-	// toolName is the tool "search for" calls.
-	toolName = "search_library"
+	// toolName is the tool "search for" calls, and notFoundName the one an
+	// unmatched question calls.
+	toolName     = "search_library"
+	notFoundName = "not_in_library"
 	// slowDelay is the pause between words when a question asks "slowly".
 	slowDelay = 150 * time.Millisecond
 	// maxRequest bounds what the handler reads.
@@ -54,7 +56,6 @@ type request struct {
 	Stream       bool            `json:"stream"`
 	System       json.RawMessage `json:"system"`
 	Tools        []tool          `json:"tools"`
-	ToolChoice   *typed          `json:"tool_choice"`
 	Thinking     *typed          `json:"thinking"`
 	OutputConfig json.RawMessage `json:"output_config"`
 	Messages     []message       `json:"messages"`
@@ -105,11 +106,12 @@ type result struct {
 // turn is what a request asks: the latest question, every search result
 // in request order, and whether a tool round followed the question.
 type turn struct {
-	question  string
-	results   []result
-	searched  bool
-	canSearch bool
-	thinking  bool
+	question    string
+	results     []result
+	searched    bool
+	canSearch   bool
+	canNotFound bool
+	thinking    bool
 }
 
 func messages(w http.ResponseWriter, r *http.Request) {
@@ -148,8 +150,8 @@ func read(req *request) (turn, error) {
 		return turn{}, errors.New("messages: the first message must be from the user")
 	}
 	t := turn{thinking: req.Thinking == nil || req.Thinking.Type != "disabled"}
-	t.canSearch = slices.ContainsFunc(req.Tools, func(tl tool) bool { return tl.Name == toolName }) &&
-		(req.ToolChoice == nil || req.ToolChoice.Type != "none")
+	t.canSearch = slices.ContainsFunc(req.Tools, func(tl tool) bool { return tl.Name == toolName })
+	t.canNotFound = slices.ContainsFunc(req.Tools, func(tl tool) bool { return tl.Name == notFoundName })
 	var citations []bool
 	var lastToolUses []string
 	questionAt := -1
@@ -307,6 +309,7 @@ type reply struct {
 // tool use with its input; or an empty thinking block.
 type out struct {
 	kind     string
+	name     string
 	text     string
 	citation map[string]any
 	input    string
@@ -322,7 +325,7 @@ func answer(t turn) reply {
 			blocks = append(blocks, out{kind: "thinking"})
 		}
 		input, _ := json.Marshal(map[string]any{"query": m[1], "this_document_only": false})
-		return reply{blocks: append(blocks, out{kind: "tool_use", input: string(input)}), stop: "tool_use"}
+		return reply{blocks: append(blocks, out{kind: "tool_use", name: toolName, input: string(input)}), stop: "tool_use"}
 	}
 	words := keywords(t.question)
 	for i, res := range t.results {
@@ -344,11 +347,19 @@ func answer(t turn) reply {
 			}}
 		}
 	}
-	text := "Your library doesn't cover this."
+	suggest := "a page on the topic"
 	if len(words) > 0 {
-		text += " Import a page about " + strings.Join(words[:min(len(words), 2)], " and ") + " to ask about it."
+		suggest = "a page about " + strings.Join(words[:min(len(words), 2)], " and ")
 	}
-	return reply{slow: slow, stop: "end_turn", blocks: []out{{kind: "text", text: text}}}
+	if t.canNotFound {
+		var blocks []out
+		if t.thinking {
+			blocks = append(blocks, out{kind: "thinking"})
+		}
+		input, _ := json.Marshal(map[string]any{"missing": "Your library doesn't cover this.", "suggest": suggest})
+		return reply{slow: slow, stop: "tool_use", blocks: append(blocks, out{kind: "tool_use", name: notFoundName, input: string(input)})}
+	}
+	return reply{slow: slow, stop: "end_turn", blocks: []out{{kind: "text", text: "Your library doesn't cover this. Import " + suggest + " to ask about it."}}}
 }
 
 var (
@@ -419,7 +430,7 @@ func stream(w http.ResponseWriter, r *http.Request, model string, inputTokens in
 			delta(i, map[string]any{"type": "signature_delta", "signature": "fakellm"})
 		case "tool_use":
 			send("content_block_start", map[string]any{"index": i, "content_block": map[string]any{
-				"type": "tool_use", "id": fmt.Sprintf("toolu_fake_%d", n), "name": toolName, "input": map[string]any{},
+				"type": "tool_use", "id": fmt.Sprintf("toolu_fake_%d", n), "name": b.name, "input": map[string]any{},
 			}})
 			delta(i, map[string]any{"type": "input_json_delta", "partial_json": b.input})
 			outputTokens += len(b.input) / 4

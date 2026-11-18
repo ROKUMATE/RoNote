@@ -91,10 +91,10 @@ func projection(all []answered, total int) int64 {
 func chatEval(ctx context.Context, st *store.Store, owner uuid.UUID, replay embed.Embedder, queries []query, run chatRun) error {
 	modelURL := strings.TrimSuffix(envOr("RONOTE_EVAL_CHAT_URL", config.DefaultChatURL), "/")
 	model := envOr("RONOTE_CHAT_MODEL", config.DefaultChatModel)
-	key := os.Getenv("ANTHROPIC_API_KEY")
+	key := os.Getenv("RONOTE_ANTHROPIC_API_KEY")
 	anthropicAPI := modelURL == config.DefaultChatURL
 	if anthropicAPI && key == "" {
-		return fmt.Errorf("asking %s needs ANTHROPIC_API_KEY; RONOTE_EVAL_CHAT_URL can point at the fake model for a dry run", modelURL)
+		return fmt.Errorf("asking %s needs RONOTE_ANTHROPIC_API_KEY; RONOTE_EVAL_CHAT_URL can point at the fake model for a dry run", modelURL)
 	}
 	if u, err := url.Parse(modelURL); err != nil || u.Host == "" {
 		return fmt.Errorf("RONOTE_EVAL_CHAT_URL: %q is not a URL", modelURL)

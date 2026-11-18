@@ -50,7 +50,7 @@ const backend = env({
   RONOTE_CHAT_ENABLED: "true",
   RONOTE_CHAT_URL: stack.llm,
   RONOTE_CHAT_MODEL: "claude-haiku-5-5",
-  ANTHROPIC_API_KEY: "",
+  RONOTE_ANTHROPIC_API_KEY: "",
   // The suite imports and signs in far more than a person does; Go tests
   // check the limits.
   RONOTE_LIMIT_IMPORTS_PER_DAY: "100000",

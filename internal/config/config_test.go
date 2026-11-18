@@ -29,7 +29,7 @@ func validEnv(overrides map[string]string) map[string]string {
 		"RONOTE_PUBLIC_URL":           "https://ronote.test",
 		"RONOTE_GITHUB_CLIENT_ID":     "client",
 		"RONOTE_GITHUB_CLIENT_SECRET": leakMarker,
-		"ANTHROPIC_API_KEY":           leakMarker,
+		"RONOTE_ANTHROPIC_API_KEY":    leakMarker,
 		"RONOTE_BLOB_ENDPOINT":        "https://s3.example.com",
 		"RONOTE_BLOB_REGION":          "eu-central-1",
 		"RONOTE_BLOB_BUCKET":          "ronote-pdfs",
@@ -318,7 +318,7 @@ func TestLoad(t *testing.T) {
 		},
 		{
 			name: "the fake model needs no key",
-			env:  validEnv(map[string]string{"RONOTE_CHAT_URL": "http://127.0.0.1:8094/", "ANTHROPIC_API_KEY": ""}),
+			env:  validEnv(map[string]string{"RONOTE_CHAT_URL": "http://127.0.0.1:8094/", "RONOTE_ANTHROPIC_API_KEY": ""}),
 			want: Config{
 				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
 				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault,
@@ -327,7 +327,7 @@ func TestLoad(t *testing.T) {
 		},
 		{
 			name: "chat turned off needs no key",
-			env:  validEnv(map[string]string{"RONOTE_CHAT_ENABLED": "false", "ANTHROPIC_API_KEY": "", "RONOTE_CHAT_MODEL": "claude-other"}),
+			env:  validEnv(map[string]string{"RONOTE_CHAT_ENABLED": "false", "RONOTE_ANTHROPIC_API_KEY": "", "RONOTE_CHAT_MODEL": "claude-other"}),
 			want: Config{
 				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
 				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault,
@@ -352,7 +352,7 @@ func TestLoad(t *testing.T) {
 		},
 		{
 			name: "chat is off by default in prod without a key",
-			env:  validEnv(map[string]string{"RONOTE_ENV": "prod", "ANTHROPIC_API_KEY": ""}),
+			env:  validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_ANTHROPIC_API_KEY": ""}),
 			want: Config{
 				Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
 				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault,
@@ -369,13 +369,13 @@ func TestLoad(t *testing.T) {
 		},
 		{
 			name:    "chat turned on by name in staging needs the key",
-			env:     validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_CHAT_ENABLED": "true", "ANTHROPIC_API_KEY": ""}),
-			wantErr: []string{"ANTHROPIC_API_KEY: not set; https://api.anthropic.com needs one"},
+			env:     validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_CHAT_ENABLED": "true", "RONOTE_ANTHROPIC_API_KEY": ""}),
+			wantErr: []string{"RONOTE_ANTHROPIC_API_KEY: not set; https://api.anthropic.com needs one"},
 		},
 		{
 			name:    "Anthropic's API needs a key",
-			env:     validEnv(map[string]string{"ANTHROPIC_API_KEY": ""}),
-			wantErr: []string{"ANTHROPIC_API_KEY: not set; https://api.anthropic.com needs one"},
+			env:     validEnv(map[string]string{"RONOTE_ANTHROPIC_API_KEY": ""}),
+			wantErr: []string{"RONOTE_ANTHROPIC_API_KEY: not set; https://api.anthropic.com needs one"},
 		},
 		{
 			name:    "the fake model refused in prod",

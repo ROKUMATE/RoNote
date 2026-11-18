@@ -16,7 +16,7 @@
 // run's hybrid metrics as the baseline. -review (make eval-review) prints the
 // queries marked for review instead of measuring, and writes nothing.
 // -chat (make eval-chat) asks the queries through chat instead, of the real
-// model with ANTHROPIC_API_KEY, or of RONOTE_EVAL_CHAT_URL, and writes
+// model with RONOTE_ANTHROPIC_API_KEY, or of RONOTE_EVAL_CHAT_URL, and writes
 // chat-report.md from the real model alone (docs/adr/0012-chat.md).
 package main
 

@@ -202,7 +202,7 @@ eval-record: ## Embed the eval's corpus and queries through RONOTE_EMBED_URL and
 eval-review: ## List the eval's queries marked for review: expected blocks and hybrid's top 5 (writes nothing)
 	sh scripts/container.sh test go run ./cmd/eval -review
 
-eval-chat: ## Ask the eval's queries through chat, of the real model; writes chat-report.md from a full run (local only: ANTHROPIC_API_KEY, the embedder, cents). [limit=N] [budget=dollars, default 1.50]
+eval-chat: ## Ask the eval's queries through chat, of the real model; writes chat-report.md from a full run (local only: RONOTE_ANTHROPIC_API_KEY, the embedder, cents). [limit=N] [budget=dollars, default 1.50]
 	sh scripts/container.sh test go run ./cmd/eval -chat -chat-limit=$(or $(limit),0) -chat-budget=$(or $(budget),1.50)
 
 test-perf-search: ## Time search over 5k-25k chunks for one user, among 200,000 others (local only: minutes, and a container)

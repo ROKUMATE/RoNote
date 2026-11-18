@@ -20,7 +20,7 @@ import (
 
 var (
 	update = flag.Bool("update", false, "rewrite testdata/requests from what the adapter sends")
-	record = flag.Bool("record", false, "record testdata/streams through Anthropic's API (needs ANTHROPIC_API_KEY)")
+	record = flag.Bool("record", false, "record testdata/streams through Anthropic's API (needs RONOTE_ANTHROPIC_API_KEY)")
 )
 
 const (
@@ -72,8 +72,8 @@ func replay(t *testing.T, stream string) *Model {
 	streamFile := filepath.Join("testdata", "streams", stream+".sse")
 	key := ""
 	if *record {
-		if key = os.Getenv("ANTHROPIC_API_KEY"); key == "" {
-			t.Skip("-record needs ANTHROPIC_API_KEY")
+		if key = os.Getenv("RONOTE_ANTHROPIC_API_KEY"); key == "" {
+			t.Skip("-record needs RONOTE_ANTHROPIC_API_KEY")
 		}
 	}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

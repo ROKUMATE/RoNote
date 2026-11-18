@@ -288,7 +288,7 @@ func parseChat(getenv func(string) string, env Env) (Chat, []error) {
 		Enabled: !env.Deployed(),
 		URL:     strings.TrimSuffix(withDefault(getenv("RONOTE_CHAT_URL"), DefaultChatURL), "/"),
 		Model:   withDefault(getenv("RONOTE_CHAT_MODEL"), DefaultChatModel),
-		APIKey:  getenv("ANTHROPIC_API_KEY"),
+		APIKey:  getenv("RONOTE_ANTHROPIC_API_KEY"),
 	}
 	if s := getenv("RONOTE_CHAT_ENABLED"); s != "" {
 		enabled, err := strconv.ParseBool(s)
@@ -301,7 +301,7 @@ func parseChat(getenv func(string) string, env Env) (Chat, []error) {
 		errs = append(errs, fmt.Errorf("RONOTE_CHAT_URL: %w", err))
 	}
 	if u, err := url.Parse(c.URL); err == nil && c.Enabled && u.Host == chatHost && c.APIKey == "" {
-		errs = append(errs, fmt.Errorf("ANTHROPIC_API_KEY: not set; %s needs one. Set it, point RONOTE_CHAT_URL at the fake model, or set RONOTE_CHAT_ENABLED=false", c.URL))
+		errs = append(errs, fmt.Errorf("RONOTE_ANTHROPIC_API_KEY: not set; %s needs one. Set it, point RONOTE_CHAT_URL at the fake model, or set RONOTE_CHAT_ENABLED=false", c.URL))
 	}
 	return c, errs
 }

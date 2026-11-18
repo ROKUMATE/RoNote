@@ -34,13 +34,16 @@ const (
 
 // answered is one question's answer as the eval scores it. hit is strict: a
 // cited block is an expected block. sectionHit is looser: a cited block sits
-// under the same headings as an expected one.
+// under the same headings as an expected one, or under a section of one.
+// refused is the model's own signal: it called not_in_library. unsourced is
+// an answer with text and no citation.
 type answered struct {
 	q          query
 	msg        store.Message
 	hit        bool
 	sectionHit bool
 	refused    bool
+	unsourced  bool
 	inputAll   int
 }
 
@@ -78,10 +81,35 @@ func indexCorpus(ctx context.Context, st *store.Store, owner uuid.UUID, ids []uu
 
 // chatRun bounds a run of the chat eval: ask only the first limit queries
 // (0 asks all), and no further question once the answers have cost budget
-// micro-dollars.
+// micro-dollars. With ids it asks just those queries, each repeat times, and
+// prints each answer: a run to look at one question, never a report.
 type chatRun struct {
 	limit  int
 	budget int64
+	ids    []string
+	repeat int
+}
+
+// partial is whether the run asks less than every query once, so it
+// writes no report.
+func (r chatRun) partial() bool { return r.limit > 0 || len(r.ids) > 0 || r.repeat > 1 }
+
+// selected is the queries to ask: all of them, or each of ids, repeat times.
+func (r chatRun) selected(queries []query) ([]query, error) {
+	if len(r.ids) == 0 {
+		return queries, nil
+	}
+	var out []query
+	for _, id := range r.ids {
+		i := slices.IndexFunc(queries, func(q query) bool { return q.ID == id })
+		if i < 0 {
+			return nil, fmt.Errorf("-chat-ids: no query %q", id)
+		}
+		for range max(r.repeat, 1) {
+			out = append(out, queries[i])
+		}
+	}
+	return out, nil
 }
 
 // askAll asks queries in order, within run, printing each answer with what
@@ -103,8 +131,11 @@ func askAll(queries []query, idx corpusIndex, run chatRun, ask func(query) (stor
 		}
 		spent += msg.Usage.CostMicroUSD
 		all = append(all, scoreAnswer(q, msg, idx))
-		say(fmt.Sprintf("  %2d/%d %-4s %-7s %d citations  $%.5f  ($%.4f so far)\n",
-			i+1, n, q.ID, msg.Status, len(msg.Content.Citations), float64(msg.Usage.CostMicroUSD)/1e6, float64(spent)/1e6))
+		say(fmt.Sprintf("  %2d/%d %-4s %-9s %d citations, %d markers  $%.5f  ($%.4f so far)\n",
+			i+1, n, q.ID, msg.Status, len(msg.Content.Citations), msg.Usage.SelfMarkers, float64(msg.Usage.CostMicroUSD)/1e6, float64(spent)/1e6))
+		if len(run.ids) > 0 {
+			say(indent(recordOf(all[len(all)-1], idx).Answer) + "\n")
+		}
 	}
 	return all, n == len(queries), nil
 }
@@ -149,9 +180,13 @@ func chatEval(ctx context.Context, st *store.Store, owner uuid.UUID, replay embe
 	if err != nil {
 		return err
 	}
+	asked, err := run.selected(queries)
+	if err != nil {
+		return err
+	}
 	fmt.Printf("Asking up to %d of %d questions of %s at %s, within $%.2f\n",
-		cmp.Or(min(run.limit, len(queries)), len(queries)), len(queries), model, modelURL, float64(run.budget)/1e6)
-	all, complete, err := askAll(queries, idx, run, func(q query) (store.Message, error) {
+		cmp.Or(min(run.limit, len(asked)), len(asked)), len(queries), model, modelURL, float64(run.budget)/1e6)
+	all, complete, err := askAll(asked, idx, run, func(q query) (store.Message, error) {
 		conv, err := svc.Create(ctx, owner, uuid.Nil)
 		if err != nil {
 			return store.Message{}, err
@@ -177,7 +212,7 @@ func chatEval(ctx context.Context, st *store.Store, owner uuid.UUID, replay embe
 	report := chatTable(all, model, modelURL)
 	fmt.Println()
 	fmt.Print(report)
-	if !complete {
+	if !complete || run.partial() {
 		fmt.Printf("\nAll %d would cost about $%.4f at this rate. Not written: a part of the questions.\n",
 			len(queries), float64(projection(all, len(queries)))/1e6)
 		return nil
@@ -200,8 +235,8 @@ func chatEval(ctx context.Context, st *store.Store, owner uuid.UUID, replay embe
 
 // answerRecord is one line of chat-answers.jsonl: what was asked, what the
 // model answered, and what it cited and cost. Status is where the answer
-// ended (done, stopped or failed), as the store keeps it; the model's own
-// stop reason is not stored.
+// ended (done, not_found, unsourced, stopped or failed), as the store keeps
+// it; the model's own stop reason is not stored.
 type answerRecord struct {
 	ID             string           `json:"id"`
 	Category       string           `json:"category"`
@@ -209,14 +244,21 @@ type answerRecord struct {
 	Answer         string           `json:"answer"`
 	Status         string           `json:"status"`
 	Error          string           `json:"error,omitempty"`
+	NotFound       *notFoundRecord  `json:"not_found,omitempty"`
 	Citations      []citationRecord `json:"citations"`
 	Expect         []string         `json:"expect"`
 	ExpectSections []string         `json:"expect_sections"`
 	Refused        bool             `json:"refused"`
+	SelfMarkers    int              `json:"self_markers"`
 	StrictHit      bool             `json:"strict_hit"`
 	SectionHit     bool             `json:"section_hit"`
 	ToolRounds     int              `json:"tool_rounds"`
 	Usage          usageRecord      `json:"usage"`
+}
+
+type notFoundRecord struct {
+	Missing string `json:"missing"`
+	Suggest string `json:"suggest"`
 }
 
 type citationRecord struct {
@@ -253,12 +295,15 @@ func recordOf(a answered, idx corpusIndex) answerRecord {
 		ID: a.q.ID, Category: a.q.Category, Query: a.q.Query, Answer: text.String(),
 		Status: string(a.msg.Status), Error: a.msg.Content.Error,
 		Citations: []citationRecord{}, Expect: a.q.Expect, ExpectSections: expectedSections(a.q, idx),
-		Refused: a.refused, StrictHit: a.hit, SectionHit: a.sectionHit, ToolRounds: u.ToolRounds,
+		Refused: a.refused, SelfMarkers: u.SelfMarkers, StrictHit: a.hit, SectionHit: a.sectionHit, ToolRounds: u.ToolRounds,
 		Usage: usageRecord{
 			Model: u.Model, InputTokens: u.InputTokens, OutputTokens: u.OutputTokens,
 			CacheCreationInputTokens: u.CacheCreationInputTokens, CacheReadInputTokens: u.CacheReadInputTokens,
 			InvalidCitations: u.InvalidCitations, FirstTokenMS: u.FirstTokenMS, LatencyMS: u.LatencyMS, CostMicroUSD: u.CostMicroUSD,
 		},
+	}
+	if n := a.msg.Content.NotFound; n != nil {
+		r.NotFound = &notFoundRecord{Missing: n.Missing, Suggest: n.Suggest}
 	}
 	for _, c := range a.msg.Content.Citations {
 		r.Citations = append(r.Citations, citationRecord{
@@ -282,6 +327,13 @@ func writeAnswers(path string, all []answered, idx corpusIndex) error {
 		}
 	}
 	return f.Close()
+}
+
+// underSection is whether the breadcrumb where is section or one of its
+// subsections: it starts with it up to a heading boundary, so "Pods" holds
+// "Pods > Using Pods" and not "Pods and more".
+func underSection(where, section string) bool {
+	return where == section || strings.HasPrefix(where, section+" > ")
 }
 
 // expectedSections are the breadcrumbs of q's expected blocks.
@@ -309,13 +361,15 @@ func citedSections(c store.Citation, idx corpusIndex) []string {
 }
 
 func scoreAnswer(q query, msg store.Message, idx corpusIndex) answered {
-	a := answered{q: q, msg: msg, refused: msg.Status == store.MessageDone && len(msg.Content.Citations) == 0}
+	a := answered{q: q, msg: msg, refused: msg.Status == store.MessageNotFound, unsourced: msg.Status == store.MessageUnsourced}
 	wanted := expectedSections(q, idx)
 	for _, c := range msg.Content.Citations {
 		if slices.ContainsFunc(c.BlockIDs, func(b string) bool { return slices.Contains(q.Expect, b) }) {
 			a.hit = true
 		}
-		if slices.ContainsFunc(citedSections(c, idx), func(where string) bool { return slices.Contains(wanted, where) }) {
+		if slices.ContainsFunc(citedSections(c, idx), func(where string) bool {
+			return slices.ContainsFunc(wanted, func(section string) bool { return underSection(where, section) })
+		}) {
 			a.sectionHit = true
 		}
 	}
@@ -329,8 +383,8 @@ func chatTable(all []answered, model, modelURL string) string {
 	var b strings.Builder
 	fmt.Fprintf(&b, "# Chat eval\n\n%s, %d questions of `queries.jsonl` asked of %s at %s, a conversation each over the whole corpus (`make eval-chat`, docs/adr/0012-chat.md).\n\n",
 		time.Now().UTC().Format("2006-01-02"), len(all), model, modelURL)
-	b.WriteString("| category | questions | citations valid | section hit rate | strict hit rate | false refusals | correct refusals | first token p50 / p95 | total p50 / p95 | mean cost |\n")
-	b.WriteString("|---|---|---|---|---|---|---|---|---|---|\n")
+	b.WriteString("| category | questions | citations valid | section hit rate | strict hit rate | false refusals | correct refusals | unsourced | self-written markers | first token p50 / p95 | total p50 / p95 | mean cost |\n")
+	b.WriteString("|---|---|---|---|---|---|---|---|---|---|---|---|\n")
 	var categories []string
 	for _, a := range all {
 		if !slices.Contains(categories, a.q.Category) {
@@ -356,18 +410,19 @@ func chatTable(all []answered, model, modelURL string) string {
 		cached += u.CacheReadInputTokens
 		largest = max(largest, a.inputAll)
 		cost += u.CostMicroUSD
-		if a.msg.Status != store.MessageDone {
+		if a.msg.Status == store.MessageFailed || a.msg.Status == store.MessageStopped {
 			failed++
 		}
 	}
-	fmt.Fprintf(&b, "\nBoth hit rates count answerable questions. **Section** (the headline): an answer cites a block under the same headings, in the same document, as an expected block. **Strict**: an answer cites an expected block itself. The labels name one block per answer where the model may cite its neighbours, so strict undercounts. A refusal is an answer with no valid citation, shown as \"Not found in your library\". Every answer, with what it cited, is in `chat-answers.jsonl`. ")
+	b.WriteString("\nBoth hit rates count answerable questions. **Section** (the headline): an answer cites a block under the same headings, in the same document, as an expected block, or under a subsection of them. **Strict**: an answer cites an expected block itself. The labels name one block per answer where the model may cite its neighbours, so strict undercounts. ")
+	b.WriteString("A refusal is the model's own signal: it called `not_in_library`, and the message is `not_found`; a false refusal is one on an answerable question, a correct one on a question with no answer. **Unsourced** counts answers with text and no valid citation, which the app shows as \"No sources\". **Self-written markers** are citation markers such as [1] or [2-3] the model wrote into its text outside code, as answers with markers (markers in all). Every answer, with what it cited, is in `chat-answers.jsonl`. ")
 	fmt.Fprintf(&b, "In all: %d tool rounds, %d citations dropped as invalid, %d answers not done; %d input tokens, %.0f%% read from cache; the largest question read %d input tokens over all its calls; total cost $%.4f.\n",
 		rounds, invalid, failed, input, percent(cached, input), largest, float64(cost)/1e6)
 	return b.String()
 }
 
 func chatRow(cat string, rows []answered) string {
-	var valid, invalid, answerable, hits, sectionHits, falseRefusals, none, correct int
+	var valid, invalid, answerable, hits, sectionHits, falseRefusals, none, correct, unsourced, markered, markers int
 	var first, total []float64
 	var cost int64
 	for _, a := range rows {
@@ -390,6 +445,13 @@ func chatRow(cat string, rows []answered) string {
 				falseRefusals++
 			}
 		}
+		if a.unsourced {
+			unsourced++
+		}
+		if n := a.msg.Usage.SelfMarkers; n > 0 {
+			markered++
+			markers += n
+		}
 		first = append(first, float64(a.msg.Usage.FirstTokenMS)/1000)
 		total = append(total, float64(a.msg.Usage.LatencyMS)/1000)
 		cost += a.msg.Usage.CostMicroUSD
@@ -398,10 +460,15 @@ func chatRow(cat string, rows []answered) string {
 	if valid+invalid > 0 {
 		validity = fmt.Sprintf("%.0f%% (%d/%d)", percent(valid, valid+invalid), valid, valid+invalid)
 	}
-	return fmt.Sprintf("| %s | %d | %s | %s | %s | %s | %s | %.1f s / %.1f s | %.1f s / %.1f s | $%.5f |\n",
-		cat, len(rows), validity, share(sectionHits, answerable), share(hits, answerable), share(falseRefusals, answerable), share(correct, none),
+	return fmt.Sprintf("| %s | %d | %s | %s | %s | %s | %s | %d | %d (%d) | %.1f s / %.1f s | %.1f s / %.1f s | $%.5f |\n",
+		cat, len(rows), validity, share(sectionHits, answerable), share(hits, answerable), share(falseRefusals, answerable), share(correct, none), unsourced, markered, markers,
 		quantile(first, 0.5), quantile(first, 0.95), quantile(total, 0.5), quantile(total, 0.95),
 		float64(cost)/1e6/float64(max(len(rows), 1)))
+}
+
+// indent sets text apart from the progress lines, a few spaces in.
+func indent(text string) string {
+	return "      " + strings.ReplaceAll(strings.TrimSpace(text), "\n", "\n      ")
 }
 
 func percent(n, of int) float64 { return 100 * float64(n) / float64(max(of, 1)) }

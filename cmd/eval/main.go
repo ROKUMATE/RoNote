@@ -58,12 +58,25 @@ const (
 	topK             = 10
 )
 
+// splitIDs is the ids a comma-separated list names.
+func splitIDs(list string) []string {
+	var ids []string
+	for id := range strings.SplitSeq(list, ",") {
+		if id = strings.TrimSpace(id); id != "" {
+			ids = append(ids, id)
+		}
+	}
+	return ids
+}
+
 func main() {
 	record := flag.Bool("record", false, "embed the corpus and queries with the configured model and record the vectors")
 	updateBaseline := flag.Bool("update-baseline", false, "write this run's hybrid metrics as the baseline")
 	reviewOnly := flag.Bool("review", false, "print the queries marked for review with their expected blocks and hybrid's top 5, and write nothing")
 	chatOnly := flag.Bool("chat", false, "ask the queries through chat, and report how its answers cite")
 	chatLimit := flag.Int("chat-limit", 0, "with -chat, ask only the first N queries (0 asks all); a part writes no report")
+	chatIDs := flag.String("chat-ids", "", "with -chat, ask only these queries (comma-separated ids), printing each answer; writes no report")
+	chatRepeat := flag.Int("chat-repeat", 1, "with -chat-ids, ask each query this many times")
 	chatBudget := flag.Float64("chat-budget", 1.50, "with -chat, ask no further question once the answers have cost this many dollars")
 	flag.Parse()
 	if (*reviewOnly || *chatOnly) && (*record || *updateBaseline) || *reviewOnly && *chatOnly {
@@ -73,7 +86,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	err := run(ctx, options{
 		record: *record, updateBaseline: *updateBaseline, review: *reviewOnly, chat: *chatOnly,
-		chatRun: chatRun{limit: *chatLimit, budget: int64(*chatBudget * 1e6)},
+		chatRun: chatRun{limit: *chatLimit, budget: int64(*chatBudget * 1e6), ids: splitIDs(*chatIDs), repeat: *chatRepeat},
 	})
 	stop()
 	if err != nil {

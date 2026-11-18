@@ -113,19 +113,27 @@ func TestScoreAnswer(t *testing.T) {
 		wantStrict  bool
 		wantSection bool
 		wantRefused bool
+		wantUnsrc   bool
 	}{
 		{name: "the expected block", msg: citing(first, "a1"), wantStrict: true, wantSection: true},
 		{name: "its neighbour in the section", msg: citing(first, "a2"), wantSection: true},
 		{name: "another section", msg: citing(first, "b1")},
 		{name: "a section of the same name in another document", msg: citing(second, "b1")},
-		{name: "no citation is a refusal", msg: store.Message{Status: store.MessageDone}, wantRefused: true},
+		{name: "not_in_library is a refusal", msg: store.Message{Status: store.MessageNotFound}, wantRefused: true},
+		{name: "a refusal that carries a citation is still a refusal", msg: func() store.Message {
+			m := citing(first, "a2")
+			m.Status = store.MessageNotFound
+			return m
+		}(), wantSection: true, wantRefused: true},
+		{name: "text with no citation is unsourced, not a refusal", msg: store.Message{Status: store.MessageUnsourced}, wantUnsrc: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			a := scoreAnswer(query{ID: "q", Category: "howto", Expect: []string{"a1"}}, tt.msg, idx)
-			if a.hit != tt.wantStrict || a.sectionHit != tt.wantSection || a.refused != tt.wantRefused {
-				t.Errorf("strict %v, section %v, refused %v; want %v, %v, %v", a.hit, a.sectionHit, a.refused, tt.wantStrict, tt.wantSection, tt.wantRefused)
+			if a.hit != tt.wantStrict || a.sectionHit != tt.wantSection || a.refused != tt.wantRefused || a.unsourced != tt.wantUnsrc {
+				t.Errorf("strict %v, section %v, refused %v, unsourced %v; want %v, %v, %v, %v",
+					a.hit, a.sectionHit, a.refused, a.unsourced, tt.wantStrict, tt.wantSection, tt.wantRefused, tt.wantUnsrc)
 			}
 		})
 	}
@@ -146,7 +154,9 @@ func TestWriteAnswers(t *testing.T) {
 	q := query{ID: "h01", Category: "howto", Query: "how?", Expect: []string{"a1"}}
 	msg := citing(first, "a2")
 	msg.Usage = store.MessageUsage{Model: "m", ToolRounds: 2, CostMicroUSD: 1500}
-	none := scoreAnswer(query{ID: "n01", Category: "none", Query: "what?"}, store.Message{Status: store.MessageDone}, idx)
+	refusal := store.Message{Status: store.MessageNotFound, Content: store.MessageContent{NotFound: &store.NotFound{Missing: "Nothing.", Suggest: "a page"}}}
+	refusal.Usage.SelfMarkers = 3
+	none := scoreAnswer(query{ID: "n01", Category: "none", Query: "what?"}, refusal, idx)
 
 	path := filepath.Join(t.TempDir(), "answers.jsonl")
 	if err := writeAnswers(path, []answered{scoreAnswer(q, msg, idx), none}, idx); err != nil {
@@ -179,8 +189,9 @@ func TestWriteAnswers(t *testing.T) {
 	if h.StrictHit || !h.SectionHit || strings.Join(h.ExpectSections, "|") != "Doc > A" {
 		t.Errorf("h01 scores = strict %v, section %v, expects %v", h.StrictHit, h.SectionHit, h.ExpectSections)
 	}
-	if n.Citations == nil || len(n.Citations) != 0 || !n.Refused {
-		t.Errorf("n01 = %+v, want a refusal with an empty citations list", n)
+	if n.Citations == nil || len(n.Citations) != 0 || !n.Refused || n.Status != "not_found" || n.SelfMarkers != 3 ||
+		n.NotFound == nil || n.NotFound.Missing != "Nothing." || n.NotFound.Suggest != "a page" {
+		t.Errorf("n01 = %+v, want a not_found refusal with what it said, its markers, and an empty citations list", n)
 	}
 }
 
@@ -188,10 +199,85 @@ func TestChatTableReportsBothHitRates(t *testing.T) {
 	t.Parallel()
 	idx, first, _ := twoSections()
 	q := query{ID: "h01", Category: "howto", Expect: []string{"a1"}}
-	report := chatTable([]answered{scoreAnswer(q, citing(first, "a2"), idx)}, "m", "https://example.test")
-	for _, want := range []string{"| section hit rate | strict hit rate |", "| howto | 1 | 100% (1/1) | 1.00 | 0.00 |", "**Section** (the headline)", "**Strict**"} {
+	marked := citing(first, "a2")
+	marked.Usage.SelfMarkers = 2
+	unsourced := store.Message{Status: store.MessageUnsourced}
+	report := chatTable([]answered{scoreAnswer(q, marked, idx), scoreAnswer(q, unsourced, idx)}, "m", "https://example.test")
+	for _, want := range []string{
+		"| section hit rate | strict hit rate |", "| unsourced | self-written markers |",
+		"| howto | 2 | 100% (1/1) | 0.50 | 0.00 | 0.00 | – | 1 | 1 (2) |", "**Section** (the headline)", "**Strict**", "`not_in_library`",
+	} {
 		if !strings.Contains(report, want) {
 			t.Errorf("report lacks %q:\n%s", want, report)
 		}
+	}
+}
+
+func TestSectionHitAcceptsSubsections(t *testing.T) {
+	t.Parallel()
+	doc := uuid.New()
+	idx := corpusIndex{
+		section: map[uuid.UUID]map[string]string{doc: {
+			"intro": "Doc > Pods", "net": "Doc > Pods > Networking", "more": "Doc > Pods and more", "top": "Doc",
+		}},
+		sectionsOf: map[string][]string{"intro": {"Doc > Pods"}},
+	}
+	tests := []struct {
+		name  string
+		cited string
+		want  bool
+	}{
+		{name: "the section itself", cited: "intro", want: true},
+		{name: "a subsection of it", cited: "net", want: true},
+		{name: "a section whose name merely starts with it", cited: "more"},
+		{name: "its parent", cited: "top"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			a := scoreAnswer(query{ID: "p15", Category: "paraphrase", Expect: []string{"intro"}}, citing(doc, tt.cited), idx)
+			if a.sectionHit != tt.want {
+				t.Errorf("section hit = %v citing %s, want %v", a.sectionHit, tt.cited, tt.want)
+			}
+		})
+	}
+}
+
+func TestChatRunSelectsQueries(t *testing.T) {
+	t.Parallel()
+	queries := queriesN(5)
+	got, err := chatRun{ids: []string{"q2", "q4"}, repeat: 2}.selected(queries)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var ids []string
+	for _, q := range got {
+		ids = append(ids, q.ID)
+	}
+	if strings.Join(ids, ",") != "q2,q2,q4,q4" {
+		t.Errorf("selected %v, want each id twice", ids)
+	}
+	if all, err := (chatRun{repeat: 1}).selected(queries); err != nil || len(all) != 5 {
+		t.Errorf("no ids selected %d queries (%v), want all 5", len(all), err)
+	}
+	if _, err := (chatRun{ids: []string{"q9"}}).selected(queries); err == nil {
+		t.Error("an unknown id was accepted")
+	}
+	for name, run := range map[string]chatRun{
+		"all": {repeat: 1}, "a limit": {limit: 3, repeat: 1}, "ids": {ids: []string{"q1"}, repeat: 1}, "repeats": {repeat: 2},
+	} {
+		if want := name != "all"; run.partial() != want {
+			t.Errorf("%s: partial = %v, want %v", name, run.partial(), want)
+		}
+	}
+}
+
+func TestSplitIDs(t *testing.T) {
+	t.Parallel()
+	if got := splitIDs(" e06, n04 ,,"); strings.Join(got, "|") != "e06|n04" {
+		t.Errorf("splitIDs = %q", got)
+	}
+	if got := splitIDs(""); len(got) != 0 {
+		t.Errorf("splitIDs of nothing = %q", got)
 	}
 }

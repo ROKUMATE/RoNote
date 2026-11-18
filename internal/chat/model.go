@@ -39,10 +39,8 @@ var (
 // Request is one call to a model.
 type Request struct {
 	System string
-	Tools  []Tool
-	// ToolsOff lets the model call none of its tools in this call, so it
-	// answers with what it has.
-	ToolsOff  bool
+	// Tools are the tools the model may call in this call.
+	Tools     []Tool
 	Messages  []Message
 	MaxTokens int
 }

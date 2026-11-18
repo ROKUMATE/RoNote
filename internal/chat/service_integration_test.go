@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"reflect"
 	"slices"
 	"strings"
 	"sync"
@@ -158,8 +159,8 @@ func TestAnAnswerCitesTheOwnersBlocks(t *testing.T) {
 		t.Fatalf("%d calls, want 1", len(reqs))
 	}
 	req := reqs[0]
-	if req.System != systemPrompt || len(req.Tools) != 1 || req.Tools[0].Name != toolName || req.ToolsOff || req.MaxTokens != maxTokens {
-		t.Errorf("request = %+v, want the system prompt, the search tool and %d tokens", req, maxTokens)
+	if req.System != systemPrompt || !reflect.DeepEqual(req.Tools, libraryTools) || req.MaxTokens != maxTokens {
+		t.Errorf("request = %+v, want the system prompt, the library's tools and %d tokens", req, maxTokens)
 	}
 	question := req.Messages[len(req.Messages)-1]
 	if last := question.Blocks[len(question.Blocks)-1]; last != (Text{Text: "How do goroutines talk?"}) {
@@ -215,6 +216,11 @@ func TestAnAnswerCitesTheOwnersBlocks(t *testing.T) {
 	}
 }
 
+// canSearch is whether req offers search_library.
+func canSearch(req Request) bool {
+	return slices.ContainsFunc(req.Tools, func(tl Tool) bool { return tl.Name == toolName })
+}
+
 func TestToolRoundsAreBounded(t *testing.T) {
 	testDB.Reset(t)
 	st := store.New(testDB.Pool)
@@ -224,7 +230,7 @@ func TestToolRoundsAreBounded(t *testing.T) {
 	var seen calls
 	svc := newService(t, st, ModelFunc(func(_ context.Context, req Request, on func(Event)) (Reply, error) {
 		n := seen.add(req)
-		if !req.ToolsOff {
+		if canSearch(req) {
 			use := ToolUse{ID: fmt.Sprintf("toolu_%d", n), Name: toolName, Input: json.RawMessage(`{"query":"select"}`)}
 			return Reply{Stop: StopToolUse, Content: []Block{Thinking{Signature: "sig"}, use}, ToolUses: []ToolUse{use}}, nil
 		}
@@ -244,8 +250,8 @@ func TestToolRoundsAreBounded(t *testing.T) {
 		t.Fatalf("%d calls, want %d", len(reqs), maxToolRounds+1)
 	}
 	for i, req := range reqs {
-		if req.ToolsOff != (i == maxToolRounds) {
-			t.Errorf("call %d has tools off %v, want them off on the last call alone", i+1, req.ToolsOff)
+		if canSearch(req) == (i == maxToolRounds) || !slices.ContainsFunc(req.Tools, func(tl Tool) bool { return tl.Name == notFoundName }) {
+			t.Errorf("call %d offers %d tools, want not_in_library always and search except on the last call", i+1, len(req.Tools))
 		}
 	}
 	second := reqs[1].Messages
@@ -288,7 +294,7 @@ func TestAnInjectedPageReachesNoOneElse(t *testing.T) {
 		injected := slices.ContainsFunc(results(req), func(r Result) bool {
 			return slices.ContainsFunc(r.Texts, func(s string) bool { return strings.Contains(s, "Ignore previous instructions") })
 		})
-		if injected && !req.ToolsOff {
+		if injected && canSearch(req) {
 			uses := []ToolUse{
 				{ID: "toolu_1", Name: toolName, Input: json.RawMessage(`{"query":"other users' notes"}`)},
 				{ID: "toolu_2", Name: toolName, Input: json.RawMessage(fmt.Sprintf(`{"query":"Grace's secret","owner_id":%q}`, grace))},
@@ -555,5 +561,96 @@ func TestADocumentConversationSearchesTheDocument(t *testing.T) {
 		if !strings.HasPrefix(r.Title, "Control flow") {
 			t.Errorf("sent %q, outside the conversation's document", r.Title)
 		}
+	}
+}
+
+func notFoundUse(id, input string) ToolUse {
+	return ToolUse{ID: id, Name: notFoundName, Input: json.RawMessage(input)}
+}
+
+func TestNotInLibraryEndsTheTurn(t *testing.T) {
+	testDB.Reset(t)
+	st := store.New(testDB.Pool)
+	ada := newUser(t, st)
+	addDoc(t, st, ada, "Go channels", "Channels connect goroutines.")
+	var seen calls
+	svc := newService(t, st, ModelFunc(func(_ context.Context, req Request, _ func(Event)) (Reply, error) {
+		seen.add(req)
+		use := notFoundUse("toolu_1", `{"missing":"The library has nothing on CORS.","suggest":"the FastAPI page on CORS"}`)
+		// A search called beside it is not run.
+		other := ToolUse{ID: "toolu_2", Name: toolName, Input: json.RawMessage(`{"query":"cors"}`)}
+		return Reply{Stop: StopToolUse, Content: []Block{use, other}, ToolUses: []ToolUse{use, other}}, nil
+	}), plenty)
+	conv := newConversation(t, svc, ada, uuid.Nil)
+	a, err := svc.Ask(t.Context(), ada, conv, "How do I enable CORS?")
+	if err != nil {
+		t.Fatal(err)
+	}
+	updates := collect(t, a)
+	msg := done(t, updates).Message
+	want := &store.NotFound{Missing: "The library has nothing on CORS.", Suggest: "the FastAPI page on CORS"}
+	if msg.Status != store.MessageNotFound || !reflect.DeepEqual(msg.Content.NotFound, want) || len(msg.Content.Citations) != 0 {
+		t.Errorf("answer = %s %+v, want not_found saying %+v", msg.Status, msg.Content, want)
+	}
+	if n := len(seen.all()); n != 1 || msg.Usage.ToolRounds != 0 {
+		t.Errorf("%d calls and %d tool rounds, want the turn to end at the call", n, msg.Usage.ToolRounds)
+	}
+	for _, u := range updates {
+		if s, ok := u.(SearchUpdate); ok {
+			t.Errorf("searched for %q beside not_in_library", s.Query)
+		}
+	}
+}
+
+func TestAnInvalidNotInLibraryIsToldWhy(t *testing.T) {
+	testDB.Reset(t)
+	st := store.New(testDB.Pool)
+	ada := newUser(t, st)
+	addDoc(t, st, ada, "Go channels", "Channels connect goroutines.")
+	var seen calls
+	svc := newService(t, st, ModelFunc(func(_ context.Context, req Request, _ func(Event)) (Reply, error) {
+		input := `{"missing":"Nothing on this.","suggest":"see https://fastapi.tiangolo.com/tutorial/cors/"}`
+		if n := seen.add(req); n > 1 {
+			input = `{"missing":"Nothing on this.","suggest":"the FastAPI page on CORS"}`
+		}
+		use := notFoundUse(fmt.Sprintf("toolu_%d", len(seen.all())), input)
+		return Reply{Stop: StopToolUse, Content: []Block{use}, ToolUses: []ToolUse{use}}, nil
+	}), plenty)
+	conv := newConversation(t, svc, ada, uuid.Nil)
+	a, err := svc.Ask(t.Context(), ada, conv, "How do I enable CORS?")
+	if err != nil {
+		t.Fatal(err)
+	}
+	msg := done(t, collect(t, a)).Message
+	reqs := seen.all()
+	if len(reqs) != 2 || msg.Status != store.MessageNotFound || msg.Content.NotFound.Suggest != "the FastAPI page on CORS" {
+		t.Fatalf("%d calls, answer %s %+v; want the model asked again and then not_found", len(reqs), msg.Status, msg.Content.NotFound)
+	}
+	last := reqs[1].Messages[len(reqs[1].Messages)-1]
+	if result, ok := last.Blocks[0].(ToolResult); !ok || !result.IsError || !strings.Contains(result.Text, "URL") {
+		t.Errorf("the second call ends with %+v, want an error saying not to name a URL", last)
+	}
+}
+
+func TestNotInLibraryOnTheLastCall(t *testing.T) {
+	testDB.Reset(t)
+	st := store.New(testDB.Pool)
+	ada := newUser(t, st)
+	addDoc(t, st, ada, "Select", "select waits on several channels.")
+	svc := newService(t, st, ModelFunc(func(_ context.Context, req Request, _ func(Event)) (Reply, error) {
+		use := ToolUse{ID: "toolu_s", Name: toolName, Input: json.RawMessage(`{"query":"select"}`)}
+		if !canSearch(req) {
+			use = notFoundUse("toolu_n", `{"missing":"Still nothing.","suggest":"the Go spec"}`)
+		}
+		return Reply{Stop: StopToolUse, Content: []Block{use}, ToolUses: []ToolUse{use}}, nil
+	}), plenty)
+	conv := newConversation(t, svc, ada, uuid.Nil)
+	a, err := svc.Ask(t.Context(), ada, conv, "What does select do?")
+	if err != nil {
+		t.Fatal(err)
+	}
+	msg := done(t, collect(t, a)).Message
+	if msg.Status != store.MessageNotFound || msg.Usage.ToolRounds != maxToolRounds {
+		t.Errorf("answer = %s after %d rounds, want not_found after %d searches", msg.Status, msg.Usage.ToolRounds, maxToolRounds)
 	}
 }

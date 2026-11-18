@@ -81,9 +81,6 @@ func (m *Model) params(req chat.Request) sdk.MessageNewParams {
 			InputSchema: sdk.ToolInputSchemaParam{Properties: t.Properties, Required: t.Required},
 		}})
 	}
-	if req.ToolsOff {
-		p.ToolChoice = sdk.ToolChoiceUnionParam{OfNone: &sdk.ToolChoiceNoneParam{}}
-	}
 	for _, msg := range req.Messages {
 		blocks := make([]sdk.ContentBlockParamUnion, 0, len(msg.Blocks))
 		for _, b := range msg.Blocks {

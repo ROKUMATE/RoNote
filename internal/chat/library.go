@@ -40,6 +40,9 @@ var searchTool = Tool{
 	Required: []string{"query"},
 }
 
+// libraryTools are the tools a turn offers, until its searches run out.
+var libraryTools = []Tool{searchTool, notFoundTool}
+
 // library is one owner's library, as one conversation searches it: the
 // conversation's document, or uuid.Nil for the whole library.
 type library struct {

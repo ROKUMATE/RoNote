@@ -396,6 +396,7 @@ func (e MessageRole) Valid() bool {
 const (
 	MessageStatusDone      MessageStatus = "done"
 	MessageStatusFailed    MessageStatus = "failed"
+	MessageStatusNotFound  MessageStatus = "not_found"
 	MessageStatusStopped   MessageStatus = "stopped"
 	MessageStatusStreaming MessageStatus = "streaming"
 )
@@ -406,6 +407,8 @@ func (e MessageStatus) Valid() bool {
 	case MessageStatusDone:
 		return true
 	case MessageStatusFailed:
+		return true
+	case MessageStatusNotFound:
 		return true
 	case MessageStatusStopped:
 		return true
@@ -542,7 +545,7 @@ type ChatDelta struct {
 
 // ChatDone defines model for ChatDone.
 type ChatDone struct {
-	// Message A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). An answer with no citations didn't find its answer in the library.
+	// Message A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). A not_found answer is the model saying the library doesn't answer, with not_found saying what is missing.
 	Message           Message `json:"message"`
 	MessagesLeftToday int     `json:"messages_left_today"`
 }
@@ -555,6 +558,15 @@ type ChatError struct {
 
 // ChatErrorCode Why an answer failed: the model didn't answer or was overloaded (model_unavailable), declined (model_refused), or the server failed (internal_error).
 type ChatErrorCode string
+
+// ChatNotFound What the model said the library lacks, on a not_found answer.
+type ChatNotFound struct {
+	// Missing One sentence on what the library lacks.
+	Missing string `json:"missing"`
+
+	// Suggest The kind of page to import, never a URL.
+	Suggest string `json:"suggest"`
+}
 
 // ChatTool defines model for ChatTool.
 type ChatTool struct {
@@ -802,18 +814,21 @@ type Me struct {
 	Login string `json:"login"`
 }
 
-// Message A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). An answer with no citations didn't find its answer in the library.
+// Message A question, or an answer: generated text, never part of a document (docs/adr/0012-chat.md). A not_found answer is the model saying the library doesn't answer, with not_found saying what is missing.
 type Message struct {
 	Citations []Citation `json:"citations"`
 	CreatedAt time.Time  `json:"created_at"`
 
 	// Error Why an answer failed: the model didn't answer or was overloaded (model_unavailable), declined (model_refused), or the server failed (internal_error).
-	Error    *ChatErrorCode     `json:"error,omitempty"`
-	ID       openapi_types.UUID `json:"id"`
-	Role     MessageRole        `json:"role"`
-	Segments []MessageSegment   `json:"segments"`
+	Error *ChatErrorCode     `json:"error,omitempty"`
+	ID    openapi_types.UUID `json:"id"`
 
-	// Status An answer streams until it is done, stopped or failed; a question is done.
+	// NotFound What the model said the library lacks, on a not_found answer.
+	NotFound *ChatNotFound    `json:"not_found,omitempty"`
+	Role     MessageRole      `json:"role"`
+	Segments []MessageSegment `json:"segments"`
+
+	// Status An answer streams until it is done, stopped, failed or not_found (the library doesn't answer); a question is done.
 	Status MessageStatus `json:"status"`
 
 	// Usage What an answer cost, across its calls to the model.
@@ -823,7 +838,7 @@ type Message struct {
 // MessageRole defines model for Message.Role.
 type MessageRole string
 
-// MessageStatus An answer streams until it is done, stopped or failed; a question is done.
+// MessageStatus An answer streams until it is done, stopped, failed or not_found (the library doesn't answer); a question is done.
 type MessageStatus string
 
 // MessageSegment A run of a message's Markdown, and the numbers of the citations that back it.

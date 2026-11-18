@@ -1556,8 +1556,8 @@ components:
       type: object
       description: >-
         A question, or an answer: generated text, never part of a document
-        (docs/adr/0012-chat.md). An answer with no citations didn't find its
-        answer in the library.
+        (docs/adr/0012-chat.md). A not_found answer is the model saying the
+        library doesn't answer, with not_found saying what is missing.
       required: [id, role, status, segments, citations, created_at]
       properties:
         id:
@@ -1568,8 +1568,10 @@ components:
           enum: [user, assistant]
         status:
           type: string
-          description: An answer streams until it is done, stopped or failed; a question is done.
-          enum: [streaming, done, stopped, failed]
+          description: >-
+            An answer streams until it is done, stopped, failed or not_found
+            (the library doesn't answer); a question is done.
+          enum: [streaming, done, stopped, failed, not_found]
         segments:
           type: array
           items:
@@ -1580,11 +1582,24 @@ components:
             $ref: "#/components/schemas/Citation"
         error:
           $ref: "#/components/schemas/ChatErrorCode"
+        not_found:
+          $ref: "#/components/schemas/ChatNotFound"
         usage:
           $ref: "#/components/schemas/ChatUsage"
         created_at:
           type: string
           format: date-time
+    ChatNotFound:
+      type: object
+      description: What the model said the library lacks, on a not_found answer.
+      required: [missing, suggest]
+      properties:
+        missing:
+          type: string
+          description: One sentence on what the library lacks.
+        suggest:
+          type: string
+          description: The kind of page to import, never a URL.
     MessageSegment:
       type: object
       description: A run of a message's Markdown, and the numbers of the citations that back it.

@@ -66,7 +66,10 @@ test("a question the document doesn't answer is not found in the library", async
   const { panel } = await chatAboutControlFlow(page);
   await ask(panel, "How do I configure ServeMux routes?");
   await expect(panel.getByText("Not found in your library")).toBeVisible();
-  await expect(panel.getByText(/Import a page about configure and servemux/)).toBeVisible();
+  await expect(panel.getByText("Your library doesn't cover this.")).toBeVisible();
+  await expect(
+    panel.getByText("To find it, import a page about configure and servemux."),
+  ).toBeVisible();
   await expect(panel.getByRole("button", { name: /^Source/ })).toHaveCount(0);
 });
 

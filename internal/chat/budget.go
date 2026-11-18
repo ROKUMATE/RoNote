@@ -58,7 +58,7 @@ func fit(p Passage) Passage {
 // fixedTokens are the tokens of the system prompt and the tools, the same
 // in every call.
 func fixedTokens() int {
-	schema, _ := json.Marshal(searchTool)
+	schema, _ := json.Marshal(libraryTools)
 	return tokens(systemPrompt) + tokens(string(schema))
 }
 

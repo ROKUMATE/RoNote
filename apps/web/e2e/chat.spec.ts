@@ -108,6 +108,9 @@ test("past the day's questions, the chat says so", async ({ page }) => {
   const { panel } = await chatAboutControlFlow(page);
   await ask(panel, "How do for statements iterate?");
   await expect(panel.getByRole("button", { name: /^Source 1: / })).toBeVisible();
+  // The chip shows while the answer still streams, and the panel sends no
+  // question until it is saved.
+  await expect(panel.getByRole("button", { name: "Ask" })).toBeVisible();
 
   // From here on, an API that allows one question a day answers the chat.
   await page.route("**/api/v1/conversations/**", async (route) => {

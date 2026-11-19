@@ -218,6 +218,41 @@ test("Stop asks the server to stop, and the answer shows as stopped", async () =
   expect(requests.some((r) => r.url.endsWith("/conversations/c1/stop"))).toBe(true);
 });
 
+test("Enter while an answer is still being written sends nothing and keeps the question", async () => {
+  const stream = eventStream();
+  let saved: Message[] = [];
+  const requests = stubApi({
+    "GET /documents": () => json({ documents: [] }),
+    "GET /conversations": () => json({ conversations: [], messages_left_today: 50 }),
+    "POST /conversations": () => json(conversation, 201),
+    "POST /conversations/c1/messages": () => {
+      stream.send("delta", { segment: 0, text: "Goroutines use channels." });
+      stream.send("citation", { segment: 0, citation: channels });
+      return stream.response();
+    },
+    "GET /conversations/c1": () => json({ conversation, messages: saved }),
+    "GET /documents/doc-go": () => apiError(404, "not_found"),
+  });
+  renderApp("/");
+  const panel = await openChat();
+  await ask(panel, "How do goroutines talk?");
+  await within(panel).findByRole("button", { name: "Source 1: Effective Go > Channels" });
+
+  // The chip is there, but the answer is not finished or saved.
+  await ask(panel, "And select?");
+  const box = within(panel).getByRole("textbox", { name: "Ask your library" });
+  expect((box as HTMLTextAreaElement).value).toBe("And select?");
+  const posts = () => requests.filter((r) => r.url.endsWith("/conversations/c1/messages")).length;
+  expect(posts()).toBe(1);
+
+  saved = [question, answer()];
+  stream.send("done", { message: answer(), messages_left_today: 49 } satisfies ChatDone);
+  stream.close();
+  await within(panel).findByRole("button", { name: "Ask" });
+  fireEvent.keyDown(box, { key: "Enter" });
+  await waitFor(() => expect(posts()).toBe(2));
+});
+
 test("with no questions left today, asking is off", async () => {
   stubApi({
     "GET /documents": () => json({ documents: [] }),

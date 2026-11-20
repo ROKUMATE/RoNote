@@ -4,6 +4,7 @@
 //
 //	worker [run]         run jobs
 //	worker healthcheck   fail unless a running worker's database answered lately
+//	worker check-config  check the configuration, starting nothing
 package main
 
 import (
@@ -49,6 +50,9 @@ var heartbeatFile = filepath.Join(os.TempDir(), "ronote-worker-alive")
 func main() {
 	err := cli.Run(os.Args[1:], "run", map[string]cli.Command{
 		"run": cli.NoArgs(run),
+		"check-config": cli.NoArgs(func() error {
+			return config.Check(os.Getenv, os.Stdout)
+		}),
 		"healthcheck": cli.NoArgs(func() error {
 			return health.Fresh(heartbeatFile, heartbeatStale, time.Now())
 		}),

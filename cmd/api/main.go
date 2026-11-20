@@ -2,6 +2,7 @@
 //
 //	api [serve]                  serve the API
 //	api migrate                  apply the migrations the database lacks
+//	api check-config             check the configuration, starting nothing
 //	api healthcheck URL          fail unless URL (its /healthz) answers 200
 package main
 
@@ -47,8 +48,11 @@ const (
 
 func main() {
 	err := cli.Run(os.Args[1:], "serve", map[string]cli.Command{
-		"serve":       cli.NoArgs(run),
-		"migrate":     cli.NoArgs(migrate),
+		"serve":   cli.NoArgs(run),
+		"migrate": cli.NoArgs(migrate),
+		"check-config": cli.NoArgs(func() error {
+			return config.Check(os.Getenv, os.Stdout)
+		}),
 		"healthcheck": healthcheck,
 	})
 	if err != nil {
@@ -157,7 +161,7 @@ func run() error {
 		Events:    broker,
 		Done:      streamsDone,
 		Accounts:  accounts{Store: st, imports: imports},
-		Cookies:   auth.Cookies{Secure: cfg.Env.Deployed()},
+		Cookies:   auth.Cookies{Secure: cfg.SecureCookies()},
 		PublicURL: cfg.PublicURL,
 		Limits:    httpapi.Limits{APIPerMinute: cfg.Limits.APIPerMinute, AuthPerMinute: cfg.Limits.AuthPerMinute},
 		// Behind Caddy, its X-Forwarded-For names the client.

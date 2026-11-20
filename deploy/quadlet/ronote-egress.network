@@ -1,0 +1,6 @@
+# ronote-egress: what may reach the internet: the api (GitHub, Anthropic) and the worker (pages).
+
+[Network]
+NetworkName=ronote-egress
+Subnet=10.89.11.0/24
+Gateway=10.89.11.1

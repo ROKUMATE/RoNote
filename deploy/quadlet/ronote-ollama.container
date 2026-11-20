@@ -1,0 +1,28 @@
+# The embedder: Ollama with the pinned model, which deploy/install.sh pulls
+# into its volume and checks against the pin. It then has no way out.
+
+[Unit]
+Description=RoNote embedder
+
+[Container]
+ContainerName=ronote-ollama
+Image=docker.io/ollama/ollama:0.40.16@sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592
+Network=ronote-data.network
+Volume=ronote-ollama.volume:/root/.ollama
+Environment=OLLAMA_HOST=0.0.0.0:11434
+ReadOnly=true
+ReadOnlyTmpfs=true
+NoNewPrivileges=true
+DropCapability=ALL
+PodmanArgs=--memory=1536m --cpus=2
+HealthCmd=ollama list
+HealthInterval=15s
+HealthStartPeriod=60s
+Notify=healthy
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

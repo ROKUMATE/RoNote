@@ -1,0 +1,143 @@
+# RoNote's one front door (docs/adr/0014-production-topology.md): the app's
+# domain, with /api to the api, and the runner's, each with its own
+# headers. Both domains come from the environment, as ronote.env sets them.
+# Caddy listens on 8080 and 8443 as an unprivileged user; the unit
+# publishes them as 80 and 443.
+
+{
+	admin off
+	http_port 8080
+	https_port 8443
+	# The http site below redirects to https without the inside port.
+	auto_https disable_redirects
+	# CI and prod-local add their own global options here (local_certs).
+	import /etc/caddy/global.d/*.caddy
+}
+
+# Request body limits, as the API's (internal/httpapi/limits.go): a PDF
+# upload up to 25 MiB and its form, a whole document 8 MiB, re-anchoring
+# highlights 1 MiB, anything else 64 KiB. The API checks them too.
+(api) {
+	@pdf path /api/v1/imports/pdf
+	@document {
+		method PATCH
+		path_regexp ^/api/v1/documents/[^/]+$
+	}
+	@reanchor path_regexp ^/api/v1/documents/[^/]+/annotations/reanchor$
+	@other {
+		not path /api/v1/imports/pdf
+		not path_regexp ^/api/v1/documents/[^/]+(/annotations/reanchor)?$
+	}
+	@document-other {
+		not method PATCH
+		path_regexp ^/api/v1/documents/[^/]+$
+	}
+	request_body @pdf {
+		max_size 26279936
+	}
+	request_body @document {
+		max_size 8MiB
+	}
+	request_body @reanchor {
+		max_size 1MiB
+	}
+	request_body @other {
+		max_size 64KiB
+	}
+	request_body @document-other {
+		max_size 64KiB
+	}
+	# Unbuffered: import progress and chat answers are event streams.
+	reverse_proxy ronote-api:8080 {
+		flush_interval -1
+	}
+}
+
+# Headers every response of both domains carries.
+(common) {
+	header {
+		Strict-Transport-Security "max-age=63072000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+		-Server
+	}
+}
+
+# Static files: hashed ones cached for good, index.html filled per request
+# with the deployment's origins (Caddy's templates, {{env "..."}}) and never
+# cached, everything precompressed (deploy/images/precompress.mjs).
+(static) {
+	route {
+		try_files {path} /index.html
+		@index path /index.html
+		header @index Cache-Control "no-cache"
+		templates @index
+		@hashed path /assets/*
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
+		file_server {
+			precompressed br gzip
+		}
+	}
+}
+
+{$RONOTE_PUBLIC_URL} {
+	import common
+	header {
+		Referrer-Policy strict-origin-when-cross-origin
+		# The runner's frame needs the page cross-origin isolated
+		# (docs/adr/0008-in-browser-code-execution.md); credentialless still
+		# loads documents' images from their own sites.
+		Cross-Origin-Opener-Policy same-origin
+		Cross-Origin-Embedder-Policy credentialless
+	}
+	handle /api/* {
+		import api
+	}
+	handle {
+		# The app's own scripts, styles and fonts only; images from any https
+		# site, since imported pages show their own; the runner alone may be
+		# framed. The API's answers keep their own policies, such as the
+		# sandbox of a PDF's original.
+		header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https: data:; font-src 'self'; connect-src 'self'; frame-src {$RONOTE_RUNNER_URL}; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'"
+		root * /srv/app
+		import static
+	}
+}
+
+# The runner (docs/adr/0008-in-browser-code-execution.md): code from
+# documents runs here, reaching nothing but its own files, framed by the app
+# alone. Only the JavaScript worker's script may evaluate code, which
+# running the reader's JavaScript is; everything else may compile Pyodide's
+# WebAssembly and nothing more. vite.runner.config.ts sends the same in dev.
+{$RONOTE_RUNNER_URL} {
+	import common
+	header {
+		Referrer-Policy no-referrer
+		Cross-Origin-Opener-Policy same-origin
+		Cross-Origin-Embedder-Policy require-corp
+		Cross-Origin-Resource-Policy cross-origin
+	}
+	@worker path_regexp ^/assets/javascript\.worker-[^/]+$
+	@not-worker not path_regexp ^/assets/javascript\.worker-[^/]+$
+	header @worker Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src 'self'; frame-ancestors {$RONOTE_PUBLIC_URL}; base-uri 'none'; form-action 'none'"
+	header @not-worker Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; frame-ancestors {$RONOTE_PUBLIC_URL}; base-uri 'none'; form-action 'none'"
+	# Pyodide's path carries its version, so its files never change.
+	@pyodide path /pyodide/*
+	header @pyodide Cache-Control "public, max-age=31536000, immutable"
+	root * /srv/runner
+	import static
+}
+
+# Plain http only redirects, outside port or not.
+http:// {
+	redir https://{host}{uri} 308
+}
+
+# The unit's health check, from inside the container only.
+http://127.0.0.1:8081 {
+	bind 127.0.0.1
+	respond /health 200
+}
+
+# CI and prod-local add sites here: the fake sign-in, the pages to import.
+import /etc/caddy/sites.d/*.caddy

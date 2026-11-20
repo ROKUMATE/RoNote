@@ -1,0 +1,30 @@
+# pdftext, which reads code from a PDF's text layer, run from docling's
+# image as in dev (deploy/pdftext/pdftext.py, docs/adr/0013-pdf-import.md).
+
+[Unit]
+Description=RoNote pdftext
+
+[Container]
+ContainerName=ronote-pdftext
+Image=quay.io/docling-project/docling-serve-cpu:v1.38.2@sha256:7a480a1604fa3b42efeddc7db9527690d9f9bc903226136013e2bfe6b1a4dfb0
+Network=ronote-converters.network
+Entrypoint=python
+Exec=/app/pdftext.py
+Volume=%h/.config/ronote/pdftext.py:/app/pdftext.py:ro,Z
+Secret=ronote-pdftext-api-key,type=env,target=PDFTEXT_API_KEY
+ReadOnly=true
+ReadOnlyTmpfs=true
+NoNewPrivileges=true
+DropCapability=ALL
+PodmanArgs=--memory=512m --cpus=1
+HealthCmd=python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5002/health')"
+HealthInterval=15s
+HealthStartPeriod=30s
+Notify=healthy
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

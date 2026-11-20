@@ -1,0 +1,33 @@
+# Postgres with pgvector, the image deploy/compose.dev.yml pins.
+
+[Unit]
+Description=RoNote Postgres
+
+[Container]
+ContainerName=ronote-postgres
+Image=docker.io/pgvector/pgvector:0.8.7-pg18-trixie@sha256:5895949dfcdf308eb0cd31c950c93c14895c77f33fbedfecf1fa511ab1d4bcd2
+Network=ronote-data.network
+Volume=ronote-pgdata.volume:/var/lib/postgresql
+Environment=POSTGRES_USER=ronote POSTGRES_DB=ronote
+Secret=ronote-postgres-password,type=env,target=POSTGRES_PASSWORD
+ReadOnly=true
+# /run holds the socket directory the entrypoint makes.
+ReadOnlyTmpfs=true
+NoNewPrivileges=true
+DropCapability=ALL
+# The entrypoint makes its directories as root, then runs Postgres as its
+# own user.
+AddCapability=CHOWN DAC_OVERRIDE FOWNER SETGID SETUID
+ShmSize=256m
+PodmanArgs=--memory=1g --cpus=1
+HealthCmd=pg_isready -U ronote -d ronote
+HealthInterval=10s
+HealthStartPeriod=60s
+Notify=healthy
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

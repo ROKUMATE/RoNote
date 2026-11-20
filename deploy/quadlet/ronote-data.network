@@ -1,0 +1,8 @@
+# ronote-data: the database, the blob store and the embedder, reached from the api and the worker only.
+# Internal: no route out.
+
+[Network]
+NetworkName=ronote-data
+Subnet=10.89.12.0/24
+Gateway=10.89.12.1
+Internal=true

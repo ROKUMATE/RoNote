@@ -26,16 +26,16 @@ From P19 on, RoNote runs somewhere other than a laptop. Earlier ADRs left the de
   | docling, pdftext | the docling image of ADR 0013, pinned by digest | PDF conversion, no egress |
   | seaweedfs | SeaweedFS, pinned by digest | the blob store; not installed when `RONOTE_BLOB_ENDPOINT` names an external S3 (R2, B2) |
 
-- **Networks.** Only Caddy publishes ports (80 and 443).
+- **Networks.** Only Caddy publishes ports: 80 and 443 (and 443/udp, HTTP/3), to its 8080 and 8443, since it runs as a user of its own.
   - `ronote-edge`: caddy and api; a fixed subnet, which is `RONOTE_TRUSTED_PROXIES`.
   - `ronote-egress`: api (Anthropic, GitHub) and worker (fetching pages).
   - `ronote-data`, internal: api, worker, migrate, postgres, seaweedfs, ollama.
   - `ronote-converters`, internal: worker, docling, pdftext.
-- **Every container** runs with a read-only root (writable paths as tmpfs or volumes) where the image allows it, `no-new-privileges`, all capabilities dropped but those its entrypoint needs, memory and CPU limits, and a health check. A unit that can't do one of these says why in a comment.
+- **Every container** runs with a read-only root (writable paths as tmpfs or volumes), `no-new-privileges`, all capabilities dropped but those its entrypoint needs, memory and CPU limits, and a health check; `deploy/units_test.go` checks it. The exceptions say why in their unit: postgres keeps `CHOWN`, `DAC_OVERRIDE`, `FOWNER`, `SETGID` and `SETUID` and seaweedfs `CHOWN`, `SETGID` and `SETUID`, because their entrypoints make their directories as root and then become their own user; the one-shot migrate has no health check. The api's and worker's checks are their own binaries (`healthcheck`), run without a shell, which distroless has none of; the worker, serving no HTTP, touches a file while its database answers.
 - **Memory on 8 GB:** caddy 128 MB, api 384 MB, worker 512 MB, postgres 1 GB, ollama 1.5 GB, docling 3 GB with one conversion worker, pdftext 512 MB, seaweedfs 384 MB; about 1 GB is left for the host.
 - **Secrets are podman secrets**, created at install and given to units with `Secret=…,type=env`: the GitHub client secret, the Anthropic key, the docling, pdftext and blob keys, and the database password. No secret, and no env file holding one, is in the repo.
 - **Two domains, as config:** `RONOTE_PUBLIC_URL` (the app) and `RONOTE_RUNNER_URL` (the runner), both https. They must be different registrable domains (ADR 0008); config compares their eTLD+1 by the public suffix list and refuses a same-site pair.
-- **One image serves any deployment.** The app and the runner read both URLs at run time, from a `<meta name="ronote-config">` in their `index.html` that Caddy fills from its environment (Vite does the same in dev). Nothing domain-specific is built into the JavaScript.
+- **One image serves any deployment.** The app and the runner read both URLs at run time, from meta tags in their `index.html` (`ronote-runner-url`, `ronote-app-url`) that Caddy fills from its environment with `templates` (Vite does the same in dev). Nothing domain-specific is built into the JavaScript.
 - **Images** (`deploy/images/`):
   - api and worker: static Go binaries (no cgo), built multi-stage and run on distroless `static-debian13:nonroot`, without shells or dev tools;
   - web: Caddy on Alpine, with the built app and runner, Pyodide precompressed;
@@ -47,14 +47,14 @@ From P19 on, RoNote runs somewhere other than a laptop. Earlier ADRs left the de
     - the static app, `/assets/*` cached for a year as immutable and `index.html` never;
     - `/api` to the api, unbuffered, for the import events and chat streams;
     - request bodies bounded per route at the API's limits (ADR 0010, ADR 0013).
-  - App headers: HSTS, a CSP that allows only its own scripts, styles, fonts and connections, framing only of the runner, and images from any https site (imported pages show their own), `nosniff`, `Referrer-Policy`, `Permissions-Policy`, COOP `same-origin` and COEP `credentialless` (ADR 0008). The API's own headers, such as `/original`'s sandbox, are kept.
+  - App headers: HSTS, a CSP that allows only its own scripts, styles, fonts and connections (so preferences load from `boot.js` rather than an inline script, ProseMirror's base styles are a stylesheet rather than an injected element, and fonts stay files rather than `data:` URIs), framing only of the runner, and images from any https site (imported pages show their own), `nosniff`, `Referrer-Policy`, `Permissions-Policy`, COOP `same-origin` and COEP `credentialless` (ADR 0008). The API's own headers, such as `/original`'s sandbox, are kept.
   - Runner domain: the policies of ADR 0008, served by path as `headersFor` does in dev. The JavaScript worker's script alone gets `'unsafe-eval'`. Pyodide is served precompressed under its version's path and cached as immutable.
 - **The api and the worker:**
   - trust `X-Forwarded-For` only from `RONOTE_TRUSTED_PROXIES` (CIDRs, none by default);
   - cap chat's spending across all users at `RONOTE_CHAT_DAILY_USD` a UTC day (ADR 0012);
   - check a configuration without starting (`check-config`), never printing a value;
   - refuse to start on a schema newer than they know; migrations run before them, as their own unit.
-- **Proof.** A CI job installs these units and this Caddy config on its runner, swapping in the fakes (fakeidp, fakeembed, fakellm, fakedocling) and `RONOTE_ENV=test` by Quadlet drop-ins, and runs a Playwright smoke suite through Caddy at `ronote.test` and `ronote-run.test`, with Caddy's internal CA. `make prod-local` runs the same units in the podman machine VM.
+- **Proof.** A CI job installs these units and this Caddy config on its runner, swapping in the fakes (fakeidp, fakeembed, fakellm, fakedocling) and `RONOTE_ENV=test` by Quadlet drop-ins, and runs a Playwright smoke suite through Caddy at `ronote.test` and `ronote-run.test`, with Caddy's internal CA, which Chromium trusts by its key. It also checks that the `ronote` user listens on 80 and 443 alone and nothing else answers, and runs `check-config` on `deploy/ronote.env.example` (which must pass) and on a same-site pair (which must fail). `make prod-local` runs the same units in the podman machine's VM (Fedora CoreOS), and the smoke suite from the Mac through an ssh tunnel.
 
 ## Consequences
 

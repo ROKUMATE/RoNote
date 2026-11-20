@@ -1,0 +1,26 @@
+# The migrations, applied once before the api and the worker start
+# (`api migrate`); they refuse a schema newer than they know.
+
+[Unit]
+Description=RoNote migrations
+Requires=ronote-postgres.service
+After=ronote-postgres.service
+
+[Container]
+ContainerName=ronote-migrate
+Image=ghcr.io/rokumate/ronote-api:@RONOTE_VERSION@
+Exec=migrate
+Network=ronote-data.network
+Secret=ronote-database-url,type=env,target=RONOTE_DATABASE_URL
+ReadOnly=true
+NoNewPrivileges=true
+DropCapability=ALL
+PodmanArgs=--memory=128m --cpus=0.5
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

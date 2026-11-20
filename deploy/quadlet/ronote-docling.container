@@ -1,0 +1,28 @@
+# docling-serve, which converts PDFs (docs/adr/0013-pdf-import.md): no way
+# out, its own key, its limits.
+
+[Unit]
+Description=RoNote docling
+
+[Container]
+ContainerName=ronote-docling
+Image=quay.io/docling-project/docling-serve-cpu:v1.38.2@sha256:7a480a1604fa3b42efeddc7db9527690d9f9bc903226136013e2bfe6b1a4dfb0
+Network=ronote-converters.network
+Environment=DOCLING_SERVE_MAX_NUM_PAGES=300 DOCLING_SERVE_MAX_FILE_SIZE=26214400 DOCLING_SERVE_MAX_DOCUMENT_TIMEOUT=540 DOCLING_SERVE_SINGLE_USE_RESULTS=true DOCLING_SERVE_ENG_LOC_NUM_WORKERS=1 HF_HUB_OFFLINE=1
+Secret=ronote-docling-api-key,type=env,target=DOCLING_SERVE_API_KEY
+ReadOnly=true
+ReadOnlyTmpfs=true
+NoNewPrivileges=true
+DropCapability=ALL
+PodmanArgs=--memory=3g --cpus=2
+HealthCmd=python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5001/health')"
+HealthInterval=15s
+HealthStartPeriod=120s
+Notify=healthy
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

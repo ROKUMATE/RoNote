@@ -1,0 +1,40 @@
+# The HTTP API, behind Caddy.
+
+[Unit]
+Description=RoNote API
+Requires=ronote-migrate.service ronote-postgres.service
+After=ronote-migrate.service ronote-postgres.service
+Wants=ronote-ollama.service ronote-seaweedfs.service
+
+[Container]
+ContainerName=ronote-api
+Image=ghcr.io/rokumate/ronote-api:@RONOTE_VERSION@
+# Caddy reaches it on edge, whose subnet is RONOTE_TRUSTED_PROXIES; GitHub
+# and Anthropic on egress; the database, blobs and embedder on data.
+Network=ronote-edge.network
+Network=ronote-egress.network
+Network=ronote-data.network
+EnvironmentFile=%h/.config/ronote/ronote.env
+Secret=ronote-database-url,type=env,target=RONOTE_DATABASE_URL
+Secret=ronote-github-client-secret,type=env,target=RONOTE_GITHUB_CLIENT_SECRET
+Secret=ronote-anthropic-api-key,type=env,target=RONOTE_ANTHROPIC_API_KEY
+Secret=ronote-blob-access-key,type=env,target=RONOTE_BLOB_ACCESS_KEY
+Secret=ronote-blob-secret-key,type=env,target=RONOTE_BLOB_SECRET_KEY
+Secret=ronote-docling-api-key,type=env,target=RONOTE_DOCLING_API_KEY
+Secret=ronote-pdftext-api-key,type=env,target=RONOTE_PDFTEXT_API_KEY
+ReadOnly=true
+NoNewPrivileges=true
+DropCapability=ALL
+PodmanArgs=--memory=384m --cpus=1
+# A JSON array runs without a shell, which distroless has none of.
+HealthCmd=["/ronote", "healthcheck", "http://127.0.0.1:8080/healthz"]
+HealthInterval=10s
+HealthStartPeriod=30s
+Notify=healthy
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

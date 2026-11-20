@@ -1,0 +1,33 @@
+# The blob store for uploaded PDFs (docs/adr/0013-pdf-import.md). Not
+# installed when ronote.env names an external S3, such as R2 or B2.
+
+[Unit]
+Description=RoNote blob store
+
+[Container]
+ContainerName=ronote-seaweedfs
+Image=docker.io/chrislusf/seaweedfs:4.53@sha256:ccad23e18639c8b98cee17e7100b95830a06077b56d8e5b006d6dcf8ec5e94a0
+Exec=server -s3 -s3.config=/etc/seaweedfs/s3.json -dir=/data -master.volumeSizeLimitMB=1024 -volume.max=64
+Network=ronote-data.network
+Volume=ronote-blobs.volume:/data
+# Its one identity, holding the blob keys, made by deploy/install.sh.
+Secret=ronote-seaweedfs-s3,target=/etc/seaweedfs/s3.json
+ReadOnly=true
+ReadOnlyTmpfs=true
+NoNewPrivileges=true
+DropCapability=ALL
+# The entrypoint gives /data to its own user, then becomes it (su-exec).
+AddCapability=CHOWN SETGID SETUID
+PodmanArgs=--memory=384m --cpus=1
+# As in compose: the check makes the bucket, so healthy means it exists.
+HealthCmd=sh -c "echo 's3.bucket.create -name ronote' | weed shell 2>&1 | grep -q -E 'created bucket|already exists'"
+HealthInterval=10s
+HealthStartPeriod=60s
+Notify=healthy
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,4 @@
+# Caddy's certificates
+
+[Volume]
+VolumeName=ronote-caddy-data

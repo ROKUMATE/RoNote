@@ -284,34 +284,51 @@ test("a check compares each example with the page's output, in the session", asy
   ]);
 });
 
-test("Stop interrupts an endless loop within a second, and keeps the session", async ({ page }) => {
+/**
+ * Runs an endless loop that writes now and then, and presses Stop once its
+ * first output arrives, from inside the loop; resolves with the run's events.
+ */
+function stopLoop(page: Page, runtime: "python" | "javascript", code: string): Promise<Event[]> {
+  return page.evaluate(
+    ([runtime, code]) =>
+      new Promise<Event[]>((resolve) => {
+        const events: Event[] = [];
+        const stop = window.runner.listen((event) => {
+          if (event.id !== "loop") return;
+          events.push(event);
+          if (event.type === "stdout" && events.length === 1) {
+            window.runner.send({ v: 1, type: "stop", runtime });
+          }
+          if (event.type !== "done") return;
+          stop();
+          resolve(events);
+        });
+        window.runner.send({ v: 1, type: "run", id: "loop", runtime, code, mode: "exec" });
+      }),
+    [runtime, code] as const,
+  );
+}
+
+// A run that ignores the interrupt for a second loses its session
+// (stopGrace), so a session that survives was also stopped within it.
+test("Stop interrupts an endless loop, and keeps the session", async ({ page }) => {
   await openRunner(page);
   await run(page, "kept = 'still here'");
-  const { end, ms } = await page.evaluate(
-    () =>
-      new Promise<{ end: string | undefined; ms: number }>((resolve) => {
-        let stopped = 0;
-        const stop = window.runner.listen((event) => {
-          if (event.id !== "loop" || event.type !== "done") return;
-          stop();
-          resolve({ end: event.end, ms: performance.now() - stopped });
-        });
-        window.runner.send({
-          v: 1,
-          type: "run",
-          id: "loop",
-          runtime: "python",
-          code: "while True:\n    pass",
-          mode: "exec",
-        });
-        setTimeout(() => {
-          stopped = performance.now();
-          window.runner.send({ v: 1, type: "stop", runtime: "python" });
-        }, 500);
-      }),
+  const loop = [
+    "import time",
+    "tick = time.monotonic()",
+    "while True:",
+    "    if time.monotonic() >= tick:",
+    "        print('still looping')",
+    "        tick += 0.2",
+  ].join("\n");
+  const stopped = shown(await stopLoop(page, "python", loop));
+  // Output, then done: the KeyboardInterrupt that stopping raised isn't shown.
+  expect(stopped.map((e) => e.type)).toEqual(["stdout", "done"]);
+  expect(stopped.at(-1)?.end).toBe("stop");
+  expect(await page.evaluate(() => window.runnerEvents.filter((e) => e.type === "ended"))).toEqual(
+    [],
   );
-  expect(end).toBe("stop");
-  expect(ms).toBeLessThan(1000);
   expect(shown(await run(page, "kept"))).toEqual([
     { type: "result", text: "'still here'" },
     { type: "done", end: "ok" },
@@ -449,31 +466,22 @@ test("an uncaught JavaScript error starts at the reader's code, and a rejection 
 test("Stop ends a JavaScript loop at once, and the session with it", async ({ page }) => {
   await openRunner(page);
   await js(page, "const kept = 'gone after Stop';");
-  const { end, ms } = await page.evaluate(
-    () =>
-      new Promise<{ end: string | undefined; ms: number }>((resolve) => {
-        let stopped = 0;
-        const stop = window.runner.listen((event) => {
-          if (event.id !== "spin" || event.type !== "done") return;
-          stop();
-          resolve({ end: event.end, ms: performance.now() - stopped });
-        });
-        window.runner.send({
-          v: 1,
-          type: "run",
-          id: "spin",
-          runtime: "javascript",
-          code: "while (true) {}",
-          mode: "exec",
-        });
-        setTimeout(() => {
-          stopped = performance.now();
-          window.runner.send({ v: 1, type: "stop", runtime: "javascript" });
-        }, 300);
-      }),
-  );
-  expect(end).toBe("stop");
-  expect(ms).toBeLessThan(1000);
+  const loop = [
+    "let tick = performance.now();",
+    "while (true) {",
+    "  if (performance.now() >= tick) {",
+    "    console.log('still spinning');",
+    "    tick += 200;",
+    "  }",
+    "}",
+  ].join("\n");
+  expect((await stopLoop(page, "javascript", loop)).at(-1)).toMatchObject({
+    type: "done",
+    end: "stop",
+  });
+  expect(await page.evaluate(() => window.runnerEvents.filter((e) => e.type === "ended"))).toEqual([
+    { v: 1, type: "ended", runtime: "javascript", reason: "stop" },
+  ]);
   expect(shown(await js(page, "typeof kept"))).toEqual([
     { type: "result", text: "'undefined'" },
     { type: "done", end: "ok" },

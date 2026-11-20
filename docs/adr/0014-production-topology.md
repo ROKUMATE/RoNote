@@ -1,0 +1,65 @@
+# 0014: Production topology
+
+Accepted, 2026-11-20.
+
+## Context
+
+From P19 on, RoNote runs somewhere other than a laptop. Earlier ADRs left the deployment open but fixed its constraints: the runner on its own registrable domain with its own headers (ADR 0008), Secure `__Host-` cookies and a client IP that comes from a proxy only once its headers are trusted (ADR 0010), chat that costs money per question (ADR 0012), and docling and pdftext with no way out (ADR 0013). One small host is enough for the users RoNote will have first, and a topology that fits on one host also fits on a laptop and in CI, where it can be proven before a real server exists.
+
+## Decision
+
+- **One Linux host**, any provider: at least 8 GB of RAM and 4 vCPUs.
+  - Rootless Podman, under a dedicated `ronote` user with lingering on, so its services start at boot without a login.
+  - Services are Quadlet units (`deploy/quadlet/`) in that user's `~/.config/containers/systemd/`; systemd orders, restarts and health-checks them.
+  - `net.ipv4.ip_unprivileged_port_start=80`, so Caddy binds 80 and 443 without root.
+  - Podman's default network, pasta, keeps a client's source address, so Caddy sees real client IPs.
+- **Containers:**
+
+  | Unit | Image | Role |
+  |---|---|---|
+  | caddy | `ghcr.io/rokumate/ronote-web` | TLS, the app's and the runner's static files, `/api` to the api |
+  | api | `ghcr.io/rokumate/ronote-api` | the HTTP API |
+  | worker | `ghcr.io/rokumate/ronote-worker` | jobs: imports, PDFs, indexing, blob deletion |
+  | migrate | `ghcr.io/rokumate/ronote-api` | `api migrate`, once, before api and worker start |
+  | postgres | pgvector, the digest in `deploy/compose.dev.yml` | the database |
+  | ollama | Ollama, pinned by digest | embeddings; the model is pulled at install, its digest checked against the pin, and the service then has no egress |
+  | docling, pdftext | the docling image of ADR 0013, pinned by digest | PDF conversion, no egress |
+  | seaweedfs | SeaweedFS, pinned by digest | the blob store; not installed when `RONOTE_BLOB_ENDPOINT` names an external S3 (R2, B2) |
+
+- **Networks.** Only Caddy publishes ports (80 and 443).
+  - `ronote-edge`: caddy and api; a fixed subnet, which is `RONOTE_TRUSTED_PROXIES`.
+  - `ronote-egress`: api (Anthropic, GitHub) and worker (fetching pages).
+  - `ronote-data`, internal: api, worker, migrate, postgres, seaweedfs, ollama.
+  - `ronote-converters`, internal: worker, docling, pdftext.
+- **Every container** runs with a read-only root (writable paths as tmpfs or volumes) where the image allows it, `no-new-privileges`, all capabilities dropped but those its entrypoint needs, memory and CPU limits, and a health check. A unit that can't do one of these says why in a comment.
+- **Memory on 8 GB:** caddy 128 MB, api 384 MB, worker 512 MB, postgres 1 GB, ollama 1.5 GB, docling 3 GB with one conversion worker, pdftext 512 MB, seaweedfs 384 MB; about 1 GB is left for the host.
+- **Secrets are podman secrets**, created at install and given to units with `Secret=…,type=env`: the GitHub client secret, the Anthropic key, the docling, pdftext and blob keys, and the database password. No secret, and no env file holding one, is in the repo.
+- **Two domains, as config:** `RONOTE_PUBLIC_URL` (the app) and `RONOTE_RUNNER_URL` (the runner), both https. They must be different registrable domains (ADR 0008); config compares their eTLD+1 by the public suffix list and refuses a same-site pair.
+- **One image serves any deployment.** The app and the runner read both URLs at run time, from a `<meta name="ronote-config">` in their `index.html` that Caddy fills from its environment (Vite does the same in dev). Nothing domain-specific is built into the JavaScript.
+- **Images** (`deploy/images/`):
+  - api and worker: static Go binaries (no cgo), built multi-stage and run on distroless `static-debian13:nonroot`, without shells or dev tools;
+  - web: Caddy on Alpine, with the built app and runner, Pyodide precompressed;
+  - bases pinned by digest; amd64 and arm64;
+  - a `v*` tag builds and pushes them to `ghcr.io/rokumate/ronote-*` with build provenance attached (`actions/attest-build-provenance`);
+  - the version is stamped into the binaries and shown by `/healthz`.
+- **Caddy.**
+  - App domain:
+    - the static app, `/assets/*` cached for a year as immutable and `index.html` never;
+    - `/api` to the api, unbuffered, for the import events and chat streams;
+    - request bodies bounded per route at the API's limits (ADR 0010, ADR 0013).
+  - App headers: HSTS, a CSP that allows only its own scripts, styles, fonts and connections, framing only of the runner, and images from any https site (imported pages show their own), `nosniff`, `Referrer-Policy`, `Permissions-Policy`, COOP `same-origin` and COEP `credentialless` (ADR 0008). The API's own headers, such as `/original`'s sandbox, are kept.
+  - Runner domain: the policies of ADR 0008, served by path as `headersFor` does in dev. The JavaScript worker's script alone gets `'unsafe-eval'`. Pyodide is served precompressed under its version's path and cached as immutable.
+- **The api and the worker:**
+  - trust `X-Forwarded-For` only from `RONOTE_TRUSTED_PROXIES` (CIDRs, none by default);
+  - cap chat's spending across all users at `RONOTE_CHAT_DAILY_USD` a UTC day (ADR 0012);
+  - check a configuration without starting (`check-config`), never printing a value;
+  - refuse to start on a schema newer than they know; migrations run before them, as their own unit.
+- **Proof.** A CI job installs these units and this Caddy config on its runner, swapping in the fakes (fakeidp, fakeembed, fakellm, fakedocling) and `RONOTE_ENV=test` by Quadlet drop-ins, and runs a Playwright smoke suite through Caddy at `ronote.test` and `ronote-run.test`, with Caddy's internal CA. `make prod-local` runs the same units in the podman machine VM.
+
+## Consequences
+
+- A deployment is a host, two domains, a GitHub OAuth app and the secrets; `deploy/install.sh` and `check-config` cover the rest.
+- One host means one API process, so the in-memory rate limits and Stop (ADR 0010, ADR 0012) stay correct.
+- Backups need Postgres and the blob store (ADR 0013); P19a doesn't set them up.
+- docling's 3 GB is below what dev gives it; CI never runs the real docling, so the limit is unproven until a real host converts real PDFs.
+- What reaches users is what CI ran: the same units, the same Caddy config and the same images, with only the fakes swapped in.

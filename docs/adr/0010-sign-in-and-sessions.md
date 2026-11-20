@@ -1,6 +1,6 @@
 # 0010: Sign-in and sessions
 
-Accepted, 2026-11-11
+Accepted, 2026-11-11. Amended 2026-11-20: behind Caddy, the client IP comes from `X-Forwarded-For` when the connection is from `RONOTE_TRUSTED_PROXIES` (ADR 0014).
 
 ## Context
 

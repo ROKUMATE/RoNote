@@ -4,21 +4,19 @@ The project's state, in at most 80 lines and 6 KB (`make lint` checks). Rewrite 
 
 ## Current milestone
 
-P18.3, cleanup after P18 and the chat eval.
-- **Chat says "not in your library" itself.** The model calls `not_in_library(missing, suggest)`; the message is `not_found` and shows both. A reply with text and no citation is `unsourced` ("No sources", never hidden); the markers a model writes into its text are counted, never rewritten (ADR 0012).
-- **Chat has run against the real model** (Claude Haiku 5.5): `make eval-chat`, 80 queries on 2026-11-18, $0.069 (`testdata/retrieval/chat-report.md`; every answer in `chat-answers.jsonl`):
-  - citations: 204 of 204 valid; hit rate 0.96 by section, 0.68 strict, against search's recall@10 of 0.96;
-  - no false refusals; of 8 unanswerable questions 4 called the tool, 3 said so in text without it (unsourced) and n04 answered with citations;
-  - e06 once wrote its own markers and was unsourced; asked 5 more times it cited every time;
-  - first token p50 2.0 s, total p50 3.2 s; about $0.0009 a question.
-- **The Anthropic key is `RONOTE_ANTHROPIC_API_KEY`**, like every other variable; a test fails when Go reads an unprefixed one.
-- **Chat stays off by default in staging and prod**, on in dev and test; P19 turns it on with `RONOTE_CHAT_ENABLED=true` (ADR 0012).
-- **Links inside highlights** pass axe in both themes: the dark accent is `#e6946d` and the dark highlight `#483c12` (4.6:1), and the styleguide and an e2e test have such a link.
-- **P18, printed PDF import** (ADR 0013), built before this:
-  - docling converts the PDF and pdftext reads its text layer into code; every PDF block records its page (IR 2, `source.pdf`);
-  - a blob port (S3 in dev and CI, memory in tests) stores the original, shown at `/api/v1/documents/{id}/original` (owner only, sandboxed), and documents can be deleted;
-  - the web app uploads PDFs and links "View page N";
-  - the verbatim report (`testdata/pdf/report.md`): 56 code blocks, 46 exact, 10 differing in whitespace only.
+P19a, the production topology (ADR 0014), proven in CI, with no real server yet.
+- **One host, rootless Podman, Quadlet** (`deploy/quadlet/`): caddy, api, worker, a one-shot migrate, postgres, ollama, docling, pdftext, seaweedfs, under a lingering `ronote` user. Only Caddy publishes ports (80, 443); data and converters are internal networks. Every unit is read-only, unprivileged, limited and health-checked (`deploy/units_test.go`). Secrets are podman secrets; `deploy/install.sh` makes them and installs everything.
+- **Caddy** (`deploy/caddy/Caddyfile`, baked into the web image) serves the app and the runner on two domains from `ronote.env`, each with its own headers. Only the JavaScript worker's script gets `'unsafe-eval'`; Pyodide is precompressed under a versioned path, cached as immutable.
+- **Images** (`deploy/images/`): api 23.9 MB and worker 18.4 MB (distroless), web 94.3 MB (Caddy and the static files). A `v*` tag pushes amd64 and arm64 to ghcr.io with build provenance. `/healthz` shows the version.
+- **One build for any domains.** The app and the runner read their origins from meta tags that Caddy fills (`RONOTE_PUBLIC_URL`, `RONOTE_RUNNER_URL`). `boot.js` replaces the inline script and ProseMirror's styles are a stylesheet, so the app's CSP allows no inline code.
+- **App:**
+  - `RONOTE_TRUSTED_PROXIES` for `X-Forwarded-For`;
+  - `RONOTE_CHAT_DAILY_USD` caps chat for all users per UTC day (`chat_spend_cap_reached`);
+  - `api|worker check-config` (a same-site runner fails);
+  - `api migrate`, and a refusal to start on a newer schema;
+  - markers are counted only in unsourced replies.
+- **Proof:** the CI job `smoke` (`make prod-ci`, `prod-check-config`, `prod-smoke`) installs the real units with the fakes by drop-ins, and runs Playwright through Caddy at `ronote.test` and `ronote-run.test`. `make prod-local` does the same in the podman VM; it passed 8 of 8, and giving the runner the app's CSP failed it.
+- **Before this, P18.3:** chat says "not in your library" with a tool, and an answer citing nothing is `unsourced`.
 
 ## What exists
 
@@ -31,15 +29,16 @@ P18.3, cleanup after P18 and the chat eval.
 - **Runner** (`apps/web/runner`): its own origin, Pyodide and JavaScript workers, a versioned message protocol.
 - **Quality:** golden fixtures and live checks for the extractor, recorded docling fixtures with goldens and the PDF verbatim report, integration tests on testcontainers (Postgres, SeaweedFS), Playwright and axe end to end against fake sign-in, embedder, model and docling, CI on every push and pull request; the search eval in CI.
 - **Dev stack:** `make dev-up` (Postgres, SeaweedFS with its bucket), `make dev-up-docling` (the real docling and pdftext); `make doctor` checks them.
+- **Production:** `deploy/` holds the images, the Quadlet units, the Caddyfile and `install.sh`. CI's `smoke` job and `make prod-local` run them with the fakes (ADR 0014).
 - **ADRs:**
   - 0001 stack, 0002 verbatim source, 0003 commits;
   - 0004 IR and links, 0005 import pipeline, 0006 editor and DocContent;
   - 0007 annotations, 0008 in-browser code execution, 0009 the jobs port;
-  - 0010 sign-in and sessions, 0011 retrieval, 0012 chat, 0013 PDF import.
+  - 0010 sign-in and sessions, 0011 retrieval, 0012 chat, 0013 PDF import, 0014 production topology.
 
 ## Next step
 
-P19: proxy headers, the runner's deployment, and chat on by env in staging and prod. First, decide what to do about the model refusing in text instead of calling the tool (docs/open-questions.md).
+P19b: a real host. Push to see the smoke job on GitHub's runner, then install from a release tag with real domains, GitHub's OAuth app and Let's Encrypt; prove docling's limits and Ollama's model there; set up backups; turn chat on by env. Still open: the model refusing in text instead of calling the tool (docs/open-questions.md).
 
 ## Quarantined tests
 

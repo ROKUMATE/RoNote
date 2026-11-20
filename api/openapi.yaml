@@ -1017,7 +1017,19 @@ paths:
         "500":
           $ref: "#/components/responses/InternalError"
         "503":
-          $ref: "#/components/responses/ChatDisabled"
+          description: |
+            Chat is turned off (code chat_disabled), or every user's answers
+            today have cost the day's budget (code chat_spend_cap_reached,
+            with Retry-After: seconds until midnight UTC).
+          headers:
+            Retry-After:
+              description: With chat_spend_cap_reached, seconds until midnight UTC.
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /conversations/{id}/stop:
     post:
       operationId: stopConversation
@@ -1193,6 +1205,7 @@ components:
         - not_a_pdf
         - pdf_too_large
         - chat_disabled
+        - chat_spend_cap_reached
         - conversation_busy
         - internal_error
     Me:

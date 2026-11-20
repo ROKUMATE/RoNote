@@ -98,3 +98,13 @@ SELECT
 FROM messages
 WHERE owner_id = sqlc.arg(owner_id)
   AND created_at > now() - make_interval(secs => sqlc.arg(window_seconds)::double precision);
+
+-- name: ChatSpentToday :one
+-- What every user's answers have cost since midnight UTC, and how long
+-- until the next one.
+SELECT
+    coalesce(sum(cost_microusd), 0)::bigint AS spent_microusd,
+    extract(epoch FROM date_trunc('day', now() AT TIME ZONE 'utc') + interval '1 day'
+        - (now() AT TIME ZONE 'utc'))::double precision AS seconds_until_midnight
+FROM messages
+WHERE created_at >= date_trunc('day', now() AT TIME ZONE 'utc') AT TIME ZONE 'utc';

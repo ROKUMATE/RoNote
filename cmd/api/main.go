@@ -130,7 +130,10 @@ func run() error {
 		Store: st, Searcher: searcher,
 		Model:     anthropic.New(cfg.Chat.URL, cfg.Chat.APIKey, cfg.Chat.Model),
 		ModelName: cfg.Chat.Model, Enabled: cfg.Chat.Enabled,
-		Limits: chat.Limits{MessagesPerDay: cfg.Limits.ChatMessagesPerDay, TokensPerDay: cfg.Limits.ChatTokensPerDay},
+		Limits: chat.Limits{
+			MessagesPerDay: cfg.Limits.ChatMessagesPerDay, TokensPerDay: cfg.Limits.ChatTokensPerDay,
+			SpendPerDayMicroUSD: cfg.Chat.DailySpendMicroUSD,
+		},
 		Logger: logger,
 	})
 	if err != nil {

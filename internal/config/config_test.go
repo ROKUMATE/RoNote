@@ -73,11 +73,11 @@ var limits = Limits{ImportsPerDay: 60, Documents: 500, APIPerMinute: 120, AuthPe
 
 // chatDefault is the default model: Haiku through Anthropic's API, with the
 // key validEnv sets.
-var chatDefault = Chat{Enabled: true, URL: "https://api.anthropic.com", Model: "claude-haiku-5-5", APIKey: leakMarker}
+var chatDefault = Chat{Enabled: true, URL: "https://api.anthropic.com", Model: "claude-haiku-5-5", APIKey: leakMarker, DailySpendMicroUSD: 500_000}
 
 // chatOffDefault is what staging and prod get unless chat is turned on by
 // name: the same model, off until it has run against the real one.
-var chatOffDefault = Chat{URL: "https://api.anthropic.com", Model: "claude-haiku-5-5", APIKey: leakMarker}
+var chatOffDefault = Chat{URL: "https://api.anthropic.com", Model: "claude-haiku-5-5", APIKey: leakMarker, DailySpendMicroUSD: 500_000}
 
 // fakeProvider points every provider URL at a local fake provider.
 var fakeProvider = map[string]string{ //nolint:gosec // URLs, not credentials
@@ -139,6 +139,24 @@ func TestLoad(t *testing.T) {
 			name:    "a proxy network with host bits",
 			env:     validEnv(map[string]string{"RONOTE_TRUSTED_PROXIES": "10.89.10.5/24"}),
 			wantErr: []string{`RONOTE_TRUSTED_PROXIES: "10.89.10.5/24" has host bits set; want 10.89.10.0/24`},
+		},
+		{
+			name: "a daily chat budget",
+			env:  validEnv(map[string]string{"RONOTE_CHAT_DAILY_USD": "2.25"}),
+			want: Config{
+				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault,
+				Chat: Chat{Enabled: true, URL: "https://api.anthropic.com", Model: "claude-haiku-5-5", APIKey: leakMarker, DailySpendMicroUSD: 2_250_000},
+			},
+		},
+		{
+			name:    "a daily chat budget that isn't one",
+			env:     validEnv(map[string]string{"RONOTE_CHAT_DAILY_USD": "0"}),
+			wantErr: []string{`RONOTE_CHAT_DAILY_USD: "0" is not an amount of dollars above 0, such as 0.50`},
+		},
+		{
+			name:    "a daily chat budget in other words",
+			env:     validEnv(map[string]string{"RONOTE_CHAT_DAILY_USD": "$1"}),
+			wantErr: []string{`RONOTE_CHAT_DAILY_USD: "$1" is not an amount of dollars above 0, such as 0.50`},
 		},
 		{
 			name:    "missing env",
@@ -342,7 +360,7 @@ func TestLoad(t *testing.T) {
 			want: Config{
 				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
 				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault,
-				Chat: Chat{Enabled: true, URL: "http://127.0.0.1:8094", Model: "claude-haiku-5-5"},
+				Chat: Chat{Enabled: true, URL: "http://127.0.0.1:8094", Model: "claude-haiku-5-5", DailySpendMicroUSD: 500_000},
 			},
 		},
 		{
@@ -351,7 +369,7 @@ func TestLoad(t *testing.T) {
 			want: Config{
 				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
 				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault,
-				Chat: Chat{URL: "https://api.anthropic.com", Model: "claude-other"},
+				Chat: Chat{URL: "https://api.anthropic.com", Model: "claude-other", DailySpendMicroUSD: 500_000},
 			},
 		},
 		{
@@ -376,7 +394,7 @@ func TestLoad(t *testing.T) {
 			want: Config{
 				Env: EnvProd, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
 				PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault,
-				Chat: Chat{URL: "https://api.anthropic.com", Model: "claude-haiku-5-5"},
+				Chat: Chat{URL: "https://api.anthropic.com", Model: "claude-haiku-5-5", DailySpendMicroUSD: 500_000},
 			},
 		},
 		{

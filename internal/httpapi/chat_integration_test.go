@@ -256,6 +256,20 @@ func TestChatOverHTTP(t *testing.T) {
 			t.Errorf("the second question = %d %s, Retry-After %d; want 429 quota_exceeded in about a day", rec.Code, rec.Body, retry)
 		}
 	})
+
+	// Run last: it makes every answer so far have cost the day's budget.
+	t.Run("the daily spend cap", func(t *testing.T) {
+		capped := o
+		capped.Chat = newChat(chat.Limits{MessagesPerDay: 100, TokensPerDay: 1_000_000, SpendPerDayMicroUSD: 1000})
+		if _, err := db.Pool.Exec(t.Context(), `UPDATE messages SET cost_microusd = 1000 WHERE role = 'assistant'`); err != nil {
+			t.Fatal(err)
+		}
+		rec := apiRequest(t, signedInAs(t, st, capped, ada.ID), http.MethodPost, messages, `{"text":"three"}`)
+		retry, _ := strconv.Atoi(rec.Header().Get("Retry-After"))
+		if rec.Code != http.StatusServiceUnavailable || decodeError(t, rec).Code != gen.ErrorCodeChatSpendCapReached || retry < 1 || retry > 24*3600 {
+			t.Errorf("a question past the cap = %d %s, Retry-After %d; want 503 chat_spend_cap_reached until midnight UTC", rec.Code, rec.Body, retry)
+		}
+	})
 }
 
 // openStream is an answer's event stream, read past its first event.

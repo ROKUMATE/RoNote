@@ -70,6 +70,8 @@ export const requestErrorMessages: Record<ErrorCode, string> = {
   not_a_pdf: "That file isn't a PDF.",
   pdf_too_large: "That PDF is larger than 25 MB, the most RoNote imports.",
   chat_disabled: "Chat is turned off right now.",
+  chat_spend_cap_reached:
+    "Chat has reached today's spending limit for everyone. It comes back at midnight UTC.",
   conversation_busy: "An answer is still being written here. Wait for it, or stop it.",
   internal_error: "Something went wrong on RoNote's side. Try again.",
 };

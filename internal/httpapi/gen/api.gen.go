@@ -167,6 +167,7 @@ const (
 	ErrorCodeBlockKindNotAllowed ErrorCode = "block_kind_not_allowed"
 	ErrorCodeBodyTooLarge        ErrorCode = "body_too_large"
 	ErrorCodeChatDisabled        ErrorCode = "chat_disabled"
+	ErrorCodeChatSpendCapReached ErrorCode = "chat_spend_cap_reached"
 	ErrorCodeConversationBusy    ErrorCode = "conversation_busy"
 	ErrorCodeCrossOrigin         ErrorCode = "cross_origin"
 	ErrorCodeIPLiteralHost       ErrorCode = "ip_literal_host"
@@ -202,6 +203,8 @@ func (e ErrorCode) Valid() bool {
 	case ErrorCodeBodyTooLarge:
 		return true
 	case ErrorCodeChatDisabled:
+		return true
+	case ErrorCodeChatSpendCapReached:
 		return true
 	case ErrorCodeConversationBusy:
 		return true

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"math"
 	"net"
 	"net/netip"
 	"net/url"
@@ -116,6 +117,9 @@ type Chat struct {
 	URL     string
 	Model   string
 	APIKey  string
+	// DailySpendMicroUSD caps what every user's answers may cost together
+	// in a UTC day (docs/adr/0014-production-topology.md).
+	DailySpendMicroUSD int64
 }
 
 // Limits are RoNote's quotas and rate limits
@@ -154,6 +158,9 @@ const (
 	defaultHTTPAddr  = "127.0.0.1:8080"
 	defaultLogLevel  = "info"
 	defaultSourceTTL = "24h"
+	// defaultChatDailyUSD is chat's budget for a UTC day, for all users
+	// together.
+	defaultChatDailyUSD = "0.50"
 )
 
 var (
@@ -311,10 +318,25 @@ func parseChat(getenv func(string) string, env Env) (Chat, []error) {
 	if err := validateProviderURL(c.URL, chatHost, env); err != nil {
 		errs = append(errs, fmt.Errorf("RONOTE_CHAT_URL: %w", err))
 	}
+	daily, err := parseDollars(withDefault(getenv("RONOTE_CHAT_DAILY_USD"), defaultChatDailyUSD))
+	if err != nil {
+		errs = append(errs, fmt.Errorf("RONOTE_CHAT_DAILY_USD: %w", err))
+	}
+	c.DailySpendMicroUSD = daily
 	if u, err := url.Parse(c.URL); err == nil && c.Enabled && u.Host == chatHost && c.APIKey == "" {
 		errs = append(errs, fmt.Errorf("RONOTE_ANTHROPIC_API_KEY: not set; %s needs one. Set it, point RONOTE_CHAT_URL at the fake model, or set RONOTE_CHAT_ENABLED=false", c.URL))
 	}
 	return c, errs
+}
+
+// parseDollars reads an amount of dollars above 0, such as 0.50, as
+// micro-dollars, the unit answers' cost is recorded in.
+func parseDollars(s string) (int64, error) {
+	usd, err := strconv.ParseFloat(s, 64)
+	if err != nil || math.IsNaN(usd) || math.IsInf(usd, 0) || usd <= 0 {
+		return 0, fmt.Errorf("%q is not an amount of dollars above 0, such as 0.50", s)
+	}
+	return int64(math.Round(usd * 1e6)), nil
 }
 
 func validateHTTPURL(s string) error {

@@ -363,6 +363,47 @@ func TestQuotas(t *testing.T) {
 	}
 }
 
+// Chat's spending across every user stops at the day's cap
+// (docs/adr/0014-production-topology.md): past it a question is refused
+// until midnight UTC, whoever asks, and yesterday's spending doesn't count.
+func TestSpendingStopsAtTheDailyCapForEveryone(t *testing.T) {
+	testDB.Reset(t)
+	ctx := t.Context()
+	st := store.New(testDB.Pool)
+	ada, grace := newUser(t, st), newUser(t, st)
+	limits := plenty
+	limits.SpendPerDayMicroUSD = 500_000
+	svc := newService(t, st, ModelFunc(func(_ context.Context, req Request, on func(Event)) (Reply, error) {
+		say(on, req, -1, "An answer.")
+		return Reply{Stop: StopEndTurn}, nil
+	}), limits)
+	a, err := svc.Ask(ctx, ada, newConversation(t, svc, ada, uuid.Nil), "q")
+	if err != nil {
+		t.Fatal(err)
+	}
+	collect(t, a)
+	// Ada's answer is made to have cost the whole day's cap.
+	if _, err := testDB.Pool.Exec(ctx, `UPDATE messages SET cost_microusd = 500000 WHERE role = 'assistant'`); err != nil {
+		t.Fatal(err)
+	}
+
+	conv := newConversation(t, svc, grace, uuid.Nil)
+	var capped *SpendCapError
+	if _, err := svc.Ask(ctx, grace, conv, "q"); !errors.As(err, &capped) || capped.RetryAfter <= 0 || capped.RetryAfter > 24*time.Hour {
+		t.Fatalf("Grace's question past the cap: err = %v, want a spend cap error until midnight UTC", err)
+	}
+
+	// Spent a second before midnight UTC is yesterday's.
+	if _, err := testDB.Pool.Exec(ctx, `UPDATE messages SET created_at = date_trunc('day', now() AT TIME ZONE 'utc') AT TIME ZONE 'utc' - interval '1 second'`); err != nil {
+		t.Fatal(err)
+	}
+	a, err = svc.Ask(ctx, grace, conv, "q")
+	if err != nil {
+		t.Fatalf("with yesterday's spending only: %v", err)
+	}
+	collect(t, a)
+}
+
 func TestOneAnswerAtATime(t *testing.T) {
 	testDB.Reset(t)
 	st := store.New(testDB.Pool)

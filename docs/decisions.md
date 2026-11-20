@@ -249,6 +249,7 @@ Recorded in [ADR 0008](adr/0008-in-browser-code-execution.md).
     - They now look for CSP's `connect-src` refusal.
 - **Found while building:**
   - output written faster than 1 MB in 50 ms came as one message over the protocol's limit, which was dropped, so the 1 MB cap never fired; the worker now sends 64 kB chunks;
+  - (P19a) a line a run left unfinished stayed in Python's stdout buffer and opened the next run's output, as did the rest of a line that Stop or the output cap cut short. `cells.py` flushes both streams as each run ends, and a Stop that lands in that code, outside the reader's, ends the run instead of crashing the worker;
   - importing `doctest` cost a second of every cold start; it loads with the first transcript now;
   - the chip's reason was keyed to `:focus-visible`, which Chrome doesn't apply to focus after mouse use.
 - **Found while building P13b:**

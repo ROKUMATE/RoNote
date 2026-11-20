@@ -52,6 +52,11 @@ function fail(error: unknown) {
   });
 }
 
+/** Whether error is Python's KeyboardInterrupt, which Stop raises. */
+function interrupted(error: unknown): boolean {
+  return error instanceof Error && "type" in error && error.type === "KeyboardInterrupt";
+}
+
 let python: ReturnType<typeof start> | undefined;
 let runs = Promise.resolve();
 
@@ -84,7 +89,14 @@ self.onmessage = (message: MessageEvent<ToWorker>) => {
       const ms = Math.round(performance.now() - started);
       post({ v: 1, type: "done", id, ms, end: error === undefined ? "ok" : "error" });
     } catch (error) {
-      fail(error);
+      // A Stop that lands in cells.py's own code, around the reader's,
+      // interrupts it there: the run is over, and the session is fine.
+      if (!interrupted(error)) {
+        fail(error);
+        return;
+      }
+      output.flush();
+      post({ v: 1, type: "done", id, ms: Math.round(performance.now() - started), end: "error" });
     }
   });
 };

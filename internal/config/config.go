@@ -430,6 +430,16 @@ func validateAddr(s string) error {
 	return nil
 }
 
+// DatabaseURL is RONOTE_DATABASE_URL, checked as Load checks it, for a
+// command that needs only the database, such as `api migrate`.
+func DatabaseURL(getenv func(string) string) (string, error) {
+	url := getenv("RONOTE_DATABASE_URL")
+	if err := validateDatabaseURL(url); err != nil {
+		return "", fmt.Errorf("RONOTE_DATABASE_URL: %w", err)
+	}
+	return url, nil
+}
+
 // validateDatabaseURL never puts the value in its errors: it holds the
 // password.
 func validateDatabaseURL(s string) error {

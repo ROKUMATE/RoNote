@@ -9,15 +9,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
-	"runtime"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
-	"github.com/pressly/goose/v3"
 	"github.com/testcontainers/testcontainers-go"
 	tcpostgres "github.com/testcontainers/testcontainers-go/modules/postgres"
+
+	"github.com/rokumate/ronote/internal/schema"
 )
 
 // Image is the dev stack's Postgres image; TestImageMatchesCompose keeps the
@@ -64,20 +62,8 @@ func (d *DB) init(ctx context.Context) error {
 	if d.Pool, err = pgxpool.New(ctx, url); err != nil {
 		return fmt.Errorf("open pool: %w", err)
 	}
-	return migrate(ctx, d.Pool)
-}
-
-func migrate(ctx context.Context, pool *pgxpool.Pool) (err error) {
-	sqlDB := stdlib.OpenDBFromPool(pool)
-	defer func() { err = errors.Join(err, sqlDB.Close()) }()
-	provider, err := goose.NewProvider(goose.DialectPostgres, sqlDB, os.DirFS(filepath.Join(repoRoot(), "migrations")))
-	if err != nil {
-		return fmt.Errorf("load migrations: %w", err)
-	}
-	if _, err := provider.Up(ctx); err != nil {
-		return fmt.Errorf("migrate up: %w", err)
-	}
-	return nil
+	_, err = schema.Migrate(ctx, d.Pool)
+	return err
 }
 
 // MigrateTo moves d's schema up or down to goose version version, so a test
@@ -85,7 +71,7 @@ func migrate(ctx context.Context, pool *pgxpool.Pool) (err error) {
 func (d *DB) MigrateTo(ctx context.Context, version int64) (err error) {
 	sqlDB := stdlib.OpenDBFromPool(d.Pool)
 	defer func() { err = errors.Join(err, sqlDB.Close()) }()
-	provider, err := goose.NewProvider(goose.DialectPostgres, sqlDB, os.DirFS(filepath.Join(repoRoot(), "migrations")))
+	provider, err := schema.Provider(sqlDB)
 	if err != nil {
 		return fmt.Errorf("load migrations: %w", err)
 	}
@@ -113,9 +99,4 @@ func (d *DB) Close() error {
 		d.Pool.Close()
 	}
 	return testcontainers.TerminateContainer(d.container)
-}
-
-func repoRoot() string {
-	_, file, _, _ := runtime.Caller(0)
-	return filepath.Join(filepath.Dir(file), "..", "..")
 }

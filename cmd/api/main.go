@@ -1,10 +1,15 @@
 // Command api serves the RoNote HTTP API.
+//
+//	api [serve]                  serve the API
+//	api migrate                  apply the migrations the database lacks
+//	api healthcheck URL          fail unless URL (its /healthz) answers 200
 package main
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"maps"
 	"net"
 	"net/http"
@@ -19,26 +24,68 @@ import (
 	"github.com/rokumate/ronote/internal/blob/s3blob"
 	"github.com/rokumate/ronote/internal/chat"
 	"github.com/rokumate/ronote/internal/chat/anthropic"
+	"github.com/rokumate/ronote/internal/cli"
 	"github.com/rokumate/ronote/internal/config"
 	"github.com/rokumate/ronote/internal/db"
 	"github.com/rokumate/ronote/internal/embed"
 	"github.com/rokumate/ronote/internal/events"
+	"github.com/rokumate/ronote/internal/health"
 	"github.com/rokumate/ronote/internal/httpapi"
 	"github.com/rokumate/ronote/internal/importer"
 	"github.com/rokumate/ronote/internal/jobs"
 	"github.com/rokumate/ronote/internal/jobs/riverjobs"
+	"github.com/rokumate/ronote/internal/schema"
 	"github.com/rokumate/ronote/internal/search"
 	"github.com/rokumate/ronote/internal/store"
 	"github.com/rokumate/ronote/internal/version"
 )
 
-const shutdownTimeout = 10 * time.Second
+const (
+	shutdownTimeout    = 10 * time.Second
+	healthcheckTimeout = 2 * time.Second
+)
 
 func main() {
-	if err := run(); err != nil {
+	err := cli.Run(os.Args[1:], "serve", map[string]cli.Command{
+		"serve":       cli.NoArgs(run),
+		"migrate":     cli.NoArgs(migrate),
+		"healthcheck": healthcheck,
+	})
+	if err != nil {
 		fmt.Fprintln(os.Stderr, "api:", err)
 		os.Exit(1)
 	}
+}
+
+// migrate applies the embedded migrations (docs/adr/0014-production-topology.md):
+// production runs it once, as its own unit, before the api and the worker.
+func migrate() error {
+	url, err := config.DatabaseURL(os.Getenv)
+	if err != nil {
+		return err
+	}
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	pool, err := db.Open(ctx, url, logger)
+	if err != nil {
+		return err
+	}
+	defer pool.Close()
+	version, err := schema.Migrate(ctx, pool)
+	if err != nil {
+		return err
+	}
+	logger.Info("schema migrated", "version", version)
+	return nil
+}
+
+// healthcheck is the container's health check: distroless has no curl.
+func healthcheck(args []string) error {
+	if len(args) != 1 {
+		return errors.New("want one argument, the URL of /healthz")
+	}
+	return health.Get(context.Background(), args[0], healthcheckTimeout)
 }
 
 func run() error {
@@ -56,6 +103,9 @@ func run() error {
 		return err
 	}
 	defer pool.Close()
+	if err := schema.Check(ctx, pool); err != nil {
+		return err
+	}
 
 	// The API only enqueues jobs; the worker process runs them. River keeps
 	// a job's attempt limit with it, so the kinds are declared here too.

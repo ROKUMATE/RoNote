@@ -283,6 +283,24 @@ test("a question over the quota says so, and keeps the question", async () => {
   ).toBe("One more?");
 });
 
+test("past the day's chat budget for everyone, the chat says so and keeps the question", async () => {
+  stubApi({
+    "GET /documents": () => json({ documents: [] }),
+    "GET /conversations": () => json({ conversations: [conversation], messages_left_today: 30 }),
+    "POST /conversations": () => json(conversation, 201),
+    "POST /conversations/c1/messages": () => apiError(503, "chat_spend_cap_reached"),
+  });
+  renderApp("/");
+  const panel = await openChat();
+  await ask(panel, "One more?");
+  expect((await within(panel).findByRole("alert")).textContent).toBe(
+    "Chat has reached today's spending limit for everyone. It comes back at midnight UTC.",
+  );
+  expect(
+    (within(panel).getByRole("textbox", { name: "Ask your library" }) as HTMLTextAreaElement).value,
+  ).toBe("One more?");
+});
+
 test("with chat turned off, the panel says so", async () => {
   stubApi({
     "GET /documents": () => json({ documents: [] }),

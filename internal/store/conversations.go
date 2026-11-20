@@ -297,6 +297,16 @@ func (s *Store) ChatUsage(ctx context.Context, owner uuid.UUID, window time.Dura
 	}, nil
 }
 
+// SpentToday is what every user's chat answers have cost since midnight
+// UTC, in micro-dollars, and how long until the next midnight.
+func (s *Store) SpentToday(ctx context.Context) (microUSD int64, untilMidnight time.Duration, err error) {
+	row, err := s.q.ChatSpentToday(ctx)
+	if err != nil {
+		return 0, 0, mapErr("chat spent today", err)
+	}
+	return row.SpentMicrousd, time.Duration(row.SecondsUntilMidnight * float64(time.Second)), nil
+}
+
 func conversationFrom(row sqlcdb.ListConversationsRow) Conversation {
 	return Conversation{
 		ID: row.ID, DocumentID: row.DocumentID.UUID, DocumentTitle: row.DocumentTitle, Title: row.Title,

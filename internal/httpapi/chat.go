@@ -149,6 +149,7 @@ func sendMessage(o Options, every time.Duration) http.HandlerFunc {
 		}
 		answer, err := o.Chat.Ask(ctx, userFrom(ctx), id, text)
 		var quota *chat.QuotaError
+		var spent *chat.SpendCapError
 		switch {
 		case errors.Is(err, store.ErrNotFound):
 			writeError(w, r, http.StatusNotFound, gen.ErrorCodeNotFound, "no such conversation")
@@ -159,6 +160,10 @@ func sendMessage(o Options, every time.Duration) http.HandlerFunc {
 		case errors.As(err, &quota):
 			w.Header().Set("Retry-After", strconv.Itoa(retrySeconds(quota.RetryAfter)))
 			writeError(w, r, http.StatusTooManyRequests, gen.ErrorCodeQuotaExceeded, err.Error())
+			return
+		case errors.As(err, &spent):
+			w.Header().Set("Retry-After", strconv.Itoa(retrySeconds(spent.RetryAfter)))
+			writeError(w, r, http.StatusServiceUnavailable, gen.ErrorCodeChatSpendCapReached, err.Error())
 			return
 		case errors.Is(err, chat.ErrDisabled):
 			writeError(w, r, http.StatusServiceUnavailable, gen.ErrorCodeChatDisabled, "chat is turned off")

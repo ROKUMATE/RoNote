@@ -58,11 +58,24 @@ func (e *QuotaError) Error() string {
 	return fmt.Sprintf("over the chat quota; a question fits in %s", e.RetryAfter.Round(time.Second))
 }
 
+// SpendCapError means every user's answers today have cost as much as the
+// day allows. RetryAfter is how long until midnight UTC, when it resets.
+type SpendCapError struct {
+	RetryAfter time.Duration
+}
+
+func (e *SpendCapError) Error() string {
+	return fmt.Sprintf("chat has spent today's budget; it resets in %s", e.RetryAfter.Round(time.Second))
+}
+
 // Limits are what one user may ask in quotaWindow: questions, and the
-// input tokens their answers read.
+// input tokens their answers read; and what all answers together may cost
+// in a UTC day, in micro-dollars, 0 for no cap
+// (docs/adr/0014-production-topology.md).
 type Limits struct {
-	MessagesPerDay int
-	TokensPerDay   int
+	MessagesPerDay      int
+	TokensPerDay        int
+	SpendPerDayMicroUSD int64
 }
 
 // Options are what a Service answers with.
@@ -253,7 +266,8 @@ func (a *Answer) send(u Update) {
 }
 
 // Ask starts the answer to question in owner's conversation. It refuses
-// with ErrDisabled, store.ErrNotFound, *QuotaError or ErrBusy. The answer
+// with ErrDisabled, *SpendCapError, store.ErrNotFound, *QuotaError or
+// ErrBusy. The answer
 // is written apart from ctx: a caller that goes away leaves it to be saved.
 func (s *Service) Ask(ctx context.Context, owner, conversation uuid.UUID, question string) (*Answer, error) {
 	if !s.o.Enabled {
@@ -265,6 +279,17 @@ func (s *Service) Ask(ctx context.Context, owner, conversation uuid.UUID, questi
 	err := s.o.Store.InTx(ctx, func(tx *store.Store, _ pgx.Tx) error {
 		if err := tx.LockOwner(ctx, owner); err != nil {
 			return err
+		}
+		// Answers still being written count once they finish, so the day
+		// can go over by what they cost.
+		if s.o.Limits.SpendPerDayMicroUSD > 0 {
+			spent, untilMidnight, err := tx.SpentToday(ctx)
+			if err != nil {
+				return err
+			}
+			if spent >= s.o.Limits.SpendPerDayMicroUSD {
+				return &SpendCapError{RetryAfter: untilMidnight}
+			}
 		}
 		u, err := tx.ChatUsage(ctx, owner, quotaWindow)
 		if err != nil {

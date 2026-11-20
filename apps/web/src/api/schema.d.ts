@@ -523,7 +523,7 @@ export interface components {
          * @description Why a request failed. Each response lists the codes it can carry.
          * @enum {string}
          */
-        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unknown_block" | "quote_mismatch" | "annotation_limit" | "unauthenticated" | "cross_origin" | "rate_limited" | "quota_exceeded" | "body_too_large" | "not_a_pdf" | "pdf_too_large" | "chat_disabled" | "conversation_busy" | "internal_error";
+        ErrorCode: "invalid_request" | "invalid_url" | "unsupported_scheme" | "url_too_long" | "ip_literal_host" | "invalid_parameter" | "invalid_cursor" | "not_found" | "method_not_allowed" | "version_conflict" | "invalid_content" | "unknown_source_block" | "source_block_modified" | "block_kind_not_allowed" | "unknown_block" | "quote_mismatch" | "annotation_limit" | "unauthenticated" | "cross_origin" | "rate_limited" | "quota_exceeded" | "body_too_large" | "not_a_pdf" | "pdf_too_large" | "chat_disabled" | "chat_spend_cap_reached" | "conversation_busy" | "internal_error";
         Me: {
             /** Format: uuid */
             id: string;
@@ -2182,7 +2182,21 @@ export interface operations {
             413: components["responses"]["BodyTooLarge"];
             429: components["responses"]["TooManyQuestions"];
             500: components["responses"]["InternalError"];
-            503: components["responses"]["ChatDisabled"];
+            /**
+             * @description Chat is turned off (code chat_disabled), or every user's answers
+             *     today have cost the day's budget (code chat_spend_cap_reached,
+             *     with Retry-After: seconds until midnight UTC).
+             */
+            503: {
+                headers: {
+                    /** @description With chat_spend_cap_reached, seconds until midnight UTC. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
     };
     stopConversation: {

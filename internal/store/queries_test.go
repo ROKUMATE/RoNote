@@ -14,10 +14,23 @@ var (
 	sqlComment  = regexp.MustCompile(`--[^\n]*`)
 )
 
+// unscoped are the queries on owned tables that may read across owners,
+// each with why. Each returns only a total, never a row of anyone's.
+var unscoped = map[string]string{
+	"ChatSpentToday": "chat's daily budget is for all users together (docs/adr/0014-production-topology.md): it sums cost only",
+}
+
 // TestOwnedQueriesAreScoped fails when a query touches documents or imports
-// without naming owner_id, so no unscoped query can exist.
+// without naming owner_id, so no unscoped query can exist but those
+// unscoped names.
 func TestOwnedQueriesAreScoped(t *testing.T) {
 	t.Parallel()
+	for name, why := range unscoped {
+		if why == "" {
+			t.Errorf("unscoped query %s has no reason", name)
+		}
+	}
+	seen := map[string]bool{}
 	queries := os.DirFS("queries")
 	files, err := fs.Glob(queries, "*.sql")
 	if err != nil {
@@ -42,6 +55,10 @@ func TestOwnedQueriesAreScoped(t *testing.T) {
 				continue
 			}
 			checked++
+			if _, ok := unscoped[name]; ok {
+				seen[name] = true
+				continue
+			}
 			if !strings.Contains(sql, "owner_id") {
 				t.Errorf("%s: query %s touches documents or imports without owner_id", file, name)
 			}
@@ -49,5 +66,10 @@ func TestOwnedQueriesAreScoped(t *testing.T) {
 	}
 	if checked == 0 {
 		t.Fatal("found no queries on documents or imports")
+	}
+	for name := range unscoped {
+		if !seen[name] {
+			t.Errorf("unscoped query %s no longer exists; remove it", name)
+		}
 	}
 }

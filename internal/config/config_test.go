@@ -3,6 +3,8 @@ package config
 import (
 	"log/slog"
 	"maps"
+	"net/netip"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -119,6 +121,24 @@ func TestLoad(t *testing.T) {
 			name: "empty host",
 			env:  validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_HTTP_ADDR": ":8080", "RONOTE_LOG_LEVEL": "warn"}),
 			want: Config{Env: EnvStaging, HTTPAddr: ":8080", LogLevel: slog.LevelWarn, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatOffDefault},
+		},
+		{
+			name: "trusted proxies",
+			env:  validEnv(map[string]string{"RONOTE_TRUSTED_PROXIES": "10.89.10.0/24, 192.0.2.7 fd00:89::/64"}),
+			want: Config{
+				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault,
+				TrustedProxies: []netip.Prefix{netip.MustParsePrefix("10.89.10.0/24"), netip.MustParsePrefix("192.0.2.7/32"), netip.MustParsePrefix("fd00:89::/64")},
+			},
+		},
+		{
+			name:    "a proxy that is no address",
+			env:     validEnv(map[string]string{"RONOTE_TRUSTED_PROXIES": "10.89.10.0/33,caddy"}),
+			wantErr: []string{`RONOTE_TRUSTED_PROXIES: "10.89.10.0/33" is not a CIDR or an IP`, `RONOTE_TRUSTED_PROXIES: "caddy" is not a CIDR or an IP`},
+		},
+		{
+			name:    "a proxy network with host bits",
+			env:     validEnv(map[string]string{"RONOTE_TRUSTED_PROXIES": "10.89.10.5/24"}),
+			wantErr: []string{`RONOTE_TRUSTED_PROXIES: "10.89.10.5/24" has host bits set; want 10.89.10.0/24`},
 		},
 		{
 			name:    "missing env",
@@ -447,7 +467,7 @@ func TestLoad(t *testing.T) {
 				if tt.want.Blob == (Blob{}) && tt.want.PDF == (PDF{}) {
 					tt.want.Blob, tt.want.PDF = blobSet, pdfSet
 				}
-				if got != tt.want {
+				if !reflect.DeepEqual(got, tt.want) {
 					t.Errorf("Load() = %+v, want %+v", got, tt.want)
 				}
 				return

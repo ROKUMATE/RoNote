@@ -11,6 +11,7 @@ import (
 	"github.com/rokumate/ronote/internal/auth"
 	"github.com/rokumate/ronote/internal/chat"
 	"github.com/rokumate/ronote/internal/httpapi/gen"
+	"github.com/rokumate/ronote/internal/version"
 )
 
 // readyTimeout bounds the database ping behind /readyz.
@@ -127,9 +128,16 @@ type statusBody struct {
 	Status string `json:"status"`
 }
 
-// healthz reports that the process is up. It checks no dependencies.
+// healthBody is /healthz's answer: up, and which build.
+type healthBody struct {
+	Status  string `json:"status"`
+	Version string `json:"version"`
+}
+
+// healthz reports that the process is up, and its version. It checks no
+// dependencies.
 func healthz(w http.ResponseWriter, _ *http.Request) {
-	writeOK(w)
+	writeJSON(w, http.StatusOK, healthBody{Status: "ok", Version: version.Version})
 }
 
 // codeNotReady is the error code of /readyz, which shares the error envelope

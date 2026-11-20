@@ -16,6 +16,8 @@ Read before changing `.github/workflows` or a target CI calls.
 | web | `make check-node-version`, `make web-deps`, `make lint-web`, `make test-web`, `make web-build` (styleguide guard and bundle budget) | the same targets |
 | e2e, after web | a Postgres service with an empty `ronote_e2e`, the dev stack's SeaweedFS through `docker compose up --wait seaweedfs` (a service container can't take its command), `make check-go-version`, `make check-node-version`, `make web-browsers WITH_DEPS=1`, `make web-e2e` (migrations, API, worker, the fake sign-in, embedder, chat model and docling, fixture site, runner, Vite; no key is set, no test reaches a real model, and docling's image is never pulled); uploads `apps/web/playwright-report` for 7 days when it fails | `make dev-up`, `make web-install`, `make web-e2e` |
 
+`.github/workflows/release.yml` runs on a `v*` tag: for each of `ronote-api`, `ronote-worker` and `ronote-web` it builds amd64 and arm64 from `deploy/images/` with buildx (Go cross-compiles, so nothing runs emulated), pushes `ghcr.io/rokumate/<image>:<tag>` and attests its build provenance. Its job alone has `packages: write`, `id-token: write` and `attestations: write`. It uses the Docker build actions rather than make targets, since pushing a multi-arch image is what those actions are for; `make images` builds the same Containerfiles for this machine's architecture.
+
 Pull requests merge by rebase only (a repository setting). A merge commit would carry the PR title as a second line, which `check-commits` rejects.
 
 Each job checks the toolchain it uses against its pin: Go against go.mod's `toolchain`, Node against `.nvmrc`. `make check` covers the commits, go and web jobs except `check-generated` and `web-build`. Run it before pushing.

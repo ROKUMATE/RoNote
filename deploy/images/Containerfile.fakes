@@ -1,0 +1,21 @@
+# The fakes the CI smoke job and make prod-local swap in for GitHub, the
+# embedder, the model and docling (docs/adr/0014-production-topology.md).
+# Built locally only; never released.
+FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.26.1-trixie@sha256:1d414b0376b53ec94b9a2493229adb81df8b90af014b18619732f1ceaaf7234a AS build
+ARG TARGETOS=linux
+ARG TARGETARCH
+WORKDIR /src
+COPY go.mod go.sum ./
+COPY cmd ./cmd
+COPY internal ./internal
+COPY migrations ./migrations
+RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
+    for c in fakeidp fakeembed fakellm fakedocling; do \
+      CGO_ENABLED=0 GOOS="$TARGETOS" GOARCH="$TARGETARCH" go build -trimpath -o "/out/$c" "./cmd/$c" || exit 1; \
+    done
+
+FROM gcr.io/distroless/static-debian13:nonroot@sha256:aafe993665bf6200db38a02c11a9351e782a84b6a45e7f33b6695638c88e3931
+COPY --from=build /out/ /usr/local/bin/
+COPY testdata/pdf /fakes/pdf
+COPY apps/web/e2e/fixtures/idp-users.json /fakes/idp-users.json
+USER nonroot:nonroot

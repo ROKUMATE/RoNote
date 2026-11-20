@@ -1,0 +1,9 @@
+.git
+**/node_modules
+bin
+.run
+.env*
+apps/web/dist
+apps/web/dist-runner
+apps/web/playwright-report
+apps/web/test-results

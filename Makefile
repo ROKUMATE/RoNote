@@ -241,8 +241,21 @@ web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromiu
 	go build -o bin/e2e/ ./cmd/api ./cmd/worker ./cmd/fakeidp ./cmd/fakeembed ./cmd/fakellm ./cmd/fakedocling
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" $(WEB) e2e
 
+# Images (deploy/images, docs/adr/0014-production-topology.md): VERSION is
+# stamped into the binaries; the local images are tagged IMAGE_TAG.
+VERSION ?= $(shell git describe --tags --always --dirty)
+IMAGE_TAG ?= local
+GO_IMAGE = podman build -f deploy/images/Containerfile.binary --build-arg VERSION=$(VERSION)
+
+images: ## Build the api, worker, web and fakes images with podman, and print their sizes
+	$(GO_IMAGE) --build-arg BINARY=api -t localhost/ronote-api:$(IMAGE_TAG) .
+	$(GO_IMAGE) --build-arg BINARY=worker -t localhost/ronote-worker:$(IMAGE_TAG) .
+	podman build -f deploy/images/Containerfile.web -t localhost/ronote-web:$(IMAGE_TAG) .
+	podman build -f deploy/images/Containerfile.fakes -t localhost/ronote-fakes:$(IMAGE_TAG) .
+	podman images --filter 'reference=localhost/ronote-*:$(IMAGE_TAG)' --format '{{.Repository}}:{{.Tag}} {{.Size}}'
+
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp run-llm run-docling pdf-fixtures pdf-record extract lint lint-go lint-web fmt
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build web-e2e
+.PHONY: web-dev web-build web-e2e images

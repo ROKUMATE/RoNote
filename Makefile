@@ -242,20 +242,59 @@ web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromiu
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" $(WEB) e2e
 
 # Images (deploy/images, docs/adr/0014-production-topology.md): VERSION is
-# stamped into the binaries; the local images are tagged IMAGE_TAG.
+# stamped into the binaries; the local images are tagged IMAGE_TAG, under
+# the names the units pull, so installing tag local uses them.
 VERSION ?= $(shell git describe --tags --always --dirty)
 IMAGE_TAG ?= local
 GO_IMAGE = podman build -f deploy/images/Containerfile.binary --build-arg VERSION=$(VERSION)
+IMAGES = ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) ghcr.io/rokumate/ronote-worker:$(IMAGE_TAG) ghcr.io/rokumate/ronote-web:$(IMAGE_TAG) localhost/ronote-fakes:$(IMAGE_TAG)
 
 images: ## Build the api, worker, web and fakes images with podman, and print their sizes
-	$(GO_IMAGE) --build-arg BINARY=api -t localhost/ronote-api:$(IMAGE_TAG) .
-	$(GO_IMAGE) --build-arg BINARY=worker -t localhost/ronote-worker:$(IMAGE_TAG) .
-	podman build -f deploy/images/Containerfile.web -t localhost/ronote-web:$(IMAGE_TAG) .
+	$(GO_IMAGE) --build-arg BINARY=api -t ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) .
+	$(GO_IMAGE) --build-arg BINARY=worker -t ghcr.io/rokumate/ronote-worker:$(IMAGE_TAG) .
+	podman build -f deploy/images/Containerfile.web -t ghcr.io/rokumate/ronote-web:$(IMAGE_TAG) .
 	podman build -f deploy/images/Containerfile.fakes -t localhost/ronote-fakes:$(IMAGE_TAG) .
-	podman images --filter 'reference=localhost/ronote-*:$(IMAGE_TAG)' --format '{{.Repository}}:{{.Tag}} {{.Size}}'
+	for i in $(IMAGES); do podman images --format '{{.Repository}}:{{.Tag}} {{.Size}}' $$i; done
+
+# The production units with the fakes (deploy/quadlet/ci): the configuration
+# and pages install.sh gets, and the images, as an archive.
+PROD_CONFIG = bin/prod-config
+SMOKE_CA = bin/smoke-ca.pem
+
+prod-config: images
+	rm -rf $(PROD_CONFIG)
+	mkdir -p $(PROD_CONFIG)/fixtures/pages/real-python-controlflow $(PROD_CONFIG)/fixtures/linked/python
+	cp deploy/quadlet/ci/config/* $(PROD_CONFIG)/
+	cp testdata/golden/real-python-controlflow/input.html $(PROD_CONFIG)/fixtures/pages/real-python-controlflow/index.html
+	cp apps/web/e2e/fixtures/python.html $(PROD_CONFIG)/fixtures/linked/python/index.html
+	rm -f bin/ronote-images.tar
+	podman save --multi-image-archive -o bin/ronote-images.tar $(IMAGES)
+
+prod-ci: prod-config ## Install the production units with the fakes on this Linux host (sudo), and check only 80 and 443 answer
+	sudo env RONOTE_GITHUB_CLIENT_SECRET=ronote-e2e-secret sh deploy/install.sh --version $(IMAGE_TAG) --config $(PROD_CONFIG) --drop-ins deploy/quadlet/ci --images bin/ronote-images.tar --skip-model
+	sudo sh deploy/as-ronote.sh podman exec ronote-caddy cat /caddy/data/caddy/pki/authorities/local/intermediate.crt > $(SMOKE_CA)
+	sh deploy/check-ports.sh 127.0.0.1 $$(hostname -I | cut -d' ' -f1)
+
+prod-local: prod-config ## The same in the podman machine's VM, then the smoke suite from this Mac
+	sh scripts/prod-local.sh
+
+prod-smoke: ## Run the smoke suite through Caddy against installed units (make prod-ci first)
+	RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
+
+# check-config on deploy/ronote.env.example, with stand-ins for its secrets:
+# it must pass, and fail with the runner on the app's site.
+EXAMPLE_SECRETS = -e RONOTE_DATABASE_URL=postgres://ronote:example@ronote-postgres:5432/ronote \
+	-e RONOTE_GITHUB_CLIENT_SECRET=example -e RONOTE_ANTHROPIC_API_KEY=example \
+	-e RONOTE_BLOB_ACCESS_KEY=example -e RONOTE_BLOB_SECRET_KEY=example \
+	-e RONOTE_DOCLING_API_KEY=example -e RONOTE_PDFTEXT_API_KEY=example
+CHECK_CONFIG = podman run --rm --env-file deploy/ronote.env.example $(EXAMPLE_SECRETS)
+
+prod-check-config: ## Check the example production config with the api image; a same-site runner must fail
+	$(CHECK_CONFIG) ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) check-config
+	! $(CHECK_CONFIG) -e RONOTE_RUNNER_URL=https://run.ronote.example ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) check-config
 
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp run-llm run-docling pdf-fixtures pdf-record extract lint lint-go lint-web fmt
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build web-e2e images
+.PHONY: web-dev web-build web-e2e images prod-config prod-ci prod-local prod-smoke prod-check-config

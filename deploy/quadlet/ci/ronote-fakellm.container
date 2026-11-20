@@ -1,0 +1,22 @@
+# The chat model (cmd/fakellm), which the api asks on data.
+
+[Unit]
+Description=RoNote fake chat model
+
+[Container]
+ContainerName=ronote-fakellm
+Image=localhost/ronote-fakes:local
+Exec=/usr/local/bin/fakellm
+Network=ronote-data.network
+Environment=RONOTE_FAKELLM_ADDR=0.0.0.0:8094
+ReadOnly=true
+NoNewPrivileges=true
+DropCapability=ALL
+PodmanArgs=--memory=128m --cpus=0.5
+HealthCmd=none
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

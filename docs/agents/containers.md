@@ -20,3 +20,10 @@ Dev runs two processes, each in its own terminal, after `make dev-up` and `make 
 - PDFs convert through the fake docling and pdftext (`cmd/fakedocling`), which `make web-dev` starts (or `make run-docling` alone): it replays the answers recorded for the fixtures in `testdata/pdf` and answers 503 to any other PDF. For any PDF of your own, stop it and run `make dev-up-docling`; both use the same addresses and keys.
 
 docs/adr/0005-import-pipeline.md describes the pipeline both serve.
+
+## The production units (docs/adr/0014-production-topology.md)
+
+- `deploy/quadlet/` holds the Quadlet units, `deploy/caddy/Caddyfile` the front door, `deploy/images/` the Containerfiles. `deploy/install.sh`, as root, makes the `ronote` user (rootless, lingering), lets it bind 80 and 443, installs the units, makes the podman secrets (never printed; kept across runs), pulls the embedding model, then restarts everything and returns once each unit is healthy. `sudo sh deploy/as-ronote.sh CMD` runs `systemctl --user`, `podman` or `journalctl --user` as that user.
+- `deploy/quadlet/ci/` swaps in the fakes and `RONOTE_ENV=test` by drop-ins, for CI and for `make prod-local`.
+- `make prod-local` installs them in the podman machine's VM (Fedora CoreOS: systemd, Quadlet, rootless podman), beside the dev stack's rootful containers, then runs the smoke suite from the Mac: an ssh tunnel from `127.0.0.1:8443` to the VM's 443 (macOS lets a user bind 443 only on every address), and Chromium maps `*.test` to it and trusts Caddy's CA by its key. The port check there looks at what the `ronote` user listens on, since the dev stack's own ports answer in the same VM. To look around: `podman machine ssh`, then `sudo sh /var/tmp/ronote/deploy/as-ronote.sh podman ps`.
+- The VM's disk is 19 GB, docling's image 5 GB of it; the images build with cache mounts, so they don't hold Go's module cache.

@@ -1,0 +1,26 @@
+# GitHub (cmd/fakeidp): the api asks it on edge, and the browser signs in
+# with it through Caddy, as idp.ronote.test.
+
+[Unit]
+Description=RoNote fake GitHub
+
+[Container]
+ContainerName=ronote-fakeidp
+Image=localhost/ronote-fakes:local
+Exec=/usr/local/bin/fakeidp
+Network=ronote-edge.network
+Environment=RONOTE_FAKEIDP_ADDR=0.0.0.0:8090 RONOTE_FAKEIDP_USERS=/fakes/idp-users.json
+# The OAuth app's ID; its secret below.
+EnvironmentFile=%h/.config/ronote/ronote.env
+Secret=ronote-github-client-secret,type=env,target=RONOTE_GITHUB_CLIENT_SECRET
+ReadOnly=true
+NoNewPrivileges=true
+DropCapability=ALL
+PodmanArgs=--memory=128m --cpus=0.5
+HealthCmd=none
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

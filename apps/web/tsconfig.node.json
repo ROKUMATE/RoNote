@@ -23,7 +23,9 @@
     "browsers.ts",
     "vitest.live.config.ts",
     "playwright.config.ts",
+    "playwright.smoke.config.ts",
     "e2e",
+    "smoke",
     "live",
     "scripts"
   ]

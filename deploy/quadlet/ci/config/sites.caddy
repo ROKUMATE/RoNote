@@ -1,0 +1,10 @@
+# The fake sign-in, where the browser is sent to sign in.
+https://idp.ronote.test {
+	reverse_proxy ronote-fakeidp:8090
+}
+
+# The pages the smoke suite imports, for the worker, on edge.
+http://ronote-caddy:8080 {
+	root * /srv/fixtures
+	file_server
+}

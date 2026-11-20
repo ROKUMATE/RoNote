@@ -1,0 +1,2 @@
+# Certificates from Caddy's own CA: the .test domains have no public one.
+local_certs

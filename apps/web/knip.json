@@ -2,6 +2,8 @@
   "$schema": "./node_modules/knip/schema.json",
   "entry": [
     "playwright.config.ts",
+    "playwright.smoke.config.ts",
+    "smoke/*.spec.ts",
     "e2e/*.spec.ts",
     "e2e/fixture-site.ts",
     "live/*.test.ts",

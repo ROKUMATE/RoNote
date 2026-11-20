@@ -1,0 +1,8 @@
+# ronote-converters: docling and pdftext, reached from the worker only (docs/adr/0013-pdf-import.md).
+# Internal: no route out.
+
+[Network]
+NetworkName=ronote-converters
+Subnet=10.89.13.0/24
+Gateway=10.89.13.1
+Internal=true

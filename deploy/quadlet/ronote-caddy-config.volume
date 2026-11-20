@@ -1,0 +1,4 @@
+# Caddy's state
+
+[Volume]
+VolumeName=ronote-caddy-config

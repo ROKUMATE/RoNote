@@ -1,0 +1,6 @@
+# ronote-edge: caddy and the api, so the api trusts caddy's X-Forwarded-For (RONOTE_TRUSTED_PROXIES).
+
+[Network]
+NetworkName=ronote-edge
+Subnet=10.89.10.0/24
+Gateway=10.89.10.1

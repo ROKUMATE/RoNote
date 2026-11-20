@@ -1,0 +1,4 @@
+# the embedding model, pulled at install
+
+[Volume]
+VolumeName=ronote-ollama

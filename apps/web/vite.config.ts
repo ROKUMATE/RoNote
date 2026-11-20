@@ -31,7 +31,14 @@ export default defineConfig({
     tailwindcss({ optimize: false }),
     origins({ RONOTE_RUNNER_URL: devRunnerURL }),
   ],
-  build: { target: browsers, manifest: true },
+  build: {
+    target: browsers,
+    manifest: true,
+    // Fonts stay files: the app's CSP allows fonts from itself, never data:
+    // URIs, which Vite would inline the smallest of
+    // (docs/adr/0014-production-topology.md).
+    assetsInlineLimit: (file) => (/\.woff2?$/.test(file) ? false : undefined),
+  },
   // An address, not localhost, which may resolve to IPv6 alone: the runner
   // answers only this origin. A busy port fails rather than taking the runner's.
   server: { host: "127.0.0.1", port: 5173, strictPort: true, proxy, headers },

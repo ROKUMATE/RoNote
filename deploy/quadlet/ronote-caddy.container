@@ -1,0 +1,34 @@
+# Caddy: TLS, the app's and the runner's files, /api to the api
+# (deploy/caddy/Caddyfile, baked into the web image). The one container that
+# publishes ports.
+
+[Unit]
+Description=RoNote Caddy
+Wants=ronote-api.service
+After=ronote-api.service
+
+[Container]
+ContainerName=ronote-caddy
+Image=ghcr.io/rokumate/ronote-web:@RONOTE_VERSION@
+Network=ronote-edge.network
+PublishPort=80:8080
+PublishPort=443:8443
+PublishPort=443:8443/udp
+# RONOTE_PUBLIC_URL and RONOTE_RUNNER_URL name its two sites.
+EnvironmentFile=%h/.config/ronote/ronote.env
+Volume=ronote-caddy-data.volume:/caddy/data
+Volume=ronote-caddy-config.volume:/caddy/config
+ReadOnly=true
+NoNewPrivileges=true
+DropCapability=ALL
+PodmanArgs=--memory=128m --cpus=1
+HealthCmd=wget -q --spider http://127.0.0.1:8081/health
+HealthInterval=10s
+Notify=healthy
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

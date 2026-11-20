@@ -1,0 +1,41 @@
+# The job worker: imports of pages and PDFs, indexing, blob cleanup.
+
+[Unit]
+Description=RoNote worker
+Requires=ronote-migrate.service ronote-postgres.service
+After=ronote-migrate.service ronote-postgres.service
+Wants=ronote-ollama.service ronote-seaweedfs.service ronote-docling.service ronote-pdftext.service
+
+[Container]
+ContainerName=ronote-worker
+Image=ghcr.io/rokumate/ronote-worker:@RONOTE_VERSION@
+# Pages on egress; the database, blobs and embedder on data; docling and
+# pdftext on converters.
+Network=ronote-egress.network
+Network=ronote-data.network
+Network=ronote-converters.network
+EnvironmentFile=%h/.config/ronote/ronote.env
+Secret=ronote-database-url,type=env,target=RONOTE_DATABASE_URL
+Secret=ronote-github-client-secret,type=env,target=RONOTE_GITHUB_CLIENT_SECRET
+Secret=ronote-anthropic-api-key,type=env,target=RONOTE_ANTHROPIC_API_KEY
+Secret=ronote-blob-access-key,type=env,target=RONOTE_BLOB_ACCESS_KEY
+Secret=ronote-blob-secret-key,type=env,target=RONOTE_BLOB_SECRET_KEY
+Secret=ronote-docling-api-key,type=env,target=RONOTE_DOCLING_API_KEY
+Secret=ronote-pdftext-api-key,type=env,target=RONOTE_PDFTEXT_API_KEY
+ReadOnly=true
+# /tmp holds the heartbeat its health check reads.
+ReadOnlyTmpfs=true
+NoNewPrivileges=true
+DropCapability=ALL
+PodmanArgs=--memory=512m --cpus=1
+# A JSON array runs without a shell, which distroless has none of.
+HealthCmd=["/ronote", "healthcheck"]
+HealthInterval=30s
+HealthStartPeriod=60s
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

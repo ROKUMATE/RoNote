@@ -80,7 +80,7 @@ export function Controls({ block, scope }: { block: IrBlock; scope: RunScope }) 
   const warm = runtime === "python" ? () => runs.warm(runtime) : undefined;
   const buttons =
     run && !run.done ? (
-      <button type="button" className="run-button" onClick={() => runs.stop(run.runtime)}>
+      <button type="button" className="run-button" onClick={() => runs.stop(block.id)}>
         <StopIcon size={16} aria-hidden />
         Stop
       </button>
@@ -319,6 +319,8 @@ function status(run: BlockRun, session: Session): string {
       return `Stopped at the ${runLimit / 1000} second limit`;
     case "output":
       return `Stopped: the output passed ${outputLimit / 1_000_000} MB`;
+    case "cancelled":
+      return "Stopped before it started";
     case "lost":
       return "Didn't finish";
   }

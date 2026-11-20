@@ -297,7 +297,7 @@ function stopLoop(page: Page, runtime: "python" | "javascript", code: string): P
           if (event.id !== "loop") return;
           events.push(event);
           if (event.type === "stdout" && events.length === 1) {
-            window.runner.send({ v: 1, type: "stop", runtime });
+            window.runner.send({ v: 1, type: "stop", runtime, id: "loop" });
           }
           if (event.type !== "done") return;
           stop();

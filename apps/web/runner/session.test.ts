@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { outputLimit, runLimit } from "../src/runner/limits";
 import type { RunnerEvent, Runtime } from "../src/runner/protocol";
+import { type Control, claim } from "./control";
 import { createSession, type RuntimeWorker, type ToWorker } from "./session";
 
 type Fake = RuntimeWorker & { posted: ToWorker[]; terminated: boolean };
@@ -18,8 +19,8 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-/** A session as runner/main.ts opens each: Python interruptible when isolated, JavaScript never. */
-function open(runtime: Runtime = "python", interruptible = runtime === "python") {
+/** A session as runner/main.ts opens each, on an isolated page unless said otherwise. */
+function open(runtime: Runtime = "python", isolated = true) {
   return createSession({
     runtime,
     spawn: () => {
@@ -38,10 +39,19 @@ function open(runtime: Runtime = "python", interruptible = runtime === "python")
       workers.push(worker);
       return worker;
     },
-    interruptible,
+    isolated,
     post: (event) => events.push(event),
   });
 }
+
+/** The memory the session shares with worker. */
+function controlOf(worker: Fake | undefined): Control | undefined {
+  const init = worker?.posted[0];
+  return init?.type === "init" ? init.control : undefined;
+}
+
+/** The worker starts the run it was sent, as a worker does: true if it may. */
+const begin = (worker: Fake | undefined) => claim(controlOf(worker));
 
 /** The worker sends data, as the code in it could. */
 function say(worker: Fake | undefined, data: unknown) {
@@ -59,7 +69,7 @@ test("a run starts its runtime, and its clock starts once the runtime is ready",
   python.run(run("a", "print(1)"));
   const [worker] = workers;
   expect(worker?.posted).toEqual([
-    { type: "init", interrupt: expect.any(Int32Array) },
+    { type: "init", control: expect.any(Int32Array) },
     { type: "run", id: "a", code: "print(1)", mode: "exec" },
   ]);
 
@@ -80,7 +90,7 @@ test("warming starts the session ahead of a run, once, and the run then waits fo
   python.warm();
   python.warm();
   expect(workers).toHaveLength(1);
-  expect(workers[0]?.posted).toEqual([{ type: "init", interrupt: expect.any(Int32Array) }]);
+  expect(workers[0]?.posted).toEqual([{ type: "init", control: expect.any(Int32Array) }]);
   say(workers[0], ready());
   vi.advanceTimersByTime(5_000);
   python.run(run("a"));
@@ -110,13 +120,12 @@ test("a run past the limit is interrupted, and its KeyboardInterrupt isn't shown
   python.run(run("a"));
   const [worker] = workers;
   say(worker, ready());
-  const init = worker?.posted[0];
-  const interrupt = init?.type === "init" ? init.interrupt : undefined;
+  expect(begin(worker)).toBe(true);
 
   vi.advanceTimersByTime(runLimit - 1);
-  expect(interrupt?.[0]).toBe(0);
+  expect(controlOf(worker)?.[0]).toBe(0);
   vi.advanceTimersByTime(1);
-  expect(interrupt?.[0]).toBe(2);
+  expect(controlOf(worker)?.[0]).toBe(2);
   say(worker, { v: 1, type: "error", id: "a", text: "KeyboardInterrupt\n" });
   say(worker, done("a", "error"));
   expect(kinds()).toEqual(["starting", "ready", "done a timeout"]);
@@ -127,7 +136,8 @@ test("a run that ignores the interrupt for a second loses its session", () => {
   const python = open();
   python.run(run("a"));
   say(workers[0], ready());
-  python.stop();
+  begin(workers[0]);
+  python.stop("a");
   vi.advanceTimersByTime(999);
   expect(workers[0]?.terminated).toBe(false);
   vi.advanceTimersByTime(1);
@@ -146,8 +156,8 @@ test("without isolation, Stop ends the session at once", () => {
   const python = open("python", false);
   python.run(run("a"));
   say(workers[0], ready());
-  expect(workers[0]?.posted[0]).toEqual({ type: "init", interrupt: undefined });
-  python.stop();
+  expect(workers[0]?.posted[0]).toEqual({ type: "init", control: undefined });
+  python.stop("a");
   expect(workers[0]?.terminated).toBe(true);
   expect(kinds()).toEqual(["starting", "ready", "done a stop", "ended"]);
 });
@@ -162,6 +172,7 @@ describe.each(["python", "javascript"] as const)("%s's runs keep the shared limi
     session.run(run("a", "loop", runtime));
     const [worker] = workers;
     say(worker, ready(runtime));
+    begin(worker);
     vi.advanceTimersByTime(runLimit - 1);
     expect(kinds()).toEqual(["starting", "ready"]);
     vi.advanceTimersByTime(1);
@@ -175,6 +186,7 @@ describe.each(["python", "javascript"] as const)("%s's runs keep the shared limi
     session.run(run("a", "flood", runtime));
     const [worker] = workers;
     say(worker, ready(runtime));
+    begin(worker);
     say(worker, { v: 1, type: "stdout", id: "a", text: "x".repeat(600_000) });
     say(worker, { v: 1, type: "stderr", id: "a", text: "y".repeat(600_000) });
     say(worker, { v: 1, type: "stdout", id: "a", text: "more" });
@@ -195,6 +207,7 @@ test("a check's examples count towards the output limit, each whole", () => {
   python.run({ ...run("a"), mode: "check" });
   const [worker] = workers;
   say(worker, ready());
+  begin(worker);
   const example = (got: string) => ({
     v: 1,
     type: "example",
@@ -210,20 +223,105 @@ test("a check's examples count towards the output limit, each whole", () => {
   expect(kinds()).toEqual(["starting", "ready", "example", "done a output"]);
 });
 
-test("runs wait their turn, and Stop drops those waiting", () => {
+test("runs wait their turn, and Stop drops a waiting run alone", () => {
   const python = open();
   python.run(run("a"));
   python.run(run("b"));
   const [worker] = workers;
   say(worker, ready());
+  begin(worker);
   say(worker, done("a"));
   expect(worker?.posted.map((m) => (m.type === "run" ? m.id : m.type))).toEqual(["init", "a", "b"]);
 
+  begin(worker);
   python.run(run("c"));
-  python.stop();
-  say(worker, done("b", "error"));
-  expect(kinds()).toEqual(["starting", "ready", "done a ok", "done c stop", "done b stop"]);
-  expect(worker?.posted).toHaveLength(3);
+  python.run(run("d"));
+  python.stop("c");
+  say(worker, done("b"));
+  expect(kinds()).toEqual(["starting", "ready", "done a ok", "done c cancelled", "done b ok"]);
+  expect(worker?.posted.map((m) => (m.type === "run" ? m.id : m.type))).toEqual([
+    "init",
+    "a",
+    "b",
+    "d",
+  ]);
+});
+
+// Stop names its run, and the worker and Stop each claim a sent run by
+// compare-and-swap (./control.ts): whichever comes first decides.
+describe.each(["python", "javascript"] as const)("%s's Stop, in each order", (runtime) => {
+  test("Stop before the worker starts the run cancels it, and keeps the session", () => {
+    const session = open(runtime);
+    session.run(run("a", "loop", runtime));
+    session.run(run("b", "next", runtime));
+    const [worker] = workers;
+    say(worker, ready(runtime));
+    session.stop("a");
+    expect(begin(worker)).toBe(false);
+    expect(controlOf(worker)?.[0]).toBe(0);
+    say(worker, { v: 1, type: "done", id: "a", ms: 0, end: "cancelled" });
+    expect(kinds()).toEqual(["starting", "ready", "done a cancelled"]);
+    expect(worker?.terminated).toBe(false);
+
+    // The next run starts as any other, in the same session.
+    expect(worker?.posted.at(-1)).toEqual({ type: "run", id: "b", code: "next", mode: "exec" });
+    expect(begin(worker)).toBe(true);
+    vi.advanceTimersByTime(5_000);
+    expect(worker?.terminated).toBe(false);
+  });
+
+  test("Stop during the run interrupts Python, and ends a JavaScript session", () => {
+    const session = open(runtime);
+    session.run(run("a", "loop", runtime));
+    const [worker] = workers;
+    say(worker, ready(runtime));
+    expect(begin(worker)).toBe(true);
+    session.stop("a");
+    if (runtime === "python") {
+      expect(controlOf(worker)?.[0]).toBe(2);
+      say(worker, { v: 1, type: "error", id: "a", text: "KeyboardInterrupt\n" });
+      say(worker, done("a", "error"));
+    }
+    expect(kinds()).toEqual(
+      runtime === "python"
+        ? ["starting", "ready", "done a stop"]
+        : ["starting", "ready", "done a stop", "ended"],
+    );
+    expect(worker?.terminated).toBe(runtime === "javascript");
+  });
+
+  test("Stop after the run is over does nothing, to the run after it either", () => {
+    const session = open(runtime);
+    session.run(run("a", "quick", runtime));
+    session.run(run("b", "loop", runtime));
+    const [worker] = workers;
+    say(worker, ready(runtime));
+    begin(worker);
+    say(worker, done("a"));
+    begin(worker);
+    session.stop("a");
+    session.stop("gone");
+    expect(controlOf(worker)?.[0]).toBe(0);
+    expect(kinds()).toEqual(["starting", "ready", "done a ok"]);
+    expect(worker?.terminated).toBe(false);
+  });
+});
+
+test("a Stop that comes as the run ends never reaches the next run", () => {
+  const python = open();
+  python.run(run("a"));
+  python.run(run("b"));
+  const [worker] = workers;
+  say(worker, ready());
+  begin(worker);
+  // The worker has finished a, but the session hasn't heard yet.
+  python.stop("a");
+  expect(controlOf(worker)?.[0]).toBe(2);
+  say(worker, done("a"));
+  expect(controlOf(worker)?.[0]).toBe(0);
+  expect(begin(worker)).toBe(true);
+  say(worker, done("b"));
+  expect(kinds()).toEqual(["starting", "ready", "done a stop", "done b ok"]);
 });
 
 test("what the worker says counts only if it parses and is about the run", () => {
@@ -269,7 +367,7 @@ test("Restart ends the session and the run in it", () => {
   say(workers[0], ready());
   python.restart();
   expect(workers[0]?.terminated).toBe(true);
-  expect(kinds()).toEqual(["starting", "ready", "done b stop", "done a stop", "ended"]);
+  expect(kinds()).toEqual(["starting", "ready", "done b cancelled", "done a stop", "ended"]);
   expect(events.at(-1)).toEqual({ v: 1, type: "ended", runtime: "python", reason: "restart" });
   expect(workers).toHaveLength(1);
 });

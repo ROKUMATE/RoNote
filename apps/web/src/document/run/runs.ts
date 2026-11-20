@@ -135,8 +135,13 @@ export class DocumentRuns {
     );
   }
 
-  stop(runtime: Runtime) {
-    void this.#runner?.then((runner) => runner.send({ v: 1, type: "stop", runtime }));
+  /** Stops blockId's run, whether it waits or runs. */
+  stop(blockId: string) {
+    const run = this.#runs.get(blockId);
+    const id = [...this.#blocks].find(([, block]) => block === blockId)?.[0];
+    if (!run || id === undefined) return;
+    const { runtime } = run;
+    void this.#runner?.then((runner) => runner.send({ v: 1, type: "stop", runtime, id }));
   }
 
   /**

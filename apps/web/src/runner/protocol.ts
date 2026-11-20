@@ -57,15 +57,17 @@ const requests = {
   // Starts the runtime's session, if it hasn't started, so a first run need
   // not wait for it: the reader is about to run something.
   warm: { runtime },
-  // Stops the runtime's run in progress and drops those waiting.
-  stop: { runtime },
+  // Stops one run: drops it while it waits, stops it while it runs, and
+  // does nothing once it is over.
+  stop: { runtime, id },
   // Ends the runtime's session; the next run starts a new one.
   restart: { runtime },
 } satisfies Shapes;
 
 const events = {
   // The runner is there. isolated: whether Stop can interrupt Python, rather
-  // than restart its session; Stop always restarts a JavaScript session.
+  // than restart its session; Stop always restarts a JavaScript session that
+  // is running code.
   hello: { isolated: boolean },
   // A runtime is loading, for its first run or the first after its session ended.
   starting: { runtime },
@@ -91,8 +93,13 @@ const events = {
     outcome: oneOf("passed", "failed", "error"),
   },
   // The run is over, after ms: it ended by itself (ok or error), was stopped
-  // (stop, timeout, or output past the limit), or lost with its session.
-  done: { id, ms: duration, end: oneOf("ok", "error", "stop", "timeout", "output", "lost") },
+  // (stop, timeout, or output past the limit), was stopped before it started
+  // (cancelled), or lost with its session.
+  done: {
+    id,
+    ms: duration,
+    end: oneOf("ok", "error", "stop", "timeout", "output", "cancelled", "lost"),
+  },
   // A runtime's session ended and its state is gone, because the reader
   // restarted it, stopping needed it, it crashed or ran out of memory, or it
   // failed to start.

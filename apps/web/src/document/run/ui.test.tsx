@@ -101,7 +101,9 @@ test("a run shows Python starting, its output labelled, and how it ended", async
   act(() => hear({ v: 1, type: "ready", runtime: "python" }));
   expect(py.getByRole("status").textContent).toBe("Running…");
   fireEvent.click(py.getByRole("button", { name: "Stop" }));
-  await waitFor(() => expect(sent.at(-1)).toEqual({ v: 1, type: "stop", runtime: "python" }));
+  await waitFor(() =>
+    expect(sent.at(-1)).toEqual({ v: 1, type: "stop", runtime: "python", id: "py:1" }),
+  );
 
   act(() => {
     hear({ v: 1, type: "stdout", id: "py:1", text: "1\n" });
@@ -118,6 +120,13 @@ test("a run shows Python starting, its output labelled, and how it ended", async
     ["run-result", "valueNone"],
   ]);
   py.getByRole("button", { name: "Run" });
+});
+
+test("a run stopped before it started says so", async () => {
+  open();
+  await runPython();
+  act(() => hear({ v: 1, type: "done", id: "py:1", ms: 0, end: "cancelled" }));
+  expect(code("py").getByRole("status").textContent).toBe("Stopped before it started");
 });
 
 test("Restart says the state is gone, and Clear removes the output", async () => {

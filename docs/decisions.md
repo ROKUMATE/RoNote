@@ -204,7 +204,7 @@ Recorded in [ADR 0008](adr/0008-in-browser-code-execution.md).
   - the app sends COOP `same-origin` and COEP `credentialless`, so both are cross-origin isolated in Chrome and Firefox.
 - **Messages** (`src/runner/protocol.ts`, version 1):
   - every message is parsed for exact shape, version and field limits, and dropped otherwise;
-  - the app names its origin in the runner's URL (`?app=`); the runner talks only when that origin is in `RONOTE_APP_ORIGINS`, and only to it;
+  - the app names its origin in the runner's URL (`?app=`); the runner talks only when that origin is the app's (`RONOTE_PUBLIC_URL`), and only to it;
   - each side also checks `event.source`.
 - **Sessions:**
   - one Pyodide session per open document, in a module worker, started by the first Run, or since P13b by the first hover or focus of a Python Run button (a `warm` request), and ended when the page closes;

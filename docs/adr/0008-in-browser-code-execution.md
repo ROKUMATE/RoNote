@@ -17,7 +17,7 @@ From P13 on, readers run code blocks from their documents. That code comes from 
   - The runner page runs each runtime in a Web Worker, so a busy interpreter never blocks either page.
   - `allow-same-origin` there means the runner's own origin: the runner can load its files and keep its worker, but it is still cross-origin to the app.
 - **The two pages talk by `postMessage` only.**
-  - The app names its origin in the runner page's URL (`?app=`). The runner talks only if that origin is one of the app's (`RONOTE_APP_ORIGINS`), and then sends every message to that origin only, so the browser delivers nothing to any other parent.
+  - The app names its origin in the runner page's URL (`?app=`). The runner talks only if that origin is the app's (`RONOTE_PUBLIC_URL`, read from the runner page's meta tag), and then sends every message to that origin only, so the browser delivers nothing to any other parent.
   - Each side checks `event.origin` against that one origin and `event.source` against the one window it expects: the runner its parent, the app its iframe.
   - The protocol is versioned (`v: 1`). Every message is validated against its shape (`src/runner/protocol.ts`, used by both sides).
   - Until a runner is deployed (P18), version 1 changes in place, as the app and the runner ship together; from then on, a change of shape bumps the version.

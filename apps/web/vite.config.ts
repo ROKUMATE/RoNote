@@ -2,6 +2,7 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 import { browsers } from "./browsers.ts";
+import { origins } from "./vite.origins.ts";
 
 // Tailwind's own optimizer targets older browsers than ./browsers and would
 // rewrite light-dark(), so Vite minifies the CSS instead.
@@ -12,8 +13,9 @@ const proxy = {
   "/api": { target: process.env.RONOTE_API_ORIGIN ?? "http://127.0.0.1:8080" },
 };
 
-// Where the runner page is served (vite.runner.config.ts).
-const runnerOrigin = process.env.RONOTE_RUNNER_ORIGIN ?? "http://localhost:5174";
+// Where the runner page is served in dev (vite.runner.config.ts), unless
+// RONOTE_RUNNER_URL says otherwise.
+export const devRunnerURL = "http://localhost:5174";
 
 // Cross-origin isolated, so the runner's frame may be too and Stop can
 // interrupt Python. credentialless still loads documents' images from their
@@ -24,8 +26,11 @@ const headers = {
 };
 
 export default defineConfig({
-  plugins: [react(), tailwindcss({ optimize: false })],
-  define: { "import.meta.env.RONOTE_RUNNER_ORIGIN": JSON.stringify(runnerOrigin) },
+  plugins: [
+    react(),
+    tailwindcss({ optimize: false }),
+    origins({ RONOTE_RUNNER_URL: devRunnerURL }),
+  ],
   build: { target: browsers, manifest: true },
   // An address, not localhost, which may resolve to IPv6 alone: the runner
   // answers only this origin. A busy port fails rather than taking the runner's.

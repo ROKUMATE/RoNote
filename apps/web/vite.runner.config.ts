@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { type Connect, defineConfig, type Plugin } from "vite";
 import { browsers } from "./browsers.ts";
+import { origins } from "./vite.origins.ts";
 
 /*
  * The runner origin (docs/adr/0008-in-browser-code-execution.md): its own
@@ -11,10 +12,11 @@ import { browsers } from "./browsers.ts";
  * would otherwise be shared.
  */
 
-// The app's origins, which alone may frame the runner and talk to it.
-const appOrigins = (process.env.RONOTE_APP_ORIGINS ?? "http://127.0.0.1:5173")
-  .split(/[\s,]+/)
-  .filter(Boolean);
+// The app's origin, which alone may frame the runner and talk to it: in
+// dev, where make web-dev serves the app, unless RONOTE_PUBLIC_URL says
+// otherwise. In production Caddy sends these headers (deploy/caddy/Caddyfile).
+const devAppURL = "http://127.0.0.1:5173";
+const appOrigin = new URL(process.env.RONOTE_PUBLIC_URL ?? devAppURL).origin;
 
 // The JavaScript worker's script, in dev and in the build: the one response
 // whose code may evaluate text, which running the reader's JavaScript takes.
@@ -32,7 +34,7 @@ export function headersFor(path: string): Record<string, string> {
       "default-src 'self'",
       `script-src 'self' ${evaluates ? "'unsafe-eval'" : "'wasm-unsafe-eval'"}`,
       "connect-src 'self'",
-      `frame-ancestors ${appOrigins.join(" ")}`,
+      `frame-ancestors ${appOrigin}`,
       "base-uri 'none'",
       "form-action 'none'",
     ].join("; "),
@@ -60,9 +62,15 @@ function headers(): Plugin {
   };
 }
 
-const pyodideDir = dirname(createRequire(import.meta.url).resolve("pyodide/package.json"));
+const pyodidePackage = createRequire(import.meta.url).resolve("pyodide/package.json");
+const pyodideDir = dirname(pyodidePackage);
 
-/** The Pyodide files the runner serves under /pyodide/, and their types. */
+// Pyodide's files keep their names, so their path carries the version: a
+// new Pyodide is a new URL, and the files can be cached for good.
+const pyodidePath = `pyodide/${JSON.parse(readFileSync(pyodidePackage, "utf8")).version}`;
+const pyodideURL = `/${pyodidePath}/`;
+
+/** The Pyodide files the runner serves under pyodideURL, and their types. */
 const pyodideFiles: Record<string, string> = {
   "pyodide.asm.mjs": "text/javascript",
   "pyodide.asm.wasm": "application/wasm",
@@ -83,7 +91,7 @@ function pyodide(): Plugin {
   return {
     name: "ronote-pyodide",
     configureServer(server) {
-      server.middlewares.use("/pyodide", (request, response, next) => {
+      server.middlewares.use(`/${pyodidePath}`, (request, response, next) => {
         const name = request.url?.split("?")[0]?.slice(1) ?? "";
         const type = pyodideFiles[name];
         if (!type) return next();
@@ -93,7 +101,11 @@ function pyodide(): Plugin {
     },
     generateBundle() {
       for (const name of Object.keys(pyodideFiles)) {
-        this.emitFile({ type: "asset", fileName: `pyodide/${name}`, source: pyodideFile(name) });
+        this.emitFile({
+          type: "asset",
+          fileName: `${pyodidePath}/${name}`,
+          source: pyodideFile(name),
+        });
       }
     },
   };
@@ -105,11 +117,11 @@ export default defineConfig({
   // it for themselves, and a worker loading a dependency the other just
   // replaced fails to start.
   cacheDir: "../node_modules/.vite-runner",
-  plugins: [headers(), pyodide()],
+  plugins: [headers(), pyodide(), origins({ RONOTE_PUBLIC_URL: devAppURL })],
   // Pyodide finds its files from indexURL, not from where Vite would put it.
   optimizeDeps: { exclude: ["pyodide"] },
   worker: { format: "es" },
-  define: { "import.meta.env.RONOTE_APP_ORIGINS": JSON.stringify(appOrigins) },
+  define: { "import.meta.env.RONOTE_PYODIDE_URL": JSON.stringify(pyodideURL) },
   build: {
     target: browsers,
     outDir: "../dist-runner",

@@ -1,9 +1,7 @@
 import { afterEach, expect, test, vi } from "vitest";
 import indexHtml from "../index.html?raw";
+import bootScript from "../public/boot.js?raw";
 import { saveReaderFont, saveTheme } from "./preferences";
-
-// The inline script in index.html that applies preferences before first paint.
-const bootScript = /<script id="boot-preferences">([\s\S]*?)<\/script>/.exec(indexHtml)?.[1] ?? "";
 
 function runBootScript() {
   new Function(bootScript)();
@@ -16,7 +14,10 @@ afterEach(() => {
   document.documentElement.removeAttribute("data-reader-font");
 });
 
-test("index.html has the boot script", () => {
+// A classic script, before the app's module: it blocks the first paint.
+test("index.html loads the boot script first, from a file", () => {
+  expect(indexHtml).toMatch(/<head>[\s\S]*<script src="\/boot\.js"><\/script>[\s\S]*<\/head>/);
+  expect(indexHtml).not.toMatch(/<script>|<script id=/);
   expect(bootScript).toContain("localStorage");
 });
 

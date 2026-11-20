@@ -11,7 +11,7 @@ entry when a phase settles it; add one when a phase leaves something open.
 - Safari isn't cross-origin isolated (no COEP `credentialless`), so Stop there ends the session; the e2e tests run Chromium only, so that path is covered by unit tests alone.
 - Pyodide is 6.3 MB with gzip; a cold start took 0.75 s on fresh browsers here in P13b (P13a measured 4.2 s). The production runner should serve it compressed and cacheable.
 - The runner's production host must serve the JavaScript worker's script (`javascript.worker.*`) with its own policy, `'unsafe-eval'` added, and every other file without it, as `headersFor` does.
-- In dev, open the app at `127.0.0.1:5173`: the runner answers only the origins in `RONOTE_APP_ORIGINS`. At `localhost:5173` the app still loads, and a Run says the code runner didn't answer.
+- In dev, open the app at `127.0.0.1:5173`: the runner answers only `RONOTE_PUBLIC_URL`'s origin. At `localhost:5173` the app still loads, and a Run says the code runner didn't answer.
 - JavaScript blocks are read on their own: one that uses a name another block imports (VitePress's `postcssIsolateStyles({...})`) offers Run, and fails with a `ReferenceError`.
 - A JavaScript `setInterval` never cleared keeps its run going until Stop or the 30 s limit, as a Node script would. Output Python prints after its run has ended (from an asyncio task) is dropped.
 - doctest ends an example's expected output at a blank line, so output a page shows with blank lines (the tutorial's `__doc__` example) fails without `<BLANKLINE>`. Version differences other than an exception's wording, such as Python 3.14's annotation order, are failures.

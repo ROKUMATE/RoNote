@@ -1,3 +1,4 @@
+import { configuredOrigin } from "../../origins";
 import { parseEvent, type RunnerEvent, type RunnerRequest } from "../../runner/protocol";
 
 /*
@@ -9,6 +10,8 @@ import { parseEvent, type RunnerEvent, type RunnerRequest } from "../../runner/p
 /** How long the runner has to answer hello before it counts as down. */
 const helloTimeout = 10_000;
 
+const noAnswer = "The code runner didn't answer.";
+
 export type Runner = {
   /** Whether Stop can interrupt code, rather than restart its session. */
   isolated: boolean;
@@ -19,8 +22,13 @@ export type Runner = {
   close(): void;
 };
 
-/** Opens a runner in a hidden frame, resolving once it has said hello. */
-export function openRunner(origin = import.meta.env.RONOTE_RUNNER_ORIGIN): Promise<Runner> {
+/**
+ * Opens a runner in a hidden frame, resolving once it has said hello. The
+ * runner's origin is the page's (src/origins.ts) unless one is given.
+ */
+export function openRunner(origin = configuredOrigin("ronote-runner-url")): Promise<Runner> {
+  // With no origin the frame's URL would be relative, and load the app.
+  if (origin === "") return Promise.reject(new Error(noAnswer));
   const frame = document.createElement("iframe");
   frame.src = `${origin}/?${new URLSearchParams({ app: location.origin })}`;
   frame.title = "Code runner";
@@ -49,7 +57,7 @@ export function openRunner(origin = import.meta.env.RONOTE_RUNNER_ORIGIN): Promi
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       close();
-      reject(new Error("The code runner didn't answer."));
+      reject(new Error(noAnswer));
     }, helloTimeout);
     const stop = listen((event) => {
       if (event.type !== "hello") return;

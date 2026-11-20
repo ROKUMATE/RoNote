@@ -9,8 +9,6 @@ entry when a phase settles it; add one when a phase leaves something open.
 - After macOS sleeps, the podman VM's clock can lag for a few minutes. Jobs no longer wait on it (P12), but tests that compare a database time with the app's, such as a user's `created_at` "about now", still fail meanwhile. `make doctor` says so and prints the fix.
 - Code in a runner worker can post a false "done", which stops its run's clock while it keeps running. The next run then waits behind it and is interrupted at its own limit, so the waste lasts until the reader runs something or leaves.
 - Safari isn't cross-origin isolated (no COEP `credentialless`), so Stop there ends the session; the e2e tests run Chromium only, so that path is covered by unit tests alone.
-- Pyodide is 6.3 MB with gzip; a cold start took 0.75 s on fresh browsers here in P13b (P13a measured 4.2 s). The production runner should serve it compressed and cacheable.
-- The runner's production host must serve the JavaScript worker's script (`javascript.worker.*`) with its own policy, `'unsafe-eval'` added, and every other file without it, as `headersFor` does.
 - In dev, open the app at `127.0.0.1:5173`: the runner answers only `RONOTE_PUBLIC_URL`'s origin. At `localhost:5173` the app still loads, and a Run says the code runner didn't answer.
 - JavaScript blocks are read on their own: one that uses a name another block imports (VitePress's `postcssIsolateStyles({...})`) offers Run, and fails with a `ReferenceError`.
 - A JavaScript `setInterval` never cleared keeps its run going until Stop or the 30 s limit, as a Node script would. Output Python prints after its run has ended (from an asyncio task) is dropped.
@@ -53,3 +51,7 @@ entry when a phase settles it; add one when a phase leaves something open.
 - PDFs: code language comes from the picker; docling's code enrichment would guess it with a model, at CPU cost, and its text would be generated. Off.
 - PDFs: conversion takes about 1 s a page on 2 CPUs: a 300-page book is five minutes, inside the 10-minute attempt. Two run at once.
 - Chat: a turn that ends with no text and no tool call (Haiku 5.5 once did, with its tools turned off, which the last call no longer does) is saved as unsourced and shows "No sources" with nothing above it.
+- Production (ADR 0014): CI and `make prod-local` run the units with the fakes, so these are unproven until a real host: docling in 3 GB with one worker, and on a read-only root; Ollama's model pull and its digest check (`--skip-model` there); pasta keeping clients' addresses (the smoke suite connects from the host itself); Let's Encrypt certificates (Caddy issues its own for `.test`).
+- The CI smoke job has run only in the podman machine's VM (Fedora CoreOS, systemd 259): GitHub's ubuntu-26.04 runner's podman, Quadlet and a lingering user under `sudo` first meet it when this branch is pushed.
+- Chat's daily spending cap counts answers when they finish, so answers already being written can take a day past it by what they cost (a few tenths of a cent each).
+- The smoke suite signs in as `RONOTE_ENV=test` (staging and prod refuse the fake sign-in), so it never sees `__Host-` cookies; `check-config` and config's tests cover them.

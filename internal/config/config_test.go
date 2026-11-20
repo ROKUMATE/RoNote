@@ -29,6 +29,8 @@ func validEnv(overrides map[string]string) map[string]string {
 		"RONOTE_ENV":                  "dev",
 		"RONOTE_DATABASE_URL":         testDatabaseURL,
 		"RONOTE_PUBLIC_URL":           "https://ronote.test",
+		"RONOTE_RUNNER_URL":           "https://ronote-run.test",
+		"RONOTE_TRUSTED_PROXIES":      "10.89.10.0/24",
 		"RONOTE_GITHUB_CLIENT_ID":     "client",
 		"RONOTE_GITHUB_CLIENT_SECRET": leakMarker,
 		"RONOTE_ANTHROPIC_API_KEY":    leakMarker,
@@ -46,11 +48,15 @@ func validEnv(overrides map[string]string) map[string]string {
 	return env
 }
 
-// blobSet and pdfSet are the blob store and converters validEnv names; a
-// case that leaves Blob and PDF out of its want expects them.
+// blobSet and pdfSet are the blob store and converters validEnv names, and
+// runnerSet and proxiesSet its runner and proxies; a case that leaves them
+// out of its want expects them.
 var (
 	blobSet = Blob{Endpoint: "https://s3.example.com", Region: "eu-central-1", Bucket: "ronote-pdfs", AccessKey: "access", SecretKey: leakMarker}
 	pdfSet  = PDF{DoclingURL: "http://docling.internal:5001", DoclingKey: leakMarker, TextURL: "http://pdftext.internal:5002", TextKey: leakMarker}
+
+	runnerSet  = "https://ronote-run.test"
+	proxiesSet = []netip.Prefix{netip.MustParsePrefix("10.89.10.0/24")}
 )
 
 // noPDFSettings unsets every blob store and converter variable.
@@ -157,6 +163,34 @@ func TestLoad(t *testing.T) {
 			name:    "a daily chat budget in other words",
 			env:     validEnv(map[string]string{"RONOTE_CHAT_DAILY_USD": "$1"}),
 			wantErr: []string{`RONOTE_CHAT_DAILY_USD: "$1" is not an amount of dollars above 0, such as 0.50`},
+		},
+		{
+			name: "dev's runner by default",
+			env:  validEnv(map[string]string{"RONOTE_RUNNER_URL": "", "RONOTE_TRUSTED_PROXIES": ""}),
+			want: Config{
+				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.test", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatDefault,
+				RunnerURL: "http://localhost:5174", TrustedProxies: []netip.Prefix{},
+			},
+		},
+		{
+			name:    "prod names its runner and its proxies",
+			env:     validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_RUNNER_URL": "", "RONOTE_TRUSTED_PROXIES": ""}),
+			wantErr: []string{"RONOTE_RUNNER_URL: not set; want the origin code from documents runs on, such as https://ronote-run.dev", "RONOTE_TRUSTED_PROXIES: not set; staging and prod run behind Caddy, whose network it names"},
+		},
+		{
+			name:    "prod's runner over https",
+			env:     validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_RUNNER_URL": "http://ronote-run.test"}),
+			wantErr: []string{`RONOTE_RUNNER_URL: "http://ronote-run.test" must be https when RONOTE_ENV is staging or prod`},
+		},
+		{
+			name:    "prod's runner on a subdomain of the app's site",
+			env:     validEnv(map[string]string{"RONOTE_ENV": "prod", "RONOTE_PUBLIC_URL": "https://app.ronote.co.uk", "RONOTE_RUNNER_URL": "https://run.ronote.co.uk"}),
+			wantErr: []string{`RONOTE_RUNNER_URL: https://run.ronote.co.uk is on the same site as RONOTE_PUBLIC_URL (ronote.co.uk); the runner needs a registrable domain of its own (docs/adr/0008-in-browser-code-execution.md)`},
+		},
+		{
+			name: "staging's runner on another site under a shared suffix",
+			env:  validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_PUBLIC_URL": "https://ronote.github.io", "RONOTE_RUNNER_URL": "https://ronote-run.github.io"}),
+			want: Config{Env: EnvStaging, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.github.io", RunnerURL: "https://ronote-run.github.io", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatOffDefault},
 		},
 		{
 			name:    "missing env",
@@ -484,6 +518,12 @@ func TestLoad(t *testing.T) {
 				}
 				if tt.want.Blob == (Blob{}) && tt.want.PDF == (PDF{}) {
 					tt.want.Blob, tt.want.PDF = blobSet, pdfSet
+				}
+				if tt.want.RunnerURL == "" {
+					tt.want.RunnerURL = runnerSet
+				}
+				if tt.want.TrustedProxies == nil {
+					tt.want.TrustedProxies = proxiesSet
 				}
 				if !reflect.DeepEqual(got, tt.want) {
 					t.Errorf("Load() = %+v, want %+v", got, tt.want)

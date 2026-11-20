@@ -16,6 +16,8 @@ import (
 	"strings"
 	"time"
 	"unicode"
+
+	"golang.org/x/net/publicsuffix"
 )
 
 // Env is the deployment environment the service runs in.
@@ -44,6 +46,10 @@ type Config struct {
 	// PublicURL is the origin people reach RoNote at, such as
 	// https://ronote.app: sign-in's callback is under it.
 	PublicURL string
+	// RunnerURL is the origin code from documents runs on, such as
+	// https://ronote-run.dev: in staging and prod a registrable domain of
+	// its own (docs/adr/0008-in-browser-code-execution.md).
+	RunnerURL string
 	// GitHub is the OAuth app people sign in with.
 	GitHub GitHub
 	// TrustedProxies are the networks whose X-Forwarded-For says which
@@ -158,6 +164,8 @@ const (
 	defaultHTTPAddr  = "127.0.0.1:8080"
 	defaultLogLevel  = "info"
 	defaultSourceTTL = "24h"
+	// devRunnerURL is where make web-dev serves the runner.
+	devRunnerURL = "http://localhost:5174"
 	// defaultChatDailyUSD is chat's budget for a UTC day, for all users
 	// together.
 	defaultChatDailyUSD = "0.50"
@@ -194,8 +202,20 @@ func Load(getenv func(string) string) (Config, error) {
 	check("RONOTE_FETCH_ALLOW_PRIVATE", err)
 	ttl, err := parseTTL(withDefault(getenv("RONOTE_SOURCE_TTL"), defaultSourceTTL))
 	check("RONOTE_SOURCE_TTL", err)
-	publicURL, err := parsePublicURL(getenv("RONOTE_PUBLIC_URL"), env)
+	publicURL, err := parseOrigin(getenv("RONOTE_PUBLIC_URL"), env, "the origin people reach RoNote at, such as https://ronote.app")
 	check("RONOTE_PUBLIC_URL", err)
+	runnerURL := getenv("RONOTE_RUNNER_URL")
+	if runnerURL == "" && !env.Deployed() {
+		runnerURL = devRunnerURL
+	}
+	runnerURL, err = parseOrigin(runnerURL, env, "the origin code from documents runs on, such as https://ronote-run.dev")
+	check("RONOTE_RUNNER_URL", err)
+	if env.Deployed() && publicURL != "" && runnerURL != "" {
+		check("RONOTE_RUNNER_URL", otherSite(runnerURL, publicURL))
+	}
+	if env.Deployed() && len(proxies) == 0 && len(proxyErrs) == 0 {
+		check("RONOTE_TRUSTED_PROXIES", errors.New("not set; staging and prod run behind Caddy, whose network it names"))
+	}
 	gh := GitHub{
 		ClientID:     getenv("RONOTE_GITHUB_CLIENT_ID"),
 		ClientSecret: getenv("RONOTE_GITHUB_CLIENT_SECRET"),
@@ -247,6 +267,7 @@ func Load(getenv func(string) string) (Config, error) {
 		FetchAllowPrivateNetworks: allowPrivate,
 		SourceTTL:                 ttl,
 		PublicURL:                 publicURL,
+		RunnerURL:                 runnerURL,
 		GitHub:                    gh,
 		Limits:                    limits,
 		Embed:                     embed,
@@ -367,9 +388,11 @@ func (e Env) Deployed() bool {
 
 // parsePublicURL reads the origin RoNote is served at, http or https with
 // no path; staging and prod need https, for Secure cookies.
-func parsePublicURL(s string, env Env) (string, error) {
+// parseOrigin reads an origin, scheme://host[:port], which in staging and
+// prod is https; want says what it is, for when it is missing.
+func parseOrigin(s string, env Env, want string) (string, error) {
 	if s == "" {
-		return "", errors.New("not set; want the origin people reach RoNote at, such as https://ronote.app")
+		return "", errors.New("not set; want " + want)
 	}
 	u, err := url.Parse(s)
 	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
@@ -382,6 +405,40 @@ func parsePublicURL(s string, env Env) (string, error) {
 		return "", fmt.Errorf("%q must be https when RONOTE_ENV is staging or prod", s)
 	}
 	return u.Scheme + "://" + u.Host, nil
+}
+
+// otherSite fails when runner is on the app's site: the same registrable
+// domain, by the public suffix list, which is what makes two hosts one site
+// to a browser's cookies (docs/adr/0008-in-browser-code-execution.md).
+func otherSite(runner, app string) error {
+	runnerSite, err := site(runner)
+	if err != nil {
+		return err
+	}
+	appSite, err := site(app)
+	if err != nil {
+		return fmt.Errorf("RONOTE_PUBLIC_URL: %w", err)
+	}
+	if runnerSite == appSite {
+		return fmt.Errorf("%s is on the same site as RONOTE_PUBLIC_URL (%s); the runner needs a registrable domain of its own (docs/adr/0008-in-browser-code-execution.md)", runner, appSite)
+	}
+	return nil
+}
+
+// site is an origin's registrable domain.
+func site(origin string) (string, error) {
+	u, err := url.Parse(origin)
+	if err != nil {
+		return "", err
+	}
+	if _, err := netip.ParseAddr(u.Hostname()); err == nil {
+		return "", fmt.Errorf("%s is an IP address; want a domain name", origin)
+	}
+	s, err := publicsuffix.EffectiveTLDPlusOne(u.Hostname())
+	if err != nil {
+		return "", fmt.Errorf("%s has no registrable domain", origin)
+	}
+	return s, nil
 }
 
 // validateProviderURL allows any http(s) URL in dev and test, where the fake
@@ -466,7 +523,7 @@ func validateAddr(s string) error {
 // parseProxies reads networks and addresses, separated by commas or
 // spaces; an address is a network of one. Each bad one is its own error.
 func parseProxies(s string) ([]netip.Prefix, []error) {
-	var nets []netip.Prefix
+	nets := []netip.Prefix{}
 	var errs []error
 	for _, field := range strings.FieldsFunc(s, func(r rune) bool { return r == ',' || unicode.IsSpace(r) }) {
 		if a, err := netip.ParseAddr(field); err == nil {

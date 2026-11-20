@@ -11,6 +11,21 @@ export async function expectNoHorizontalScroll(page: Page) {
   expect(overflow, "page scrolls sideways").toBe(0);
 }
 
+/** Types text into the search palette and closes it: fails unless the page takes the keys. */
+export async function expectTyping(page: Page, text: string) {
+  await page.keyboard.press("ControlOrMeta+k");
+  const palette = page.getByRole("dialog", { name: "Search your library" });
+  const field = palette.getByRole("combobox", { name: "Search your library" });
+  await expect(field).toBeFocused();
+  await page.keyboard.type(text);
+  await expect(field).toHaveValue(text);
+  // A search field's first Escape clears it; the next closes the dialog.
+  await page.keyboard.press("Escape");
+  await expect(field).toHaveValue("");
+  await page.keyboard.press("Escape");
+  await expect(palette).toBeHidden();
+}
+
 /** Fails on any axe violation, naming each rule and where it failed. */
 export async function expectNoAxeViolations(page: Page) {
   const { violations } = await new AxeBuilder({ page }).analyze();

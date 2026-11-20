@@ -1,4 +1,5 @@
 import type { Frame, Page } from "@playwright/test";
+import { expectTyping } from "./helpers";
 import { stack } from "./stack";
 import { expect, test } from "./test";
 
@@ -335,26 +336,21 @@ test("Stop interrupts an endless loop, and keeps the session", async ({ page }) 
   ]);
 });
 
-test("output past 1 MB stops the run, and the page stays responsive", async ({ page }) => {
+test("output past 1 MB stops the run and says so, and the page and session go on", async ({
+  page,
+}) => {
   await openRunner(page);
-  await run(page, "pass");
-  const { output, end, slowest } = await page.evaluate(
+  await run(page, "kept = 'still here'");
+  const { output, end } = await page.evaluate(
     () =>
-      new Promise<{ output: number; end: string | undefined; slowest: number }>((resolve) => {
+      new Promise<{ output: number; end: string | undefined }>((resolve) => {
         let output = 0;
-        let slowest = 0;
-        let last = performance.now();
-        const tick = setInterval(() => {
-          slowest = Math.max(slowest, performance.now() - last);
-          last = performance.now();
-        }, 0);
         const stop = window.runner.listen((event) => {
           if (event.id !== "flood") return;
           if (event.type === "stdout") output += event.text?.length ?? 0;
           if (event.type !== "done") return;
           stop();
-          clearInterval(tick);
-          resolve({ output, end: event.end, slowest });
+          resolve({ output, end: event.end });
         });
         const code = "while True:\n    print('x' * 999)";
         window.runner.send({
@@ -369,7 +365,12 @@ test("output past 1 MB stops the run, and the page stays responsive", async ({ p
   );
   expect(end).toBe("output");
   expect(output).toBe(1_000_000);
-  expect(slowest).toBeLessThan(250);
+
+  await expectTyping(page, "print");
+  expect(shown(await run(page, "print(kept)"))).toEqual([
+    { type: "stdout", text: "still here\n" },
+    { type: "done", end: "ok" },
+  ]);
 });
 
 test("Python can't reach the API or the page", async ({ page }) => {

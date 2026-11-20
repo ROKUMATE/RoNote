@@ -3,6 +3,7 @@ import {
   chooseTheme,
   expectNoAxeViolations,
   expectNoHorizontalScroll,
+  expectTyping,
   fixtureURL,
   importPage,
 } from "./helpers";
@@ -99,9 +100,9 @@ test("Stop pressed as the run is sent stops it, and the session keeps its names"
   );
 });
 
-test("output stops at 1 MB, and the page stays responsive", async ({ page }) => {
+test("output stops at 1 MB and says so, and the page still takes input", async ({ page }) => {
   const blocks = await openPythonPage(page);
-  const flood = blocks.nth(3);
+  const [define, use, flood] = [blocks.nth(0), blocks.nth(1), blocks.nth(3)];
   await flood.getByRole("button", { name: "Run" }).click();
   await expect(flood.getByRole("status")).toHaveText("Stopped: the output passed 1 MB", {
     timeout: 20_000,
@@ -110,14 +111,11 @@ test("output stops at 1 MB, and the page stays responsive", async ({ page }) => 
     1_000_000,
   );
 
-  const roundTrip = await page.evaluate(
-    () =>
-      new Promise<number>((resolve) => {
-        const started = performance.now();
-        setTimeout(() => resolve(performance.now() - started));
-      }),
-  );
-  expect(roundTrip).toBeLessThan(250);
+  await expectTyping(page, "print");
+  await define.getByRole("button", { name: "Run" }).click();
+  await expect(define.getByRole("status")).toHaveText(/^Ran in /);
+  await use.getByRole("button", { name: "Run" }).click();
+  await expect(use.locator(".run-text")).toHaveText("42\n");
   await flood.getByRole("button", { name: "Clear" }).click();
   await expect(flood.locator(".run-output")).toHaveCount(0);
 });

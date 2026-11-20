@@ -1,6 +1,9 @@
 // Command worker runs background jobs: imports of pages and PDFs, blob
 // cleanup and indexing, through the jobs port on River
 // (docs/adr/0009-jobs-port.md).
+//
+//	worker [run]         run jobs
+//	worker healthcheck   fail unless a running worker's database answered lately
 package main
 
 import (
@@ -10,17 +13,21 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
 	"github.com/rokumate/ronote/internal/blob/s3blob"
+	"github.com/rokumate/ronote/internal/cli"
 	"github.com/rokumate/ronote/internal/config"
 	"github.com/rokumate/ronote/internal/db"
 	"github.com/rokumate/ronote/internal/docling"
 	"github.com/rokumate/ronote/internal/embed"
 	"github.com/rokumate/ronote/internal/fetch"
+	"github.com/rokumate/ronote/internal/health"
 	"github.com/rokumate/ronote/internal/importer"
 	"github.com/rokumate/ronote/internal/jobs/riverjobs"
+	"github.com/rokumate/ronote/internal/schema"
 	"github.com/rokumate/ronote/internal/search"
 	"github.com/rokumate/ronote/internal/store"
 	"github.com/rokumate/ronote/internal/version"
@@ -29,8 +36,24 @@ import (
 // backfillEvery spaces the backfill's index jobs.
 const backfillEvery = 200 * time.Millisecond
 
+// The worker serves no HTTP, so its health check reads a file it touches
+// every heartbeatEvery while its database answers; three missed beats fail
+// it (docs/adr/0014-production-topology.md).
+const (
+	heartbeatEvery = 30 * time.Second
+	heartbeatStale = 3 * heartbeatEvery
+)
+
+var heartbeatFile = filepath.Join(os.TempDir(), "ronote-worker-alive")
+
 func main() {
-	if err := run(); err != nil {
+	err := cli.Run(os.Args[1:], "run", map[string]cli.Command{
+		"run": cli.NoArgs(run),
+		"healthcheck": cli.NoArgs(func() error {
+			return health.Fresh(heartbeatFile, heartbeatStale, time.Now())
+		}),
+	})
+	if err != nil {
 		fmt.Fprintln(os.Stderr, "worker:", err)
 		os.Exit(1)
 	}
@@ -51,6 +74,10 @@ func run() error {
 		return err
 	}
 	defer pool.Close()
+	if err := schema.Check(ctx, pool); err != nil {
+		return err
+	}
+	go health.Beat(ctx, heartbeatFile, heartbeatEvery, pool.Ping)
 
 	queue, err := riverjobs.New(pool, riverjobs.Options{Logger: logger})
 	if err != nil {

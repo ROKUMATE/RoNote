@@ -480,3 +480,34 @@ func TestLogger(t *testing.T) {
 		t.Errorf("prod log = %q, want JSON at warn and above", js.String())
 	}
 }
+
+// `api migrate` reads the database's URL alone, checked as Load checks it.
+func TestDatabaseURL(t *testing.T) {
+	t.Parallel()
+	good := "postgres://ronote:" + leakMarker + "@db:5432/ronote"
+	tests := []struct {
+		url     string
+		wantErr string
+	}{
+		{url: good},
+		{url: "", wantErr: "RONOTE_DATABASE_URL: not set"},
+		{url: "mysql://ronote:" + leakMarker + "@db/ronote", wantErr: "RONOTE_DATABASE_URL: not a postgres://"},
+	}
+	for _, tt := range tests {
+		got, err := DatabaseURL(func(name string) string {
+			if name == "RONOTE_DATABASE_URL" {
+				return tt.url
+			}
+			return ""
+		})
+		if tt.wantErr == "" {
+			if err != nil || got != good {
+				t.Errorf("DatabaseURL = %v; want the URL", err)
+			}
+			continue
+		}
+		if err == nil || !strings.HasPrefix(err.Error(), tt.wantErr) || strings.Contains(err.Error(), leakMarker) {
+			t.Errorf("DatabaseURL(%q) error = %v, want %q and no secret", tt.url, err, tt.wantErr)
+		}
+	}
+}

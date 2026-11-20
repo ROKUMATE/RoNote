@@ -1,0 +1,26 @@
+# The web app and the runner, as static files Caddy serves
+# (docs/adr/0014-production-topology.md). Nothing domain-specific is built
+# in: each index.html names its origins as Caddy template calls.
+
+# Built on the build machine: the files are the same for every architecture.
+FROM --platform=$BUILDPLATFORM docker.io/library/node:26.13.0-trixie-slim@sha256:5adad64f9a1fca2d51972caa65983634c8a774eb300d72b20f7f2a0f60368072 AS build
+WORKDIR /src
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/web/package.json apps/web/
+COPY tools/openapi-ts/package.json tools/openapi-ts/
+RUN npm install --global "pnpm@$(node -p 'require("./package.json").packageManager.split("@")[1]')" \
+    && pnpm install --frozen-lockfile --filter ./apps/web
+COPY apps/web ./apps/web
+COPY deploy/images/precompress.mjs ./
+RUN pnpm --dir apps/web build && node precompress.mjs apps/web/dist apps/web/dist-runner \
+    && mkdir -p /out/data /out/config
+
+FROM docker.io/library/caddy:2.11.9-alpine@sha256:003a97808e781aa9f7e75cc2f43d34d461099031faf5e20faefb9f61126836f0
+COPY --from=build /src/apps/web/dist /srv/app
+COPY --from=build /src/apps/web/dist-runner /srv/runner
+# Caddy's certificates and state, owned by its user. The base image's own
+# /data and /config belong to root, so these are new directories.
+COPY --from=build --chown=10001:10001 /out/data /caddy/data
+COPY --from=build --chown=10001:10001 /out/config /caddy/config
+ENV XDG_DATA_HOME=/caddy/data XDG_CONFIG_HOME=/caddy/config
+USER 10001:10001

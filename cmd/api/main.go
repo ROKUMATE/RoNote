@@ -29,6 +29,7 @@ import (
 	"github.com/rokumate/ronote/internal/jobs/riverjobs"
 	"github.com/rokumate/ronote/internal/search"
 	"github.com/rokumate/ronote/internal/store"
+	"github.com/rokumate/ronote/internal/version"
 )
 
 const shutdownTimeout = 10 * time.Second
@@ -124,7 +125,7 @@ func run() error {
 
 	serveErr := make(chan error, 1)
 	go func() { serveErr <- srv.Serve(ln) }()
-	logger.Info("api listening", "addr", ln.Addr().String(), "env", cfg.Env)
+	logger.Info("api listening", "addr", ln.Addr().String(), "env", cfg.Env, "version", version.Version)
 
 	select {
 	case err := <-serveErr:

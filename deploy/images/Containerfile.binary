@@ -1,0 +1,29 @@
+# The api and the worker (docs/adr/0014-production-topology.md): one static
+# Go binary each, on distroless, as a non-root user. BINARY names the
+# command; VERSION is stamped into it and shown by /healthz.
+#
+#   podman build -f deploy/images/Containerfile.binary --build-arg BINARY=api .
+
+# Built on the build machine for the target's architecture: Go cross-compiles,
+# so an arm64 image needs no emulation.
+FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.26.1-trixie@sha256:1d414b0376b53ec94b9a2493229adb81df8b90af014b18619732f1ceaaf7234a AS build
+ARG TARGETOS=linux
+ARG TARGETARCH
+ARG BINARY
+ARG VERSION=dev
+WORKDIR /src
+COPY go.mod go.sum ./
+COPY cmd ./cmd
+COPY internal ./internal
+COPY migrations ./migrations
+# Modules and the build cache stay out of the image's layers: go build
+# fetches only the modules this binary needs.
+RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
+    test -n "$BINARY" && CGO_ENABLED=0 GOOS="$TARGETOS" GOARCH="$TARGETARCH" \
+    go build -trimpath -ldflags "-s -w -X github.com/rokumate/ronote/internal/version.Version=$VERSION" \
+    -o /out/ronote "./cmd/$BINARY"
+
+FROM gcr.io/distroless/static-debian13:nonroot@sha256:aafe993665bf6200db38a02c11a9351e782a84b6a45e7f33b6695638c88e3931
+COPY --from=build /out/ronote /ronote
+USER nonroot:nonroot
+ENTRYPOINT ["/ronote"]

@@ -23,6 +23,7 @@ import (
 	"github.com/rokumate/ronote/internal/jobs/riverjobs"
 	"github.com/rokumate/ronote/internal/search"
 	"github.com/rokumate/ronote/internal/store"
+	"github.com/rokumate/ronote/internal/version"
 )
 
 // backfillEvery spaces the backfill's index jobs.
@@ -74,7 +75,7 @@ func run() error {
 	indexer := search.NewIndexer(st, embed.NewClient(cfg.Embed.URL, cfg.Embed.Model), logger)
 	queue.Handle(search.JobKind, indexer.Handle, search.JobOptions)
 	logger.Info("worker started", "kinds", []string{importer.Kind, importer.PDFKind, importer.DeleteBlobsKind, importer.SweepBlobsKind, search.JobKind},
-		"env", cfg.Env, "source_ttl", cfg.SourceTTL.String(), "embed_model", cfg.Embed.Model)
+		"env", cfg.Env, "version", version.Version, "source_ttl", cfg.SourceTTL.String(), "embed_model", cfg.Embed.Model)
 
 	// Leftover blobs are swept now, then daily.
 	if err := cleaner.ScheduleSweep(ctx, 0); err != nil {

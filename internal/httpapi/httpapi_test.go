@@ -35,7 +35,7 @@ func TestRoutes(t *testing.T) {
 		wantCode   gen.ErrorCode
 		wantAllow  string
 	}{
-		{name: "healthz", method: http.MethodGet, target: "/healthz", wantStatus: http.StatusOK, wantBody: `{"status":"ok"}` + "\n"},
+		{name: "healthz", method: http.MethodGet, target: "/healthz", wantStatus: http.StatusOK, wantBody: `{"status":"ok","version":"dev"}` + "\n"},
 		{name: "readyz", method: http.MethodGet, target: "/readyz", wantStatus: http.StatusOK, wantBody: `{"status":"ok"}` + "\n"},
 		{name: "unknown path", method: http.MethodGet, target: "/nope", wantStatus: http.StatusNotFound, wantCode: "not_found"},
 		{

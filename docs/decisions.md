@@ -211,7 +211,7 @@ Recorded in [ADR 0008](adr/0008-in-browser-code-execution.md).
   - blocks share `__main__`, as notebook cells do; a block gives back the repr of its last value; a `>>>` transcript runs a statement at a time, like the REPL;
   - tracebacks start at the reader's code (`<cell n>`, with source lines);
   - the runner page keeps the limits on its own clock and treats what the worker says as untrusted, since the code in the worker shares its realm:
-    - Stop and the 30 s limit set Pyodide's interrupt buffer, and end the session if the run hasn't stopped a second later;
+    - Stop and the 30 s limit set Pyodide's interrupt buffer, and end the session if the run hasn't stopped a second later. The end-to-end tests check Stop by the session surviving, never by wall time (P19a: a 1,000 ms limit failed at 1,321 ms under load): a session that survives was interrupted, and so within that second;
     - output past 1 MB stops the run;
     - a crash or a failed start ends the session and says so;
     - without isolation (Safari), Stop ends the session instead.

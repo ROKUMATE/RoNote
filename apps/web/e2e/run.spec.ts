@@ -40,18 +40,28 @@ test("blocks share one session, and Restart clears it", async ({ page }) => {
   await expect(use.locator(".run-error")).toContainText("NameError: name 'x' is not defined");
 });
 
-test("Stop ends an endless loop within a second", async ({ page }) => {
+// Stop must interrupt Python, not restart it, or x would be gone. A run that
+// ignores the interrupt for a second loses its session (stopGrace), so a
+// session that survives was also stopped within that second.
+test("Stop interrupts an endless loop, and the session keeps its names", async ({ page }) => {
   const blocks = await openPythonPage(page);
-  const loop = blocks.nth(2);
-  await loop.getByRole("button", { name: "Run" }).click();
-  await expect(loop.getByRole("status")).toHaveText("Running…", { timeout: 20_000 });
+  const [define, use, loop] = [blocks.nth(0), blocks.nth(1), blocks.nth(2)];
+  await define.getByRole("button", { name: "Run" }).click();
+  await expect(define.getByRole("status")).toHaveText(/^Ran in /, { timeout: 20_000 });
 
-  await page.waitForTimeout(300);
-  const stopped = Date.now();
+  await loop.getByRole("button", { name: "Run" }).click();
+  // Output from inside the loop: the run is under way, not still on its way.
+  await expect(loop.locator(".run-text")).toContainText("still looping");
   await loop.getByRole("button", { name: "Stop" }).click();
   await expect(loop.getByRole("status")).toHaveText(/^Stopped after /);
-  expect(Date.now() - stopped).toBeLessThan(1000);
-  await expect(loop.getByRole("button", { name: "Run" })).toBeVisible();
+  await expect(loop.locator(".run-error")).toHaveCount(0);
+
+  await use.getByRole("button", { name: "Run" }).click();
+  await expect(use.getByRole("status")).toHaveText(/^Ran in /);
+  await expect(use.locator(".run-text")).toHaveText("42\n");
+  await expect(page.getByText("Stopping restarted Python. Earlier results are gone.")).toHaveCount(
+    0,
+  );
 });
 
 test("output stops at 1 MB, and the page stays responsive", async ({ page }) => {

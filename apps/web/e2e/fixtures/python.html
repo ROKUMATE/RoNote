@@ -11,8 +11,12 @@
 <pre><code class="language-python">print(x + 1)
 </code></pre>
 <h2 id="limits">Limits</h2>
-<pre><code class="language-python">while True:
-    pass
+<pre><code class="language-python">import time
+tick = time.monotonic()
+while True:
+    if time.monotonic() &gt;= tick:
+        print("still looping")
+        tick += 0.2
 </code></pre>
 <pre><code class="language-python">while True:
     print("x" * 999)

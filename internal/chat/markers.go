@@ -4,6 +4,8 @@ import (
 	"regexp"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/rokumate/ronote/internal/store"
 )
 
 var (
@@ -32,4 +34,15 @@ func countMarkers(text string) int {
 		n++
 	}
 	return n
+}
+
+// selfMarkers is the markers counted on a message: only in a reply with no
+// valid citation, where a written [1] stands for a citation that never came.
+// In a cited reply, brackets are the answer's own text, such as a printed
+// list.
+func selfMarkers(c store.MessageContent) int {
+	if len(c.Citations) > 0 {
+		return 0
+	}
+	return countMarkers(text(c))
 }

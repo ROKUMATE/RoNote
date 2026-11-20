@@ -493,7 +493,7 @@ func (s *Service) finish(ctx context.Context, t *turn, owner, conversation uuid.
 		Model: s.o.ModelName, InputTokens: t.usage.InputTokens, OutputTokens: t.usage.OutputTokens,
 		CacheCreationInputTokens: t.usage.CacheCreationInputTokens, CacheReadInputTokens: t.usage.CacheReadInputTokens,
 		CostMicroUSD: s.price.Cost(t.usage), FirstTokenMS: int(t.firstText.Milliseconds()), LatencyMS: int(time.Since(t.start).Milliseconds()),
-		ToolRounds: t.rounds, InvalidCitations: t.cite.invalid, SelfMarkers: countMarkers(text(content)),
+		ToolRounds: t.rounds, InvalidCitations: t.cite.invalid, SelfMarkers: selfMarkers(content),
 	}
 	msg, err := s.o.Store.FinishMessage(saveCtx, owner, t.answer.MessageID, status, content, usage)
 	if err != nil {

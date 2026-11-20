@@ -87,3 +87,20 @@ test("a runner that never answers fails, and its frame goes", async () => {
   await expect(opening).rejects.toThrow("The code runner didn't answer.");
   expect(document.querySelectorAll("iframe")).toHaveLength(1);
 });
+
+test("the runner's origin is the one the page names", () => {
+  const tag = document.createElement("meta");
+  tag.name = "ronote-runner-url";
+  tag.content = "https://ronote-run.test";
+  document.head.append(tag);
+  void openRunner().catch(() => undefined);
+  tag.remove();
+  const opened = document.querySelectorAll("iframe")[1];
+  expect(opened?.src).toBe(`https://ronote-run.test/?app=${encodeURIComponent(location.origin)}`);
+  opened?.remove();
+});
+
+test("with no runner origin, no frame opens and the runner counts as down", async () => {
+  await expect(openRunner("")).rejects.toThrow("The code runner didn't answer.");
+  expect(document.querySelectorAll("iframe")).toHaveLength(1);
+});

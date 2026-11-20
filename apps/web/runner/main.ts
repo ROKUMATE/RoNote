@@ -1,3 +1,4 @@
+import { configuredOrigin } from "../src/origins";
 import { parseRequest, type RunnerEvent } from "../src/runner/protocol";
 import { createSession } from "./session";
 
@@ -6,7 +7,8 @@ import { createSession } from "./session";
  * code from documents away from the app's data
  * (docs/adr/0008-in-browser-code-execution.md), one session per runtime. The
  * app names its origin in the page's URL; the runner talks only to its
- * parent, and only when that origin is one of the app's.
+ * parent, and only when that origin is the app's, as the page's meta tag
+ * names it.
  */
 
 const app = new URLSearchParams(location.search).get("app") ?? "";
@@ -16,7 +18,9 @@ function post(message: RunnerEvent) {
   window.parent.postMessage(message, app);
 }
 
-if (window.parent !== window && import.meta.env.RONOTE_APP_ORIGINS.includes(app)) {
+const appOrigin = configuredOrigin("ronote-app-url");
+
+if (window.parent !== window && appOrigin !== "" && app === appOrigin) {
   const sessions = {
     python: createSession({
       runtime: "python",

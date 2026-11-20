@@ -30,7 +30,7 @@ function writer(stream: "stdout" | "stderr") {
 }
 
 async function start(interrupt: Int32Array | undefined) {
-  const pyodide = await loadPyodide({ indexURL: "/pyodide/" });
+  const pyodide = await loadPyodide({ indexURL: import.meta.env.RONOTE_PYODIDE_URL });
   pyodide.setStdout(writer("stdout"));
   pyodide.setStderr(writer("stderr"));
   if (interrupt) pyodide.setInterruptBuffer(interrupt);

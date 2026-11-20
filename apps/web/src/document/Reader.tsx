@@ -70,6 +70,9 @@ export function Reader({
     ],
     content: toEditor(content),
     immediatelyRender: true,
+    // Its base rules are in styles/prosemirror.css: an injected <style>
+    // element is what the app's CSP refuses.
+    injectCSS: false,
     shouldRerenderOnTransaction: false,
     editorProps: {
       attributes: { "aria-label": "Document text", class: "reader-content" },

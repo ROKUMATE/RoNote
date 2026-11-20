@@ -8,6 +8,7 @@ and gives back each one's verdict.
 """
 
 import linecache
+import sys
 import traceback
 
 import __main__
@@ -85,6 +86,17 @@ def check(source):
 async def run(source, mode):
     """Runs source as mode says (exec, doctest or check); returns (repr of the
     last value or None, traceback or None, the examples checked or None)."""
+    try:
+        return await _run(source, mode)
+    finally:
+        # What the run left in Python's buffers, such as a line without its
+        # newline or one a Stop cut short, is its own output, never the next
+        # run's.
+        sys.stdout.flush()
+        sys.stderr.flush()
+
+
+async def _run(source, mode):
     if mode == "check":
         try:
             return None, None, check(source)

@@ -212,6 +212,18 @@ test("Python runs blocks in one session, and Restart clears it", async ({ page }
   ]);
 });
 
+test("a run's output is its own, even a line it left unfinished", async ({ page }) => {
+  await openRunner(page);
+  expect(shown(await run(page, "print('no newline', end='')"))).toEqual([
+    { type: "stdout", text: "no newline" },
+    { type: "done", end: "ok" },
+  ]);
+  expect(shown(await run(page, "print('next')"))).toEqual([
+    { type: "stdout", text: "next\n" },
+    { type: "done", end: "ok" },
+  ]);
+});
+
 test("a traceback starts at the reader's code, and a transcript runs like the REPL", async ({
   page,
 }) => {

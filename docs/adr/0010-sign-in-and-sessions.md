@@ -45,7 +45,7 @@ Until P15 every `/api/v1` request acted as one dev user, `RONOTE_DEV_USER_EMAIL`
     - The documents quota sends no `Retry-After`: waiting frees nothing.
   - **Rate limits** (`rate_limited`): 120 API requests per user per minute, the import event stream excluded, and 20 auth requests per client IP per minute.
     - They count in memory, per API process, in fixed one-minute windows. A second API process needs a shared store first (`docs/open-questions.md`).
-    - The client IP is the connection's `RemoteAddr`. Trusting a proxy's headers comes with the deployment, P19.
+    - The client IP is the connection's `RemoteAddr`, unless that is a proxy in `RONOTE_TRUSTED_PROXIES`: then it is the first hop of `X-Forwarded-For`, read from its end, that no trusted proxy added (ADR 0014). A header from anyone else is ignored.
   - Defaults live in config (`RONOTE_LIMIT_*`).
 - **Every route bounds its request body**, answering 413 `body_too_large` past it:
   - 8 MiB for saving a document, whose source page may be up to 5 MB;

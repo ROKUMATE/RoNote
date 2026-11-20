@@ -20,10 +20,10 @@ var validRequestID = regexp.MustCompile(`^[A-Za-z0-9._-]{1,64}$`)
 
 type requestIDKey struct{}
 
-// withMiddleware wraps h in request ID, access log and panic recovery,
-// outermost first.
-func withMiddleware(logger *slog.Logger, h http.Handler) http.Handler {
-	return withRequestID(withAccessLog(logger, withRecovery(logger, h)))
+// withMiddleware wraps h in request ID, client IP, access log and panic
+// recovery, outermost first.
+func withMiddleware(logger *slog.Logger, proxies Proxies, h http.Handler) http.Handler {
+	return withRequestID(withClientIP(proxies, withAccessLog(logger, withRecovery(logger, h))))
 }
 
 // withRequestID keeps a valid incoming X-Request-ID or generates a new one,
@@ -61,6 +61,7 @@ func withAccessLog(logger *slog.Logger, next http.Handler) http.Handler {
 			slog.Int("status", status),
 			slog.Float64("duration_ms", durationMS(time.Since(start))),
 			slog.String("request_id", requestID(r.Context())),
+			slog.String("client_ip", clientIPFrom(r.Context())),
 		)
 	})
 }

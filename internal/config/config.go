@@ -8,11 +8,13 @@ import (
 	"io"
 	"log/slog"
 	"net"
+	"net/netip"
 	"net/url"
 	"slices"
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 )
 
 // Env is the deployment environment the service runs in.
@@ -43,6 +45,10 @@ type Config struct {
 	PublicURL string
 	// GitHub is the OAuth app people sign in with.
 	GitHub GitHub
+	// TrustedProxies are the networks whose X-Forwarded-For says which
+	// client a request is from: Caddy's in production, none by default
+	// (docs/adr/0014-production-topology.md).
+	TrustedProxies []netip.Prefix
 	// Limits bound what one user, or one IP, may do.
 	Limits Limits
 	// Embed is the embedder search uses.
@@ -173,6 +179,10 @@ func Load(getenv func(string) string) (Config, error) {
 	check("RONOTE_LOG_LEVEL", err)
 	dbURL := getenv("RONOTE_DATABASE_URL")
 	check("RONOTE_DATABASE_URL", validateDatabaseURL(dbURL))
+	proxies, proxyErrs := parseProxies(getenv("RONOTE_TRUSTED_PROXIES"))
+	for _, err := range proxyErrs {
+		check("RONOTE_TRUSTED_PROXIES", err)
+	}
 	allowPrivate, err := parseAllowPrivate(getenv("RONOTE_FETCH_ALLOW_PRIVATE"), env)
 	check("RONOTE_FETCH_ALLOW_PRIVATE", err)
 	ttl, err := parseTTL(withDefault(getenv("RONOTE_SOURCE_TTL"), defaultSourceTTL))
@@ -226,6 +236,7 @@ func Load(getenv func(string) string) (Config, error) {
 		HTTPAddr:                  addr,
 		LogLevel:                  level,
 		DatabaseURL:               dbURL,
+		TrustedProxies:            proxies,
 		FetchAllowPrivateNetworks: allowPrivate,
 		SourceTTL:                 ttl,
 		PublicURL:                 publicURL,
@@ -428,6 +439,29 @@ func validateAddr(s string) error {
 		return fmt.Errorf("%q has port %q; want 1-65535", s, port)
 	}
 	return nil
+}
+
+// parseProxies reads networks and addresses, separated by commas or
+// spaces; an address is a network of one. Each bad one is its own error.
+func parseProxies(s string) ([]netip.Prefix, []error) {
+	var nets []netip.Prefix
+	var errs []error
+	for _, field := range strings.FieldsFunc(s, func(r rune) bool { return r == ',' || unicode.IsSpace(r) }) {
+		if a, err := netip.ParseAddr(field); err == nil {
+			nets = append(nets, netip.PrefixFrom(a, a.BitLen()))
+			continue
+		}
+		n, err := netip.ParsePrefix(field)
+		switch {
+		case err != nil:
+			errs = append(errs, fmt.Errorf("%q is not a CIDR or an IP", field))
+		case n != n.Masked():
+			errs = append(errs, fmt.Errorf("%q has host bits set; want %s", field, n.Masked()))
+		default:
+			nets = append(nets, n)
+		}
+	}
+	return nets, errs
 }
 
 // DatabaseURL is RONOTE_DATABASE_URL, checked as Load checks it, for a

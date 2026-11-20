@@ -157,6 +157,8 @@ func run() error {
 		Cookies:   auth.Cookies{Secure: cfg.Env.Deployed()},
 		PublicURL: cfg.PublicURL,
 		Limits:    httpapi.Limits{APIPerMinute: cfg.Limits.APIPerMinute, AuthPerMinute: cfg.Limits.AuthPerMinute},
+		// Behind Caddy, its X-Forwarded-For names the client.
+		TrustedProxies: cfg.TrustedProxies,
 		// Scores help tune search in dev and test; people don't need them.
 		Searcher:   searcher,
 		ShowScores: !cfg.Env.Deployed(),

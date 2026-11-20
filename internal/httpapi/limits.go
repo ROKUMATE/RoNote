@@ -3,7 +3,6 @@ package httpapi
 import (
 	"errors"
 	"math"
-	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -39,16 +38,10 @@ func newLimiters(l Limits) limiters {
 	return lim
 }
 
-// byIP limits requests per client IP: the connection's, since no proxy's
-// headers are trusted yet.
+// byIP limits requests per client IP: the connection's, or behind a
+// trusted proxy the one it forwards for (withClientIP).
 func (l limiters) byIP(next http.Handler) http.Handler {
-	return limit(l.perIP, func(r *http.Request) string {
-		host, _, err := net.SplitHostPort(r.RemoteAddr)
-		if err != nil {
-			return r.RemoteAddr
-		}
-		return host
-	}, next)
+	return limit(l.perIP, func(r *http.Request) string { return clientIPFrom(r.Context()) }, next)
 }
 
 // byUser limits a signed-in user's requests, the import event stream

@@ -82,7 +82,7 @@ func TestRecovery(t *testing.T) {
 
 			var logs bytes.Buffer
 			logger := slog.New(slog.NewJSONHandler(&logs, nil))
-			rec := record(withMiddleware(logger, tt.handler), newRequest(t, http.MethodGet, "/"))
+			rec := record(withMiddleware(logger, nil, tt.handler), newRequest(t, http.MethodGet, "/"))
 
 			if rec.Code != tt.wantStatus {
 				t.Errorf("status = %d, want %d", rec.Code, tt.wantStatus)
@@ -114,7 +114,7 @@ func TestRecovery(t *testing.T) {
 func TestRecoveryReraisesErrAbortHandler(t *testing.T) {
 	t.Parallel()
 
-	h := withMiddleware(discardLogger, http.HandlerFunc(func(http.ResponseWriter, *http.Request) {
+	h := withMiddleware(discardLogger, nil, http.HandlerFunc(func(http.ResponseWriter, *http.Request) {
 		panic(http.ErrAbortHandler)
 	}))
 	defer func() {

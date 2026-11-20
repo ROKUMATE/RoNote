@@ -46,6 +46,9 @@ type Options struct {
 	PublicURL string
 	// Limits are the rate limits.
 	Limits Limits
+	// TrustedProxies may say, in X-Forwarded-For, which client a request
+	// is from.
+	TrustedProxies Proxies
 	// Searcher searches users' libraries; ShowScores puts each result's
 	// scores in the answer, in dev and test.
 	Searcher   Searcher
@@ -66,7 +69,7 @@ func New(o Options) http.Handler {
 	mux.Handle("GET /api/v1/auth/github/start", protect(lim.byIP(limitBody(signInStart(o)))))
 	mux.Handle("GET /api/v1/auth/github/callback", protect(lim.byIP(limitBody(signInCallback(o)))))
 	mux.Handle("/api/v1/", protect(requireSession(o, lim.byUser(limitBody(chatOff(o.Chat, router{mux: apiRoutes(o, lim)}))))))
-	return withMiddleware(o.Logger, router{mux: mux})
+	return withMiddleware(o.Logger, o.TrustedProxies, router{mux: mux})
 }
 
 // crossOrigin returns what wraps every /api route: Go's CSRF protection,

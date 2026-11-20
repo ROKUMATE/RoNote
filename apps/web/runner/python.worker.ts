@@ -1,6 +1,7 @@
 import { loadPyodide } from "pyodide";
 import type { RunnerEvent } from "../src/runner/protocol";
 import cells from "./cells.py?raw";
+import { type Control, claim, interruptBuffer } from "./control";
 import { createOutput } from "./output";
 import type { ToWorker } from "./session";
 
@@ -29,15 +30,15 @@ function writer(stream: "stdout" | "stderr") {
   };
 }
 
-async function start(interrupt: Int32Array | undefined) {
+async function start(control: Control | undefined) {
   const pyodide = await loadPyodide({ indexURL: import.meta.env.RONOTE_PYODIDE_URL });
   pyodide.setStdout(writer("stdout"));
   pyodide.setStderr(writer("stderr"));
-  if (interrupt) pyodide.setInterruptBuffer(interrupt);
+  if (control) pyodide.setInterruptBuffer(interruptBuffer(control));
   const scope = pyodide.globals.get("dict")();
   pyodide.runPython(cells, { globals: scope, filename: "cells.py" });
   post({ v: 1, type: "ready", runtime: "python" });
-  return { run: scope.get("run"), interrupt };
+  return { run: scope.get("run"), control };
 }
 
 /**
@@ -57,7 +58,7 @@ let runs = Promise.resolve();
 self.onmessage = (message: MessageEvent<ToWorker>) => {
   const request = message.data;
   if (request.type === "init") {
-    python = start(request.interrupt);
+    python = start(request.control);
     python.catch(fail);
     return;
   }
@@ -65,8 +66,11 @@ self.onmessage = (message: MessageEvent<ToWorker>) => {
     const started = performance.now();
     const { id } = request;
     try {
-      const { run, interrupt } = await (python ?? Promise.reject(new Error("not started")));
-      if (interrupt) interrupt[0] = 0;
+      const { run, control } = await (python ?? Promise.reject(new Error("not started")));
+      if (!claim(control)) {
+        post({ v: 1, type: "done", id, ms: 0, end: "cancelled" });
+        return;
+      }
       output.start(id);
       const outcome = await run(request.code, request.mode);
       const [value, error, examples] = outcome.toJs();

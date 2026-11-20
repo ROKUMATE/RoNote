@@ -64,6 +64,41 @@ test("Stop interrupts an endless loop, and the session keeps its names", async (
   );
 });
 
+test("Stop pressed as the run is sent stops it, and the session keeps its names", async ({
+  page,
+}) => {
+  const blocks = await openPythonPage(page);
+  const [define, use, loop] = [blocks.nth(0), blocks.nth(1), blocks.nth(2)];
+  await define.getByRole("button", { name: "Run" }).click();
+  await expect(define.getByRole("status")).toHaveText(/^Ran in /, { timeout: 20_000 });
+
+  // Run, then Stop as soon as it shows, before the next task: the Stop
+  // reaches the runner before its worker can have started the run.
+  await loop.evaluate(async (block) => {
+    const button = (name: string) =>
+      [...block.querySelectorAll("button")].find((b) => b.textContent === name);
+    await new Promise<void>((resolve) => {
+      const shown = new MutationObserver(() => {
+        if (!button("Stop")) return;
+        shown.disconnect();
+        resolve();
+      });
+      shown.observe(block, { subtree: true, childList: true, characterData: true });
+      button("Run")?.click();
+    });
+    button("Stop")?.click();
+  });
+  await expect(loop.getByRole("status")).toHaveText(/^Stopped (after |before it started$)/);
+  await expect(loop.locator(".run-error")).toHaveCount(0);
+
+  await use.getByRole("button", { name: "Run" }).click();
+  await expect(use.getByRole("status")).toHaveText(/^Ran in /);
+  await expect(use.locator(".run-text")).toHaveText("42\n");
+  await expect(page.getByText("Stopping restarted Python. Earlier results are gone.")).toHaveCount(
+    0,
+  );
+});
+
 test("output stops at 1 MB, and the page stays responsive", async ({ page }) => {
   const blocks = await openPythonPage(page);
   const flood = blocks.nth(3);

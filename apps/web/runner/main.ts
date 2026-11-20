@@ -28,17 +28,18 @@ if (window.parent !== window && appOrigin !== "" && app === appOrigin) {
         new Worker(new URL("./python.worker.ts", import.meta.url), {
           type: "module",
         }),
-      interruptible: crossOriginIsolated,
+      isolated: crossOriginIsolated,
       post,
     }),
-    // Stop ends a JavaScript session: nothing interrupts a busy JS worker.
+    // Stop ends a JavaScript session running code: nothing interrupts a busy
+    // JS worker.
     javascript: createSession({
       runtime: "javascript",
       spawn: () =>
         new Worker(new URL("./javascript.worker.ts", import.meta.url), {
           type: "module",
         }),
-      interruptible: false,
+      isolated: crossOriginIsolated,
       post,
     }),
   };
@@ -57,7 +58,7 @@ if (window.parent !== window && appOrigin !== "" && app === appOrigin) {
         sessions[request.runtime].warm();
         break;
       case "stop":
-        sessions[request.runtime].stop();
+        sessions[request.runtime].stop(request.id);
         break;
       case "restart":
         sessions[request.runtime].restart();

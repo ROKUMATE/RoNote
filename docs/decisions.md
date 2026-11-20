@@ -212,6 +212,7 @@ Recorded in [ADR 0008](adr/0008-in-browser-code-execution.md).
   - tracebacks start at the reader's code (`<cell n>`, with source lines);
   - the runner page keeps the limits on its own clock and treats what the worker says as untrusted, since the code in the worker shares its realm:
     - Stop and the 30 s limit set Pyodide's interrupt buffer, and end the session if the run hasn't stopped a second later. The end-to-end tests check Stop by the session surviving, never by wall time (P19a: a 1,000 ms limit failed at 1,321 ms under load): a session that survives was interrupted, and so within that second;
+    - Stop names its run (since P19a): a waiting run is dropped, and one the worker hasn't started is cancelled ("Stopped before it started") and keeps the session, in both runtimes. The session and its worker share a run-state word (`runner/control.ts`) that Stop and the worker's start each claim by compare-and-swap, and only the session resets it and the interrupt signal, when it sends a run. The worker used to clear the signal as it started a run, which lost a Stop sent just before: the session ended a second later with its state;
     - output past 1 MB stops the run;
     - a crash or a failed start ends the session and says so;
     - without isolation (Safari), Stop ends the session instead.

@@ -5,6 +5,7 @@ import {
   type RunnerRequest,
   type Runtime,
 } from "../src/runner/protocol";
+import { type Control, cancel, createControl, interrupt, sending } from "./control";
 
 /*
  * One session of a runtime: a worker running it, the runs waiting for it,
@@ -18,7 +19,7 @@ type Run = Extract<RunnerRequest, { type: "run" }>;
 
 /** What the session sends its worker. */
 export type ToWorker =
-  | { type: "init"; interrupt: Int32Array | undefined }
+  | { type: "init"; control: Control | undefined }
   | { type: "run"; id: string; code: string; mode: Run["mode"] };
 
 /** What the session needs of a worker; the test seam. */
@@ -33,24 +34,29 @@ export type SessionOptions = {
   runtime: Runtime;
   /** Starts a worker that runs the runtime. */
   spawn: () => RuntimeWorker;
-  /** Whether Stop can interrupt the code, through a shared buffer, rather than end the session. */
-  interruptible: boolean;
+  /**
+   * Whether the page is cross-origin isolated, so the session shares memory
+   * with its worker (./control.ts): then Stop cancels a run the worker
+   * hasn't started, and interrupts running Python, rather than end the
+   * session.
+   */
+  isolated: boolean;
   /** Sends an event to the app. */
   post: (event: RunnerEvent) => void;
 };
 
-export function createSession({ runtime, spawn, interruptible, post }: SessionOptions) {
-  let worker:
-    | { thread: RuntimeWorker; interrupt: Int32Array | undefined; ready: boolean }
-    | undefined;
+export function createSession({ runtime, spawn, isolated, post }: SessionOptions) {
+  let worker: { thread: RuntimeWorker; control: Control | undefined; ready: boolean } | undefined;
   const waiting: Run[] = [];
-  let current: (Run & { limits: RunLimits; stopped?: Stopped; grace?: number }) | undefined;
+  let current:
+    | (Run & { limits: RunLimits; stopped?: Stopped; cancelled?: boolean; grace?: number })
+    | undefined;
 
   function start() {
     post({ v: 1, type: "starting", runtime });
     const thread = spawn();
-    const interrupt = interruptible ? new Int32Array(new SharedArrayBuffer(4)) : undefined;
-    const started = { thread, interrupt, ready: false };
+    const control = isolated ? createControl() : undefined;
+    const started = { thread, control, ready: false };
     worker = started;
     thread.onmessage = (message) => {
       if (worker === started) heard(message.data);
@@ -59,7 +65,7 @@ export function createSession({ runtime, spawn, interruptible, post }: SessionOp
       error.preventDefault();
       if (worker === started) end(started.ready ? "crash" : "failed");
     };
-    thread.postMessage({ type: "init", interrupt });
+    thread.postMessage({ type: "init", control });
   }
 
   /** Starts the next waiting run, if none is in progress. */
@@ -70,6 +76,7 @@ export function createSession({ runtime, spawn, interruptible, post }: SessionOp
     if (!worker) start();
     current = { ...run, limits: limitRun(() => stop("timeout")) };
     if (worker?.ready) current.limits.start();
+    if (worker?.control) sending(worker.control);
     worker?.thread.postMessage({ type: "run", id: run.id, code: run.code, mode: run.mode });
   }
 
@@ -108,7 +115,12 @@ export function createSession({ runtime, spawn, interruptible, post }: SessionOp
         return;
       }
       case "done":
-        finish(current.stopped ?? (event.end === "error" ? "error" : "ok"));
+        // The session knows whether it cancelled the run; the worker only says it skipped it.
+        finish(
+          current.cancelled
+            ? "cancelled"
+            : (current.stopped ?? (event.end === "error" ? "error" : "ok")),
+        );
         next();
     }
   }
@@ -121,16 +133,24 @@ export function createSession({ runtime, spawn, interruptible, post }: SessionOp
     current = undefined;
   }
 
-  /** Stops the current run: interrupts it if it can, else ends the session. */
+  /**
+   * Stops the current run: cancels it if the worker hasn't started it,
+   * interrupts it if it is Python, and else ends the session. A worker that
+   * doesn't answer within stopGrace loses its session.
+   */
   function stop(why: Stopped) {
     if (!current || current.stopped) return;
     current.stopped = why;
-    if (worker?.interrupt && worker.ready) {
-      Atomics.store(worker.interrupt, 0, 2);
-      current.grace = setTimeout(() => end("stop"), stopGrace);
+    const control = worker?.ready ? worker.control : undefined;
+    if (control && cancel(control)) {
+      current.cancelled = true;
+    } else if (control && runtime === "python") {
+      interrupt(control);
     } else {
       end("stop");
+      return;
     }
+    current.grace = setTimeout(() => end("stop"), stopGrace);
   }
 
   /** Ends the session, and the run in it; the next run starts a new one. */
@@ -142,11 +162,14 @@ export function createSession({ runtime, spawn, interruptible, post }: SessionOp
     next();
   }
 
-  /** Drops the runs waiting, each told it stopped. */
+  /** Tells the app run id was stopped before it started. */
+  function cancelled(id: string) {
+    post({ v: 1, type: "done", id, ms: 0, end: "cancelled" });
+  }
+
+  /** Drops the runs waiting. */
   function drop() {
-    for (const run of waiting.splice(0)) {
-      post({ v: 1, type: "done", id: run.id, ms: 0, end: "stop" });
-    }
+    for (const run of waiting.splice(0)) cancelled(run.id);
   }
 
   return {
@@ -158,9 +181,15 @@ export function createSession({ runtime, spawn, interruptible, post }: SessionOp
     warm() {
       if (!worker) start();
     },
-    stop() {
-      drop();
-      stop("stop");
+    /** Stops run id: drops it while it waits, stops it while it runs, and does nothing once it's over. */
+    stop(id: string) {
+      const at = waiting.findIndex((run) => run.id === id);
+      if (at !== -1) {
+        waiting.splice(at, 1);
+        cancelled(id);
+      } else if (current?.id === id) {
+        stop("stop");
+      }
     },
     restart() {
       drop();

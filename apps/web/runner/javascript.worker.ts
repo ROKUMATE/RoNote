@@ -1,4 +1,5 @@
 import type { RunnerEvent } from "../src/runner/protocol";
+import { type Control, claim } from "./control";
 import { declare, type Insert, place, prepare } from "./evaluate";
 import { formatLog, formatResult, formatValue, type Place } from "./format";
 import { createOutput } from "./output";
@@ -164,12 +165,17 @@ async function run(id: string, code: string) {
 }
 
 let runs = Promise.resolve();
+let control: Control | undefined;
 
 self.addEventListener("message", (message: MessageEvent<ToWorker>) => {
   const request = message.data;
   if (request.type === "init") {
+    control = request.control;
     post({ v: 1, type: "ready", runtime: "javascript" });
     return;
   }
-  runs = runs.then(() => run(request.id, request.code));
+  runs = runs.then(() => {
+    if (claim(control)) return run(request.id, request.code);
+    post({ v: 1, type: "done", id: request.id, ms: 0, end: "cancelled" });
+  });
 });

@@ -1,6 +1,10 @@
 package chat
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/rokumate/ronote/internal/store"
+)
 
 func TestCountMarkers(t *testing.T) {
 	t.Parallel()
@@ -31,5 +35,21 @@ func TestCountMarkers(t *testing.T) {
 				t.Errorf("countMarkers(%q) = %d, want %d", tt.text, got, tt.want)
 			}
 		})
+	}
+}
+
+// p11's answer in the chat eval prints Python lists; it cites the page, so
+// they are output, not markers. The same text with no citation counts them.
+func TestSelfMarkersCountOnlyInUnsourcedReplies(t *testing.T) {
+	t.Parallel()
+	const p11 = "This prints [1], then [1, 2], then [1, 2, 3]."
+	segments := []store.Segment{{Text: p11, Citations: []int{1}}}
+	cited := store.MessageContent{Segments: segments, Citations: []store.Citation{{N: 1}}}
+	if got := selfMarkers(cited); got != 0 {
+		t.Errorf("cited reply: %d markers, want 0", got)
+	}
+	unsourced := store.MessageContent{Segments: segments}
+	if got := selfMarkers(unsourced); got != 3 {
+		t.Errorf("unsourced reply: %d markers, want 3", got)
 	}
 }

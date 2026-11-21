@@ -197,3 +197,46 @@ func TestAsRonoteGivesRonoteItsOwnHome(t *testing.T) {
 		t.Errorf("as ronote, HOME and XDG_CONFIG_HOME are %q; want %q", got, want)
 	}
 }
+
+// Production gives every unit fifteen minutes to start (an image pull and a
+// health check on a small host); only CI's drop-in shortens it.
+func TestProductionUnitsHaveFifteenMinutesToStart(t *testing.T) {
+	t.Parallel()
+	for _, path := range glob(t, "quadlet/*.container") {
+		if got := readUnit(t, path)["Service"]["TimeoutStartSec"]; !slices.Equal(got, []string{"900"}) {
+			t.Errorf("%s: TimeoutStartSec = %q, want 900", path, got)
+		}
+	}
+}
+
+// A saved image keeps no digest reference, so in CI a unit pinning a third-
+// party image would pull it. Its drop-in names the local tag make
+// prod-config gives it, from the unit's own pin, which stays.
+func TestCIThirdPartyImagesAreTheUnitsOwn(t *testing.T) {
+	t.Parallel()
+	makefile, err := os.ReadFile("../Makefile")
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := regexp.MustCompile(`(?m)^CI_THIRD_PARTY = (.*)$`).FindSubmatch(makefile)
+	if m == nil {
+		t.Fatal("no CI_THIRD_PARTY in the Makefile")
+	}
+	want := strings.Fields(string(m[1]))
+	var got []string
+	for _, path := range ciUnits("*.container.d/image.conf") {
+		name := strings.TrimSuffix(strings.TrimPrefix(filepath.Base(filepath.Dir(path)), "ronote-"), ".container.d")
+		got = append(got, name)
+		if image := readUnit(t, path).container("Image"); !slices.Equal(image, []string{"localhost/ronote-ci/" + name + ":pinned"}) {
+			t.Errorf("%s: Image = %q, want localhost/ronote-ci/%s:pinned", path, image, name)
+		}
+		if pin := readUnit(t, filepath.Join("quadlet", "ronote-"+name+".container")).container("Image"); len(pin) != 1 || !strings.Contains(pin[0], "@sha256:") {
+			t.Errorf("ronote-%s.container: Image = %q, want a digest pin", name, pin)
+		}
+	}
+	slices.Sort(got)
+	slices.Sort(want)
+	if !slices.Equal(got, want) {
+		t.Errorf("drop-ins give local names to %q, the Makefile tags %q", got, want)
+	}
+}

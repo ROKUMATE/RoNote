@@ -28,7 +28,7 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts and ronote-deploy
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts, ronote-deploy and bootstrap's firewall rules
 	PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s deploy/pdftext -t deploy/pdftext
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
@@ -42,6 +42,7 @@ hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the docto
 	sh scripts/test-backup.sh
 	sh scripts/test-alerts.sh
 	sh scripts/test-deploy.sh
+	sh scripts/test-open-web-ports.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
@@ -313,8 +314,10 @@ prod-config: images
 	rm -f bin/ronote-images.tar
 	podman save --multi-image-archive -o bin/ronote-images.tar $(IMAGES) $(CI_TAGS)
 
-prod-ci: prod-config ## Install the production units with the fakes on this Linux host (sudo), and check only 80 and 443 answer
-	sudo env $(CI_INSTALL_ENV) sh deploy/install.sh --version $(IMAGE_TAG) --config $(PROD_CONFIG) --drop-ins deploy/quadlet/ci --images bin/ronote-images.tar --skip-model
+prod-ci: prod-config ## Bootstrap this Ubuntu 26.04 host and install the production units with the fakes (sudo), and check only 80 and 443 answer
+	rm -f bin/ci-deploy-key bin/ci-deploy-key.pub
+	ssh-keygen -q -t ed25519 -N '' -C ronote-ci -f bin/ci-deploy-key
+	sudo env $(CI_INSTALL_ENV) sh deploy/bootstrap.sh --deploy-key bin/ci-deploy-key.pub -- --version $(IMAGE_TAG) --config $(PROD_CONFIG) --drop-ins deploy/quadlet/ci --images bin/ronote-images.tar --skip-model
 	sudo sh deploy/as-ronote.sh podman exec ronote-caddy cat /caddy/data/caddy/pki/authorities/local/intermediate.crt > $(SMOKE_CA)
 	sh deploy/check-ports.sh 127.0.0.1 $$(hostname -I | cut -d' ' -f1)
 

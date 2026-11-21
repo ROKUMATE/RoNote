@@ -6,7 +6,7 @@ Every make target and what it runs, in detail. AGENTS.md keeps one line each.
 |---|---|
 | `make help` | list targets (default target) |
 | `make setup` | point git at `.githooks`, make the hook executable, set `pull.rebase true`; run once per clone |
-| `make hooks-test` | test the commit message hook (normal and strict mode), `scripts/check-commits.sh`, the clock check of `scripts/container.sh` (against fake `podman`, `docker` and `date`), and `scripts/run.sh` with `scripts/stop.sh`, `scripts/check-doc-sizes.sh`, `deploy/check-environment.sh` (against made-up `show-environment` output), and `deploy/report-failed.sh` (against a fake runner); and pdftext's line and column arithmetic (`deploy/pdftext`, plain `python3`) |
+| `make hooks-test` | test the commit message hook (normal and strict mode), `scripts/check-commits.sh`, the clock check of `scripts/container.sh` (against fake `podman`, `docker` and `date`), and `scripts/run.sh` with `scripts/stop.sh`, `scripts/check-doc-sizes.sh`, `deploy/check-environment.sh` (against made-up `show-environment` output), and `deploy/report-failed.sh` (against a fake runner), the backup and the restore drill (`deploy/backup/`, against a fake podman: the steps, the retention, a failed count or table, and no secret in any argument or output); and pdftext's line and column arithmetic (`deploy/pdftext`, plain `python3`) |
 | `make check-commits RANGE=main..HEAD` | check every commit message in `RANGE` in strict mode; in CI the event sets the range (`scripts/commit-range.sh`). `scripts/check-commits.sh` exits 0 when all pass, 1 when any is bad (report on stderr), 2 on a usage or internal error |
 | `make tools` | install the pinned golangci-lint into `./bin` |
 | `make check` | `lint`, `test`, `test-perf`, `hooks-test` and `units-check`: what CI's fast jobs run. Run it before pushing |
@@ -62,6 +62,7 @@ Every make target and what it runs, in detail. AGENTS.md keeps one line each.
 | `make sqlc` | regenerate `internal/store/sqlcdb` from `migrations/` and `internal/store/queries/`; commit the result |
 | `make runner-pages APP_URL=https://…` | the runner's Cloudflare Pages site in `apps/web/dist-pages`, from `make web-build`'s runner: `index.html` names the app, `_headers` comes from `apps/web/runner-headers.ts`, and every file is checked for exactly one CSP |
 | `make runner-deploy` | release only: `wrangler pages deploy apps/web/dist-pages` to the project `CLOUDFLARE_PAGES_PROJECT`, with `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; installs wrangler from `deploy/pages`'s own lockfile |
+| `make backup-now` / `restore-drill` | on a host `install.sh` set up (sudo): `deploy/run-now.sh` starts `ronote-backup@db` and `ronote-backup@pdfs`, or `ronote-restore-drill`, as their timers would, and prints what each said; fails if one does (docs/adr/0015-operations.md) |
 | `make generate` | regenerate everything generated: sqlc output, then `internal/httpapi/gen` (oapi-codegen) and `apps/web/src/api/schema.d.ts` (openapi-typescript) from `api/openapi.yaml`, and `deploy/caddy/runner.caddy` from `apps/web/runner-headers.ts`; commit the result. Needs Node as well as Go |
 | `make check-generated` | `make generate`, then fail if the output differs from what is committed |
 | `make check-go-version` | print the Go toolchain and fail unless it is go.mod's `toolchain` |

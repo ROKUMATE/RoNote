@@ -2,8 +2,10 @@ package store
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/pgvector/pgvector-go"
 
 	"github.com/rokumate/ronote/internal/store/sqlcdb"
@@ -125,4 +127,17 @@ func (s *Store) SearchChunks(ctx context.Context, q SearchQuery) ([]SearchHit, e
 		return nil, mapErr("search chunks", err)
 	}
 	return hits, nil
+}
+
+// ChunkToSearch is the newest chunk's owner and a word it is indexed by,
+// for the restore drill's search; found is false when nothing is indexed.
+func (s *Store) ChunkToSearch(ctx context.Context) (owner uuid.UUID, word string, found bool, err error) {
+	row, err := s.q.ChunkToSearch(ctx)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return uuid.Nil, "", false, nil
+	}
+	if err != nil {
+		return uuid.Nil, "", false, mapErr("chunk to search", err)
+	}
+	return row.OwnerID, row.Word, true, nil
 }

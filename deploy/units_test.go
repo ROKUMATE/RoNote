@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -255,5 +256,43 @@ func TestHealthChecksNeedNoQuotingQuadletMangles(t *testing.T) {
 				t.Errorf("%s: HealthCmd = %s; write it as a JSON array, or without double quotes", path, cmd)
 			}
 		}
+	}
+}
+
+// The units' memory is ADR 0014's budget for the 12 GB host, which leaves
+// it at least 2 GB with every long-running unit at its limit, and no unit
+// asks for more than the host's 2 CPUs.
+func TestUnitsFitTheHost(t *testing.T) {
+	t.Parallel()
+	budget := map[string]int{
+		"ronote-caddy": 128, "ronote-api": 512, "ronote-worker": 512, "ronote-postgres": 2048,
+		"ronote-ollama": 2048, "ronote-docling": 4096, "ronote-pdftext": 512, "ronote-seaweedfs": 384,
+	}
+	limit := regexp.MustCompile(`--memory=(\d+)([mg]) --cpus=([\d.]+)`)
+	total := 0
+	for _, path := range glob(t, "quadlet/*.container") {
+		u := readUnit(t, path)
+		m := limit.FindStringSubmatch(strings.Join(u.container("PodmanArgs"), " "))
+		if m == nil {
+			t.Fatalf("%s: no --memory and --cpus in PodmanArgs", path)
+		}
+		mb, _ := strconv.Atoi(m[1])
+		if m[2] == "g" {
+			mb *= 1024
+		}
+		if cpus, _ := strconv.ParseFloat(m[3], 64); cpus > 2 {
+			t.Errorf("%s: --cpus=%s, more than the host's 2", path, m[3])
+		}
+		if slices.Equal(u["Service"]["Type"], []string{"oneshot"}) {
+			continue
+		}
+		name := strings.TrimSuffix(filepath.Base(path), ".container")
+		if want, ok := budget[name]; !ok || mb != want {
+			t.Errorf("%s: --memory is %d MB, ADR 0014's budget is %d MB", path, mb, want)
+		}
+		total += mb
+	}
+	if total > 10*1024 {
+		t.Errorf("the long-running units take %d MB, leaving the 12 GB host under 2 GB", total)
 	}
 }

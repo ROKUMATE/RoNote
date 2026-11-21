@@ -25,7 +25,7 @@ Secret=ronote-pdftext-api-key,type=env,target=RONOTE_PDFTEXT_API_KEY
 ReadOnly=true
 NoNewPrivileges=true
 DropCapability=ALL
-PodmanArgs=--memory=384m --cpus=1
+PodmanArgs=--memory=512m --cpus=1
 # A JSON array runs without a shell, which distroless has none of.
 HealthCmd=["/ronote", "healthcheck", "http://127.0.0.1:8080/healthz"]
 HealthInterval=10s

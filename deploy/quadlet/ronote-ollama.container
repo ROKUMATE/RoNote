@@ -14,7 +14,7 @@ ReadOnly=true
 ReadOnlyTmpfs=true
 NoNewPrivileges=true
 DropCapability=ALL
-PodmanArgs=--memory=1536m --cpus=2
+PodmanArgs=--memory=2g --cpus=2
 HealthCmd=ollama list
 HealthInterval=15s
 HealthStartPeriod=60s

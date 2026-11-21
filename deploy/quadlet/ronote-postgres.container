@@ -19,7 +19,7 @@ DropCapability=ALL
 # own user.
 AddCapability=CHOWN DAC_OVERRIDE FOWNER SETGID SETUID
 ShmSize=256m
-PodmanArgs=--memory=1g --cpus=1
+PodmanArgs=--memory=2g --cpus=1
 HealthCmd=pg_isready -U ronote -d ronote
 HealthInterval=10s
 HealthStartPeriod=60s

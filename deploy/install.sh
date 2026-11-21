@@ -223,6 +223,11 @@ services=
 for f in "$units"/ronote-*.container; do
 	services="$services $(basename "$f" .container).service"
 done
+# systemd says only that a unit timed out, so what it and its container
+# logged and how its health check answers is printed for each unit that is down.
 # shellcheck disable=SC2086 # one word per service
-as_user systemctl --user restart $services
+if ! as_user systemctl --user restart $services; then
+	sh "$here/report-failed.sh" "$here/as-ronote.sh" $services
+	die "a unit didn't start; why is above"
+fi
 say "started:$services"

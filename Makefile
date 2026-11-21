@@ -16,7 +16,7 @@ db_url_required = test -n "$$RONOTE_DATABASE_URL" || { echo "RONOTE_DATABASE_URL
 WEB := pnpm --dir apps/web
 # The end-to-end tests' own database, recreated by every make web-e2e.
 E2E_DATABASE_URL ?= postgres://ronote:ronote@127.0.0.1:5432/ronote_e2e?sslmode=disable
-GENERATED := internal/store/sqlcdb internal/httpapi/gen apps/web/src/api/schema.d.ts
+GENERATED := internal/store/sqlcdb internal/httpapi/gen apps/web/src/api/schema.d.ts deploy/caddy/runner.caddy
 node_required = want=$$(cat .nvmrc); have=$$(node --version 2>/dev/null); [ "$$have" = "v$$want" ] || \
 	{ echo "Node $$want is required (.nvmrc), found $${have:-none}. With nvm: nvm install && nvm use" >&2; exit 1; }
 
@@ -168,10 +168,11 @@ river-migration: ## Add a migration with River's schema: make river-migration fi
 sqlc: ## Regenerate internal/store/sqlcdb from migrations and queries
 	go tool sqlc generate
 
-generate: sqlc ## Regenerate all generated code: sqlc, then the API server and the web app's API types from api/openapi.yaml
+generate: sqlc ## Regenerate all generated code: sqlc, the API server and the web app's API types from api/openapi.yaml, and Caddy's runner site
 	go tool oapi-codegen -config api/oapi-codegen.yaml api/openapi.yaml
 	@$(node_required)
 	pnpm --filter @ronote/openapi-ts generate
+	$(WEB) exec node scripts/runner-caddy.ts > deploy/caddy/runner.caddy
 
 check-generated: generate ## Fail if generated code is stale
 	@test -z "$$(git status --porcelain -- $(GENERATED))" || \
@@ -230,12 +231,13 @@ web-dev: ## Run the web dev server (styleguide at /_styleguide), the runner, the
 	@$(node_required)
 	sh scripts/run.sh web sh -c 'go run ./cmd/fakeidp & idp=$$!; go run ./cmd/fakellm & llm=$$!; go run ./cmd/fakedocling & docling=$$!; $(WEB) runner & runner=$$!; $(WEB) dev; kill $$idp $$llm $$docling $$runner'
 
-web-build: ## Build the web app and the runner; fails if dev-only code ships or it is over budget
+web-build: ## Build the web app and the runner, and the runner's Pages site; fails if dev-only code ships, it is over budget or the site is wrong
 	@$(node_required)
 	$(WEB) build
 	@! grep -rIil styleguide apps/web/dist || \
 		{ echo "make web-build: dev-only styleguide code found in the files above" >&2; exit 1; }
 	$(WEB) exec node scripts/budget.ts
+	$(WEB) exec node scripts/runner-pages.ts https://ronote.example
 
 web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromium); locally needs make dev-up
 	@$(node_required)

@@ -9,6 +9,7 @@
 node_modules/
 dist/
 dist-runner/
+dist-pages/
 *.tsbuildinfo
 npm-debug.log*
 yarn-error.log*

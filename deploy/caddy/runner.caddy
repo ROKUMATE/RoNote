@@ -1,0 +1,23 @@
+# Generated from apps/web/runner-headers.ts by make generate: edit that.
+# The runner (docs/adr/0008-in-browser-code-execution.md), in CI and make
+# prod-local; production's is on Cloudflare Pages (docs/adr/0015-operations.md).
+{$RONOTE_RUNNER_URL} {
+	header {
+		Strict-Transport-Security "max-age=63072000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+		Referrer-Policy "no-referrer"
+		Cross-Origin-Opener-Policy "same-origin"
+		Cross-Origin-Embedder-Policy "require-corp"
+		Cross-Origin-Resource-Policy "cross-origin"
+		-Server
+	}
+	@worker path /assets/javascript.worker-*
+	@not-worker not path /assets/javascript.worker-*
+	header @worker Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src 'self'; frame-ancestors {$RONOTE_PUBLIC_URL}; base-uri 'none'; form-action 'none'"
+	header @not-worker Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; frame-ancestors {$RONOTE_PUBLIC_URL}; base-uri 'none'; form-action 'none'"
+	@immutable path /assets/* /pyodide/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+	root * /srv/runner
+	import static
+}

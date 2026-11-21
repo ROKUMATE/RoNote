@@ -9,9 +9,14 @@ import type { Plugin } from "vite";
 
 const placeholder = /\{\{env "(RONOTE_[A-Z_]+)"\}\}/g;
 
+/** Fills index.html's {{env "NAME"}} with value(NAME). */
+export function fill(html: string, value: (name: string) => string): string {
+  return html.replace(placeholder, (_, name: string) => value(name));
+}
+
 /** Fills index.html's {{env "NAME"}} with process.env, or with defaults. */
 export function fillOrigins(html: string, defaults: Record<string, string>): string {
-  return html.replace(placeholder, (_, name: string) => process.env[name] ?? defaults[name] ?? "");
+  return fill(html, (name) => process.env[name] ?? defaults[name] ?? "");
 }
 
 /** Fills index.html's origins on the dev server. */

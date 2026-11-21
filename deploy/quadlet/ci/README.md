@@ -16,6 +16,8 @@ units, and `config/` as the deployment's configuration.
   (`localhost/ronote-ci/<name>:pinned`) that `ronote-<name>.container.d/image.conf`
   names: a saved image keeps no digest reference, so the pin would make podman pull.
 - `RONOTE_ENV=test`: staging and prod refuse a fake sign-in.
+- Caddy serves the runner too (`config/sites.caddy` imports `runner.caddy`),
+  which production has on Cloudflare Pages.
 - Caddy issues its own certificates (`local_certs`) for `ronote.test`,
   `ronote-run.test` and `idp.ronote.test`, and serves the pages the smoke
   suite imports to the worker at `http://ronote-caddy:8080`.

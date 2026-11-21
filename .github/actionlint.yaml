@@ -1,5 +1,6 @@
-# actionlint 1.7.12 does not know the GitHub-hosted ubuntu-26.04 label yet
+# actionlint 1.7.12 does not know the GitHub-hosted ubuntu-26.04 labels yet
 # (rhysd/actionlint#682). Delete this file once the pinned actionlint does.
 self-hosted-runner:
   labels:
     - ubuntu-26.04
+    - ubuntu-26.04-arm

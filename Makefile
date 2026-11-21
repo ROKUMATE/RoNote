@@ -259,8 +259,13 @@ images: ## Build the api, worker, web and fakes images with podman, and print th
 	for i in $(IMAGES); do podman images --format '{{.Repository}}:{{.Tag}} {{.Size}}' $$i; done
 
 # The production units with the fakes (deploy/quadlet/ci): the configuration
-# and pages install.sh gets, and the images, as an archive.
+# and pages install.sh gets, and the images, as an archive. The units' third-
+# party images in CI are pulled by the units' own pins and tagged under local
+# names, which the drop-ins use: a saved image keeps no digest reference, so a
+# unit pinning one would pull it. Nothing else is pulled (Pull=never).
 PROD_CONFIG = bin/prod-config
+CI_THIRD_PARTY = postgres seaweedfs
+CI_TAGS = $(foreach n,$(CI_THIRD_PARTY),localhost/ronote-ci/$(n):pinned)
 SMOKE_CA = bin/smoke-ca.pem
 
 prod-config: images
@@ -269,8 +274,12 @@ prod-config: images
 	cp deploy/quadlet/ci/config/* $(PROD_CONFIG)/
 	cp testdata/golden/real-python-controlflow/input.html $(PROD_CONFIG)/fixtures/pages/real-python-controlflow/index.html
 	cp apps/web/e2e/fixtures/python.html $(PROD_CONFIG)/fixtures/linked/python/index.html
+	for n in $(CI_THIRD_PARTY); do \
+		ref=$$(sed -n 's/^Image=//p' deploy/quadlet/ronote-$$n.container) && \
+		podman pull -q "$$ref" >/dev/null && podman tag "$$ref" localhost/ronote-ci/$$n:pinned || exit 1; \
+	done
 	rm -f bin/ronote-images.tar
-	podman save --multi-image-archive -o bin/ronote-images.tar $(IMAGES)
+	podman save --multi-image-archive -o bin/ronote-images.tar $(IMAGES) $(CI_TAGS)
 
 prod-ci: prod-config ## Install the production units with the fakes on this Linux host (sudo), and check only 80 and 443 answer
 	sudo env RONOTE_GITHUB_CLIENT_SECRET=ronote-e2e-secret sh deploy/install.sh --version $(IMAGE_TAG) --config $(PROD_CONFIG) --drop-ins deploy/quadlet/ci --images bin/ronote-images.tar --skip-model

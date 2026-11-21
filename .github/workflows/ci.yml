@@ -232,8 +232,31 @@ jobs:
       # The production units, Caddy config and images, with the fakes in by
       # drop-ins (deploy/quadlet/ci), installed by deploy/install.sh under
       # their own rootless user; then only 80 and 443 may answer.
+      # GitHub's runner image writes its own user's XDG_* directories into
+      # /etc/environment, and pam_env hands them to ronote's systemd, whose
+      # Quadlet generator then opened /home/runner's and found no units
+      # (docs/adr/0014-production-topology.md). install.sh refuses that, so
+      # they go before it runs. Names only are printed, but for the XDG_*
+      # lines, which are directories.
+      - name: Clear the runner's per-user variables before installing the units
+        run: |
+          echo "/etc/environment sets:"
+          sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/  \1/p' /etc/environment
+          sudo cp /etc/environment /etc/environment.runner
+          echo "removing from /etc/environment (a copy is /etc/environment.runner):"
+          grep '^XDG_' /etc/environment || true
+          sudo sed -i '/^XDG_/d' /etc/environment
+          if id ronote >/dev/null 2>&1; then sudo systemctl restart "user@$(id -u ronote).service"; fi
       - name: Build the images and install the units on this runner
         run: make prod-ci
+      - name: Show which of the runner's variables ronote's systemd has
+        if: always()
+        run: |
+          sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p' /etc/environment.runner | sort > "$RUNNER_TEMP/runner-names"
+          echo "ronote's systemd environment, names only:"
+          sudo sh deploy/as-ronote.sh systemctl --user show-environment | cut -d= -f1 | sort | tee "$RUNNER_TEMP/manager-names"
+          echo "of them, set in the runner's /etc/environment:"
+          comm -12 "$RUNNER_TEMP/runner-names" "$RUNNER_TEMP/manager-names"
       - name: Check the example production config, and refuse a same-site runner
         run: make prod-check-config
       - name: Run the smoke suite through Caddy

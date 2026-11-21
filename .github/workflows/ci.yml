@@ -284,3 +284,15 @@ jobs:
           name: smoke-report-${{ matrix.runner }}
           path: apps/web/playwright-report
           retention-days: 7
+      # What the api, worker, fake model and the rest logged, with the
+      # Playwright trace: a failed chat answer is a story told by both.
+      - name: Save the units' journals
+        if: failure()
+        run: make prod-journals
+      - name: Upload the units' journals
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: units-journal-${{ matrix.runner }}
+          path: bin/prod-journals.log
+          retention-days: 7

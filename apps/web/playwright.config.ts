@@ -135,6 +135,8 @@ export default defineConfig({
       url: `${stack.api}/readyz`,
       reuseExistingServer: false,
       gracefulShutdown: stop,
+      // CI keeps the api's log, its request and answer lines, in the job's.
+      ...(process.env.CI ? { stdout: "pipe" as const } : {}),
     },
     {
       name: "api, embedder down",

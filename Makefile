@@ -327,6 +327,10 @@ prod-local: prod-config ## The same in the podman machine's VM, then the smoke s
 deploy-host: ## Deploy TAG on the production host over SSH (release only: DEPLOY_HOST, DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS)
 	sh scripts/deploy-host.sh "$(TAG)"
 
+prod-journals: ## Save what ronote's units logged since boot, and their containers' states, in bin/prod-journals.log, for a failed smoke run (sudo)
+	sudo sh deploy/as-ronote.sh journalctl --user -b --no-pager -o short-precise -u 'ronote-*' > bin/prod-journals.log
+	sudo sh deploy/as-ronote.sh podman ps -a --format '{{.Names}} {{.Status}}' >> bin/prod-journals.log
+
 backup-now: ## Back up the database and the PDFs now, as the timers do, on a host install.sh set up (sudo)
 	sudo sh deploy/run-now.sh ronote-backup@db.service ronote-backup@pdfs.service
 
@@ -359,4 +363,4 @@ prod-check-config: ## Check the example production config with the api image; a 
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config
+.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config

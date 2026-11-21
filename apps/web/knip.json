@@ -8,7 +8,9 @@
     "e2e/fixture-site.ts",
     "live/*.test.ts",
     "scripts/budget.ts",
-    "scripts/pdf-fixtures.ts"
+    "scripts/pdf-fixtures.ts",
+    "scripts/runner-caddy.ts",
+    "scripts/runner-pages.ts"
   ],
   "playwright": false,
   "ignoreBinaries": ["go"],

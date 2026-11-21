@@ -45,7 +45,7 @@ export default defineConfig({
   preview: { proxy, headers },
   test: {
     environment: "jsdom",
-    include: ["src/**/*.test.{ts,tsx}", "runner/**/*.test.ts", "vite.config.test.ts"],
+    include: ["src/**/*.test.{ts,tsx}", "runner/**/*.test.ts", "*.test.ts"],
     setupFiles: ["src/test-setup.ts"],
     // Vitest's on-disk module cache keys a test's build by the test file's
     // own text, but an import.meta.glob in it also depends on which files

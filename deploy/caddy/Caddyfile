@@ -1,6 +1,7 @@
 # RoNote's one front door (docs/adr/0014-production-topology.md): the app's
-# domain, with /api to the api, and the runner's, each with its own
-# headers. Both domains come from the environment, as ronote.env sets them.
+# domain, with /api to the api, and its headers; the runner's domain is
+# Cloudflare Pages' (docs/adr/0015-operations.md). Both domains come from the
+# environment, as ronote.env sets them.
 # Caddy listens on 8080 and 8443 as an unprivileged user; the unit
 # publishes them as 80 and 443.
 
@@ -104,29 +105,9 @@
 	}
 }
 
-# The runner (docs/adr/0008-in-browser-code-execution.md): code from
-# documents runs here, reaching nothing but its own files, framed by the app
-# alone. Only the JavaScript worker's script may evaluate code, which
-# running the reader's JavaScript is; everything else may compile Pyodide's
-# WebAssembly and nothing more. vite.runner.config.ts sends the same in dev.
-{$RONOTE_RUNNER_URL} {
-	import common
-	header {
-		Referrer-Policy no-referrer
-		Cross-Origin-Opener-Policy same-origin
-		Cross-Origin-Embedder-Policy require-corp
-		Cross-Origin-Resource-Policy cross-origin
-	}
-	@worker path_regexp ^/assets/javascript\.worker-[^/]+$
-	@not-worker not path_regexp ^/assets/javascript\.worker-[^/]+$
-	header @worker Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src 'self'; frame-ancestors {$RONOTE_PUBLIC_URL}; base-uri 'none'; form-action 'none'"
-	header @not-worker Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; frame-ancestors {$RONOTE_PUBLIC_URL}; base-uri 'none'; form-action 'none'"
-	# Pyodide's path carries its version, so its files never change.
-	@pyodide path /pyodide/*
-	header @pyodide Cache-Control "public, max-age=31536000, immutable"
-	root * /srv/runner
-	import static
-}
+# The runner's site is in production on Cloudflare Pages
+# (docs/adr/0015-operations.md); in CI and make prod-local their sites
+# import runner.caddy, made from the same definition as Pages' headers.
 
 # Plain http only redirects, outside port or not.
 http:// {

@@ -19,6 +19,8 @@
   "include": [
     "vite.config.ts",
     "vite.config.test.ts",
+    "runner-headers.test.ts",
+    "runner-pages.test.ts",
     "vite.runner.config.ts",
     "browsers.ts",
     "vitest.live.config.ts",

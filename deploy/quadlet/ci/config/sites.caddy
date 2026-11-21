@@ -1,3 +1,6 @@
+# The runner, which production has on Cloudflare Pages.
+import /etc/caddy/runner.caddy
+
 # The fake sign-in, where the browser is sent to sign in.
 https://idp.ronote.test {
 	reverse_proxy ronote-fakeidp:8090

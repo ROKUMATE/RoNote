@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { type Connect, defineConfig, type Plugin } from "vite";
 import { browsers } from "./browsers.ts";
+import { headersFor as runnerHeaders, workerScripts } from "./runner-headers.ts";
 import { origins } from "./vite.origins.ts";
 
 /*
@@ -14,34 +15,17 @@ import { origins } from "./vite.origins.ts";
 
 // The app's origin, which alone may frame the runner and talk to it: in
 // dev, where make web-dev serves the app, unless RONOTE_PUBLIC_URL says
-// otherwise. In production Caddy sends these headers (deploy/caddy/Caddyfile).
+// otherwise. Caddy and Cloudflare Pages send the same headers, from the
+// same definition (runner-headers.ts).
 const devAppURL = "http://127.0.0.1:5173";
 const appOrigin = new URL(process.env.RONOTE_PUBLIC_URL ?? devAppURL).origin;
 
-// The JavaScript worker's script, in dev and in the build: the one response
-// whose code may evaluate text, which running the reader's JavaScript takes.
-const javascriptWorker = /(^|\/)javascript\.worker[.-][^/]*$/;
+// The dev server serves the JavaScript worker's script from its source.
+const workers = [...workerScripts, "/javascript.worker.ts"];
 
-/**
- * The runner's headers for a response to path. Every response keeps code
- * from reaching any other host; only the JavaScript worker's script may
- * evaluate code, and its worker lives by that policy, not the page's.
- */
+/** The runner's headers for a response to path, on the dev and preview servers. */
 export function headersFor(path: string): Record<string, string> {
-  const evaluates = javascriptWorker.test(path);
-  return {
-    "Content-Security-Policy": [
-      "default-src 'self'",
-      `script-src 'self' ${evaluates ? "'unsafe-eval'" : "'wasm-unsafe-eval'"}`,
-      "connect-src 'self'",
-      `frame-ancestors ${appOrigin}`,
-      "base-uri 'none'",
-      "form-action 'none'",
-    ].join("; "),
-    "Cross-Origin-Opener-Policy": "same-origin",
-    "Cross-Origin-Embedder-Policy": "require-corp",
-    "Cross-Origin-Resource-Policy": "cross-origin",
-  };
+  return runnerHeaders(path, appOrigin, workers);
 }
 
 /** Sets every response's headers by its path, in dev and in preview. */

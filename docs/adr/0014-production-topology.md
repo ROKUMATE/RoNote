@@ -62,4 +62,5 @@ From P19 on, RoNote runs somewhere other than a laptop. Earlier ADRs left the de
 - One host means one API process, so the in-memory rate limits and Stop (ADR 0010, ADR 0012) stay correct.
 - Backups need Postgres and the blob store (ADR 0013); P19a doesn't set them up.
 - docling's 3 GB is below what dev gives it; CI never runs the real docling, so the limit is unproven until a real host converts real PDFs.
+- `install.sh` refuses a host whose PAM gives the `ronote` user's systemd another user's `XDG_*` directories, as GitHub's runner image does for its own user in `/etc/environment`: Quadlet and every podman would use that user's directories. It never overrides them; a host that trips it removes those lines from `/etc/environment` (or `/etc/security/pam_env.conf`) and restarts `user@<uid>.service`. CI does that before installing.
 - What reaches users is what CI ran: the same units, the same Caddy config and the same images, with only the fakes swapped in.

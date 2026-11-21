@@ -66,13 +66,23 @@ REPO=$work/repo
 RESTORE_DIR=$work/drill
 export LOG REPO RESTORE_DIR
 
-# run SCRIPT ARG...: runs it with the fake, leaving its output in $out, its
-# exit in $status and the podman calls in $log.
+# run [VAR=VALUE...] SCRIPT ARG...: runs it with the fake and those set,
+# leaving its output in $out, its exit in $status and the podman calls in
+# $log. (Assignments before a function call may outlast it, so they are
+# arguments.)
 run() {
   : >"$LOG"
+  vars=
+  while :; do
+    case $1 in
+      *=*) vars="$vars $1"; shift ;;
+      *) break ;;
+    esac
+  done
   script=$1
   shift
-  out=$(PATH="$bin:$PATH" RONOTE_ETC=$etc RONOTE_BACKUP_WORK="$RESTORE_DIR" sh "$backup/$script" "$@" 2>&1)
+  # shellcheck disable=SC2086 # one word per assignment
+  out=$(env $vars PATH="$bin:$PATH" RONOTE_ETC="$etc" RONOTE_BACKUP_WORK="$RESTORE_DIR" sh "$backup/$script" "$@" 2>&1)
   status=$?
   log=$(cat "$LOG")
 }
@@ -118,7 +128,7 @@ holds 'it keeps 7 daily, 4 weekly, 6 monthly' ran 'forget --tag db --keep-daily 
 holds 'restic gets its password from podman' ran '--secret ronote-restic-password,type=env,target=RESTIC_PASSWORD'
 holds 'no secret is in an argument or the output' clean
 
-COUNT_FAILS=1 run backup.sh db
+run COUNT_FAILS=1 backup.sh db
 holds 'a dump that fails to count fails the backup, before restic' failed_before 'backup --tag db'
 
 run backup.sh pdfs
@@ -136,7 +146,7 @@ case $status:$out in
 esac
 holds 'the scratch database is removed' cleaned_up
 
-ROWS=4 run restore-drill.sh
+run ROWS=4 restore-drill.sh
 case $status:$out in
   0:*) result 'a table that differs fails the drill, by name' "passed: $out" ;;
   *"public.documents (4 rows, the backup counted 5)"*) result 'a table that differs fails the drill, by name' ok ;;
@@ -144,7 +154,7 @@ case $status:$out in
 esac
 holds 'a failed drill still removes its database' cleaned_up
 
-STATUS=3 run restore-drill.sh
+run STATUS=3 restore-drill.sh
 holds 'a schema behind this build fails the drill' failed_before 'search-check'
 holds 'no secret in the drill' clean
 

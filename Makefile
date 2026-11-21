@@ -28,7 +28,7 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, and the backups
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups and the alerts
 	PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s deploy/pdftext -t deploy/pdftext
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
@@ -40,6 +40,7 @@ hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the docto
 	sh scripts/test-check-environment.sh
 	sh scripts/test-report-failed.sh
 	sh scripts/test-backup.sh
+	sh scripts/test-alerts.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
@@ -290,7 +291,8 @@ CI_TAGS = $(foreach n,$(CI_THIRD_PARTY) $(CI_BACKUP_IMAGES),localhost/ronote-ci/
 # repository on the host rather than R2.
 random = $(shell od -An -N16 -tx1 /dev/urandom | tr -d ' \n')
 CI_INSTALL_ENV = RONOTE_GITHUB_CLIENT_SECRET=$(random) RONOTE_RESTIC_PASSWORD=$(random) \
-	RONOTE_BACKUP_REPO=/var/lib/restic/repo RONOTE_BACKUP_ACCESS_KEY=none RONOTE_BACKUP_SECRET_KEY=none
+	RONOTE_BACKUP_REPO=/var/lib/restic/repo RONOTE_BACKUP_ACCESS_KEY=none RONOTE_BACKUP_SECRET_KEY=none \
+	RONOTE_NTFY_TOPIC=$(random)
 SMOKE_CA = bin/smoke-ca.pem
 
 prod-config: images
@@ -324,6 +326,9 @@ backup-now: ## Back up the database and the PDFs now, as the timers do, on a hos
 restore-drill: ## Run the restore drill now, as its weekly timer does, on a host install.sh set up (sudo)
 	sudo sh deploy/run-now.sh ronote-restore-drill.service
 
+watch-now: ## Run the health watch now, as its 5-minute timer does, on a host install.sh set up (sudo); its alerts go to ntfy, or say they would
+	sudo sh deploy/run-now.sh ronote-watch.service
+
 prod-smoke: ## Run the smoke suite through Caddy against installed units (make prod-ci first)
 	RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
 
@@ -347,4 +352,4 @@ prod-check-config: ## Check the example production config with the api image; a 
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build runner-pages runner-deploy web-e2e images backup-now restore-drill units-check prod-config prod-ci prod-local prod-smoke prod-check-config
+.PHONY: web-dev web-build runner-pages runner-deploy web-e2e images backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config

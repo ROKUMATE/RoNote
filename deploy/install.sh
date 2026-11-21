@@ -19,7 +19,8 @@
 # RONOTE_BLOB_ACCESS_KEY and RONOTE_BLOB_SECRET_KEY for the object store;
 # for the backups (docs/adr/0015-operations.md), RONOTE_RESTIC_PASSWORD,
 # RONOTE_BACKUP_REPO (restic's s3:https://… URL of the R2 bucket) and
-# RONOTE_BACKUP_ACCESS_KEY and RONOTE_BACKUP_SECRET_KEY, R2's token.
+# RONOTE_BACKUP_ACCESS_KEY and RONOTE_BACKUP_SECRET_KEY, R2's token; for the
+# alerts, RONOTE_NTFY_TOPIC, the ntfy topic's name.
 set -eu
 
 here=$(cd "$(dirname "$0")" && pwd)
@@ -158,14 +159,22 @@ secret ronote-restic-password "${RONOTE_RESTIC_PASSWORD:-}"
 secret ronote-backup-repo "${RONOTE_BACKUP_REPO:-}"
 secret ronote-backup-access-key "${RONOTE_BACKUP_ACCESS_KEY:-}"
 secret ronote-backup-secret-key "${RONOTE_BACKUP_SECRET_KEY:-}"
+secret ronote-ntfy-topic "${RONOTE_NTFY_TOPIC:-}"
 
-# The backups and the restore drill: their scripts, and the user services and
-# timers that run them as ronote.
+# The backups, the restore drill and the alerts: their scripts, and the user
+# services and timers that run them as ronote.
 lib=$home/.local/lib/ronote
 userunits=$home/.config/systemd/user
 install -d -o "$user" -g "$user" -m 700 "$home/.local" "$home/.local/lib" "$lib" "$home/.config/systemd" "$userunits"
 install -o "$user" -g "$user" -m 600 "$here/backup/lib.sh" "$here/backup/backup.sh" "$here/backup/restore-drill.sh" "$here/backup/count-rows.awk" "$lib"/
-install -o "$user" -g "$user" -m 600 "$here"/backup/ronote-*.service "$here"/backup/ronote-*.timer "$userunits"/
+install -o "$user" -g "$user" -m 600 "$here/alerts/alert.sh" "$here/alerts/watch.sh" "$lib"/
+install -o "$user" -g "$user" -m 600 "$here"/backup/ronote-*.service "$here"/backup/ronote-*.timer \
+	"$here"/alerts/ronote-*.service "$here"/alerts/ronote-*.timer "$userunits"/
+
+# The journal keeps at most 1 GB, every user's included.
+install -d /etc/systemd/journald.conf.d
+printf '[Journal]\nSystemMaxUse=1G\n' >/etc/systemd/journald.conf.d/90-ronote.conf
+systemctl try-reload-or-restart systemd-journald
 
 # Root opens the archive, which may sit where ronote can't read, such as a
 # checkout; ronote's podman reads it from stdin.
@@ -247,5 +256,5 @@ if ! as_user systemctl --user restart $services; then
 	die "a unit didn't start; why is above"
 fi
 say "started:$services"
-as_user systemctl --user enable --now ronote-backup-db.timer ronote-backup-pdfs.timer ronote-restore-drill.timer
-say "the backups and the restore drill are on their timers"
+as_user systemctl --user enable --now ronote-backup-db.timer ronote-backup-pdfs.timer ronote-restore-drill.timer ronote-watch.timer
+say "the backups, the restore drill and the health watch are on their timers"

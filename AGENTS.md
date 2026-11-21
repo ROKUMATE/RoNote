@@ -46,6 +46,7 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make check-commits RANGE=main..HEAD` | check each commit message in strict mode |
 | `make web-dev` | app on `127.0.0.1:5173`, the runner on `localhost:5174`, the fake sign-in and chat model |
 | `make web-build` | production build and bundle budgets |
+| `make runner-pages APP_URL=…` / `runner-deploy` / `deploy-host TAG=…` | the runner's Cloudflare Pages site / deploy it / deploy a release on the host (release only) |
 | `make web-e2e` | Playwright and axe against the full stack (`make dev-up` first) |
 | `make run-api` / `run-worker` | the API on `127.0.0.1:8080` / the job worker |
 | `make run-idp` / `run-llm` / `run-docling` | the fake GitHub sign-in on `127.0.0.1:8090` / chat model on `:8094` / docling and pdftext on `:5001`, `:5002` (`web-dev` starts all) |
@@ -55,6 +56,7 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make doctor` | check the VM's clock, the pinned embedding model, and the blob store, docling and pdftext |
 | `make images` | the production images with podman, and their sizes (docs/adr/0014-production-topology.md) |
 | `make units-check` | Quadlet's dry run on the units; skipped where Quadlet isn't installed |
+| `make backup-now` / `restore-drill` / `watch-now` | back up / run the restore drill / the health watch now, on an installed host |
 | `make prod-ci` / `prod-local` / `prod-smoke` | install the production units with the fakes on this Linux host / in the podman VM / run the smoke suite through Caddy |
 | `make generate` / `check-generated` | regenerate sqlc and OpenAPI output / fail if stale |
 | `make migrate-up` / `migrate-new name=...` | apply / create goose migrations |

@@ -1,0 +1,8 @@
+# One backup (docs/adr/0015-operations.md): %i is db or pdfs.
+[Unit]
+Description=RoNote backup of the %i
+OnFailure=ronote-alert@backup-%i.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh %h/.local/lib/ronote/backup.sh %i

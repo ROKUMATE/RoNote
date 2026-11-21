@@ -4,7 +4,7 @@
 Description=RoNote API
 Requires=ronote-migrate.service ronote-postgres.service
 After=ronote-migrate.service ronote-postgres.service
-Wants=ronote-ollama.service ronote-seaweedfs.service
+Wants=ronote-ollama.service
 
 [Container]
 ContainerName=ronote-api

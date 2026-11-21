@@ -6,17 +6,23 @@
 # the user, the secrets and the data, and installs the units again.
 #
 #   sudo sh deploy/install.sh --version v1.2.3 --config DIR
-#       [--drop-ins DIR] [--images FILE] [--skip-model]
+#       [--drop-ins DIR] [--images FILE] [--skip-model] [--pin NAME=REF]...
 #
 # --config DIR   files for ~ronote/.config/ronote, ronote.env at least
 #                (deploy/ronote.env.example); kept from an earlier run if absent
 # --drop-ins DIR units and drop-ins added beside the units (deploy/quadlet/ci)
 # --images FILE  an image archive (podman save) to load instead of pulling
 # --skip-model   no embedding model: the drop-ins replace Ollama
+# --pin NAME=REF run NAME (ronote-api, -worker, -web) as REF: ronote-deploy
+#                pins a release's images by digest
 #
 # Secrets it doesn't generate come from its environment, never from a file:
 # RONOTE_GITHUB_CLIENT_SECRET, and RONOTE_ANTHROPIC_API_KEY when chat is on;
-# RONOTE_BLOB_ACCESS_KEY and RONOTE_BLOB_SECRET_KEY for an external S3.
+# RONOTE_BLOB_ACCESS_KEY and RONOTE_BLOB_SECRET_KEY for the object store;
+# for the backups (docs/adr/0015-operations.md), RONOTE_RESTIC_PASSWORD,
+# RONOTE_BACKUP_REPO (restic's s3:https://… URL of the R2 bucket) and
+# RONOTE_BACKUP_ACCESS_KEY and RONOTE_BACKUP_SECRET_KEY, R2's token; for the
+# alerts, RONOTE_NTFY_TOPIC, the ntfy topic's name.
 set -eu
 
 here=$(cd "$(dirname "$0")" && pwd)
@@ -27,6 +33,7 @@ config=
 dropins=
 images=
 skip_model=false
+pins=
 
 die() {
 	printf 'install: %s\n' "$*" >&2
@@ -44,6 +51,7 @@ while [ $# -gt 0 ]; do
 	--drop-ins) dropins=${2:?}; shift 2 ;;
 	--images) images=${2:?}; shift 2 ;;
 	--skip-model) skip_model=true; shift ;;
+	--pin) pins="$pins --pin ${2:?}"; shift 2 ;;
 	*) die "unknown argument $1; see the comment at the top of $0" ;;
 	esac
 done
@@ -93,6 +101,8 @@ printf '%s\n' "$manager_env" | sh "$here/check-environment.sh" "$uid" "$home" ||
 etc=$home/.config/ronote
 units=$home/.config/containers/systemd
 install -d -o "$user" -g "$user" -m 700 "$home/.config" "$etc" "$home/.config/containers" "$units"
+# The backups' pinned images; a configuration (CI's) may name its own.
+cp "$repo/deploy/backup/images" "$etc/backup.images"
 if [ -n "$config" ]; then
 	cp -R "$config"/. "$etc"/
 fi
@@ -100,16 +110,17 @@ fi
 cp "$repo/deploy/pdftext/pdftext.py" "$etc/pdftext.py"
 chown -R "$user:$user" "$etc"
 
-# An external S3 (R2, B2) needs no SeaweedFS.
-seaweedfs=true
-grep -q '^RONOTE_BLOB_ENDPOINT=http://ronote-seaweedfs:' "$etc/ronote.env" || seaweedfs=false
 set -- "$units" "$version"
-[ "$seaweedfs" = true ] || set -- "$@" --no-seaweedfs
 [ -z "$dropins" ] || set -- "$@" --drop-ins "$dropins"
-
+# shellcheck disable=SC2086 # two words a pin
+[ -z "$pins" ] || set -- "$@" $pins
 find "$units" -mindepth 1 -maxdepth 1 -name 'ronote-*' -exec rm -rf {} +
 sh "$here/units.sh" "$@"
 chown -R "$user:$user" "$units"
+# SeaweedFS comes only with CI's drop-ins; production's blobs are in an
+# external store, whose keys come from this command's environment.
+seaweedfs=false
+[ ! -f "$units/ronote-seaweedfs.container" ] || seaweedfs=true
 
 # Secrets: made once, never printed, kept by later runs.
 secret() {
@@ -150,6 +161,26 @@ else
 	secret ronote-blob-access-key "${RONOTE_BLOB_ACCESS_KEY:-}"
 	secret ronote-blob-secret-key "${RONOTE_BLOB_SECRET_KEY:-}"
 fi
+secret ronote-restic-password "${RONOTE_RESTIC_PASSWORD:-}"
+secret ronote-backup-repo "${RONOTE_BACKUP_REPO:-}"
+secret ronote-backup-access-key "${RONOTE_BACKUP_ACCESS_KEY:-}"
+secret ronote-backup-secret-key "${RONOTE_BACKUP_SECRET_KEY:-}"
+secret ronote-ntfy-topic "${RONOTE_NTFY_TOPIC:-}"
+
+# The backups, the restore drill and the alerts: their scripts, and the user
+# services and timers that run them as ronote.
+lib=$home/.local/lib/ronote
+userunits=$home/.config/systemd/user
+install -d -o "$user" -g "$user" -m 700 "$home/.local" "$home/.local/lib" "$lib" "$home/.config/systemd" "$userunits"
+install -o "$user" -g "$user" -m 600 "$here/backup/lib.sh" "$here/backup/backup.sh" "$here/backup/restore-drill.sh" "$here/backup/count-rows.awk" "$lib"/
+install -o "$user" -g "$user" -m 600 "$here/alerts/alert.sh" "$here/alerts/watch.sh" "$lib"/
+install -o "$user" -g "$user" -m 600 "$here"/backup/ronote-*.service "$here"/backup/ronote-*.timer \
+	"$here"/alerts/ronote-*.service "$here"/alerts/ronote-*.timer "$userunits"/
+
+# The journal keeps at most 1 GB, every user's included.
+install -d /etc/systemd/journald.conf.d
+printf '[Journal]\nSystemMaxUse=1G\n' >/etc/systemd/journald.conf.d/90-ronote.conf
+systemctl try-reload-or-restart systemd-journald
 
 # Root opens the archive, which may sit where ronote can't read, such as a
 # checkout; ronote's podman reads it from stdin.
@@ -231,3 +262,5 @@ if ! as_user systemctl --user restart $services; then
 	die "a unit didn't start; why is above"
 fi
 say "started:$services"
+as_user systemctl --user enable --now ronote-backup-db.timer ronote-backup-pdfs.timer ronote-restore-drill.timer ronote-watch.timer
+say "the backups, the restore drill and the health watch are on their timers"

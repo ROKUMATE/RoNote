@@ -397,3 +397,8 @@ Recorded in [ADR 0009](adr/0009-jobs-port.md).
   - the API declares the job kinds it enqueues to River; the PDF and blob kinds were missing, which only the end-to-end tests could see, since the integration harness shares one queue with the worker. `importer.Kinds` now lists them, and a test checks the service enqueues nothing else;
   - jsdom's `File` isn't Node's, so `FormData` stringifies it in unit tests: the upload's file part is checked end to end;
   - the import dialog fades in; axe checks muted text only once it is fully shown.
+
+## Operations (since P19b, ADR 0015)
+
+- **No metrics endpoint yet.** Nothing on one host would scrape `/metrics`, and the alerts (`deploy/alerts/`) watch what matters: units' health, the disk, the certificate, the backups and the drill, and chat's spend cap. The api's access log already records each request's path, status and time. A metrics endpoint comes with a scraper, on the internal network only.
+- **The spend cap is watched through the journal**, not a query: the api logs `chat spend cap reached` once a UTC day (`chat.SpendCapReached`), and the watcher matches that line, so the cap's arithmetic stays in one place.

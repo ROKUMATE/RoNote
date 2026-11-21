@@ -3,6 +3,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -40,4 +41,27 @@ func Run(args []string, def string, commands map[string]Command) error {
 		return fmt.Errorf("%s: %w", name, err)
 	}
 	return nil
+}
+
+// ExitError ends a command with Code, for a caller that tells failures
+// apart by exit status, such as `api migrate status` for ronote-deploy.
+type ExitError struct {
+	Code int
+	Err  error
+}
+
+func (e *ExitError) Error() string { return e.Err.Error() }
+
+func (e *ExitError) Unwrap() error { return e.Err }
+
+// ExitCode is the status a command's result exits with: 0 for none, an
+// ExitError's own code, or 1 for any other error.
+func ExitCode(err error) int {
+	if err == nil {
+		return 0
+	}
+	if exit, ok := errors.AsType[*ExitError](err); ok {
+		return exit.Code
+	}
+	return 1
 }

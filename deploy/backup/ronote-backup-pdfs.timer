@@ -1,0 +1,11 @@
+# The PDF bucket, weekly.
+[Unit]
+Description=RoNote's weekly PDF backup
+
+[Timer]
+OnCalendar=Sun *-*-* 03:45:00 UTC
+Persistent=true
+Unit=ronote-backup@pdfs.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,8 @@
+# The weekly restore drill (docs/adr/0015-operations.md).
+[Unit]
+Description=RoNote restore drill
+OnFailure=ronote-alert@restore-drill.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh %h/.local/lib/ronote/restore-drill.sh

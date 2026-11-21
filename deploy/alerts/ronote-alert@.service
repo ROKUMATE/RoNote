@@ -1,0 +1,8 @@
+# An alert for a unit that failed (docs/adr/0015-operations.md): their
+# OnFailure= starts it, with what failed as its instance.
+[Unit]
+Description=RoNote alert: %I failed
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh %h/.local/lib/ronote/alert.sh "%I failed" "See what it said: journalctl --user --since -1d -u 'ronote-*'"

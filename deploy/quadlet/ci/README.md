@@ -12,9 +12,15 @@ units, and `config/` as the deployment's configuration.
   image comes from the archive `make prod-config` saves, so a missing one fails
   at once, by name, and nothing waits on Docker Hub) and `TimeoutStartSec=300`,
   where production has 900. It needs Quadlet 5.2; `make units-check` checks it.
+- `ronote-seaweedfs` is CI's blob store (production's is Oracle's Object
+  Storage), and `seaweedfs.conf` starts the api and the worker after it: its
+  health check makes the bucket they check as they start.
 - Postgres and SeaweedFS run the images their units pin, saved under local names
   (`localhost/ronote-ci/<name>:pinned`) that `ronote-<name>.container.d/image.conf`
   names: a saved image keeps no digest reference, so the pin would make podman pull.
+- `config/backup.images` names the backups' restic and rclone by the local tags
+  `make prod-config` gives their pins; the repository is on the host
+  (`RONOTE_BACKUP_REPO=/var/lib/restic/repo`, in `ronote-backup`'s volume).
 - `RONOTE_ENV=test`: staging and prod refuse a fake sign-in.
 - Caddy serves the runner too (`config/sites.caddy` imports `runner.caddy`),
   which production has on Cloudflare Pages.

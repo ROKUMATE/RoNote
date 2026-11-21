@@ -28,7 +28,7 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic and the installer's environment check and failure report
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts, ronote-deploy and bootstrap's firewall rules
 	PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s deploy/pdftext -t deploy/pdftext
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
@@ -39,6 +39,10 @@ hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the docto
 	sh scripts/test-doc-sizes.sh
 	sh scripts/test-check-environment.sh
 	sh scripts/test-report-failed.sh
+	sh scripts/test-backup.sh
+	sh scripts/test-alerts.sh
+	sh scripts/test-deploy.sh
+	sh scripts/test-open-web-ports.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
@@ -237,7 +241,19 @@ web-build: ## Build the web app and the runner, and the runner's Pages site; fai
 	@! grep -rIil styleguide apps/web/dist || \
 		{ echo "make web-build: dev-only styleguide code found in the files above" >&2; exit 1; }
 	$(WEB) exec node scripts/budget.ts
-	$(WEB) exec node scripts/runner-pages.ts https://ronote.example
+	@$(MAKE) --no-print-directory runner-pages APP_URL=https://ronote.example
+
+runner-pages: ## Make the runner's Cloudflare Pages site in apps/web/dist-pages for the app at APP_URL, from make web-build's runner
+	@test -n "$(APP_URL)" || { echo "make runner-pages: set APP_URL to the app's https origin" >&2; exit 1; }
+	$(WEB) exec node scripts/runner-pages.ts "$(APP_URL)"
+
+# wrangler has its own package and lockfile (deploy/pages), outside the
+# workspace, so only a release installs it.
+runner-deploy: ## Deploy apps/web/dist-pages to Cloudflare Pages (release only: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_PAGES_PROJECT)
+	@test -n "$$CLOUDFLARE_PAGES_PROJECT" || { echo "make runner-deploy: set CLOUDFLARE_PAGES_PROJECT" >&2; exit 1; }
+	@test -d apps/web/dist-pages || { echo "make runner-deploy: no apps/web/dist-pages; run make runner-pages first" >&2; exit 1; }
+	pnpm install --frozen-lockfile --dir deploy/pages
+	pnpm --dir deploy/pages run pages
 
 web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromium); locally needs make dev-up
 	@$(node_required)
@@ -267,7 +283,18 @@ images: ## Build the api, worker, web and fakes images with podman, and print th
 # unit pinning one would pull it. Nothing else is pulled (Pull=never).
 PROD_CONFIG = bin/prod-config
 CI_THIRD_PARTY = postgres seaweedfs
-CI_TAGS = $(foreach n,$(CI_THIRD_PARTY),localhost/ronote-ci/$(n):pinned)
+# The backups' images (deploy/backup/images), tagged the same way, which CI's
+# configuration names.
+CI_BACKUP_IMAGES = restic rclone
+CI_TAGS = $(foreach n,$(CI_THIRD_PARTY) $(CI_BACKUP_IMAGES),localhost/ronote-ci/$(n):pinned)
+# install.sh's secrets in CI and make prod-local: stand-ins made fresh each
+# run, so no secret-shaped value is in the repo (install.sh keeps the first
+# ones a host is given, and the fake sign-in reads the api's), and a restic
+# repository on the host rather than R2.
+random = $(shell od -An -N16 -tx1 /dev/urandom | tr -d ' \n')
+CI_INSTALL_ENV = RONOTE_GITHUB_CLIENT_SECRET=$(random) RONOTE_RESTIC_PASSWORD=$(random) \
+	RONOTE_BACKUP_REPO=/var/lib/restic/repo RONOTE_BACKUP_ACCESS_KEY=none RONOTE_BACKUP_SECRET_KEY=none \
+	RONOTE_NTFY_TOPIC=$(random)
 SMOKE_CA = bin/smoke-ca.pem
 
 prod-config: images
@@ -277,25 +304,44 @@ prod-config: images
 	cp testdata/golden/real-python-controlflow/input.html $(PROD_CONFIG)/fixtures/pages/real-python-controlflow/index.html
 	cp apps/web/e2e/fixtures/python.html $(PROD_CONFIG)/fixtures/linked/python/index.html
 	for n in $(CI_THIRD_PARTY); do \
-		ref=$$(sed -n 's/^Image=//p' deploy/quadlet/ronote-$$n.container) && \
+		ref=$$(cat deploy/quadlet/ronote-$$n.container deploy/quadlet/ci/ronote-$$n.container 2>/dev/null | sed -n 's/^Image=//p') && \
+		podman pull -q "$$ref" >/dev/null && podman tag "$$ref" localhost/ronote-ci/$$n:pinned || exit 1; \
+	done
+	for n in $(CI_BACKUP_IMAGES); do \
+		ref=$$(sed -n "s/^$$n=//p" deploy/backup/images) && \
 		podman pull -q "$$ref" >/dev/null && podman tag "$$ref" localhost/ronote-ci/$$n:pinned || exit 1; \
 	done
 	rm -f bin/ronote-images.tar
 	podman save --multi-image-archive -o bin/ronote-images.tar $(IMAGES) $(CI_TAGS)
 
-prod-ci: prod-config ## Install the production units with the fakes on this Linux host (sudo), and check only 80 and 443 answer
-	sudo env RONOTE_GITHUB_CLIENT_SECRET=ronote-e2e-secret sh deploy/install.sh --version $(IMAGE_TAG) --config $(PROD_CONFIG) --drop-ins deploy/quadlet/ci --images bin/ronote-images.tar --skip-model
+prod-ci: prod-config ## Bootstrap this Ubuntu 26.04 host and install the production units with the fakes (sudo), and check only 80 and 443 answer
+	rm -f bin/ci-deploy-key bin/ci-deploy-key.pub
+	ssh-keygen -q -t ed25519 -N '' -C ronote-ci -f bin/ci-deploy-key
+	sudo env $(CI_INSTALL_ENV) sh deploy/bootstrap.sh --deploy-key bin/ci-deploy-key.pub -- --version $(IMAGE_TAG) --config $(PROD_CONFIG) --drop-ins deploy/quadlet/ci --images bin/ronote-images.tar --skip-model
 	sudo sh deploy/as-ronote.sh podman exec ronote-caddy cat /caddy/data/caddy/pki/authorities/local/intermediate.crt > $(SMOKE_CA)
 	sh deploy/check-ports.sh 127.0.0.1 $$(hostname -I | cut -d' ' -f1)
 
 prod-local: prod-config ## The same in the podman machine's VM, then the smoke suite from this Mac
-	sh scripts/prod-local.sh
+	INSTALL_ENV='$(CI_INSTALL_ENV)' sh scripts/prod-local.sh
+
+deploy-host: ## Deploy TAG on the production host over SSH (release only: DEPLOY_HOST, DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS)
+	sh scripts/deploy-host.sh "$(TAG)"
+
+backup-now: ## Back up the database and the PDFs now, as the timers do, on a host install.sh set up (sudo)
+	sudo sh deploy/run-now.sh ronote-backup@db.service ronote-backup@pdfs.service
+
+restore-drill: ## Run the restore drill now, as its weekly timer does, on a host install.sh set up (sudo)
+	sudo sh deploy/run-now.sh ronote-restore-drill.service
+
+watch-now: ## Run the health watch now, as its 5-minute timer does, on a host install.sh set up (sudo); its alerts go to ntfy, or say they would
+	sudo sh deploy/run-now.sh ronote-watch.service
 
 prod-smoke: ## Run the smoke suite through Caddy against installed units (make prod-ci first)
 	RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
 
-# check-config on deploy/ronote.env.example, with stand-ins for its secrets:
-# it must pass, and fail with the runner on the app's site.
+# check-config on deploy/ronote.env.example, with stand-ins for its secrets,
+# --offline since its blob store is an example: it must pass, and fail with
+# the runner on the app's site.
 EXAMPLE_SECRETS = -e RONOTE_DATABASE_URL=postgres://ronote:example@ronote-postgres:5432/ronote \
 	-e RONOTE_GITHUB_CLIENT_SECRET=example -e RONOTE_ANTHROPIC_API_KEY=example \
 	-e RONOTE_BLOB_ACCESS_KEY=example -e RONOTE_BLOB_SECRET_KEY=example \
@@ -306,11 +352,11 @@ units-check: ## Convert the Quadlet units with Quadlet's dry run (skipped where 
 	sh deploy/units-check.sh
 
 prod-check-config: ## Check the example production config with the api image; a same-site runner must fail
-	$(CHECK_CONFIG) ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) check-config
-	! $(CHECK_CONFIG) -e RONOTE_RUNNER_URL=https://run.ronote.example ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) check-config
+	$(CHECK_CONFIG) ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) check-config --offline
+	! $(CHECK_CONFIG) -e RONOTE_RUNNER_URL=https://run.ronote.example.me ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) check-config --offline
 
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp run-llm run-docling pdf-fixtures pdf-record extract lint lint-go lint-web fmt
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build web-e2e images units-check prod-config prod-ci prod-local prod-smoke prod-check-config
+.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config

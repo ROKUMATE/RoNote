@@ -18,6 +18,7 @@ var (
 // each with why. Each returns only a total, never a row of anyone's.
 var unscoped = map[string]string{
 	"ChatSpentToday": "chat's daily budget is for all users together (docs/adr/0014-production-topology.md): it sums cost only",
+	"ChunkToSearch":  "the restore drill searches one owner's restored library for a word of theirs (docs/adr/0015-operations.md); only the number of hits leaves it",
 }
 
 // TestOwnedQueriesAreScoped fails when a query touches documents or imports

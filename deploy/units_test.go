@@ -13,6 +13,8 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/rokumate/ronote/internal/chat"
 )
 
 // unit is a Quadlet file's keys, by section, each with every value given.
@@ -138,10 +140,10 @@ func TestImagesMatchCompose(t *testing.T) {
 		images[m[1]] = true
 	}
 	for name, prefix := range map[string]string{
-		"ronote-postgres.container":  "docker.io/",
-		"ronote-seaweedfs.container": "docker.io/",
-		"ronote-docling.container":   "",
-		"ronote-pdftext.container":   "",
+		"ronote-postgres.container":     "docker.io/",
+		"ci/ronote-seaweedfs.container": "docker.io/",
+		"ronote-docling.container":      "",
+		"ronote-pdftext.container":      "",
 	} {
 		image := readUnit(t, filepath.Join("quadlet", name)).container("Image")
 		if len(image) != 1 || !images[strings.TrimPrefix(image[0], prefix)] {
@@ -231,7 +233,11 @@ func TestCIThirdPartyImagesAreTheUnitsOwn(t *testing.T) {
 		if image := readUnit(t, path).container("Image"); !slices.Equal(image, []string{"localhost/ronote-ci/" + name + ":pinned"}) {
 			t.Errorf("%s: Image = %q, want localhost/ronote-ci/%s:pinned", path, image, name)
 		}
-		if pin := readUnit(t, filepath.Join("quadlet", "ronote-"+name+".container")).container("Image"); len(pin) != 1 || !strings.Contains(pin[0], "@sha256:") {
+		unit := filepath.Join("quadlet", "ronote-"+name+".container")
+		if _, err := os.Stat(unit); err != nil {
+			unit = filepath.Join("quadlet", "ci", "ronote-"+name+".container")
+		}
+		if pin := readUnit(t, unit).container("Image"); len(pin) != 1 || !strings.Contains(pin[0], "@sha256:") {
 			t.Errorf("ronote-%s.container: Image = %q, want a digest pin", name, pin)
 		}
 	}
@@ -266,7 +272,7 @@ func TestUnitsFitTheHost(t *testing.T) {
 	t.Parallel()
 	budget := map[string]int{
 		"ronote-caddy": 128, "ronote-api": 512, "ronote-worker": 512, "ronote-postgres": 2048,
-		"ronote-ollama": 2048, "ronote-docling": 4096, "ronote-pdftext": 512, "ronote-seaweedfs": 384,
+		"ronote-ollama": 2048, "ronote-docling": 4096, "ronote-pdftext": 512,
 	}
 	limit := regexp.MustCompile(`--memory=(\d+)([mg]) --cpus=([\d.]+)`)
 	total := 0
@@ -294,5 +300,73 @@ func TestUnitsFitTheHost(t *testing.T) {
 	}
 	if total > 10*1024 {
 		t.Errorf("the long-running units take %d MB, leaving the 12 GB host under 2 GB", total)
+	}
+}
+
+// Production's blobs are in Oracle's Object Storage (ADR 0015): no
+// production unit runs or waits for SeaweedFS, which only CI's drop-ins add.
+func TestProductionRunsNoSeaweedFS(t *testing.T) {
+	t.Parallel()
+	for _, path := range append(glob(t, "quadlet/*.container"), glob(t, "quadlet/*.volume")...) {
+		text, err := os.ReadFile(path) //nolint:gosec // the test's own files
+		if err != nil {
+			t.Fatal(err)
+		}
+		if strings.Contains(string(text), "seaweedfs") || strings.Contains(string(text), "ronote-blobs") {
+			t.Errorf("%s names SeaweedFS or its volume; only deploy/quadlet/ci may", path)
+		}
+	}
+}
+
+// The backups' images are pinned by digest, and CI runs each by the local
+// tag make prod-config gives it (CI_BACKUP_IMAGES), as it does the units'.
+func TestBackupImagesArePinned(t *testing.T) {
+	t.Parallel()
+	read := func(path string) map[string]string {
+		data, err := os.ReadFile(path) //nolint:gosec // the test's own files
+		if err != nil {
+			t.Fatal(err)
+		}
+		images := map[string]string{}
+		for line := range strings.Lines(string(data)) {
+			if name, ref, ok := strings.Cut(strings.TrimSpace(line), "="); ok && !strings.HasPrefix(name, "#") {
+				images[name] = ref
+			}
+		}
+		return images
+	}
+	pinned, ci := read("backup/images"), read("quadlet/ci/config/backup.images")
+	makefile, err := os.ReadFile("../Makefile")
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := regexp.MustCompile(`(?m)^CI_BACKUP_IMAGES = (.*)$`).FindSubmatch(makefile)
+	if m == nil {
+		t.Fatal("no CI_BACKUP_IMAGES in the Makefile")
+	}
+	names := strings.Fields(string(m[1]))
+	if len(names) != len(pinned) || len(ci) != len(pinned) {
+		t.Errorf("backup/images names %d images, CI's %d, the Makefile %q", len(pinned), len(ci), names)
+	}
+	for _, name := range names {
+		if !strings.Contains(pinned[name], "@sha256:") {
+			t.Errorf("backup/images: %s = %q, want a digest pin", name, pinned[name])
+		}
+		if want := "localhost/ronote-ci/" + name + ":pinned"; ci[name] != want {
+			t.Errorf("CI's backup.images: %s = %q, want %s", name, ci[name], want)
+		}
+	}
+}
+
+// The watcher alerts on the line the api logs when chat reaches its daily
+// spend cap; the two must name it alike.
+func TestTheWatcherMatchesTheSpendCapLine(t *testing.T) {
+	t.Parallel()
+	watch, err := os.ReadFile("alerts/watch.sh")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(watch), "grep -q '"+chat.SpendCapReached+"'") {
+		t.Errorf("alerts/watch.sh doesn't match %q, which the api logs", chat.SpendCapReached)
 	}
 }

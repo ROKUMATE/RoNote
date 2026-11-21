@@ -1,5 +1,6 @@
-# The blob store for uploaded PDFs (docs/adr/0013-pdf-import.md). Not
-# installed when ronote.env names an external S3, such as R2 or B2.
+# The blob store for uploaded PDFs (docs/adr/0013-pdf-import.md) in CI and
+# make prod-local only: production's is Oracle's Object Storage
+# (docs/adr/0015-operations.md).
 
 [Unit]
 Description=RoNote blob store

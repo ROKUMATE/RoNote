@@ -289,7 +289,7 @@ prod-config: images
 	cp testdata/golden/real-python-controlflow/input.html $(PROD_CONFIG)/fixtures/pages/real-python-controlflow/index.html
 	cp apps/web/e2e/fixtures/python.html $(PROD_CONFIG)/fixtures/linked/python/index.html
 	for n in $(CI_THIRD_PARTY); do \
-		ref=$$(sed -n 's/^Image=//p' deploy/quadlet/ronote-$$n.container) && \
+		ref=$$(cat deploy/quadlet/ronote-$$n.container deploy/quadlet/ci/ronote-$$n.container 2>/dev/null | sed -n 's/^Image=//p') && \
 		podman pull -q "$$ref" >/dev/null && podman tag "$$ref" localhost/ronote-ci/$$n:pinned || exit 1; \
 	done
 	rm -f bin/ronote-images.tar
@@ -306,8 +306,9 @@ prod-local: prod-config ## The same in the podman machine's VM, then the smoke s
 prod-smoke: ## Run the smoke suite through Caddy against installed units (make prod-ci first)
 	RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
 
-# check-config on deploy/ronote.env.example, with stand-ins for its secrets:
-# it must pass, and fail with the runner on the app's site.
+# check-config on deploy/ronote.env.example, with stand-ins for its secrets,
+# --offline since its blob store is an example: it must pass, and fail with
+# the runner on the app's site.
 EXAMPLE_SECRETS = -e RONOTE_DATABASE_URL=postgres://ronote:example@ronote-postgres:5432/ronote \
 	-e RONOTE_GITHUB_CLIENT_SECRET=example -e RONOTE_ANTHROPIC_API_KEY=example \
 	-e RONOTE_BLOB_ACCESS_KEY=example -e RONOTE_BLOB_SECRET_KEY=example \
@@ -318,8 +319,8 @@ units-check: ## Convert the Quadlet units with Quadlet's dry run (skipped where 
 	sh deploy/units-check.sh
 
 prod-check-config: ## Check the example production config with the api image; a same-site runner must fail
-	$(CHECK_CONFIG) ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) check-config
-	! $(CHECK_CONFIG) -e RONOTE_RUNNER_URL=https://run.ronote.example ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) check-config
+	$(CHECK_CONFIG) ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) check-config --offline
+	! $(CHECK_CONFIG) -e RONOTE_RUNNER_URL=https://run.ronote.example.me ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) check-config --offline
 
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp run-llm run-docling pdf-fixtures pdf-record extract lint lint-go lint-web fmt
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc

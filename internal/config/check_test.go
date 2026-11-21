@@ -46,17 +46,18 @@ func TestCheckTheExampleProductionConfig(t *testing.T) {
 	t.Parallel()
 	env := with(exampleEnv(t), exampleSecrets)
 	var out strings.Builder
-	if err := Check(func(k string) string { return env[k] }, &out); err != nil {
+	if _, err := Check(func(k string) string { return env[k] }, &out); err != nil {
 		t.Fatalf("Check(the example) = %v", err)
 	}
 	said := out.String()
 	for _, want := range []string{
 		"config OK for prod",
-		"app: https://ronote.example; runner: https://ronote-run.example",
+		"app: https://ronote.example.me; runner: https://ronote-runner.pages.dev",
 		"cookies: Secure, named __Host-",
 		"sign-in: github.com/login/oauth/authorize",
 		"trusted proxies: 10.89.10.0/24",
-		"chat: on, claude-haiku-5-5 at https://api.anthropic.com, $0.50 a day for everyone",
+		"chat: on, claude-haiku-5-5 at https://api.anthropic.com, $0.20 a day for everyone",
+		"blob store: https://examplenamespace.compat.objectstorage.eu-frankfurt-1.oraclecloud.com, bucket ronote-pdfs",
 		"database: ronote-postgres:5432/ronote",
 	} {
 		if !strings.Contains(said, want) {
@@ -68,10 +69,10 @@ func TestCheckTheExampleProductionConfig(t *testing.T) {
 	}
 
 	// The same deployment with the runner on the app's own site.
-	sameSite := with(env, map[string]string{"RONOTE_RUNNER_URL": "https://run.ronote.example"})
+	sameSite := with(env, map[string]string{"RONOTE_RUNNER_URL": "https://run.ronote.example.me"})
 	out.Reset()
-	err := Check(func(k string) string { return sameSite[k] }, &out)
-	if err == nil || !strings.Contains(err.Error(), "same site as RONOTE_PUBLIC_URL (ronote.example)") || out.Len() != 0 {
+	_, err := Check(func(k string) string { return sameSite[k] }, &out)
+	if err == nil || !strings.Contains(err.Error(), "same site as RONOTE_PUBLIC_URL (example.me)") || out.Len() != 0 {
 		t.Errorf("Check with a same-site runner = %v, said %q; want it refused, saying nothing else", err, out.String())
 	}
 }

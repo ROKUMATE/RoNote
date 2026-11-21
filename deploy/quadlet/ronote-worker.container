@@ -4,7 +4,7 @@
 Description=RoNote worker
 Requires=ronote-migrate.service ronote-postgres.service
 After=ronote-migrate.service ronote-postgres.service
-Wants=ronote-ollama.service ronote-seaweedfs.service ronote-docling.service ronote-pdftext.service
+Wants=ronote-ollama.service ronote-docling.service ronote-pdftext.service
 
 [Container]
 ContainerName=ronote-worker

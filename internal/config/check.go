@@ -13,15 +13,15 @@ import (
 func (c Config) SecureCookies() bool { return c.Env.Deployed() }
 
 // Check loads the configuration through getenv and writes what it found to
-// w, starting nothing and never writing a secret: `api check-config` and
-// `worker check-config` (docs/adr/0014-production-topology.md).
-func Check(getenv func(string) string, w io.Writer) error {
+// w, starting nothing and never writing a secret, for `api check-config`
+// and `worker check-config` (docs/adr/0014-production-topology.md).
+func Check(getenv func(string) string, w io.Writer) (Config, error) {
 	cfg, err := Load(getenv)
 	if err != nil {
-		return err
+		return Config{}, err
 	}
 	_, err = io.WriteString(w, cfg.Summary())
-	return err
+	return cfg, err
 }
 
 // Summary says what the configuration sets, a line each, without secrets:

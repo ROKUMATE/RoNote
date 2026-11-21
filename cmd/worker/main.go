@@ -2,9 +2,10 @@
 // cleanup and indexing, through the jobs port on River
 // (docs/adr/0009-jobs-port.md).
 //
-//	worker [run]         run jobs
-//	worker healthcheck   fail unless a running worker's database answered lately
-//	worker check-config  check the configuration, starting nothing
+//	worker [run]                    run jobs
+//	worker healthcheck              fail unless a running worker's database answered lately
+//	worker check-config [--offline] check the configuration, and the blob store's
+//	                                bucket unless --offline, starting nothing
 package main
 
 import (
@@ -19,6 +20,7 @@ import (
 	"time"
 
 	"github.com/rokumate/ronote/internal/blob/s3blob"
+	"github.com/rokumate/ronote/internal/checkconfig"
 	"github.com/rokumate/ronote/internal/cli"
 	"github.com/rokumate/ronote/internal/config"
 	"github.com/rokumate/ronote/internal/db"
@@ -50,16 +52,16 @@ var heartbeatFile = filepath.Join(os.TempDir(), "ronote-worker-alive")
 func main() {
 	err := cli.Run(os.Args[1:], "run", map[string]cli.Command{
 		"run": cli.NoArgs(run),
-		"check-config": cli.NoArgs(func() error {
-			return config.Check(os.Getenv, os.Stdout)
-		}),
+		"check-config": func(args []string) error {
+			return checkconfig.Run(context.Background(), args, os.Getenv, os.Stdout)
+		},
 		"healthcheck": cli.NoArgs(func() error {
 			return health.Fresh(heartbeatFile, heartbeatStale, time.Now())
 		}),
 	})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "worker:", err)
-		os.Exit(1)
+		os.Exit(cli.ExitCode(err))
 	}
 }
 
@@ -79,6 +81,9 @@ func run() error {
 	}
 	defer pool.Close()
 	if err := schema.Check(ctx, pool); err != nil {
+		return err
+	}
+	if err := checkconfig.Bucket(ctx, cfg); err != nil {
 		return err
 	}
 	go health.Beat(ctx, heartbeatFile, heartbeatEvery, pool.Ping)

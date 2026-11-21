@@ -56,6 +56,52 @@ func TestCheckRefusesANewerSchema(t *testing.T) {
 	}
 }
 
+// Versions tells the database's version from the build's newest: equal on
+// the migrated database, behind once its newest migration is undone, and
+// ahead once one the build doesn't know is recorded.
+func TestVersionsSaysBehindOrAhead(t *testing.T) {
+	ctx := t.Context()
+	newest := version(t)
+	got, err := schema.Versions(ctx, testDB.Pool)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != (schema.Status{Current: newest, Newest: newest}) || got.Behind() || got.Ahead() {
+		t.Errorf("Versions on the migrated database = %+v, want %d and %d", got, newest, newest)
+	}
+
+	for _, tc := range []struct {
+		name          string
+		change, undo  string
+		current       int64
+		behind, ahead bool
+	}{
+		{"behind", `DELETE FROM goose_db_version WHERE version_id = $1`, `INSERT INTO goose_db_version (version_id, is_applied) VALUES ($1, true)`, newest - 1, true, false},
+		{"ahead", `INSERT INTO goose_db_version (version_id, is_applied) VALUES ($1 + 1, true)`, `DELETE FROM goose_db_version WHERE version_id = $1 + 1`, newest + 1, false, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if _, err := testDB.Pool.Exec(ctx, tc.change, newest); err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() {
+				// The test's context is done by the time cleanups run.
+				if _, err := testDB.Pool.Exec(context.WithoutCancel(ctx), tc.undo, newest); err != nil {
+					t.Error(err)
+				}
+			})
+			got, err := schema.Versions(ctx, testDB.Pool)
+			if err != nil {
+				t.Fatal(err)
+			}
+			want := schema.Status{Current: tc.current, Newest: newest}
+			if got != want || got.Behind() != tc.behind || got.Ahead() != tc.ahead {
+				t.Errorf("Versions = %+v (behind %v, ahead %v), want %+v (behind %v, ahead %v)",
+					got, got.Behind(), got.Ahead(), want, tc.behind, tc.ahead)
+			}
+		})
+	}
+}
+
 func version(t *testing.T) int64 {
 	t.Helper()
 	var v int64

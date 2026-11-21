@@ -65,9 +65,9 @@ function expectHeaders(got: Headers, want: Headers, where: string) {
   expect(got.server, `${where}: server`).toBeUndefined();
 }
 
-/** Text of path on page's origin. */
+/** Text of path on page's origin, past the browser's cache. */
 function textOf(page: Page, path: string): Promise<string> {
-  return page.evaluate((path) => fetch(path).then((r) => r.text()), path);
+  return page.evaluate((path) => fetch(path, { cache: "no-store" }).then((r) => r.text()), path);
 }
 
 test.describe.configure({ mode: "serial" });
@@ -120,26 +120,27 @@ test("import a documentation page, search it and chat with a citation", async ()
   await dialog.getByRole("button", { name: "Import", exact: true }).click();
   await expect(page).toHaveURL(/\/doc\/[0-9a-f-]{36}$/, { timeout: 30_000 });
   await expect(page.getByRole("article")).toBeVisible();
+  const id = new URL(page.url()).pathname.replace("/doc/", "");
 
-  // Indexing waits for edits to settle, then the fake embedder: search
-  // again until it finds the page.
-  await page.keyboard.press("ControlOrMeta+k");
-  const palette = page.getByRole("dialog", { name: "Search your library" });
-  const query = palette.getByRole("combobox", { name: "Search your library" });
-  const hit = palette.getByRole("option").filter({ hasText: "for Statements" }).first();
+  // Indexing waits for edits to settle, then the fake embedder: ask the API,
+  // for this document alone, until search finds it. Retyping in the palette
+  // can't wait for it, since its debounce sees no change and searches once.
   await expect
     .poll(
-      async () => {
-        await query.fill("");
-        await query.fill("for statements");
-        return hit.waitFor({ timeout: 3_000 }).then(
-          () => true,
-          () => false,
-        );
-      },
-      { timeout: 45_000 },
+      async () =>
+        (
+          JSON.parse(await textOf(page, `/api/v1/search?q=statements&document_id=${id}`)) as {
+            results: unknown[];
+          }
+        ).results.length,
+      { timeout: 45_000, message: "the page is indexed" },
     )
-    .toBe(true);
+    .toBeGreaterThan(0);
+  await page.keyboard.press("ControlOrMeta+k");
+  const palette = page.getByRole("dialog", { name: "Search your library" });
+  await palette.getByRole("combobox", { name: "Search your library" }).fill("for statements");
+  const hit = palette.getByRole("option").filter({ hasText: "for Statements" }).first();
+  await expect(hit).toBeVisible();
   // Choosing it lands on its block, and closes the palette.
   await hit.click();
   await expect(palette).toBeHidden();

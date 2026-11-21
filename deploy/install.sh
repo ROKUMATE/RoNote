@@ -50,6 +50,13 @@ done
 [ "$(id -u)" -eq 0 ] || die "run it as root, with sudo"
 [ -n "$version" ] || die "--version is required: the images' tag, such as v1.2.3"
 
+# Quadlet takes Entrypoint= (pdftext's) from Podman 5.0 on.
+podman=$(podman version --format '{{.Client.Version}}') || die "no podman: install Podman 5.0 or later"
+IFS=. read -r major _ <<EOF
+$podman
+EOF
+[ "$major" -ge 5 ] || die "Podman $podman is too old: the units need 5.0 or later, for Quadlet's Entrypoint="
+
 # The user, with its own subordinate IDs for rootless containers, and its
 # services running without a login.
 if ! id "$user" >/dev/null 2>&1; then
@@ -89,17 +96,12 @@ chown -R "$user:$user" "$etc"
 # An external S3 (R2, B2) needs no SeaweedFS.
 seaweedfs=true
 grep -q '^RONOTE_BLOB_ENDPOINT=http://ronote-seaweedfs:' "$etc/ronote.env" || seaweedfs=false
+set -- "$units" "$version"
+[ "$seaweedfs" = true ] || set -- "$@" --no-seaweedfs
+[ -z "$dropins" ] || set -- "$@" --drop-ins "$dropins"
 
 find "$units" -mindepth 1 -maxdepth 1 -name 'ronote-*' -exec rm -rf {} +
-for f in "$here"/quadlet/ronote-*; do
-	case $f in */ronote-seaweedfs.container | */ronote-blobs.volume) [ "$seaweedfs" = true ] || continue ;; esac
-	sed "s|@RONOTE_VERSION@|$version|g" "$f" >"$units/$(basename "$f")"
-done
-if [ -n "$dropins" ]; then
-	for f in "$dropins"/ronote-*; do
-		cp -R "$f" "$units"/
-	done
-fi
+sh "$here/units.sh" "$@"
 chown -R "$user:$user" "$units"
 
 # Secrets: made once, never printed, kept by later runs.
@@ -149,6 +151,41 @@ if [ -n "$images" ]; then
 fi
 
 as_user systemctl --user daemon-reload
+
+# Quadlet's generator makes the services at daemon-reload, and leaves out,
+# with no more than a log line, a unit it can't convert or one in a
+# directory it doesn't look in. So each one is checked here, and a missing
+# one stops the install with what Quadlet and systemd say, not at restart.
+want=
+for f in "$units"/ronote-*.container "$units"/ronote-*.network "$units"/ronote-*.volume; do
+	name=$(basename "$f")
+	case $name in
+	*.container) want="$want ${name%.container}.service" ;;
+	*.network) want="$want ${name%.network}-network.service" ;;
+	*.volume) want="$want ${name%.volume}-volume.service" ;;
+	esac
+done
+made=$(as_user systemctl --user list-unit-files --no-legend 'ronote-*' | awk '{ print $1 }')
+missing=
+for s in $want; do
+	printf '%s\n' "$made" | grep -qx "$s" || missing="$missing $s"
+done
+if [ -n "$missing" ]; then
+	generator=/usr/lib/systemd/user-generators/podman-user-generator
+	[ -e "$generator" ] || generator=/usr/libexec/podman/quadlet
+	say "Quadlet's dry run on $units, as $user:"
+	{ as_user env QUADLET_UNIT_DIRS="$units" "$generator" -dryrun -user >/dev/null; } 2>&1 || true
+	say "versions:"
+	as_user podman --version || true
+	as_user systemctl --version || true
+	say "the user generators:"
+	ls -l /usr/lib/systemd/user-generators/ || true
+	say "$user's systemd environment, which the generator runs in:"
+	as_user systemctl --user show-environment || true
+	say "the generator's log:"
+	as_user journalctl --user -b --no-pager _COMM=podman-user-gen || true
+	die "Quadlet made no unit for:$missing; the reasons are above"
+fi
 
 # The embedding model, pulled once over egress into Ollama's volume and
 # checked against the pin; Ollama itself then runs with no way out.

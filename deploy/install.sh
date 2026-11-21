@@ -6,13 +6,15 @@
 # the user, the secrets and the data, and installs the units again.
 #
 #   sudo sh deploy/install.sh --version v1.2.3 --config DIR
-#       [--drop-ins DIR] [--images FILE] [--skip-model]
+#       [--drop-ins DIR] [--images FILE] [--skip-model] [--pin NAME=REF]...
 #
 # --config DIR   files for ~ronote/.config/ronote, ronote.env at least
 #                (deploy/ronote.env.example); kept from an earlier run if absent
 # --drop-ins DIR units and drop-ins added beside the units (deploy/quadlet/ci)
 # --images FILE  an image archive (podman save) to load instead of pulling
 # --skip-model   no embedding model: the drop-ins replace Ollama
+# --pin NAME=REF run NAME (ronote-api, -worker, -web) as REF: ronote-deploy
+#                pins a release's images by digest
 #
 # Secrets it doesn't generate come from its environment, never from a file:
 # RONOTE_GITHUB_CLIENT_SECRET, and RONOTE_ANTHROPIC_API_KEY when chat is on;
@@ -31,6 +33,7 @@ config=
 dropins=
 images=
 skip_model=false
+pins=
 
 die() {
 	printf 'install: %s\n' "$*" >&2
@@ -48,6 +51,7 @@ while [ $# -gt 0 ]; do
 	--drop-ins) dropins=${2:?}; shift 2 ;;
 	--images) images=${2:?}; shift 2 ;;
 	--skip-model) skip_model=true; shift ;;
+	--pin) pins="$pins --pin ${2:?}"; shift 2 ;;
 	*) die "unknown argument $1; see the comment at the top of $0" ;;
 	esac
 done
@@ -108,6 +112,8 @@ chown -R "$user:$user" "$etc"
 
 set -- "$units" "$version"
 [ -z "$dropins" ] || set -- "$@" --drop-ins "$dropins"
+# shellcheck disable=SC2086 # two words a pin
+[ -z "$pins" ] || set -- "$@" $pins
 find "$units" -mindepth 1 -maxdepth 1 -name 'ronote-*' -exec rm -rf {} +
 sh "$here/units.sh" "$@"
 chown -R "$user:$user" "$units"

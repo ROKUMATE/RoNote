@@ -28,7 +28,7 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups and the alerts
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts and ronote-deploy
 	PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s deploy/pdftext -t deploy/pdftext
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
@@ -41,6 +41,7 @@ hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the docto
 	sh scripts/test-report-failed.sh
 	sh scripts/test-backup.sh
 	sh scripts/test-alerts.sh
+	sh scripts/test-deploy.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
@@ -320,6 +321,9 @@ prod-ci: prod-config ## Install the production units with the fakes on this Linu
 prod-local: prod-config ## The same in the podman machine's VM, then the smoke suite from this Mac
 	INSTALL_ENV='$(CI_INSTALL_ENV)' sh scripts/prod-local.sh
 
+deploy-host: ## Deploy TAG on the production host over SSH (release only: DEPLOY_HOST, DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS)
+	sh scripts/deploy-host.sh "$(TAG)"
+
 backup-now: ## Back up the database and the PDFs now, as the timers do, on a host install.sh set up (sudo)
 	sudo sh deploy/run-now.sh ronote-backup@db.service ronote-backup@pdfs.service
 
@@ -352,4 +356,4 @@ prod-check-config: ## Check the example production config with the api image; a 
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build runner-pages runner-deploy web-e2e images backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config
+.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config

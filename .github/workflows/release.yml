@@ -2,8 +2,10 @@ name: Release
 
 # A v* tag builds the images of docs/adr/0014-production-topology.md for
 # amd64 and arm64, pushes them to ghcr.io and attests how they were built,
-# then deploys the runner to Cloudflare Pages (docs/adr/0015-operations.md)
-# from the environment "production", whose required reviewer approves it.
+# then deploys it (docs/adr/0015-operations.md) from the environment
+# "production", whose required reviewer approves it: the runner to Cloudflare
+# Pages, then the release on the host, which goes back to the previous one
+# if it isn't healthy.
 
 on:
   push:
@@ -67,8 +69,8 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
-  runner:
-    name: Runner on Cloudflare Pages
+  deploy:
+    name: Deploy
     needs: images
     runs-on: ubuntu-26.04
     timeout-minutes: 20
@@ -102,3 +104,12 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
         run: make runner-deploy
+      # The deploy user's key runs ronote-deploy and nothing else; the host's
+      # own key, pinned, so nothing can pose as it.
+      - name: Deploy the release on the host
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+          TAG: ${{ github.ref_name }}
+        run: make deploy-host TAG="$TAG"

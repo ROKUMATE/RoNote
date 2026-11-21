@@ -32,7 +32,7 @@ printf 'prod-local: copying the units, configuration and images into the VM\n'
 remote "sudo rm -rf $dir && sudo mkdir -p $dir && sudo chown $login $dir && chmod 700 $dir"
 tar -cf - deploy scripts/embed-check.sh bin/prod-config bin/ronote-images.tar | remote "sudo tar -xf - -C $dir"
 
-remote "cd $dir && sudo env RONOTE_GITHUB_CLIENT_SECRET=ronote-e2e-secret sh deploy/install.sh --version local --config bin/prod-config --drop-ins deploy/quadlet/ci --images bin/ronote-images.tar --skip-model"
+remote "cd $dir && sudo env ${INSTALL_ENV:?make prod-local sets it} sh deploy/install.sh --version local --config bin/prod-config --drop-ins deploy/quadlet/ci --images bin/ronote-images.tar --skip-model"
 remote "sudo sh $dir/deploy/as-ronote.sh podman exec ronote-caddy cat /caddy/data/caddy/pki/authorities/local/intermediate.crt" >bin/smoke-ca.pem
 
 # The dev stack's own containers publish its ports in the same VM, so only
@@ -47,4 +47,8 @@ ssh -i "$key" -p "$port" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/
 status=0
 RONOTE_SMOKE_HOST=127.0.0.1:8443 make prod-smoke || status=$?
 ssh -S "$socket" -O exit "$login@localhost" 2>/dev/null || true
-exit "$status"
+[ "$status" -eq 0 ] || exit "$status"
+
+# What the smoke suite made, backed up into the VM's own restic repository
+# and restored by the drill, as make backup-now and make restore-drill do.
+remote "sudo sh $dir/deploy/run-now.sh ronote-backup@db.service ronote-backup@pdfs.service ronote-restore-drill.service"

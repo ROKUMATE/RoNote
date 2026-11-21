@@ -1,0 +1,10 @@
+# Weekly, after Sunday's backups.
+[Unit]
+Description=RoNote's weekly restore drill
+
+[Timer]
+OnCalendar=Sun *-*-* 05:00:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target

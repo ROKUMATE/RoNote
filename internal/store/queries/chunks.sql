@@ -32,3 +32,14 @@ WHERE model = $1 AND text_sha256 = ANY(sqlc.arg(hashes)::bytea[]);
 INSERT INTO embedding_cache (model, text_sha256, embedding)
 VALUES ($1, $2, sqlc.arg(embedding)::halfvec)
 ON CONFLICT DO NOTHING;
+
+-- name: ChunkToSearch :one
+-- The restore drill's search (docs/adr/0015-operations.md): the newest
+-- chunk's owner and a word it is indexed by, which it searches its owner's
+-- library for. The word is one of its lexemes, which full-text search kept,
+-- so never a stopword; the longest, as the most particular.
+SELECT newest.owner_id, word.lexeme::text AS word
+FROM (SELECT owner_id, tsv FROM chunks ORDER BY created_at DESC LIMIT 1) AS newest,
+    unnest(tsvector_to_array(newest.tsv)) AS word (lexeme)
+ORDER BY length(word.lexeme) DESC, word.lexeme
+LIMIT 1;

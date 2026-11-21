@@ -1,0 +1,5 @@
+# The backups' images in CI and make prod-local: deploy/backup/images' pins,
+# saved by make prod-config under local names, since a saved image keeps no
+# digest reference.
+restic=localhost/ronote-ci/restic:pinned
+rclone=localhost/ronote-ci/rclone:pinned

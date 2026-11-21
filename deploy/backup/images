@@ -1,0 +1,5 @@
+# The images backup.sh and restore-drill.sh run (docs/adr/0015-operations.md),
+# pinned by digest. install.sh puts this in ~ronote/.config/ronote/backup.images;
+# CI's configuration replaces it with the local tags make prod-config gives them.
+restic=docker.io/restic/restic:0.19.1@sha256:136600b6ff6843d61d355f7f71f460a166429f35de6fd11b568fece3c9a4d510
+rclone=docker.io/rclone/rclone:1.76.0@sha256:7cbeec24a44f206067597c0368be4de90ae19a64d5113c7d1938bd737a81e466

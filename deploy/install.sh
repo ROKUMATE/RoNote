@@ -16,7 +16,10 @@
 #
 # Secrets it doesn't generate come from its environment, never from a file:
 # RONOTE_GITHUB_CLIENT_SECRET, and RONOTE_ANTHROPIC_API_KEY when chat is on;
-# RONOTE_BLOB_ACCESS_KEY and RONOTE_BLOB_SECRET_KEY for an external S3.
+# RONOTE_BLOB_ACCESS_KEY and RONOTE_BLOB_SECRET_KEY for the object store;
+# for the backups (docs/adr/0015-operations.md), RONOTE_RESTIC_PASSWORD,
+# RONOTE_BACKUP_REPO (restic's s3:https://… URL of the R2 bucket) and
+# RONOTE_BACKUP_ACCESS_KEY and RONOTE_BACKUP_SECRET_KEY, R2's token.
 set -eu
 
 here=$(cd "$(dirname "$0")" && pwd)
@@ -93,6 +96,8 @@ printf '%s\n' "$manager_env" | sh "$here/check-environment.sh" "$uid" "$home" ||
 etc=$home/.config/ronote
 units=$home/.config/containers/systemd
 install -d -o "$user" -g "$user" -m 700 "$home/.config" "$etc" "$home/.config/containers" "$units"
+# The backups' pinned images; a configuration (CI's) may name its own.
+cp "$repo/deploy/backup/images" "$etc/backup.images"
 if [ -n "$config" ]; then
 	cp -R "$config"/. "$etc"/
 fi
@@ -149,6 +154,18 @@ else
 	secret ronote-blob-access-key "${RONOTE_BLOB_ACCESS_KEY:-}"
 	secret ronote-blob-secret-key "${RONOTE_BLOB_SECRET_KEY:-}"
 fi
+secret ronote-restic-password "${RONOTE_RESTIC_PASSWORD:-}"
+secret ronote-backup-repo "${RONOTE_BACKUP_REPO:-}"
+secret ronote-backup-access-key "${RONOTE_BACKUP_ACCESS_KEY:-}"
+secret ronote-backup-secret-key "${RONOTE_BACKUP_SECRET_KEY:-}"
+
+# The backups and the restore drill: their scripts, and the user services and
+# timers that run them as ronote.
+lib=$home/.local/lib/ronote
+userunits=$home/.config/systemd/user
+install -d -o "$user" -g "$user" -m 700 "$home/.local" "$home/.local/lib" "$lib" "$home/.config/systemd" "$userunits"
+install -o "$user" -g "$user" -m 600 "$here/backup/lib.sh" "$here/backup/backup.sh" "$here/backup/restore-drill.sh" "$here/backup/count-rows.awk" "$lib"/
+install -o "$user" -g "$user" -m 600 "$here"/backup/ronote-*.service "$here"/backup/ronote-*.timer "$userunits"/
 
 # Root opens the archive, which may sit where ronote can't read, such as a
 # checkout; ronote's podman reads it from stdin.
@@ -230,3 +247,5 @@ if ! as_user systemctl --user restart $services; then
 	die "a unit didn't start; why is above"
 fi
 say "started:$services"
+as_user systemctl --user enable --now ronote-backup-db.timer ronote-backup-pdfs.timer ronote-restore-drill.timer
+say "the backups and the restore drill are on their timers"

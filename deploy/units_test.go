@@ -315,3 +315,43 @@ func TestProductionRunsNoSeaweedFS(t *testing.T) {
 		}
 	}
 }
+
+// The backups' images are pinned by digest, and CI runs each by the local
+// tag make prod-config gives it (CI_BACKUP_IMAGES), as it does the units'.
+func TestBackupImagesArePinned(t *testing.T) {
+	t.Parallel()
+	read := func(path string) map[string]string {
+		data, err := os.ReadFile(path) //nolint:gosec // the test's own files
+		if err != nil {
+			t.Fatal(err)
+		}
+		images := map[string]string{}
+		for line := range strings.Lines(string(data)) {
+			if name, ref, ok := strings.Cut(strings.TrimSpace(line), "="); ok && !strings.HasPrefix(name, "#") {
+				images[name] = ref
+			}
+		}
+		return images
+	}
+	pinned, ci := read("backup/images"), read("quadlet/ci/config/backup.images")
+	makefile, err := os.ReadFile("../Makefile")
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := regexp.MustCompile(`(?m)^CI_BACKUP_IMAGES = (.*)$`).FindSubmatch(makefile)
+	if m == nil {
+		t.Fatal("no CI_BACKUP_IMAGES in the Makefile")
+	}
+	names := strings.Fields(string(m[1]))
+	if len(names) != len(pinned) || len(ci) != len(pinned) {
+		t.Errorf("backup/images names %d images, CI's %d, the Makefile %q", len(pinned), len(ci), names)
+	}
+	for _, name := range names {
+		if !strings.Contains(pinned[name], "@sha256:") {
+			t.Errorf("backup/images: %s = %q, want a digest pin", name, pinned[name])
+		}
+		if want := "localhost/ronote-ci/" + name + ":pinned"; ci[name] != want {
+			t.Errorf("CI's backup.images: %s = %q, want %s", name, ci[name], want)
+		}
+	}
+}

@@ -28,7 +28,7 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic and the installer's environment check and failure report
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, and the backups
 	PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s deploy/pdftext -t deploy/pdftext
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
@@ -39,6 +39,7 @@ hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the docto
 	sh scripts/test-doc-sizes.sh
 	sh scripts/test-check-environment.sh
 	sh scripts/test-report-failed.sh
+	sh scripts/test-backup.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
@@ -279,7 +280,17 @@ images: ## Build the api, worker, web and fakes images with podman, and print th
 # unit pinning one would pull it. Nothing else is pulled (Pull=never).
 PROD_CONFIG = bin/prod-config
 CI_THIRD_PARTY = postgres seaweedfs
-CI_TAGS = $(foreach n,$(CI_THIRD_PARTY),localhost/ronote-ci/$(n):pinned)
+# The backups' images (deploy/backup/images), tagged the same way, which CI's
+# configuration names.
+CI_BACKUP_IMAGES = restic rclone
+CI_TAGS = $(foreach n,$(CI_THIRD_PARTY) $(CI_BACKUP_IMAGES),localhost/ronote-ci/$(n):pinned)
+# install.sh's secrets in CI and make prod-local: stand-ins made fresh each
+# run, so no secret-shaped value is in the repo (install.sh keeps the first
+# ones a host is given, and the fake sign-in reads the api's), and a restic
+# repository on the host rather than R2.
+random = $(shell od -An -N16 -tx1 /dev/urandom | tr -d ' \n')
+CI_INSTALL_ENV = RONOTE_GITHUB_CLIENT_SECRET=$(random) RONOTE_RESTIC_PASSWORD=$(random) \
+	RONOTE_BACKUP_REPO=/var/lib/restic/repo RONOTE_BACKUP_ACCESS_KEY=none RONOTE_BACKUP_SECRET_KEY=none
 SMOKE_CA = bin/smoke-ca.pem
 
 prod-config: images
@@ -292,16 +303,26 @@ prod-config: images
 		ref=$$(cat deploy/quadlet/ronote-$$n.container deploy/quadlet/ci/ronote-$$n.container 2>/dev/null | sed -n 's/^Image=//p') && \
 		podman pull -q "$$ref" >/dev/null && podman tag "$$ref" localhost/ronote-ci/$$n:pinned || exit 1; \
 	done
+	for n in $(CI_BACKUP_IMAGES); do \
+		ref=$$(sed -n "s/^$$n=//p" deploy/backup/images) && \
+		podman pull -q "$$ref" >/dev/null && podman tag "$$ref" localhost/ronote-ci/$$n:pinned || exit 1; \
+	done
 	rm -f bin/ronote-images.tar
 	podman save --multi-image-archive -o bin/ronote-images.tar $(IMAGES) $(CI_TAGS)
 
 prod-ci: prod-config ## Install the production units with the fakes on this Linux host (sudo), and check only 80 and 443 answer
-	sudo env RONOTE_GITHUB_CLIENT_SECRET=ronote-e2e-secret sh deploy/install.sh --version $(IMAGE_TAG) --config $(PROD_CONFIG) --drop-ins deploy/quadlet/ci --images bin/ronote-images.tar --skip-model
+	sudo env $(CI_INSTALL_ENV) sh deploy/install.sh --version $(IMAGE_TAG) --config $(PROD_CONFIG) --drop-ins deploy/quadlet/ci --images bin/ronote-images.tar --skip-model
 	sudo sh deploy/as-ronote.sh podman exec ronote-caddy cat /caddy/data/caddy/pki/authorities/local/intermediate.crt > $(SMOKE_CA)
 	sh deploy/check-ports.sh 127.0.0.1 $$(hostname -I | cut -d' ' -f1)
 
 prod-local: prod-config ## The same in the podman machine's VM, then the smoke suite from this Mac
-	sh scripts/prod-local.sh
+	INSTALL_ENV='$(CI_INSTALL_ENV)' sh scripts/prod-local.sh
+
+backup-now: ## Back up the database and the PDFs now, as the timers do, on a host install.sh set up (sudo)
+	sudo sh deploy/run-now.sh ronote-backup@db.service ronote-backup@pdfs.service
+
+restore-drill: ## Run the restore drill now, as its weekly timer does, on a host install.sh set up (sudo)
+	sudo sh deploy/run-now.sh ronote-restore-drill.service
 
 prod-smoke: ## Run the smoke suite through Caddy against installed units (make prod-ci first)
 	RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
@@ -326,4 +347,4 @@ prod-check-config: ## Check the example production config with the api image; a 
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build runner-pages runner-deploy web-e2e images units-check prod-config prod-ci prod-local prod-smoke prod-check-config
+.PHONY: web-dev web-build runner-pages runner-deploy web-e2e images backup-now restore-drill units-check prod-config prod-ci prod-local prod-smoke prod-check-config

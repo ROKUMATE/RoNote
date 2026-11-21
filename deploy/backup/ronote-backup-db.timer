@@ -1,0 +1,11 @@
+# The database, nightly; a missed night runs at the next boot.
+[Unit]
+Description=RoNote's nightly database backup
+
+[Timer]
+OnCalendar=*-*-* 03:15:00 UTC
+Persistent=true
+Unit=ronote-backup@db.service
+
+[Install]
+WantedBy=timers.target

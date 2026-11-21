@@ -267,6 +267,12 @@ jobs:
         run: make prod-check-config
       - name: Run the smoke suite through Caddy
         run: make prod-smoke
+      # What the suite made, backed up into a restic repository on this
+      # runner (R2 in production), then restored by the drill.
+      - name: Back up the database and the PDFs
+        run: make backup-now
+      - name: Run the restore drill
+        run: make restore-drill
       - name: Upload the Playwright report
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

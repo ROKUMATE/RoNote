@@ -7,6 +7,8 @@
 //	api check-config [--offline] check the configuration, and the blob store's
 //	                             bucket unless --offline, starting nothing
 //	api healthcheck URL          fail unless URL (its /healthz) answers 200
+//	api search-check             search the database's newest chunk's library by a
+//	                             word of it, by words alone: the restore drill's
 package main
 
 import (
@@ -60,6 +62,20 @@ func main() {
 			return checkconfig.Run(context.Background(), args, os.Getenv, os.Stdout)
 		},
 		"healthcheck": healthcheck,
+		"search-check": cli.NoArgs(func() error {
+			return withDatabase(func(ctx context.Context, pool *pgxpool.Pool, _ *slog.Logger) error {
+				hits, searched, err := search.CheckSearch(ctx, store.New(pool))
+				switch {
+				case err != nil:
+					return err
+				case !searched:
+					fmt.Println("search: nothing is indexed to search")
+				default:
+					fmt.Printf("search: %d hits in the newest chunk's library\n", hits)
+				}
+				return nil
+			})
+		}),
 	})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "api:", err)

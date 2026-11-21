@@ -12,6 +12,30 @@ import (
 	pgvector "github.com/pgvector/pgvector-go"
 )
 
+const chunkToSearch = `-- name: ChunkToSearch :one
+SELECT newest.owner_id, word.lexeme::text AS word
+FROM (SELECT owner_id, tsv FROM chunks ORDER BY created_at DESC LIMIT 1) AS newest,
+    unnest(tsvector_to_array(newest.tsv)) AS word (lexeme)
+ORDER BY length(word.lexeme) DESC, word.lexeme
+LIMIT 1
+`
+
+type ChunkToSearchRow struct {
+	OwnerID uuid.UUID
+	Word    string
+}
+
+// The restore drill's search (docs/adr/0015-operations.md): the newest
+// chunk's owner and a word it is indexed by, which it searches its owner's
+// library for. The word is one of its lexemes, which full-text search kept,
+// so never a stopword; the longest, as the most particular.
+func (q *Queries) ChunkToSearch(ctx context.Context) (ChunkToSearchRow, error) {
+	row := q.db.QueryRow(ctx, chunkToSearch)
+	var i ChunkToSearchRow
+	err := row.Scan(&i.OwnerID, &i.Word)
+	return i, err
+}
+
 const countDocumentChunks = `-- name: CountDocumentChunks :one
 SELECT count(*)::int
 FROM chunks

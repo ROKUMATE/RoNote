@@ -193,6 +193,13 @@ func TestLoad(t *testing.T) {
 			want: Config{Env: EnvStaging, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.github.io", RunnerURL: "https://ronote-run.github.io", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatOffDefault},
 		},
 		{
+			// docs/adr/0015-operations.md: pages.dev is on the Public Suffix
+			// List, so each Pages project is a site of its own.
+			name: "staging's app on a .me domain and its runner on Cloudflare Pages",
+			env:  validEnv(map[string]string{"RONOTE_ENV": "staging", "RONOTE_PUBLIC_URL": "https://ronote.example.me", "RONOTE_RUNNER_URL": "https://ronote-runner.pages.dev"}),
+			want: Config{Env: EnvStaging, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day, PublicURL: "https://ronote.example.me", RunnerURL: "https://ronote-runner.pages.dev", GitHub: github, Limits: limits, Embed: embedDefault, Chat: chatOffDefault},
+		},
+		{
 			name:    "missing env",
 			env:     validEnv(map[string]string{"RONOTE_ENV": ""}),
 			wantErr: []string{"RONOTE_ENV: not set; want one of dev, test, staging, prod"},

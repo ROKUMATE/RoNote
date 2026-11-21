@@ -106,6 +106,19 @@ func (s *Store) List(ctx context.Context, prefix string) iter.Seq2[blob.Info, er
 	}
 }
 
+// Check fails unless the bucket exists and takes a write, naming it. A write
+// alone can't tell: SeaweedFS makes a missing bucket for a key with Admin
+// rights, where Oracle's store refuses one (docs/adr/0015-operations.md).
+func (s *Store) Check(ctx context.Context) error {
+	if _, err := s.client.HeadBucket(ctx, &s3.HeadBucketInput{Bucket: &s.bucket}); err != nil {
+		if notFound(err) {
+			return fmt.Errorf("blob store: bucket %s doesn't exist: make it, as docs/runbook.md says", s.bucket)
+		}
+		return fmt.Errorf("blob store: bucket %s: %w", s.bucket, err)
+	}
+	return blob.CheckWritable(ctx, s, s.bucket)
+}
+
 func notFound(err error) bool {
 	var noKey *types.NoSuchKey
 	var resp *smithyhttp.ResponseError

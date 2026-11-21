@@ -6,9 +6,12 @@ package blob
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
+	"fmt"
 	"io"
 	"iter"
+	"strings"
 	"time"
 )
 
@@ -56,6 +59,25 @@ func DeletePrefix(ctx context.Context, s Store, prefix string) error {
 		if err := s.Delete(ctx, key); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+// checkPrefix holds the objects CheckWritable writes, apart from any blob.
+const checkPrefix = ".ronote-check/"
+
+// CheckWritable writes a small object to s and deletes it, failing with
+// the bucket's name when either is refused: a store that is missing, or
+// takes no writes, fails at start rather than at a reader's first upload
+// (docs/adr/0015-operations.md).
+func CheckWritable(ctx context.Context, s Store, bucket string) error {
+	key := checkPrefix + rand.Text()
+	body := strings.NewReader("ok")
+	if err := s.Put(ctx, key, body, body.Size()); err != nil {
+		return fmt.Errorf("blob store: bucket %s takes no write: %w", bucket, err)
+	}
+	if err := s.Delete(ctx, key); err != nil {
+		return fmt.Errorf("blob store: bucket %s keeps %s: %w", bucket, key, err)
 	}
 	return nil
 }

@@ -4,7 +4,8 @@
 //	api migrate                  apply the migrations the database lacks
 //	api migrate status           print the schema's version against this build's;
 //	                             exit 3 if the database is behind, 4 if ahead
-//	api check-config             check the configuration, starting nothing
+//	api check-config [--offline] check the configuration, and the blob store's
+//	                             bucket unless --offline, starting nothing
 //	api healthcheck URL          fail unless URL (its /healthz) answers 200
 package main
 
@@ -29,6 +30,7 @@ import (
 	"github.com/rokumate/ronote/internal/blob/s3blob"
 	"github.com/rokumate/ronote/internal/chat"
 	"github.com/rokumate/ronote/internal/chat/anthropic"
+	"github.com/rokumate/ronote/internal/checkconfig"
 	"github.com/rokumate/ronote/internal/cli"
 	"github.com/rokumate/ronote/internal/config"
 	"github.com/rokumate/ronote/internal/db"
@@ -54,9 +56,9 @@ func main() {
 	err := cli.Run(os.Args[1:], "serve", map[string]cli.Command{
 		"serve":   cli.NoArgs(run),
 		"migrate": migrate,
-		"check-config": cli.NoArgs(func() error {
-			return config.Check(os.Getenv, os.Stdout)
-		}),
+		"check-config": func(args []string) error {
+			return checkconfig.Run(context.Background(), args, os.Getenv, os.Stdout)
+		},
 		"healthcheck": healthcheck,
 	})
 	if err != nil {
@@ -141,6 +143,9 @@ func run() error {
 	}
 	defer pool.Close()
 	if err := schema.Check(ctx, pool); err != nil {
+		return err
+	}
+	if err := checkconfig.Bucket(ctx, cfg); err != nil {
 		return err
 	}
 

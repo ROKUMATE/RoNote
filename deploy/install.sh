@@ -100,16 +100,15 @@ fi
 cp "$repo/deploy/pdftext/pdftext.py" "$etc/pdftext.py"
 chown -R "$user:$user" "$etc"
 
-# An external S3 (R2, B2) needs no SeaweedFS.
-seaweedfs=true
-grep -q '^RONOTE_BLOB_ENDPOINT=http://ronote-seaweedfs:' "$etc/ronote.env" || seaweedfs=false
 set -- "$units" "$version"
-[ "$seaweedfs" = true ] || set -- "$@" --no-seaweedfs
 [ -z "$dropins" ] || set -- "$@" --drop-ins "$dropins"
-
 find "$units" -mindepth 1 -maxdepth 1 -name 'ronote-*' -exec rm -rf {} +
 sh "$here/units.sh" "$@"
 chown -R "$user:$user" "$units"
+# SeaweedFS comes only with CI's drop-ins; production's blobs are in an
+# external store, whose keys come from this command's environment.
+seaweedfs=false
+[ ! -f "$units/ronote-seaweedfs.container" ] || seaweedfs=true
 
 # Secrets: made once, never printed, kept by later runs.
 secret() {

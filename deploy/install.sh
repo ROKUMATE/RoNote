@@ -82,6 +82,13 @@ as_user() {
 	sh "$here/as-ronote.sh" "$@"
 }
 
+# ronote's manager gets its environment from the host's PAM, which can hold
+# another user's directories (GitHub's runner image puts its own user's in
+# /etc/environment). Quadlet and podman would then use those, so this stops
+# the install instead of overriding them.
+manager_env=$(as_user systemctl --user show-environment) || die "can't read $user's systemd environment"
+printf '%s\n' "$manager_env" | sh "$here/check-environment.sh" "$uid" "$home" || die "$user's systemd has another user's directories; see above"
+
 # Configuration, then the units.
 etc=$home/.config/ronote
 units=$home/.config/containers/systemd

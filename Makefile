@@ -237,7 +237,19 @@ web-build: ## Build the web app and the runner, and the runner's Pages site; fai
 	@! grep -rIil styleguide apps/web/dist || \
 		{ echo "make web-build: dev-only styleguide code found in the files above" >&2; exit 1; }
 	$(WEB) exec node scripts/budget.ts
-	$(WEB) exec node scripts/runner-pages.ts https://ronote.example
+	@$(MAKE) --no-print-directory runner-pages APP_URL=https://ronote.example
+
+runner-pages: ## Make the runner's Cloudflare Pages site in apps/web/dist-pages for the app at APP_URL, from make web-build's runner
+	@test -n "$(APP_URL)" || { echo "make runner-pages: set APP_URL to the app's https origin" >&2; exit 1; }
+	$(WEB) exec node scripts/runner-pages.ts "$(APP_URL)"
+
+# wrangler has its own package and lockfile (deploy/pages), outside the
+# workspace, so only a release installs it.
+runner-deploy: ## Deploy apps/web/dist-pages to Cloudflare Pages (release only: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_PAGES_PROJECT)
+	@test -n "$$CLOUDFLARE_PAGES_PROJECT" || { echo "make runner-deploy: set CLOUDFLARE_PAGES_PROJECT" >&2; exit 1; }
+	@test -d apps/web/dist-pages || { echo "make runner-deploy: no apps/web/dist-pages; run make runner-pages first" >&2; exit 1; }
+	pnpm install --frozen-lockfile --dir deploy/pages
+	pnpm --dir deploy/pages run pages
 
 web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromium); locally needs make dev-up
 	@$(node_required)
@@ -313,4 +325,4 @@ prod-check-config: ## Check the example production config with the api image; a 
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build web-e2e images units-check prod-config prod-ci prod-local prod-smoke prod-check-config
+.PHONY: web-dev web-build runner-pages runner-deploy web-e2e images units-check prod-config prod-ci prod-local prod-smoke prod-check-config

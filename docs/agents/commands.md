@@ -60,6 +60,8 @@ Every make target and what it runs, in detail. AGENTS.md keeps one line each.
 | `make migrate-new name=...` | create the next sequential SQL migration in `migrations/` |
 | `make river-migration first=N last=M` | add a migration holding River's own migrations N to M, from the River version go.mod pins. Goose owns all schema, River's tables included; after a River upgrade, `make test-integration` names the versions to add |
 | `make sqlc` | regenerate `internal/store/sqlcdb` from `migrations/` and `internal/store/queries/`; commit the result |
+| `make runner-pages APP_URL=https://…` | the runner's Cloudflare Pages site in `apps/web/dist-pages`, from `make web-build`'s runner: `index.html` names the app, `_headers` comes from `apps/web/runner-headers.ts`, and every file is checked for exactly one CSP |
+| `make runner-deploy` | release only: `wrangler pages deploy apps/web/dist-pages` to the project `CLOUDFLARE_PAGES_PROJECT`, with `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; installs wrangler from `deploy/pages`'s own lockfile |
 | `make generate` | regenerate everything generated: sqlc output, then `internal/httpapi/gen` (oapi-codegen) and `apps/web/src/api/schema.d.ts` (openapi-typescript) from `api/openapi.yaml`, and `deploy/caddy/runner.caddy` from `apps/web/runner-headers.ts`; commit the result. Needs Node as well as Go |
 | `make check-generated` | `make generate`, then fail if the output differs from what is committed |
 | `make check-go-version` | print the Go toolchain and fail unless it is go.mod's `toolchain` |

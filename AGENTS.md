@@ -46,6 +46,7 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make check-commits RANGE=main..HEAD` | check each commit message in strict mode |
 | `make web-dev` | app on `127.0.0.1:5173`, the runner on `localhost:5174`, the fake sign-in and chat model |
 | `make web-build` | production build and bundle budgets |
+| `make runner-pages APP_URL=…` / `runner-deploy` | the runner's Cloudflare Pages site / deploy it (release only) |
 | `make web-e2e` | Playwright and axe against the full stack (`make dev-up` first) |
 | `make run-api` / `run-worker` | the API on `127.0.0.1:8080` / the job worker |
 | `make run-idp` / `run-llm` / `run-docling` | the fake GitHub sign-in on `127.0.0.1:8090` / chat model on `:8094` / docling and pdftext on `:5001`, `:5002` (`web-dev` starts all) |

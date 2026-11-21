@@ -1,0 +1,9 @@
+# Its own workspace, apart from the repo's (see package.json), with the
+# repo's rules: exact versions, and the pinned Node.
+savePrefix: ""
+engineStrict: true
+# wrangler runs without its dependencies' install scripts, which only check
+# the binaries their platform packages already ship.
+allowBuilds:
+  esbuild: false
+  workerd: false

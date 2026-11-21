@@ -49,7 +49,7 @@ tools: ## Install the pinned golangci-lint into ./bin
 		$(golangci_lint_current) || { echo "make tools: failed to install golangci-lint $(GOLANGCI_LINT_VERSION)" >&2; exit 1; }; \
 	}
 
-check: lint test test-perf hooks-test ## Run what CI's fast jobs run; do this before pushing
+check: lint test test-perf hooks-test units-check ## Run what CI's fast jobs run; do this before pushing
 
 test: test-go test-web ## Run Go and web unit tests
 
@@ -289,6 +289,9 @@ EXAMPLE_SECRETS = -e RONOTE_DATABASE_URL=postgres://ronote:example@ronote-postgr
 	-e RONOTE_DOCLING_API_KEY=example -e RONOTE_PDFTEXT_API_KEY=example
 CHECK_CONFIG = podman run --rm --env-file deploy/ronote.env.example $(EXAMPLE_SECRETS)
 
+units-check: ## Convert the Quadlet units with Quadlet's dry run (skipped where Quadlet isn't installed)
+	sh deploy/units-check.sh
+
 prod-check-config: ## Check the example production config with the api image; a same-site runner must fail
 	$(CHECK_CONFIG) ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) check-config
 	! $(CHECK_CONFIG) -e RONOTE_RUNNER_URL=https://run.ronote.example ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) check-config
@@ -297,4 +300,4 @@ prod-check-config: ## Check the example production config with the api image; a 
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build web-e2e images prod-config prod-ci prod-local prod-smoke prod-check-config
+.PHONY: web-dev web-build web-e2e images units-check prod-config prod-ci prod-local prod-smoke prod-check-config

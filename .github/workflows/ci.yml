@@ -273,6 +273,10 @@ jobs:
         run: make backup-now
       - name: Run the restore drill
         run: make restore-drill
+      # CI's configuration sets no RONOTE_NTFY_URL: alerts say what they
+      # would send (Caddy's local certificate is always about to expire).
+      - name: Run the health watch
+        run: make watch-now
       - name: Upload the Playwright report
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

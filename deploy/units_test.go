@@ -13,6 +13,8 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/rokumate/ronote/internal/chat"
 )
 
 // unit is a Quadlet file's keys, by section, each with every value given.
@@ -353,5 +355,18 @@ func TestBackupImagesArePinned(t *testing.T) {
 		if want := "localhost/ronote-ci/" + name + ":pinned"; ci[name] != want {
 			t.Errorf("CI's backup.images: %s = %q, want %s", name, ci[name], want)
 		}
+	}
+}
+
+// The watcher alerts on the line the api logs when chat reaches its daily
+// spend cap; the two must name it alike.
+func TestTheWatcherMatchesTheSpendCapLine(t *testing.T) {
+	t.Parallel()
+	watch, err := os.ReadFile("alerts/watch.sh")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(watch), "grep -q '"+chat.SpendCapReached+"'") {
+		t.Errorf("alerts/watch.sh doesn't match %q, which the api logs", chat.SpendCapReached)
 	}
 }

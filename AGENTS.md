@@ -56,7 +56,7 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make doctor` | check the VM's clock, the pinned embedding model, and the blob store, docling and pdftext |
 | `make images` | the production images with podman, and their sizes (docs/adr/0014-production-topology.md) |
 | `make units-check` | Quadlet's dry run on the units; skipped where Quadlet isn't installed |
-| `make backup-now` / `restore-drill` | back up / run the restore drill now, on an installed host |
+| `make backup-now` / `restore-drill` / `watch-now` | back up / run the restore drill / the health watch now, on an installed host |
 | `make prod-ci` / `prod-local` / `prod-smoke` | install the production units with the fakes on this Linux host / in the podman VM / run the smoke suite through Caddy |
 | `make generate` / `check-generated` | regenerate sqlc and OpenAPI output / fail if stale |
 | `make migrate-up` / `migrate-new name=...` | apply / create goose migrations |

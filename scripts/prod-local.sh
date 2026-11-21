@@ -50,5 +50,6 @@ ssh -S "$socket" -O exit "$login@localhost" 2>/dev/null || true
 [ "$status" -eq 0 ] || exit "$status"
 
 # What the smoke suite made, backed up into the VM's own restic repository
-# and restored by the drill, as make backup-now and make restore-drill do.
-remote "sudo sh $dir/deploy/run-now.sh ronote-backup@db.service ronote-backup@pdfs.service ronote-restore-drill.service"
+# and restored by the drill, then the health watch, whose alerts only say
+# what they would send: as make backup-now, restore-drill and watch-now do.
+remote "sudo sh $dir/deploy/run-now.sh ronote-backup@db.service ronote-backup@pdfs.service ronote-restore-drill.service ronote-watch.service"

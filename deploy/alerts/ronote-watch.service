@@ -1,0 +1,7 @@
+# RoNote's health, every 5 minutes (docs/adr/0015-operations.md).
+[Unit]
+Description=RoNote health watch
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh %h/.local/lib/ronote/watch.sh

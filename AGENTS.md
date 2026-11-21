@@ -30,7 +30,7 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | Command | What it does |
 |---|---|
 | `make setup` | point git at `.githooks`; once per clone |
-| `make check` | `lint`, `test`, `test-perf`, `hooks-test`: CI's fast jobs. Run before pushing |
+| `make check` | `lint`, `test`, `test-perf`, `hooks-test`, `units-check`: CI's fast jobs. Run before pushing |
 | `make lint` | `lint-go`, `lint-web`, `lint-docs` |
 | `make lint-go` / `lint-web` | golangci-lint, deadcode, tidy, actionlint / Biome, tsc, knip |
 | `make lint-docs` | CONTEXT.md and AGENTS.md within their sizes |
@@ -54,6 +54,7 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make dev-up` / `dev-down` | start / stop the dev stack (Postgres, SeaweedFS); `dev-up-docling` adds the real docling |
 | `make doctor` | check the VM's clock, the pinned embedding model, and the blob store, docling and pdftext |
 | `make images` | the production images with podman, and their sizes (docs/adr/0014-production-topology.md) |
+| `make units-check` | Quadlet's dry run on the units; skipped where Quadlet isn't installed |
 | `make prod-ci` / `prod-local` / `prod-smoke` | install the production units with the fakes on this Linux host / in the podman VM / run the smoke suite through Caddy |
 | `make generate` / `check-generated` | regenerate sqlc and OpenAPI output / fail if stale |
 | `make migrate-up` / `migrate-new name=...` | apply / create goose migrations |

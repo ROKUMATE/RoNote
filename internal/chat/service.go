@@ -101,6 +101,8 @@ type Service struct {
 	mu      sync.Mutex
 	running map[uuid.UUID]running // by conversation
 	wg      sync.WaitGroup
+
+	capped spendCapLog
 }
 
 type running struct {
@@ -288,6 +290,7 @@ func (s *Service) Ask(ctx context.Context, owner, conversation uuid.UUID, questi
 				return err
 			}
 			if spent >= s.o.Limits.SpendPerDayMicroUSD {
+				s.capped.reached(s.o.Logger, time.Now(), s.o.Limits.SpendPerDayMicroUSD)
 				return &SpendCapError{RetryAfter: untilMidnight}
 			}
 		}

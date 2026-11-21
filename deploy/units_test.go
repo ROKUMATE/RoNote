@@ -240,3 +240,20 @@ func TestCIThirdPartyImagesAreTheUnitsOwn(t *testing.T) {
 		t.Errorf("drop-ins give local names to %q, the Makefile tags %q", got, want)
 	}
 }
+
+// Quadlet 5.7 drops the closing quote of a quoted HealthCmd when it writes
+// the unit, so systemd hands podman a command with a quote left open, which
+// sh then refuses ("unterminated quoted string"). A JSON array is not split
+// that way, and a plain string needs no quote: podman runs it with sh -c.
+func TestHealthChecksNeedNoQuotingQuadletMangles(t *testing.T) {
+	t.Parallel()
+	paths := append(glob(t, "quadlet/*.container"), ciUnits("*.container")...)
+	paths = append(paths, ciUnits("*.d/*.conf")...)
+	for _, path := range paths {
+		for _, cmd := range readUnit(t, path).container("HealthCmd") {
+			if strings.Contains(cmd, `"`) && !strings.HasPrefix(cmd, "[") {
+				t.Errorf("%s: HealthCmd = %s; write it as a JSON array, or without double quotes", path, cmd)
+			}
+		}
+	}
+}

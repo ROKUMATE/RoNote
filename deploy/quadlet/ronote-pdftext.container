@@ -17,7 +17,7 @@ ReadOnlyTmpfs=true
 NoNewPrivileges=true
 DropCapability=ALL
 PodmanArgs=--memory=512m --cpus=1
-HealthCmd=python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5002/health')"
+HealthCmd=["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5002/health')"]
 HealthInterval=15s
 HealthStartPeriod=30s
 Notify=healthy

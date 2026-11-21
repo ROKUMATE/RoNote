@@ -19,8 +19,9 @@ DropCapability=ALL
 # The entrypoint gives /data to its own user, then becomes it (su-exec).
 AddCapability=CHOWN SETGID SETUID
 PodmanArgs=--memory=384m --cpus=1
-# As in compose: the check makes the bucket, so healthy means it exists.
-HealthCmd=sh -c "echo 's3.bucket.create -name ronote' | weed shell 2>&1 | grep -q -E 'created bucket|already exists'"
+# As in compose: the check makes the bucket, so healthy means it exists. A
+# plain string, which podman runs with sh -c: Quadlet 5.7 mangles a quoted one.
+HealthCmd=echo 's3.bucket.create -name ronote' | weed shell 2>&1 | grep -q -E 'created bucket|already exists'
 HealthInterval=10s
 HealthStartPeriod=60s
 Notify=healthy

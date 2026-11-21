@@ -1,6 +1,6 @@
 # 0008: In-browser code execution
 
-Accepted, 2026-11-05. Amended 2026-11-06: the production runner gets its own registrable domain. Amended in P13b: checking examples, JavaScript, unlabelled blocks, warming up Python. Amended 2026-11-20: the app and the runner read their origins at run time, and Caddy serves the runner's headers in production (ADR 0014).
+Accepted, 2026-11-05. Amended 2026-11-06: the production runner gets its own registrable domain. Amended in P13b: checking examples, JavaScript, unlabelled blocks, warming up Python. Amended 2026-11-20: the app and the runner read their origins at run time, and Caddy serves the runner's headers in production (ADR 0014). Amended 2026-11-21: the runner's headers come from one definition, which makes the dev server's, Caddy's and Cloudflare Pages' (ADR 0015).
 
 ## Context
 

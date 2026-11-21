@@ -142,8 +142,10 @@ else
 	secret ronote-blob-secret-key "${RONOTE_BLOB_SECRET_KEY:-}"
 fi
 
+# Root opens the archive, which may sit where ronote can't read, such as a
+# checkout; ronote's podman reads it from stdin.
 if [ -n "$images" ]; then
-	as_user podman load -q -i "$images"
+	as_user podman load -q <"$images"
 fi
 
 as_user systemctl --user daemon-reload

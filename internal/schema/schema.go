@@ -32,24 +32,46 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) (int64, error) {
 	})
 }
 
-// Check fails when the database's schema is newer than the newest migration
-// this build embeds: code that doesn't know a column or a constraint
-// mustn't write around it. An older schema passes, since migrations run
-// before the api and worker start.
-func Check(ctx context.Context, pool *pgxpool.Pool) error {
+// Status is a database's schema version against the newest migration this
+// build embeds.
+type Status struct {
+	Current, Newest int64
+}
+
+// Behind reports a database that needs this build's migrations.
+func (s Status) Behind() bool { return s.Current < s.Newest }
+
+// Ahead reports a database a newer build migrated.
+func (s Status) Ahead() bool { return s.Current > s.Newest }
+
+// Versions reads the database's schema version and this build's newest.
+func Versions(ctx context.Context, pool *pgxpool.Pool) (Status, error) {
+	var s Status
 	_, err := withProvider(pool, func(p *goose.Provider) (int64, error) {
 		current, err := p.GetDBVersion(ctx)
 		if err != nil {
 			return 0, fmt.Errorf("read the schema version: %w", err)
 		}
 		sources := p.ListSources()
-		newest := sources[len(sources)-1].Version
-		if current > newest {
-			return 0, fmt.Errorf("the database's schema is at version %d, newer than this build's newest migration, %d: run a build that knows it", current, newest)
-		}
+		s = Status{Current: current, Newest: sources[len(sources)-1].Version}
 		return current, nil
 	})
-	return err
+	return s, err
+}
+
+// Check fails when the database's schema is newer than the newest migration
+// this build embeds: code that doesn't know a column or a constraint
+// mustn't write around it. An older schema passes, since migrations run
+// before the api and worker start.
+func Check(ctx context.Context, pool *pgxpool.Pool) error {
+	s, err := Versions(ctx, pool)
+	if err != nil {
+		return err
+	}
+	if s.Ahead() {
+		return fmt.Errorf("the database's schema is at version %d, newer than this build's newest migration, %d: run a build that knows it", s.Current, s.Newest)
+	}
+	return nil
 }
 
 func withProvider(pool *pgxpool.Pool, f func(*goose.Provider) (int64, error)) (version int64, err error) {

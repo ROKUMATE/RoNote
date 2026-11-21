@@ -2,6 +2,8 @@
 //
 //	api [serve]                  serve the API
 //	api migrate                  apply the migrations the database lacks
+//	api migrate status           print the schema's version against this build's;
+//	                             exit 3 if the database is behind, 4 if ahead
 //	api check-config             check the configuration, starting nothing
 //	api healthcheck URL          fail unless URL (its /healthz) answers 200
 package main
@@ -16,10 +18,12 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/rokumate/ronote/internal/auth"
 	"github.com/rokumate/ronote/internal/blob/s3blob"
@@ -49,7 +53,7 @@ const (
 func main() {
 	err := cli.Run(os.Args[1:], "serve", map[string]cli.Command{
 		"serve":   cli.NoArgs(run),
-		"migrate": cli.NoArgs(migrate),
+		"migrate": migrate,
 		"check-config": cli.NoArgs(func() error {
 			return config.Check(os.Getenv, os.Stdout)
 		}),
@@ -57,13 +61,47 @@ func main() {
 	})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "api:", err)
-		os.Exit(1)
+		os.Exit(cli.ExitCode(err))
 	}
 }
 
 // migrate applies the embedded migrations (docs/adr/0014-production-topology.md):
 // production runs it once, as its own unit, before the api and the worker.
-func migrate() error {
+// `migrate status` compares the schema with this build's, for ronote-deploy
+// and the restore drill (docs/adr/0015-operations.md).
+func migrate(args []string) error {
+	switch {
+	case len(args) == 0:
+		return withDatabase(func(ctx context.Context, pool *pgxpool.Pool, logger *slog.Logger) error {
+			version, err := schema.Migrate(ctx, pool)
+			if err != nil {
+				return err
+			}
+			logger.Info("schema migrated", "version", version)
+			return nil
+		})
+	case len(args) == 1 && args[0] == "status":
+		return withDatabase(func(ctx context.Context, pool *pgxpool.Pool, _ *slog.Logger) error {
+			s, err := schema.Versions(ctx, pool)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("schema at version %d; this build's newest is %d\n", s.Current, s.Newest)
+			switch {
+			case s.Behind():
+				return &cli.ExitError{Code: 3, Err: errors.New("the database is behind this build: run api migrate")}
+			case s.Ahead():
+				return &cli.ExitError{Code: 4, Err: errors.New("the database is ahead of this build: a newer build migrated it")}
+			}
+			return nil
+		})
+	}
+	return fmt.Errorf("takes nothing or status, got %q", strings.Join(args, " "))
+}
+
+// withDatabase runs f on the database RONOTE_DATABASE_URL names, alone of
+// the configuration: migrating needs nothing else.
+func withDatabase(f func(context.Context, *pgxpool.Pool, *slog.Logger) error) error {
 	url, err := config.DatabaseURL(os.Getenv)
 	if err != nil {
 		return err
@@ -76,12 +114,7 @@ func migrate() error {
 		return err
 	}
 	defer pool.Close()
-	version, err := schema.Migrate(ctx, pool)
-	if err != nil {
-		return err
-	}
-	logger.Info("schema migrated", "version", version)
-	return nil
+	return f(ctx, pool, logger)
 }
 
 // healthcheck is the container's health check: distroless has no curl.

@@ -6,6 +6,7 @@ package deploy
 import (
 	"bufio"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -163,5 +164,36 @@ func TestTheAPIAndTheWorkerGetTheSameSecrets(t *testing.T) {
 	worker := readUnit(t, "quadlet/ronote-worker.container").container("Secret")
 	if !slices.Equal(api, worker) || len(api) == 0 {
 		t.Errorf("api secrets %q, worker secrets %q; want the same", api, worker)
+	}
+}
+
+// as-ronote.sh runs podman as ronote, which must read its own config even
+// when sudo keeps the caller's HOME and XDG dirs, as GitHub's runner does.
+func TestAsRonoteGivesRonoteItsOwnHome(t *testing.T) {
+	t.Parallel()
+	bin := t.TempDir()
+	fakes := map[string]string{
+		"id":     "echo 1001",
+		"getent": "echo ronote:x:1001:1001::/home/ronote:/usr/sbin/nologin",
+		// A sudo that keeps the environment: it drops -u ronote and runs the rest.
+		"sudo": `shift 2; exec "$@"`,
+	}
+	for name, body := range fakes {
+		if err := os.WriteFile(filepath.Join(bin, name), []byte("#!/bin/sh\n"+body+"\n"), 0o700); err != nil { //nolint:gosec // a test's fake commands
+			t.Fatal(err)
+		}
+	}
+	cmd := exec.CommandContext(t.Context(), "sh", "as-ronote.sh", "sh", "-c", `printf '%s %s' "$HOME" "${XDG_CONFIG_HOME-unset}"`)
+	cmd.Env = []string{
+		"PATH=" + bin + ":/usr/bin:/bin",
+		"HOME=/home/runner",
+		"XDG_CONFIG_HOME=/home/runner/.config",
+	}
+	got, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("%v: %s", err, got)
+	}
+	if want := "/home/ronote unset"; string(got) != want {
+		t.Errorf("as ronote, HOME and XDG_CONFIG_HOME are %q; want %q", got, want)
 	}
 }

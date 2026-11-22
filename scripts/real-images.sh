@@ -4,7 +4,8 @@
 # subcommands write Markdown for the job summary to stdout, the reason for a
 # failure to stderr, and exit 1 on a failure.
 #
-#   sh scripts/real-images.sh arm64     each real image has a linux/arm64 build
+#   sh scripts/real-images.sh arm64     each pinned image is a multi-arch index
+#                                       listing linux/amd64 and linux/arm64
 #   sudo sh scripts/real-images.sh memory
 #                                       each container's peak memory against
 #                                       its limit, after a run; a container
@@ -30,24 +31,70 @@ as_user() {
 	sh "${RONOTE_AS_RONOTE:-$here/../deploy/as-ronote.sh}" "$@"
 }
 
+# The images the units and the backups pin by digest.
+pinned() {
+	{
+		sed -n 's/^Image=//p' "$here"/../deploy/quadlet/*.container "$here"/../deploy/quadlet/ci/*.container
+		sed -n 's/^[a-z]*=//p' "$here/../deploy/backup/images"
+	} | grep '@sha256:' | sort -u
+}
+
+# by_digest REF: REF without its tag. podman refuses a reference with both a
+# tag and a digest ("currently not supported"), and the digest is what a unit
+# runs by.
+by_digest() {
+	name=${1%%@*}
+	case ${name##*/} in
+	*:*) name=${name%:*} ;;
+	esac
+	printf '%s@%s' "$name" "${1#*@}"
+}
+
+# arm64: each pin is the multi-arch index, listing linux/amd64 and
+# linux/arm64. A pin that is one architecture's manifest would run that
+# image on the other, and one podman can't read is no verdict on its builds,
+# so each says what it is.
 arm64() {
-	say "### Real images on arm64"
+	say "### Pinned images: multi-arch indexes with linux/arm64"
 	say ""
-	say "| image | linux/arm64 |"
-	say "|---|---|"
-	# pdftext runs docling's image: two images cover the three real units.
-	refs=$(sed -n 's/^Image=//p' "$here/../deploy/quadlet/ronote-ollama.container" "$here/../deploy/quadlet/ronote-docling.container" | sort -u)
+	say "| image | index | linux/amd64 | linux/arm64 |"
+	say "|---|---|---|---|"
+	errors=$(mktemp)
+	trap 'rm -f "$errors"' EXIT
+	broken=false
+	refs=$(pinned)
 	for ref in $refs; do
-		if manifest=$(podman manifest inspect "$ref" 2>&1) && printf '%s\n' "$manifest" | grep -q '"architecture": *"arm64"'; then
-			say "| \`$ref\` | yes |"
-		else
-			say "| \`$ref\` | **no** |"
-			fail "no linux/arm64 build of $ref"
+		if ! manifest=$(podman manifest inspect "$(by_digest "$ref")" 2>"$errors"); then
+			say "| \`$ref\` | **error** | - | - |"
+			fail "can't inspect $ref: $(cat "$errors")"
+			continue
 		fi
+		flat=$(printf '%s' "$manifest" | tr -d ' \t\r\n')
+		case $flat in
+		*'"manifests":['*) ;;
+		*)
+			say "| \`$ref\` | **single** | - | - |"
+			fail "$ref is a single-arch manifest, not a multi-arch index: production on arm64 would pull the wrong image"
+			broken=true
+			continue
+			;;
+		esac
+		platforms=$(printf '%s' "$flat" | grep -o '"platform":{[^}]*}' | grep '"os":"linux"')
+		row="| \`$ref\` | yes |"
+		for arch in amd64 arm64; do
+			if printf '%s\n' "$platforms" | grep -q "\"architecture\":\"$arch\""; then
+				row="$row yes |"
+			else
+				row="$row **no** |"
+				fail "no linux/$arch entry in the index of $ref"
+				broken=true
+			fi
+		done
+		say "$row"
 	done
-	if [ "$failed" = true ]; then
+	if [ "$broken" = true ]; then
 		say ""
-		say "An image without an arm64 build can't run on the production host (Oracle's A1 is arm64). Options: pick a release of it that has one; build it for arm64 and pin that; or run production on an amd64 host, which ADR 0015 allows."
+		say "A pin that is not an index listing both platforms can't run on both the amd64 hosts ADR 0015 allows and Oracle's arm64 A1. Options: pin the image's index digest (the one of its tag); pick a release that has both builds; or build it for the missing architecture and pin that."
 	fi
 }
 

@@ -62,9 +62,10 @@ jobs:
           key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ steps.versions.outputs.playwright }}
       - name: Install Chromium and its system packages
         run: make web-browsers WITH_DEPS=1
-      # An image with no arm64 build fails here, saying which, before gigabytes
+      # A pin that is not a multi-arch index with both platforms, or that
+      # podman can't read, fails here, saying which and why, before gigabytes
       # are pulled.
-      - name: Check that the real images have arm64 builds
+      - name: Check that every pinned image is a multi-arch index with arm64
         run: make prod-arm64-images >> "$GITHUB_STEP_SUMMARY"
       - name: Convert the units, with the fakes and with the real images
         run: make units-check

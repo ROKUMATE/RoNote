@@ -4,10 +4,10 @@ import { type FormEvent, type KeyboardEvent, useEffect, useId, useRef, useState 
 import { type ChatEvent, sendMessage } from "../api/chat";
 import { chatErrorMessages, requestErrorMessage } from "../api/messages";
 import {
-  chatKey,
   conversationQuery,
   conversationsQuery,
   createConversation,
+  refreshConversation,
   stopAnswer,
 } from "../api/queries";
 import type { ChatErrorCode, Citation, Message, MessageSegment } from "../api/schema";
@@ -32,6 +32,12 @@ type Live = {
   citations: Citation[];
   searching?: string | undefined;
   error?: ChatErrorCode;
+  /**
+   * Set when its stream ends, as the answer does, whatever the conversation
+   * says: it stays on screen until the conversation is read again, with
+   * the id of the message the stream said it saved.
+   */
+  ended?: { at: number; messageId?: string | undefined };
 };
 
 /** Where a new conversation looks: the open document, or the library. */
@@ -73,17 +79,32 @@ export function Conversation({
   const saved = conversation.data?.messages ?? [];
   // The question and answer streaming here show live, not as saved so far.
   const messages = live ? saved.slice(0, before) : saved;
-  const writing = live !== undefined || saved.some((m) => m.status === "streaming");
+  // An answer is written while its stream runs, or while a saved one still
+  // streams: not the one this stream ended, which a read begun before the end
+  // may still show so.
+  const writing =
+    (live !== undefined && live.ended === undefined) ||
+    saved.some((m) => m.status === "streaming" && m.id !== live?.ended?.messageId);
   const left = list.data?.messages_left_today;
 
   // Leaving stops reading the stream; the server finishes and saves it.
   useEffect(() => () => reading.current?.abort(), []);
+
+  // An answer whose stream ended goes once the conversation, read again
+  // since, has what the server saved.
+  const ended = live?.ended;
+  useEffect(() => {
+    if (ended && !conversation.isFetching && conversation.dataUpdatedAt >= ended.at) {
+      setLive(undefined);
+    }
+  }, [ended, conversation.isFetching, conversation.dataUpdatedAt]);
 
   const ask = async (question: string) => {
     setRefused(undefined);
     setBefore(saved.length);
     setLive({ question, segments: [], citations: [] });
     let conversationId = id;
+    let answerId: string | undefined;
     try {
       if (!conversationId) {
         conversationId = (await createConversation(scope === "document" ? documentId : undefined))
@@ -91,14 +112,30 @@ export function Conversation({
         onStarted(conversationId);
       }
       reading.current = new AbortController();
-      await sendMessage(conversationId, question, hear, reading.current.signal);
-      await queryClient.invalidateQueries({ queryKey: chatKey });
-      setLive(undefined);
+      await sendMessage(
+        conversationId,
+        question,
+        (event) => {
+          if (event.type === "done") answerId = event.data.message.id;
+          hear(event);
+        },
+        reading.current.signal,
+      );
+      // The stream's own end ends the answer, not what a read of the
+      // conversation finds: it may have begun before the end. The time is
+      // taken here, not in the update, which React runs when it renders.
+      const ended = { at: Date.now(), messageId: answerId };
+      setLive((l) => l && { ...l, ended });
     } catch (error) {
-      if (reading.current?.signal.aborted) return;
       setLive(undefined);
-      setTyped(question);
-      setRefused(requestErrorMessage(error));
+      if (!reading.current?.signal.aborted) {
+        setTyped(question);
+        setRefused(requestErrorMessage(error));
+      }
+    } finally {
+      // This request's conversation, by its own id, not the component's,
+      // which a new conversation has not been given yet.
+      if (conversationId) void refreshConversation(queryClient, conversationId);
     }
   };
 

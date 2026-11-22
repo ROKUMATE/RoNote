@@ -402,4 +402,5 @@ Recorded in [ADR 0009](adr/0009-jobs-port.md).
 ## Operations (since P19b, ADR 0015)
 
 - **No metrics endpoint yet.** Nothing on one host would scrape `/metrics`, and the alerts (`deploy/alerts/`) watch what matters: units' health, the disk, the certificate, the backups and the drill, and chat's spend cap. The api's access log already records each request's path, status and time. A metrics endpoint comes with a scraper, on the internal network only.
+- **Quadlet applies drop-ins by file name, not by directory.** The real images' layer (`deploy/quadlet/real`) first named its files `real.conf`, which sorts before `ronote-.container.d/start.conf`, so `start.conf`'s `Pull=never` and five-minute timeout won over a unit's own drop-in, with the dry run reporting nothing. The files are `z-real.conf`; `make units-check` reads each service's pull policy and timeout from Quadlet's output for both sets, and a Go test holds the names.
 - **The spend cap is watched through the journal**, not a query: the api logs `chat spend cap reached` once a UTC day (`chat.SpendCapReached`), and the watcher matches that line, so the cap's arithmetic stays in one place.

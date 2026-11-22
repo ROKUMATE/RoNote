@@ -23,6 +23,8 @@ const spki = createHash("sha256")
 
 export default defineConfig({
   testDir: "smoke",
+  // The real docling and Ollama's one test, or the rest (make prod-real-smoke).
+  testMatch: process.env.RONOTE_SMOKE_REAL ? "real.spec.ts" : "smoke.spec.ts",
   forbidOnly: Boolean(process.env.CI),
   timeout: 90_000,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "line",

@@ -64,10 +64,14 @@ func glob(t *testing.T, pattern string) []string {
 	return paths
 }
 
-// ciUnits are CI's units and drop-ins (deploy/quadlet/ci) matching pattern,
-// held to the same rules.
+// ciUnits are CI's units and drop-ins, in deploy/quadlet/ci and its layers,
+// ci-fakes and real, matching pattern, held to the same rules.
 func ciUnits(pattern string) []string {
-	paths, _ := filepath.Glob(filepath.Join("quadlet", "ci", pattern))
+	var paths []string
+	for _, dir := range []string{"ci", "ci-fakes", "real"} {
+		more, _ := filepath.Glob(filepath.Join("quadlet", dir, pattern))
+		paths = append(paths, more...)
+	}
 	return paths
 }
 
@@ -368,5 +372,29 @@ func TestTheWatcherMatchesTheSpendCapLine(t *testing.T) {
 	}
 	if !strings.Contains(string(watch), "grep -q '"+chat.SpendCapReached+"'") {
 		t.Errorf("alerts/watch.sh doesn't match %q, which the api logs", chat.SpendCapReached)
+	}
+}
+
+// The real images' layer must outrank the shared drop-in: Quadlet applies
+// drop-ins by file name, whichever directory they are in, so a file that
+// sorts before ronote-.container.d/start.conf loses its Pull and its start
+// time to start.conf's (make units-check finds that in Quadlet's own output).
+func TestTheRealLayerSortsAfterTheSharedDropIn(t *testing.T) {
+	t.Parallel()
+	paths := glob(t, "quadlet/real/ronote-*.container.d/*.conf")
+	if len(paths) != 3 {
+		t.Errorf("the real layer has %d drop-ins, want ollama's, docling's and pdftext's", len(paths))
+	}
+	for _, path := range paths {
+		if name := filepath.Base(path); name <= "start.conf" {
+			t.Errorf("%s sorts before start.conf, which would win", path)
+		}
+		u := readUnit(t, path)
+		if got := u.container("Pull"); !slices.Equal(got, []string{"missing"}) {
+			t.Errorf("%s: Pull = %q, want missing", path, got)
+		}
+		if got := u["Service"]["TimeoutStartSec"]; !slices.Equal(got, []string{"1500"}) {
+			t.Errorf("%s: TimeoutStartSec = %q, want 1500", path, got)
+		}
 	}
 }

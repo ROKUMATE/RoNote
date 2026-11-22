@@ -32,7 +32,7 @@ printf 'prod-local: copying the units, configuration and images into the VM\n'
 remote "sudo rm -rf $dir && sudo mkdir -p $dir && sudo chown $login $dir && chmod 700 $dir"
 tar -cf - deploy scripts/embed-check.sh bin/prod-config bin/ronote-images.tar | remote "sudo tar -xf - -C $dir"
 
-remote "cd $dir && sudo env ${INSTALL_ENV:?make prod-local sets it} sh deploy/install.sh --version local --config bin/prod-config --drop-ins deploy/quadlet/ci --images bin/ronote-images.tar --skip-model"
+remote "cd $dir && sudo env ${INSTALL_ENV:?make prod-local sets it} sh deploy/install.sh --version local --config bin/prod-config ${DROPINS:?make prod-local sets it} --images bin/ronote-images.tar --skip-model"
 remote "sudo sh $dir/deploy/as-ronote.sh podman exec ronote-caddy cat /caddy/data/caddy/pki/authorities/local/intermediate.crt" >bin/smoke-ca.pem
 
 # The dev stack's own containers publish its ports in the same VM, so only

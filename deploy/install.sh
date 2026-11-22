@@ -6,11 +6,12 @@
 # the user, the secrets and the data, and installs the units again.
 #
 #   sudo sh deploy/install.sh --version v1.2.3 --config DIR
-#       [--drop-ins DIR] [--images FILE] [--skip-model] [--pin NAME=REF]...
+#       [--drop-ins DIR]... [--images FILE] [--skip-model] [--pin NAME=REF]...
 #
 # --config DIR   files for ~ronote/.config/ronote, ronote.env at least
 #                (deploy/ronote.env.example); kept from an earlier run if absent
-# --drop-ins DIR units and drop-ins added beside the units (deploy/quadlet/ci)
+# --drop-ins DIR units and drop-ins added beside the units (deploy/quadlet/ci,
+#                and its layers ci-fakes or real); a later DIR's files replace an earlier's
 # --images FILE  an image archive (podman save) to load instead of pulling
 # --skip-model   no embedding model: the drop-ins replace Ollama
 # --pin NAME=REF run NAME (ronote-api, -worker, -web) as REF: ronote-deploy
@@ -48,7 +49,7 @@ while [ $# -gt 0 ]; do
 	case $1 in
 	--version) version=${2:?}; shift 2 ;;
 	--config) config=${2:?}; shift 2 ;;
-	--drop-ins) dropins=${2:?}; shift 2 ;;
+	--drop-ins) dropins="$dropins --drop-ins ${2:?}"; shift 2 ;;
 	--images) images=${2:?}; shift 2 ;;
 	--skip-model) skip_model=true; shift ;;
 	--pin) pins="$pins --pin ${2:?}"; shift 2 ;;
@@ -111,7 +112,8 @@ cp "$repo/deploy/pdftext/pdftext.py" "$etc/pdftext.py"
 chown -R "$user:$user" "$etc"
 
 set -- "$units" "$version"
-[ -z "$dropins" ] || set -- "$@" --drop-ins "$dropins"
+# shellcheck disable=SC2086 # two words a drop-in directory
+[ -z "$dropins" ] || set -- "$@" $dropins
 # shellcheck disable=SC2086 # two words a pin
 [ -z "$pins" ] || set -- "$@" $pins
 find "$units" -mindepth 1 -maxdepth 1 -name 'ronote-*' -exec rm -rf {} +

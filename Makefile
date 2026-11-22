@@ -28,7 +28,7 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts, ronote-deploy and bootstrap's firewall rules
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts, ronote-deploy bootstrap's firewall rules and the real-image reports
 	PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s deploy/pdftext -t deploy/pdftext
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
@@ -43,6 +43,7 @@ hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the docto
 	sh scripts/test-alerts.sh
 	sh scripts/test-deploy.sh
 	sh scripts/test-open-web-ports.sh
+	sh scripts/test-real-images.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
@@ -296,6 +297,18 @@ CI_INSTALL_ENV = RONOTE_GITHUB_CLIENT_SECRET=$(random) RONOTE_RESTIC_PASSWORD=$(
 	RONOTE_BACKUP_REPO=/var/lib/restic/repo RONOTE_BACKUP_ACCESS_KEY=none RONOTE_BACKUP_SECRET_KEY=none \
 	RONOTE_NTFY_TOPIC=$(random)
 SMOKE_CA = bin/smoke-ca.pem
+# The drop-in layers (deploy/quadlet): ci for everything CI changes, then the
+# fakes for Ollama, docling and pdftext, or the real images' settings.
+CI_FAKES_DROPINS = --drop-ins deploy/quadlet/ci --drop-ins deploy/quadlet/ci-fakes
+CI_REAL_DROPINS = --drop-ins deploy/quadlet/ci --drop-ins deploy/quadlet/real
+# bootstrap.sh with a throwaway deploy key, and the images, as install.sh gets them.
+BOOTSTRAP = rm -f bin/ci-deploy-key bin/ci-deploy-key.pub && \
+	ssh-keygen -q -t ed25519 -N '' -C ronote-ci -f bin/ci-deploy-key && \
+	sudo env $(CI_INSTALL_ENV) sh deploy/bootstrap.sh --deploy-key bin/ci-deploy-key.pub -- --version $(IMAGE_TAG) --config $(PROD_CONFIG) --images bin/ronote-images.tar
+define after_install
+sudo sh deploy/as-ronote.sh podman exec ronote-caddy cat /caddy/data/caddy/pki/authorities/local/intermediate.crt > $(SMOKE_CA)
+sh deploy/check-ports.sh 127.0.0.1 $$(hostname -I | cut -d' ' -f1)
+endef
 
 prod-config: images
 	rm -rf $(PROD_CONFIG)
@@ -315,14 +328,31 @@ prod-config: images
 	podman save --multi-image-archive -o bin/ronote-images.tar $(IMAGES) $(CI_TAGS)
 
 prod-ci: prod-config ## Bootstrap this Ubuntu 26.04 host and install the production units with the fakes (sudo), and check only 80 and 443 answer
-	rm -f bin/ci-deploy-key bin/ci-deploy-key.pub
-	ssh-keygen -q -t ed25519 -N '' -C ronote-ci -f bin/ci-deploy-key
-	sudo env $(CI_INSTALL_ENV) sh deploy/bootstrap.sh --deploy-key bin/ci-deploy-key.pub -- --version $(IMAGE_TAG) --config $(PROD_CONFIG) --drop-ins deploy/quadlet/ci --images bin/ronote-images.tar --skip-model
-	sudo sh deploy/as-ronote.sh podman exec ronote-caddy cat /caddy/data/caddy/pki/authorities/local/intermediate.crt > $(SMOKE_CA)
-	sh deploy/check-ports.sh 127.0.0.1 $$(hostname -I | cut -d' ' -f1)
+	$(BOOTSTRAP) $(CI_FAKES_DROPINS) --skip-model
+	$(after_install)
+
+# The real docling, pdftext and Ollama, with the fakes only for GitHub's sign-in
+# and the chat model (.github/workflows/arm-real.yml): the real embedding model
+# is pulled and its digest checked, and the worker's embedder is the real one.
+ci-clear-environment: ## On a CI runner: remove the runner's per-user XDG_* lines from /etc/environment before installing (sudo)
+	sh scripts/ci-clear-environment.sh
+
+prod-real: prod-config ## Install the units with the real docling and Ollama images on this Ubuntu 26.04 host (sudo): minutes of pulling
+	grep -v '^RONOTE_EMBED_MODEL=' $(PROD_CONFIG)/ronote.env > $(PROD_CONFIG)/ronote.env.real && mv $(PROD_CONFIG)/ronote.env.real $(PROD_CONFIG)/ronote.env
+	$(BOOTSTRAP) $(CI_REAL_DROPINS)
+	$(after_install)
+
+prod-real-smoke: ## Import a PDF through the real docling and search it with the real embedder, through Caddy (make prod-real first)
+	RONOTE_SMOKE_REAL=1 RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
+
+prod-memory: ## Peak memory of each installed container against its limit, as Markdown; fails on an OOM kill or a restart (sudo)
+	@sudo sh scripts/real-images.sh memory
+
+prod-arm64-images: ## Fail unless every real image has a linux/arm64 build, as Markdown
+	@sh scripts/real-images.sh arm64
 
 prod-local: prod-config ## The same in the podman machine's VM, then the smoke suite from this Mac
-	INSTALL_ENV='$(CI_INSTALL_ENV)' sh scripts/prod-local.sh
+	INSTALL_ENV='$(CI_INSTALL_ENV)' DROPINS='$(CI_FAKES_DROPINS)' sh scripts/prod-local.sh
 
 deploy-host: ## Deploy TAG on the production host over SSH (release only: DEPLOY_HOST, DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS)
 	sh scripts/deploy-host.sh "$(TAG)"
@@ -363,4 +393,4 @@ prod-check-config: ## Check the example production config with the api image; a 
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config
+.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images prod-real prod-real-smoke prod-memory prod-arm64-images ci-clear-environment prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config

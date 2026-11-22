@@ -38,26 +38,22 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make test-perf` | timing tests alone (`perf` tag, one package at a time) |
 | `make test-integration` | unit and integration tests on testcontainers |
 | `make eval` / `eval-record` | the retrieval eval on recorded vectors, gated on `baseline.json` / re-record them through the model |
-| `make eval-review` | the eval's queries marked for review, with their expected blocks and hybrid's top 5 |
-| `make eval-chat` | the eval's queries through chat, of the real model; local only, costs cents |
+| `make eval-review` / `eval-chat` | the eval's queries marked for review / through the real chat model (costs cents) |
 | `make test-perf-search` | search timing over large libraries; local only |
 | `make test-live` | extract the live pages and check the RAG tutorial; network, never CI |
 | `make hooks-test` | test the commit hook, the scripts and pdftext |
 | `make check-commits RANGE=main..HEAD` | check each commit message in strict mode |
 | `make web-dev` | app on `127.0.0.1:5173`, the runner on `localhost:5174`, the fake sign-in and chat model |
 | `make web-build` | production build and bundle budgets |
-| `make runner-pages APP_URL=…` / `runner-deploy` / `deploy-host TAG=…` | the runner's Cloudflare Pages site / deploy it / deploy a release on the host (release only) |
 | `make web-e2e` | Playwright and axe against the full stack (`make dev-up` first) |
 | `make run-api` / `run-worker` | the API on `127.0.0.1:8080` / the job worker |
-| `make run-idp` / `run-llm` / `run-docling` | the fake GitHub sign-in on `127.0.0.1:8090` / chat model on `:8094` / docling and pdftext on `:5001`, `:5002` (`web-dev` starts all) |
+| `make run-idp` / `run-llm` / `run-docling` | the fake sign-in on `:8090` / chat model on `:8094` / docling and pdftext on `:5001`, `:5002` (`web-dev` starts all) |
 | `make pdf-fixtures` / `pdf-record` | print the PDF fixtures / record real docling's answers, goldens and the verbatim report |
 | `make stop` | end what the `run-*` targets and `web-dev` started |
 | `make dev-up` / `dev-down` | start / stop the dev stack (Postgres, SeaweedFS); `dev-up-docling` adds the real docling |
-| `make doctor` | check the VM's clock, the pinned embedding model, and the blob store, docling and pdftext |
-| `make images` | the production images with podman, and their sizes (docs/adr/0014-production-topology.md) |
-| `make units-check` | Quadlet's dry run on the units; skipped where Quadlet isn't installed |
-| `make backup-now` / `restore-drill` / `watch-now` | back up / run the restore drill / the health watch now, on an installed host |
-| `make prod-ci` / `prod-local` / `prod-smoke` | install the production units with the fakes on this Linux host / in the podman VM / run the smoke suite through Caddy |
+| `make doctor` | check the VM's clock, the embedding model, the blob store, docling and pdftext |
+| `make images` / `units-check` / `prod-ci` / `prod-local` / `prod-smoke` | the production images, Quadlet's dry run on the units, the units with the fakes on this host / in the podman VM, the smoke suite through Caddy (docs/adr/0014-production-topology.md) |
+| `make runner-pages` / `runner-deploy` / `deploy-host` / `backup-now` / `restore-drill` / `watch-now` | the runner's Pages site and the release's deploys; backups, the drill and the health watch on an installed host (docs/adr/0015-operations.md) |
 | `make generate` / `check-generated` | regenerate sqlc and OpenAPI output / fail if stale |
 | `make migrate-up` / `migrate-new name=...` | apply / create goose migrations |
 | `make extract url=...` | print one page's IR |
@@ -107,6 +103,8 @@ Read `docs/agents/commands.md` for every target and what it runs in full, and `d
 - Unit tests never touch the network or paid APIs; loopback `httptest` servers are fine.
 - Extractor changes: `go test ./internal/extract -update` rewrites the goldens; review that diff like code. `TestCodeIsVerbatim` and `TestGoldenHasNoJunk` stay green, and `FuzzExtract` runs 60s before committing.
 - Web: Vitest and Testing Library; Playwright with axe, zero violations in light and dark. No screenshot assertions.
+- Never stop, remove or `compose down` the developer's dev stack, nor release its port forwards: a test stack runs under its own compose project name and ports.
+- Load for a reproduction: at most half the cores in busy loops, each under `timeout 600` and killed by a trap on exit or failure; check free memory first, and none while swap is over half full; kill every load process before reporting.
 - A test that must stop running is quarantined, never deleted: `test.fixme`, `test.skip` or `t.Skip`, with `Quarantined: #N` naming its issue. Every phase summary lists the quarantined tests.
 
 ## Verbatim rule

@@ -1,11 +1,18 @@
 # CI and prod-local drop-ins
 
-The production units with the fakes swapped in (docs/adr/0014-production-topology.md):
+The production units as CI runs them (docs/adr/0014-production-topology.md):
 `deploy/install.sh --drop-ins deploy/quadlet/ci` installs these beside the
-units, and `config/` as the deployment's configuration.
+units, and `config/` as the deployment's configuration. A second `--drop-ins`
+adds a layer over this one: `ci-fakes`, for the smoke jobs and `make
+prod-local`, or `real`, for the weekly real-image job (`.github/workflows/arm-real.yml`).
 
-- `ronote-ollama`, `ronote-docling`, `ronote-pdftext` run `cmd/fakeembed` and
-  `cmd/fakedocling` from the `ronote-fakes` image instead of their real images.
+- `../ci-fakes` makes `ronote-ollama`, `ronote-docling` and `ronote-pdftext` run
+  `cmd/fakeembed` and `cmd/fakedocling` from the `ronote-fakes` image instead of
+  their real images.
+- `../real` leaves those three on their real images, which their start pulls
+  (`Pull=missing`) within 25 minutes, not 5; its files are named `z-real.conf`
+  because Quadlet applies drop-ins by file name, and they must sort after
+  `start.conf` below. The memory limits and health checks stay production's.
 - `ronote-fakellm` and `ronote-fakeidp` are the model and GitHub; the fake
   sign-in is behind Caddy as `idp.ronote.test`, since the browser goes there.
 - `ronote-.container.d/start.conf` applies to every unit: `Pull=never` (every

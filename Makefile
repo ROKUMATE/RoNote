@@ -28,7 +28,7 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts, ronote-deploy bootstrap's firewall rules and the real-image reports
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts, ronote-deploy bootstrap's firewall rules the real-image reports and the failure journals
 	PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s deploy/pdftext -t deploy/pdftext
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
@@ -44,6 +44,7 @@ hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the docto
 	sh scripts/test-deploy.sh
 	sh scripts/test-open-web-ports.sh
 	sh scripts/test-real-images.sh
+	sh scripts/test-prod-journals.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
@@ -357,9 +358,8 @@ prod-local: prod-config ## The same in the podman machine's VM, then the smoke s
 deploy-host: ## Deploy TAG on the production host over SSH (release only: DEPLOY_HOST, DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS)
 	sh scripts/deploy-host.sh "$(TAG)"
 
-prod-journals: ## Save what ronote's units logged since boot, and their containers' states, in bin/prod-journals.log, for a failed smoke run (sudo)
-	sudo sh deploy/as-ronote.sh journalctl --user -b --no-pager -o short-precise -u 'ronote-*' > bin/prod-journals.log
-	sudo sh deploy/as-ronote.sh podman ps -a --format '{{.Names}} {{.Status}}' >> bin/prod-journals.log
+prod-journals: ## Save what ronote's units logged since boot, and their containers' states, in bin/prod-journals.log, for a failed CI run; "no units installed" if none was (sudo)
+	sudo sh scripts/prod-journals.sh bin/prod-journals.log
 
 backup-now: ## Back up the database and the PDFs now, as the timers do, on a host install.sh set up (sudo)
 	sudo sh deploy/run-now.sh ronote-backup@db.service ronote-backup@pdfs.service

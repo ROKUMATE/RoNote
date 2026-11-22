@@ -222,6 +222,21 @@ export function conversationQuery(id: string) {
   });
 }
 
+/**
+ * Reads conversation id, and the list, again once an answer in it has ended.
+ * A read of the conversation begun while the answer was written is stale by
+ * now, and an invalidation joins a read in flight, when the query has no
+ * data yet, instead of starting another: so that read is cancelled first.
+ */
+export async function refreshConversation(client: QueryClient, id: string): Promise<void> {
+  const key = conversationQuery(id).queryKey;
+  await client.cancelQueries({ queryKey: key });
+  await Promise.all([
+    client.invalidateQueries({ queryKey: key }),
+    client.invalidateQueries({ queryKey: conversationsQuery.queryKey }),
+  ]);
+}
+
 /** Starts a conversation about a document, or over the whole library. */
 export async function createConversation(documentId?: string): Promise<Conversation> {
   return dataOrThrow(

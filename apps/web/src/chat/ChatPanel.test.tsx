@@ -106,9 +106,7 @@ test("Mod+J opens the chat; an answer streams with a citation that lands on its 
   const panel = await openChat();
   await ask(panel, "  How do goroutines talk? ");
 
-  const chip = await within(panel).findByRole("button", {
-    name: "Source 1: Effective Go > Channels",
-  });
+  await within(panel).findByRole("button", { name: "Source 1: Effective Go > Channels" });
   expect(within(panel).getByText("generated")).toBeTruthy();
   expect(within(panel).getByText("Goroutines use channels.")).toBeTruthy();
   await within(panel).findByText("49 questions left today");
@@ -121,8 +119,116 @@ test("Mod+J opens the chat; an answer streams with a citation that lands on its 
       .json(),
   ).toEqual({});
 
-  fireEvent.click(chip);
+  // The live answer gives way to the saved one under the chip, so it is found
+  // again when clicked, as a person's click or a locator does.
+  fireEvent.click(within(panel).getByRole("button", { name: "Source 1: Effective Go > Channels" }));
   await waitFor(() => expect(app.router.state.location.href).toBe("/doc/doc-go?block=b-channels"));
+});
+
+/**
+ * The server's side of GET /conversations/{id} while an answer is written:
+ * what a read finds is what the server has when it asks, and the first read
+ * arrives only once land() is called, as a response held up behind the
+ * stream does. Such a read began before the answer ended, so what it carries
+ * is stale by the time it lands.
+ */
+function lateFirstRead(conv: Conversation, messages: Message[]) {
+  let current = messages;
+  let reads = 0;
+  let land: () => void = () => {};
+  const landed = new Promise<void>((resolve) => {
+    land = resolve;
+  });
+  return {
+    set: (next: Message[]) => {
+      current = next;
+    },
+    reads: () => reads,
+    land,
+    handler: async () => {
+      const found = current;
+      if (++reads === 1) await landed;
+      return json({ conversation: conv, messages: found });
+    },
+  };
+}
+
+// The answer's own stream ends it, whatever a read of the conversation then
+// finds: here the panel's first read began while the answer was written, and
+// lands after its end, carrying the answer as still streaming.
+test("an answer that ends as its POST resolves settles, for a new conversation", async () => {
+  const server = lateFirstRead(conversation, []);
+  stubApi({
+    "GET /documents": () => json({ documents: [] }),
+    "GET /conversations": () => json({ conversations: [], messages_left_today: 50 }),
+    "POST /conversations": () => json(conversation, 201),
+    "POST /conversations/c1/messages": async () => {
+      server.set([question, answer({ status: "streaming", segments: [] })]);
+      // The panel is reading the conversation, and has no answer yet.
+      await waitFor(() => expect(server.reads()).toBe(1));
+      server.set([question, answer()]);
+      setTimeout(server.land, 0);
+      // done arrives in the same tick the POST resolves.
+      return answered(answer());
+    },
+    "GET /conversations/c1": server.handler,
+  });
+  renderApp("/");
+  const panel = await openChat();
+  await ask(panel, "How do goroutines talk?");
+
+  await within(panel).findByRole("button", { name: "Source 1: Effective Go > Channels" });
+  await waitFor(() => expect(within(panel).queryByRole("button", { name: "Stop" })).toBeNull());
+  expect(within(panel).getByRole("button", { name: "Ask" })).toBeTruthy();
+  expect(within(panel).getByText("Goroutines use channels.")).toBeTruthy();
+  expect(
+    within(panel).getByRole("button", { name: "Source 1: Effective Go > Channels" }),
+  ).toBeTruthy();
+});
+
+test("an answer that ends as its POST resolves settles, for an existing conversation", async () => {
+  const earlier = [
+    question,
+    answer({ id: "m0", segments: [{ text: "Earlier answer.", citations: [] }] }),
+  ];
+  const followUp: Message = {
+    ...question,
+    id: "m3",
+    segments: [{ text: "And with a buffer?", citations: [] }],
+  };
+  const server = lateFirstRead(conversation, earlier);
+  stubApi({
+    "GET /documents": () => json({ documents: [] }),
+    "GET /conversations": () => json({ conversations: [conversation], messages_left_today: 50 }),
+    "POST /conversations/c1/messages": async () => {
+      server.set([...earlier, followUp, answer({ id: "m4", status: "streaming", segments: [] })]);
+      await waitFor(() => expect(server.reads()).toBe(1));
+      const final = answer({
+        id: "m4",
+        segments: [{ text: "Goroutines use channels.", citations: [1] }],
+      });
+      server.set([...earlier, followUp, final]);
+      setTimeout(server.land, 0);
+      return answered(final);
+    },
+    "GET /conversations/c1": server.handler,
+  });
+  renderApp("/");
+  const panel = await openChat();
+  fireEvent.click(within(panel).getByRole("button", { name: "Conversations" }));
+  const list = await within(panel).findByRole("list", { name: "Conversations" });
+  fireEvent.click(within(list).getByRole("button", { name: /^How do goroutines talk\?/ }));
+  await ask(panel, "And with a buffer?");
+
+  await within(panel).findByRole("button", { name: "Source 1: Effective Go > Channels" });
+  await waitFor(() => expect(within(panel).queryByRole("button", { name: "Stop" })).toBeNull());
+  expect(within(panel).getByRole("button", { name: "Ask" })).toBeTruthy();
+  // What the server saved, not the read that began before the answer ended.
+  expect(await within(panel).findByText("Earlier answer.")).toBeTruthy();
+  expect(await within(panel).findByText("And with a buffer?")).toBeTruthy();
+  expect(
+    await within(panel).findByRole("button", { name: "Source 1: Effective Go > Channels" }),
+  ).toBeTruthy();
 });
 
 test("a not_found answer says what the library lacks and what to import", async () => {

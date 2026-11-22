@@ -21,6 +21,9 @@ on:
     paths:
       - .github/workflows/arm-real.yml
       - deploy/quadlet/real/**
+      - deploy/bootstrap.sh
+      - deploy/pasta-apparmor.sh
+      - scripts/pasta-check.sh
       - deploy/quadlet/ronote-docling.container
       - deploy/quadlet/ronote-pdftext.container
       - deploy/quadlet/ronote-ollama.container
@@ -76,8 +79,14 @@ jobs:
         run: |
           df -h / /home
           free -h
+      # Ubuntu's AppArmor profile for pasta refuses podman's signal; bootstrap
+      # adds upstream's rule (deploy/pasta-apparmor.sh). What it was before:
+      - name: Show whether podman may stop pasta, before bootstrap
+        run: make prod-pasta-evidence
       - name: Install the units with the real images
         run: make prod-real
+      - name: Stop and start every unit, with no AppArmor denial
+        run: make prod-pasta-check
       - name: Import a PDF through the real docling, and search it
         run: make prod-real-smoke
       # Each container's peak against its limit, after the work; an OOM kill

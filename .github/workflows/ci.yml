@@ -242,8 +242,14 @@ jobs:
       # (scripts/ci-clear-environment.sh says how); install.sh refuses them.
       - name: Clear the runner's per-user variables before installing the units
         run: make ci-clear-environment
+      # Ubuntu's AppArmor profile for pasta refuses podman's signal; bootstrap
+      # adds upstream's rule (deploy/pasta-apparmor.sh). What it was before:
+      - name: Show whether podman may stop pasta, before bootstrap
+        run: make prod-pasta-evidence
       - name: Build the images and install the units on this runner
         run: make prod-ci
+      - name: Stop and start every unit, with no AppArmor denial
+        run: make prod-pasta-check
       - name: Show which of the runner's variables ronote's systemd has
         if: always()
         run: |

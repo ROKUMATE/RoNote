@@ -348,7 +348,7 @@ prod-real-smoke: ## Import a PDF through the real docling and search it with the
 prod-memory: ## Peak memory of each installed container against its limit, as Markdown; fails on an OOM kill or a restart (sudo)
 	@sudo sh scripts/real-images.sh memory
 
-prod-arm64-images: ## Fail unless every real image has a linux/arm64 build, as Markdown
+prod-arm64-images: ## Fail unless every digest-pinned image is a multi-arch index with linux/amd64 and linux/arm64, as Markdown
 	@sh scripts/real-images.sh arm64
 
 prod-local: prod-config ## The same in the podman machine's VM, then the smoke suite from this Mac

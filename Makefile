@@ -28,7 +28,7 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts, ronote-deploy bootstrap's firewall rules the real-image reports and the failure journals
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts, ronote-deploy bootstrap's firewall and AppArmor rules, the real-image reports and the failure journals
 	PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s deploy/pdftext -t deploy/pdftext
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
@@ -45,6 +45,7 @@ hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the docto
 	sh scripts/test-open-web-ports.sh
 	sh scripts/test-real-images.sh
 	sh scripts/test-prod-journals.sh
+	sh scripts/test-pasta-apparmor.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
@@ -346,6 +347,12 @@ prod-real: prod-config ## Install the units with the real docling and Ollama ima
 prod-real-smoke: ## Import a PDF through the real docling and search it with the real embedder, through Caddy (make prod-real first)
 	RONOTE_SMOKE_REAL=1 RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
 
+prod-pasta-evidence: ## Before bootstrap.sh on a CI runner: passt's version, pasta's AppArmor signal rules, the reproducer and the kernel's denials; never fails
+	sh scripts/pasta-check.sh evidence
+
+prod-pasta-check: ## After the install: every unit stopped and started, the reproducer as ronote between, and no AppArmor denial (sudo)
+	sudo sh scripts/pasta-check.sh check
+
 prod-memory: ## Peak memory of each installed container against its limit, as Markdown; fails on an OOM kill or a restart (sudo)
 	@sudo sh scripts/real-images.sh memory
 
@@ -393,4 +400,4 @@ prod-check-config: ## Check the example production config with the api image; a 
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images prod-real prod-real-smoke prod-memory prod-arm64-images ci-clear-environment prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config
+.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images prod-real prod-real-smoke prod-pasta-evidence prod-pasta-check prod-memory prod-arm64-images ci-clear-environment prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config

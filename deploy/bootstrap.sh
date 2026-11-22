@@ -11,6 +11,7 @@
 # INSTALL-ARGS       deploy/install.sh's, with its secrets in the environment
 #
 #   1. Podman, pasta and the tools the scripts use; unattended upgrades on;
+#      podman allowed to stop pasta under Ubuntu's AppArmor profile;
 #   2. SSH by key alone, and no root login (where sshd runs);
 #   3. 80 and 443 opened in Oracle's iptables rules, which reject them;
 #   4. the deploy user, its forced command, and ronote-deploy's bare clone;
@@ -51,6 +52,7 @@ apt-get update -qq
 apt-get install -y -qq podman passt uidmap unattended-upgrades git curl openssl >/dev/null
 printf 'APT::Periodic::Update-Package-Lists "1";\nAPT::Periodic::Unattended-Upgrade "1";\n' >/etc/apt/apt.conf.d/20auto-upgrades
 say "packages, with unattended upgrades on"
+sh "$here/pasta-apparmor.sh"
 
 # 2. SSH by key alone. A host without sshd (CI's runner) has nothing to harden.
 if command -v sshd >/dev/null 2>&1; then

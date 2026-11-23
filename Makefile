@@ -28,7 +28,7 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts, ronote-deploy bootstrap's firewall and AppArmor rules, the real-image reports and the failure journals
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts, ronote-deploy bootstrap's firewall, AppArmor rule and swap, the real-image reports and the failure journals
 	PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s deploy/pdftext -t deploy/pdftext
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
@@ -46,6 +46,7 @@ hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the docto
 	sh scripts/test-real-images.sh
 	sh scripts/test-prod-journals.sh
 	sh scripts/test-pasta-apparmor.sh
+	sh scripts/test-host-swap.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \

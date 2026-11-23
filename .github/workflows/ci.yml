@@ -246,8 +246,16 @@ jobs:
       # adds upstream's rule (deploy/pasta-apparmor.sh). What it was before:
       - name: Show whether podman may stop pasta, before bootstrap
         run: make prod-pasta-evidence
+      # The runner comes with swap; without it, bootstrap makes the host's
+      # own (deploy/host-swap.sh), which the step after checks.
+      - name: Turn the runner's swap off
+        run: sudo swapoff -a
       - name: Build the images and install the units on this runner
         run: make prod-ci
+      - name: Check bootstrap's swap file and swappiness
+        run: |
+          grep '^/swapfile ' /proc/swaps
+          test "$(sysctl -n vm.swappiness)" = 10
       - name: Stop and start every unit, with no AppArmor denial
         run: make prod-pasta-check
       - name: Show which of the runner's variables ronote's systemd has

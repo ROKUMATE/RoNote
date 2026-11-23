@@ -224,7 +224,7 @@ memory() {
 	} || failed=true
 	if [ "$failed" = true ]; then
 		say ""
-		say "Docling is the unit to doubt: it is given 4 GiB of the 12 GB host (ADR 0014), the most of any. Options, none applied here: raise its limit to 5-6 GiB, paid for from the host's 2.3 GB of headroom; cap what it converts at once (\`DOCLING_SERVE_MAX_NUM_PAGES\`, fewer workers); or give production the whole Always Free allowance, 4 OCPUs and 24 GB, and raise the limits to match."
+		say "Docling is the unit to doubt: it is given 4 GiB of the 12 GB host (ADR 0014), the most of any. Options, none applied here: raise its limit to 5-6 GiB, paid for from the host's 2.3 GB of headroom; or cap what it converts at once (\`DOCLING_SERVE_MAX_NUM_PAGES\`, fewer workers). Always Free's A1 allowance is 2 OCPUs and 12 GB, all of it this host's already: more than that is a paid shape."
 	fi
 	say ""
 	say "### ronote's images, containers and volumes"

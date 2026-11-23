@@ -161,8 +161,12 @@ esac
 samples 'ronote-docling 4294967296 4194304000 0 4294967296 1'
 run "memory $work/samples"
 case $status:$err:$out in
-  1:*"ronote-docling was killed for memory at its 4096 MiB limit"*:*"**OOM-killed**"*"Options"*"4 OCPUs and 24 GB"*) result 'an OOM-killed docling fails, with options' ok ;;
+  1:*"ronote-docling was killed for memory at its 4096 MiB limit"*:*"**OOM-killed**"*"Options"*"Always Free's A1 allowance is 2 OCPUs and 12 GB"*) result 'an OOM-killed docling fails, with options' ok ;;
   *) result 'an OOM-killed docling fails, with options' "exit $status; $err; $out" ;;
+esac
+case $out in
+  *"24 GB"* | *"4 OCPUs"*) result 'the options offer only what Always Free gives' "said: $out" ;;
+  *) result 'the options offer only what Always Free gives' ok ;;
 esac
 
 samples

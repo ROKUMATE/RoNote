@@ -9,6 +9,7 @@
     "live/*.test.ts",
     "scripts/budget.ts",
     "scripts/pdf-fixtures.ts",
+    "scripts/worst-pdf.ts",
     "scripts/runner-caddy.ts",
     "scripts/runner-pages.ts"
   ],

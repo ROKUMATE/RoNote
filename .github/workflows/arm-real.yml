@@ -29,6 +29,9 @@ on:
       - deploy/quadlet/ronote-ollama.container
       - scripts/real-images.sh
       - apps/web/smoke/real.spec.ts
+      - apps/web/smoke/worst.spec.ts
+      - apps/web/scripts/worst-pdf.ts
+      - deploy/backup/**
 
 permissions:
   contents: read
@@ -41,7 +44,7 @@ jobs:
   real:
     name: Real docling and Ollama on arm64
     runs-on: ubuntu-26.04-arm
-    timeout-minutes: 75
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -83,17 +86,35 @@ jobs:
       # adds upstream's rule (deploy/pasta-apparmor.sh). What it was before:
       - name: Show whether podman may stop pasta, before bootstrap
         run: make prod-pasta-evidence
+      # Every second, each container's own cgroup: its peak, anon and file,
+      # from the install's pulls to the report.
+      - name: Start sampling the containers' memory
+        run: make prod-memory-sampler
       - name: Install the units with the real images
         run: make prod-real
       - name: Stop and start every unit, with no AppArmor denial
         run: make prod-pasta-check
       - name: Import a PDF through the real docling, and search it
         run: make prod-real-smoke
+      # The worst PDF the units accept, about 300 pages of code and tables,
+      # timed against docling's 540 s, with searches all the while.
+      - name: Import the worst accepted PDF, searching meanwhile
+        run: make prod-worst-pdf
+      - name: Back up the database and the PDFs
+        run: make backup-now
+      - name: Run the restore drill
+        run: make restore-drill
+      - name: Report the worst PDF's times
+        if: always()
+        run: if [ -f bin/worst-pdf.md ]; then cat bin/worst-pdf.md >> "$GITHUB_STEP_SUMMARY"; fi
       # Each container's peak against its limit, after the work; an OOM kill
       # or a restart fails the job, with options in the summary.
       - name: Report each container's peak memory
         if: always()
         run: make prod-memory >> "$GITHUB_STEP_SUMMARY"
+      - name: Report Ollama's settings
+        if: always()
+        run: make prod-ollama-settings >> "$GITHUB_STEP_SUMMARY"
       - name: Show the disk after
         if: always()
         run: df -h / /home

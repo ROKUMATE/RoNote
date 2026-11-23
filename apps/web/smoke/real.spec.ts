@@ -6,7 +6,7 @@ import { expect, test } from "@playwright/test";
  * .github/workflows/arm-real.yml), through Caddy as the smoke suite goes: a
  * PDF converted by docling's real models, and found by a search whose meaning
  * half Ollama's embeddings answered. Only GitHub's sign-in and the chat model
- * are the fakes. make prod-real-smoke runs it.
+ * are the fakes. make prod-real-smoke runs it, then make prod-worst-pdf.
  */
 
 const pdfs = join(import.meta.dirname, "..", "..", "..", "testdata", "pdf");

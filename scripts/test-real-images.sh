@@ -49,37 +49,38 @@ esac
 FAKE
 chmod +x "$bin/podman"
 
-# The runner: one healthy unit set, then what each case changes through
-# environment variables. UNITS lists the services; each container has a peak
-# (bytes) in PEAK_<name>, a limit of 4 GiB, and no kill or restart unless
-# KILLED or RESTARTS name it.
+# The runner: the services UNITS names, none restarted unless RESTARTS names
+# it; podman inspect knows two containers a script ran, by their IDs, and
+# logs each call to INSPECTED.
 cat >"$work/runner.sh" <<'FAKE'
 #!/bin/sh
 case $* in
   *"list-units"*) for u in $UNITS; do printf '%s.service loaded active running RoNote\n' "$u"; done
                   printf 'ronote-edge-network.service loaded active exited net\n' ;;
-  *"container exists"*) for last; do :; done; case $last in ronote-edge-network) exit 1 ;; esac ;;
-  *"show -p MemoryPeak"*) for last; do :; done; name=${last%.service}
-                          eval "printf '%s\n' \"\${PEAK_$(printf '%s' "$name" | tr - _)}\"" ;;
   *"show -p NRestarts"*) for last; do :; done; name=${last%.service}
                          case " $RESTARTS " in *" $name "*) echo 3 ;; *) echo 0 ;; esac ;;
-  *"State.OOMKilled"*) for last; do :; done; case " $KILLED " in *" $last "*) echo true ;; *) echo false ;; esac ;;
-  *"HostConfig.Memory"*) echo 4294967296 ;;
+  *"podman inspect"*) for last; do :; done; echo "$last" >>"$INSPECTED"
+                      case $last in
+                        aaaa) echo 'quirky_turing docker.io/restic/restic:0.18.1@sha256:0a' ;;
+                        bbbb) echo 'ronote-drill-postgres docker.io/pgvector/pgvector:pg17@sha256:0b' ;;
+                        *) echo "Error: no such object: $last" >&2; exit 125 ;;
+                      esac ;;
+  *"system df"*) printf 'TYPE  TOTAL  ACTIVE  SIZE  RECLAIMABLE\nImages  9  9  7.1GB  0B (0%%)\n' ;;
 esac
 FAKE
 
 UNITS='ronote-docling ronote-api'
-PEAK_ronote_docling=2147483648
-PEAK_ronote_api=104857600
-export UNITS PEAK_ronote_docling PEAK_ronote_api
+INSPECTED=$work/inspected
+export UNITS INSPECTED
 
-# run SUBCOMMAND [VAR=VALUE...]: leaves stdout in $out, stderr in $err and
+# run 'SUBCOMMAND [ARG...]' [VAR=VALUE...]: leaves stdout in $out, stderr in $err and
 # the exit in $status.
 run() {
   sub=$1
   shift
   # shellcheck disable=SC2086 # one word per assignment
-  out=$(env NO_ARM64='' NO_AMD64='' SINGLE='' BROKEN='' KILLED='' RESTARTS='' "$@" PATH="$bin:$PATH" RONOTE_AS_RONOTE="$work/runner.sh" sh "$tool" "$sub" 2>"$work/err")
+  # shellcheck disable=SC2086 # the subcommand and its arguments
+  out=$(env NO_ARM64='' NO_AMD64='' SINGLE='' BROKEN='' RESTARTS='' "$@" PATH="$bin:$PATH" RONOTE_AS_RONOTE="$work/runner.sh" sh "$tool" $sub 2>"$work/err")
   status=$?
   err=$(cat "$work/err")
 }
@@ -126,31 +127,120 @@ case $err in
   *) result 'an inspect error is not called a missing arm64 build' ok ;;
 esac
 
-run memory
+# samples LINE...: a samples file of KEY PEAK ANON FILE LIMIT OOM-KILLS lines:
+# docling's two samples, 2048 MiB peak, 1200 anon, 800 file of 4096; the api
+# within 1 GiB; a backup's restic in its 512 MiB; and a network's cgroup.
+samples() {
+  {
+    printf 'ronote-docling 1073741824 805306368 268435456 4294967296 0\n'
+    printf 'ronote-docling 2147483648 1258291200 838860800 4294967296 0\n'
+    printf 'ronote-api 104857600 52428800 10485760 1073741824 0\n'
+    printf 'restic 50331648 41943040 1048576 536870912 0\n'
+    printf 'ronote-edge-network 4096 4096 0 0 0\n'
+    for line; do printf '%s\n' "$line"; done
+  } >"$work/samples"
+}
+
+samples
+run "memory $work/samples"
 if [ "$status" -eq 0 ] && [ -z "$err" ]; then result 'containers within their limits pass' ok; else result 'containers within their limits pass' "exit $status: $err"; fi
 case $out in
-  *"| ronote-docling | 2048 MiB | 4096 MiB | 50% | ok |"*"| ronote-api | 100 MiB | 4096 MiB | 2% | ok |"*) result 'the table gives peak, limit and share' ok ;;
-  *) result 'the table gives peak, limit and share' "said: $out" ;;
+  *"| ronote-api | 100 MiB | 50 MiB | 10 MiB | 1024 MiB | 9% | 4% | ok |"*"| ronote-docling | 2048 MiB | 1200 MiB | 800 MiB | 4096 MiB | 50% | 29% | ok |"*) result 'the table splits the peak into anon and file' ok ;;
+  *) result 'the table splits the peak into anon and file' "said: $out" ;;
+esac
+case $out in
+  *"| restic | 48 MiB | 40 MiB | 1 MiB | 512 MiB | 9% | 7% | ok |"*) result "a backup's container has its row" ok ;;
+  *) result "a backup's container has its row" "said: $out" ;;
 esac
 case $out in *"edge-network"*) result 'only containers are listed' "said: $out" ;; *) result 'only containers are listed' ok ;; esac
+case $out in
+  *'```'*"Images  9  9  7.1GB"*'```'*) result "podman system df follows, as ronote" ok ;;
+  *) result "podman system df follows, as ronote" "said: $out" ;;
+esac
 
-run memory KILLED=ronote-docling PEAK_ronote_docling=4294967296
+samples 'ronote-docling 4294967296 4194304000 0 4294967296 1'
+run "memory $work/samples"
 case $status:$err:$out in
   1:*"ronote-docling was killed for memory at its 4096 MiB limit"*:*"**OOM-killed**"*"Options"*"4 OCPUs and 24 GB"*) result 'an OOM-killed docling fails, with options' ok ;;
   *) result 'an OOM-killed docling fails, with options' "exit $status; $err; $out" ;;
 esac
 
-run memory RESTARTS=ronote-api
+samples
+run "memory $work/samples" RESTARTS=ronote-api
 case $status:$err in
-  1:*"ronote-api restarted 3 times"*) result 'a container that restarted fails' ok ;;
-  *) result 'a container that restarted fails' "exit $status: $err" ;;
+  1:*"ronote-api restarted 3 times"*) result 'a unit that restarted fails' ok ;;
+  *) result 'a unit that restarted fails' "exit $status: $err" ;;
 esac
 
-run memory PEAK_ronote_docling=4000000000
+samples 'ronote-docling 3600000000 3500000000 100000000 4294967296 0'
+run "memory $work/samples"
 case $status:$out in
-  0:*"near its limit"*) result 'near its limit is flagged, not failed' ok ;;
-  *) result 'near its limit is flagged, not failed' "exit $status: $out" ;;
+  0:*"| 81% | anon near its limit |"*) result 'anon over 80% is flagged, not failed' ok ;;
+  *) result 'anon over 80% is flagged, not failed' "exit $status: $out" ;;
 esac
+
+samples 'ronote-docling 4000000000 2000000000 2000000000 4294967296 0'
+run "memory $work/samples"
+case $out in
+  *"| 93% | 46% | ok |"*) result 'a peak of file cache alone is no warning' ok ;;
+  *) result 'a peak of file cache alone is no warning' "said: $out" ;;
+esac
+
+samples
+# A stand-in sampler, started by another shell so this one reports nothing of it.
+sampler=$(sh -c 'sleep 600 >/dev/null 2>&1 & echo $!')
+echo "$sampler" >"$work/samples.pid"
+run "memory $work/samples"
+if ! kill -0 "$sampler" 2>/dev/null && [ ! -e "$work/samples.pid" ]; then
+  result 'the report stops the sampler' ok
+else
+  kill "$sampler" 2>/dev/null
+  result 'the report stops the sampler' 'still running'
+fi
+
+: >"$work/samples"
+run "memory $work/samples"
+case $status:$err in
+  1:*"no samples in $work/samples"*) result 'no samples fails' ok ;;
+  *) result 'no samples fails' "exit $status: $err" ;;
+esac
+
+# The sampler, once, on a cgroup tree: a unit, whose service's cgroup also
+# counts podman's start, with its container's own; a unit between
+# containers, with none; a backup's container in its scope with its conmon
+# beside it; and a scope whose container has gone.
+cg=$work/cg
+mkdir -p "$cg/app.slice/ronote-api.service/libpod-payload-0123" "$cg/app.slice/ronote-docling.service" "$cg/user.slice/libpod-aaaa.scope" \
+  "$cg/user.slice/libpod-conmon-aaaa.scope" "$cg/user.slice/libpod-cccc.scope"
+api=$cg/app.slice/ronote-api.service
+printf '9999\n' >"$api/memory.peak"
+printf 'anon 9999\nfile 9999\n' >"$api/memory.stat"
+printf 'max\n' >"$api/memory.max"
+printf '1000\n' >"$api/libpod-payload-0123/memory.peak"
+printf 'anon 600\nfile 300\nkernel 50\n' >"$api/libpod-payload-0123/memory.stat"
+printf 'low 0\noom 0\noom_kill 0\n' >"$api/libpod-payload-0123/memory.events"
+printf '2147483648\n' >"$api/libpod-payload-0123/memory.max"
+for d in libpod-aaaa.scope libpod-cccc.scope; do
+  printf '5000\n' >"$cg/user.slice/$d/memory.peak"
+  printf 'anon 4000\nfile 100\n' >"$cg/user.slice/$d/memory.stat"
+  printf 'oom_kill 2\n' >"$cg/user.slice/$d/memory.events"
+  printf '536870912\n' >"$cg/user.slice/$d/memory.max"
+done
+rm -f "$work/s" "$work/s.names" "$INSPECTED"
+run "sample $work/s 0" RONOTE_USER_CGROUP="$cg"
+run "sample $work/s 0" RONOTE_USER_CGROUP="$cg"
+want='restic 5000 4000 100 536870912 2
+ronote-api 1000 600 300 2147483648 0'
+if [ "$status" -eq 0 ] && [ "$(sort -u "$work/s")" = "$want" ] && [ "$(sort "$work/s" | uniq -c | awk '{ print $1 }' | sort -u)" = 2 ]; then
+  result "each sample has each container's peak, anon, file, limit and OOM kills" ok
+else
+  result "each sample has each container's peak, anon, file, limit and OOM kills" "exit $status $err: $(cat "$work/s")"
+fi
+if [ "$(grep -c aaaa "$INSPECTED")" = 1 ] && [ "$(cat "$work/s.names")" = 'aaaa restic' ]; then
+  result "a script's container is named once, by its image" ok
+else
+  result "a script's container is named once, by its image" "inspected: $(cat "$INSPECTED"); names: $(cat "$work/s.names")"
+fi
 
 printf '%s passed, %s failed\n' "$passed" "$failed"
 [ "$failed" -eq 0 ]

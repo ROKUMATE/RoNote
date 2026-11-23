@@ -345,7 +345,7 @@ prod-real: prod-config ## Install the units with the real docling and Ollama ima
 	$(after_install)
 
 prod-real-smoke: ## Import a PDF through the real docling and search it with the real embedder, through Caddy (make prod-real first)
-	RONOTE_SMOKE_REAL=1 RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
+	RONOTE_SMOKE_SPEC=real RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
 
 prod-pasta-evidence: ## Before bootstrap.sh on a CI runner: passt's version, pasta's AppArmor signal rules, the reproducer and the kernel's denials; never fails
 	sh scripts/pasta-check.sh evidence
@@ -353,8 +353,26 @@ prod-pasta-evidence: ## Before bootstrap.sh on a CI runner: passt's version, pas
 prod-pasta-check: ## After the install: every unit stopped and started, the reproducer as ronote between, and no AppArmor denial (sudo)
 	sudo sh scripts/pasta-check.sh check
 
-prod-memory: ## Peak memory of each installed container against its limit, as Markdown; fails on an OOM kill or a restart (sudo)
-	@sudo sh scripts/real-images.sh memory
+# The worst PDF the units accept (apps/web/scripts/worst-pdf.ts), printed
+# here, never committed.
+WORST_PDF = bin/worst.pdf
+WORST_PAGES = 298
+
+prod-worst-pdf: ## Print the worst PDF the units accept ($(WORST_PAGES) pages of code and tables) and import it through Caddy, timing each step and searching meanwhile, into bin/worst-pdf.md (make prod-real first)
+	rm -f bin/worst-pdf.md
+	$(WEB) exec node scripts/worst-pdf.ts $(CURDIR)/$(WORST_PDF) $(WORST_PAGES) ../..
+	RONOTE_SMOKE_SPEC=worst RONOTE_WORST_PDF=$(CURDIR)/$(WORST_PDF) RONOTE_WORST_PAGES=$(WORST_PAGES) RONOTE_WORST_REPORT=$(CURDIR)/bin/worst-pdf.md \
+		RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
+
+prod-memory-sampler: ## Start sampling the memory of ronote's containers every second into bin/memory-samples, in the background, until make prod-memory (sudo)
+	sudo rm -f bin/memory-samples bin/memory-samples.names bin/memory-samples.pid
+	sudo sh -c 'nohup sh scripts/real-images.sh sample bin/memory-samples >/dev/null 2>&1 & echo $$! > bin/memory-samples.pid'
+
+prod-memory: ## Stop the sampler; each container's peak memory, anon and file against its limit, then podman system df, as Markdown; fails on an OOM kill or a restart (sudo)
+	@sudo sh scripts/real-images.sh memory bin/memory-samples
+
+prod-ollama-settings: ## The settings Ollama logged as it started and loaded the model, as Markdown (sudo)
+	@sudo sh scripts/real-images.sh ollama
 
 prod-arm64-images: ## Fail unless every digest-pinned image is a multi-arch index with linux/amd64 and linux/arm64, as Markdown
 	@sh scripts/real-images.sh arm64
@@ -400,4 +418,4 @@ prod-check-config: ## Check the example production config with the api image; a 
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images prod-real prod-real-smoke prod-pasta-evidence prod-pasta-check prod-memory prod-arm64-images ci-clear-environment prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config
+.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images prod-real prod-real-smoke prod-worst-pdf prod-memory-sampler prod-ollama-settings prod-pasta-evidence prod-pasta-check prod-memory prod-arm64-images ci-clear-environment prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config

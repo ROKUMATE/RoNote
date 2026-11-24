@@ -72,7 +72,7 @@ jobs:
       # podman can't read, fails here, saying which and why, before gigabytes
       # are pulled.
       - name: Check that every pinned image is a multi-arch index with arm64
-        run: make prod-arm64-images >> "$GITHUB_STEP_SUMMARY"
+        run: make prod-arm64-images
       - name: Convert the units, with the fakes and with the real images
         run: make units-check
       - name: Clear the runner's per-user variables before installing the units
@@ -104,17 +104,27 @@ jobs:
         run: make backup-now
       - name: Run the restore drill
         run: make restore-drill
-      - name: Report the worst PDF's times
-        if: always()
-        run: if [ -f bin/worst-pdf.md ]; then cat bin/worst-pdf.md >> "$GITHUB_STEP_SUMMARY"; fi
       # Each container's peak against its limit, after the work; an OOM kill
       # or a restart fails the job, with options in the summary.
       - name: Report each container's peak memory
         if: always()
-        run: make prod-memory >> "$GITHUB_STEP_SUMMARY"
+        run: make prod-memory
       - name: Report Ollama's settings
         if: always()
-        run: make prod-ollama-settings >> "$GITHUB_STEP_SUMMARY"
+        run: make prod-ollama-settings
+      # Each report is in the log already; the summary and an artifact too,
+      # as gh reads the log and the artifacts but not the summary.
+      - name: Put the reports in the job's summary
+        if: always()
+        run: make ci-summary
+      - name: Upload the reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: arm-real-reports
+          path: bin/reports
+          retention-days: 30
+          if-no-files-found: warn
       - name: Show the disk after
         if: always()
         run: df -h / /home

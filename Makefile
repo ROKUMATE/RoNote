@@ -363,29 +363,40 @@ prod-pasta-evidence: ## Before bootstrap.sh on a CI runner: passt's version, pas
 prod-pasta-check: ## After the install: every unit stopped and started, the reproducer as ronote between, and no AppArmor denial (sudo)
 	sudo sh scripts/pasta-check.sh check
 
+# The ARM job's reports, as Markdown: each into bin/reports, then printed to
+# the log, keeping the command's exit; make ci-summary puts them in the
+# job's summary, and the job uploads the directory. report FILE,COMMAND.
+REPORTS = bin/reports
+ARM_REPORTS = arm64-images.md worst-pdf.md memory.md ollama-settings.md
+report = mkdir -p $(REPORTS); status=0; $(2) >$(REPORTS)/$(1) || status=$$?; cat $(REPORTS)/$(1); exit $$status
+
 # The worst PDF the units accept (apps/web/scripts/worst-pdf.ts), printed
 # here, never committed.
 WORST_PDF = bin/worst.pdf
 WORST_PAGES = 298
 
-prod-worst-pdf: | bin ## Print the worst PDF the units accept ($(WORST_PAGES) pages of code and tables) and import it through Caddy, timing each step and searching meanwhile, into bin/worst-pdf.md (make prod-real first)
-	rm -f bin/worst-pdf.md
+prod-worst-pdf: | bin ## Print the worst PDF the units accept ($(WORST_PAGES) pages of code and tables) and import it through Caddy, timing each step and searching meanwhile, into bin/reports/worst-pdf.md and the log (make prod-real first)
+	rm -f $(REPORTS)/worst-pdf.md && mkdir -p $(REPORTS)
 	$(WEB) exec node scripts/worst-pdf.ts $(CURDIR)/$(WORST_PDF) $(WORST_PAGES) ../..
-	RONOTE_SMOKE_SPEC=worst RONOTE_WORST_PDF=$(CURDIR)/$(WORST_PDF) RONOTE_WORST_PAGES=$(WORST_PAGES) RONOTE_WORST_REPORT=$(CURDIR)/bin/worst-pdf.md \
-		RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
+	status=0; RONOTE_SMOKE_SPEC=worst RONOTE_WORST_PDF=$(CURDIR)/$(WORST_PDF) RONOTE_WORST_PAGES=$(WORST_PAGES) RONOTE_WORST_REPORT=$(CURDIR)/$(REPORTS)/worst-pdf.md \
+		RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts || status=$$?; \
+		cat $(REPORTS)/worst-pdf.md 2>/dev/null; exit $$status
 
 prod-memory-sampler: | bin ## Start sampling the memory of ronote's containers every second into bin/memory-samples, in the background, until make prod-memory (sudo)
 	sudo rm -f bin/memory-samples bin/memory-samples.names bin/memory-samples.pid
 	sudo sh -c 'nohup sh scripts/real-images.sh sample bin/memory-samples >/dev/null 2>&1 & echo $$! > bin/memory-samples.pid'
 
-prod-memory: | bin ## Stop the sampler; each container's peak memory, anon and file against its limit, then podman system df, as Markdown; fails on an OOM kill or a restart (sudo)
-	@sudo sh scripts/real-images.sh memory bin/memory-samples
+prod-memory: | bin ## Stop the sampler; each container's peak memory, anon and file against its limit, then podman system df, into bin/reports/memory.md and the log; fails on an OOM kill or a restart (sudo)
+	@$(call report,memory.md,sudo sh scripts/real-images.sh memory bin/memory-samples)
 
-prod-ollama-settings: ## The settings Ollama logged as it started and loaded the model, as Markdown (sudo)
-	@sudo sh scripts/real-images.sh ollama
+prod-ollama-settings: | bin ## The settings Ollama logged as it started and loaded the model, into bin/reports/ollama-settings.md and the log (sudo)
+	@$(call report,ollama-settings.md,sudo sh scripts/real-images.sh ollama)
 
-prod-arm64-images: ## Fail unless every digest-pinned image is a multi-arch index with linux/amd64 and linux/arm64, as Markdown
-	@sh scripts/real-images.sh arm64
+prod-arm64-images: | bin ## Fail unless every digest-pinned image is a multi-arch index with linux/amd64 and linux/arm64, into bin/reports/arm64-images.md and the log
+	@$(call report,arm64-images.md,sh scripts/real-images.sh arm64)
+
+ci-summary: | bin ## On CI: append the reports in bin/reports to the job's summary, in the job's order
+	@for f in $(ARM_REPORTS); do [ ! -f $(REPORTS)/$$f ] || { cat $(REPORTS)/$$f; echo; }; done >>"$${GITHUB_STEP_SUMMARY:?not on CI}"
 
 prod-local: prod-config | bin ## The same in the podman machine's VM, then the smoke suite from this Mac
 	INSTALL_ENV='$(CI_INSTALL_ENV)' DROPINS='$(CI_FAKES_DROPINS)' sh scripts/prod-local.sh
@@ -428,4 +439,4 @@ prod-check-config: ## Check the example production config with the api image; a 
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images prod-real prod-real-smoke prod-worst-pdf prod-memory-sampler prod-ollama-settings prod-pasta-evidence prod-pasta-check prod-memory prod-arm64-images ci-clear-environment prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config
+.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images prod-real prod-real-smoke prod-worst-pdf prod-memory-sampler prod-ollama-settings ci-summary prod-pasta-evidence prod-pasta-check prod-memory prod-arm64-images ci-clear-environment prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config

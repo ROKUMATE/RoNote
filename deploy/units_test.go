@@ -398,3 +398,30 @@ func TestTheRealLayerSortsAfterTheSharedDropIn(t *testing.T) {
 		}
 	}
 }
+
+// Ollama embeds with one model, one request at a time, and keeps it loaded:
+// its memory is in the budget (ADR 0014), and a cold load would make the
+// first search after an idle spell wait. The context fits the largest
+// embedding input (search's maxEmbedChars, under 2048 tokens) and the query
+// prefix, rounded up to a power of two: 4096, a KV cache of 448 MiB.
+func TestOllamaIsPinnedToOneModelAndItsContext(t *testing.T) {
+	t.Parallel()
+	env := map[string]string{}
+	for _, line := range readUnit(t, "quadlet/ronote-ollama.container").container("Environment") {
+		for _, kv := range strings.Fields(line) {
+			k, v, _ := strings.Cut(kv, "=")
+			env[k] = v
+		}
+	}
+	want := map[string]string{
+		"OLLAMA_CONTEXT_LENGTH":    "4096",
+		"OLLAMA_NUM_PARALLEL":      "1",
+		"OLLAMA_MAX_LOADED_MODELS": "1",
+		"OLLAMA_KEEP_ALIVE":        "-1",
+	}
+	for k, v := range want {
+		if env[k] != v {
+			t.Errorf("ronote-ollama.container: %s = %q, want %q", k, env[k], v)
+		}
+	}
+}

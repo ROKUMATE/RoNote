@@ -28,7 +28,7 @@ setup: ## Install the commit hook and rebase on pull
 	chmod +x .githooks/commit-msg
 	git config pull.rebase true
 
-hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts, ronote-deploy bootstrap's firewall, AppArmor rule and swap, the real-image reports and the failure journals
+hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts, ronote-deploy bootstrap's firewall, AppArmor rule and swap, every target making bin/ in a fresh checkout, the real-image reports and the failure journals
 	PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s deploy/pdftext -t deploy/pdftext
 	sh scripts/test-commit-msg.sh
 	sh scripts/test-check-commits.sh
@@ -47,12 +47,21 @@ hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the docto
 	sh scripts/test-prod-journals.sh
 	sh scripts/test-pasta-apparmor.sh
 	sh scripts/test-host-swap.sh
+	sh scripts/test-fresh-bin.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \
 		sh scripts/check-commits.sh "$$range"
 
-tools: ## Install the pinned golangci-lint into ./bin
+# bin/ holds what the build and CI make (tools, logs, the production
+# config, reports); it is ignored, so a fresh checkout has none. Every target
+# that names it waits for it (| bin), made as the user who runs make, never
+# with sudo, so the later steps that run without sudo can still write there
+# (scripts/test-fresh-bin.sh checks every target).
+bin:
+	mkdir -p bin
+
+tools: | bin ## Install the pinned golangci-lint into ./bin
 	@$(golangci_lint_current) || { \
 		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/v$(GOLANGCI_LINT_VERSION)/install.sh | \
 			sh -s -- -b bin v$(GOLANGCI_LINT_VERSION); \
@@ -103,7 +112,7 @@ extract: ## Print a page's IR: make extract url=https://... [format=text]
 
 lint: lint-go lint-web lint-docs ## Lint Go and web code, and the agent docs' sizes
 
-lint-go: ## Lint Go code and CI workflows (golangci-lint, deadcode, go mod tidy, actionlint)
+lint-go: | bin ## Lint Go code and CI workflows (golangci-lint, deadcode, go mod tidy, actionlint)
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) run
 	@dead=$$(go tool deadcode -test -tags integration,live,perf ./...) || { echo "make lint-go: deadcode failed" >&2; exit 1; }; \
@@ -121,7 +130,7 @@ lint-web: ## Lint web code (Biome, tsc, knip)
 	@$(node_required)
 	$(WEB) lint
 
-fmt: ## Format Go code with gofumpt and goimports
+fmt: | bin ## Format Go code with gofumpt and goimports
 	@$(golangci_lint_required)
 	$(GOLANGCI_LINT) fmt
 
@@ -259,7 +268,7 @@ runner-deploy: ## Deploy apps/web/dist-pages to Cloudflare Pages (release only: 
 	pnpm install --frozen-lockfile --dir deploy/pages
 	pnpm --dir deploy/pages run pages
 
-web-e2e: ## Run web end-to-end tests against the full stack (Playwright, Chromium); locally needs make dev-up
+web-e2e: | bin ## Run web end-to-end tests against the full stack (Playwright, Chromium); locally needs make dev-up
 	@$(node_required)
 	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" sh scripts/e2e-db.sh
 	go build -o bin/e2e/ ./cmd/api ./cmd/worker ./cmd/fakeidp ./cmd/fakeembed ./cmd/fakellm ./cmd/fakedocling
@@ -313,7 +322,7 @@ sudo sh deploy/as-ronote.sh podman exec ronote-caddy cat /caddy/data/caddy/pki/a
 sh deploy/check-ports.sh 127.0.0.1 $$(hostname -I | cut -d' ' -f1)
 endef
 
-prod-config: images
+prod-config: images | bin
 	rm -rf $(PROD_CONFIG)
 	mkdir -p $(PROD_CONFIG)/fixtures/pages/real-python-controlflow $(PROD_CONFIG)/fixtures/linked/python
 	cp deploy/quadlet/ci/config/* $(PROD_CONFIG)/
@@ -330,7 +339,7 @@ prod-config: images
 	rm -f bin/ronote-images.tar
 	podman save --multi-image-archive -o bin/ronote-images.tar $(IMAGES) $(CI_TAGS)
 
-prod-ci: prod-config ## Bootstrap this Ubuntu 26.04 host and install the production units with the fakes (sudo), and check only 80 and 443 answer
+prod-ci: prod-config | bin ## Bootstrap this Ubuntu 26.04 host and install the production units with the fakes (sudo), and check only 80 and 443 answer
 	$(BOOTSTRAP) $(CI_FAKES_DROPINS) --skip-model
 	$(after_install)
 
@@ -340,7 +349,7 @@ prod-ci: prod-config ## Bootstrap this Ubuntu 26.04 host and install the product
 ci-clear-environment: ## On a CI runner: remove the runner's per-user XDG_* lines from /etc/environment before installing (sudo)
 	sh scripts/ci-clear-environment.sh
 
-prod-real: prod-config ## Install the units with the real docling and Ollama images on this Ubuntu 26.04 host (sudo): minutes of pulling
+prod-real: prod-config | bin ## Install the units with the real docling and Ollama images on this Ubuntu 26.04 host (sudo): minutes of pulling
 	grep -v '^RONOTE_EMBED_MODEL=' $(PROD_CONFIG)/ronote.env > $(PROD_CONFIG)/ronote.env.real && mv $(PROD_CONFIG)/ronote.env.real $(PROD_CONFIG)/ronote.env
 	$(BOOTSTRAP) $(CI_REAL_DROPINS)
 	$(after_install)
@@ -359,17 +368,17 @@ prod-pasta-check: ## After the install: every unit stopped and started, the repr
 WORST_PDF = bin/worst.pdf
 WORST_PAGES = 298
 
-prod-worst-pdf: ## Print the worst PDF the units accept ($(WORST_PAGES) pages of code and tables) and import it through Caddy, timing each step and searching meanwhile, into bin/worst-pdf.md (make prod-real first)
+prod-worst-pdf: | bin ## Print the worst PDF the units accept ($(WORST_PAGES) pages of code and tables) and import it through Caddy, timing each step and searching meanwhile, into bin/worst-pdf.md (make prod-real first)
 	rm -f bin/worst-pdf.md
 	$(WEB) exec node scripts/worst-pdf.ts $(CURDIR)/$(WORST_PDF) $(WORST_PAGES) ../..
 	RONOTE_SMOKE_SPEC=worst RONOTE_WORST_PDF=$(CURDIR)/$(WORST_PDF) RONOTE_WORST_PAGES=$(WORST_PAGES) RONOTE_WORST_REPORT=$(CURDIR)/bin/worst-pdf.md \
 		RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
 
-prod-memory-sampler: ## Start sampling the memory of ronote's containers every second into bin/memory-samples, in the background, until make prod-memory (sudo)
+prod-memory-sampler: | bin ## Start sampling the memory of ronote's containers every second into bin/memory-samples, in the background, until make prod-memory (sudo)
 	sudo rm -f bin/memory-samples bin/memory-samples.names bin/memory-samples.pid
 	sudo sh -c 'nohup sh scripts/real-images.sh sample bin/memory-samples >/dev/null 2>&1 & echo $$! > bin/memory-samples.pid'
 
-prod-memory: ## Stop the sampler; each container's peak memory, anon and file against its limit, then podman system df, as Markdown; fails on an OOM kill or a restart (sudo)
+prod-memory: | bin ## Stop the sampler; each container's peak memory, anon and file against its limit, then podman system df, as Markdown; fails on an OOM kill or a restart (sudo)
 	@sudo sh scripts/real-images.sh memory bin/memory-samples
 
 prod-ollama-settings: ## The settings Ollama logged as it started and loaded the model, as Markdown (sudo)
@@ -378,13 +387,13 @@ prod-ollama-settings: ## The settings Ollama logged as it started and loaded the
 prod-arm64-images: ## Fail unless every digest-pinned image is a multi-arch index with linux/amd64 and linux/arm64, as Markdown
 	@sh scripts/real-images.sh arm64
 
-prod-local: prod-config ## The same in the podman machine's VM, then the smoke suite from this Mac
+prod-local: prod-config | bin ## The same in the podman machine's VM, then the smoke suite from this Mac
 	INSTALL_ENV='$(CI_INSTALL_ENV)' DROPINS='$(CI_FAKES_DROPINS)' sh scripts/prod-local.sh
 
 deploy-host: ## Deploy TAG on the production host over SSH (release only: DEPLOY_HOST, DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS)
 	sh scripts/deploy-host.sh "$(TAG)"
 
-prod-journals: ## Save what ronote's units logged since boot, and their containers' states, in bin/prod-journals.log, for a failed CI run; "no units installed" if none was (sudo)
+prod-journals: | bin ## Save what ronote's units logged since boot, and their containers' states, in bin/prod-journals.log, for a failed CI run; "no units installed" if none was (sudo)
 	sudo sh scripts/prod-journals.sh bin/prod-journals.log
 
 backup-now: ## Back up the database and the PDFs now, as the timers do, on a host install.sh set up (sudo)

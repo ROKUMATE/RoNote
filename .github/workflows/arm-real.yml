@@ -32,6 +32,7 @@ on:
       - apps/web/smoke/worst.spec.ts
       - apps/web/scripts/worst-pdf.ts
       - deploy/backup/**
+      - cmd/worker/**
 
 permissions:
   contents: read
@@ -96,29 +97,39 @@ jobs:
         run: make prod-pasta-check
       - name: Import a PDF through the real docling, and search it
         run: make prod-real-smoke
+      # From here each step runs whatever failed before it, unless the run
+      # was cancelled: each measures something of its own.
+      # Docling's time, anon and swap at 30, 60 and 120 pages, each once
+      # with no retries, against its 540 s.
+      - name: Convert 30, 60 and 120 pages through docling
+        if: ${{ !cancelled() }}
+        run: make prod-docling-curve
       # The worst PDF the units accept, about 300 pages of code and tables,
       # timed against docling's 540 s, with searches all the while.
       - name: Import the worst accepted PDF, searching meanwhile
+        if: ${{ !cancelled() }}
         run: make prod-worst-pdf
       - name: Back up the database and the PDFs
+        if: ${{ !cancelled() }}
         run: make backup-now
       - name: Run the restore drill
+        if: ${{ !cancelled() }}
         run: make restore-drill
       # Each container's peak against its limit, after the work; an OOM kill
       # or a restart fails the job, with options in the summary.
       - name: Report each container's peak memory
-        if: always()
+        if: ${{ !cancelled() }}
         run: make prod-memory
       - name: Report Ollama's settings
-        if: always()
+        if: ${{ !cancelled() }}
         run: make prod-ollama-settings
       # Each report is in the log already; the summary and an artifact too,
       # as gh reads the log and the artifacts but not the summary.
       - name: Put the reports in the job's summary
-        if: always()
+        if: ${{ !cancelled() }}
         run: make ci-summary
       - name: Upload the reports
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: arm-real-reports
@@ -126,7 +137,7 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
       - name: Show the disk after
-        if: always()
+        if: ${{ !cancelled() }}
         run: df -h / /home
       - name: Upload the Playwright report
         if: failure()

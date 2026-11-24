@@ -8,7 +8,8 @@ import { chromium, type Page } from "@playwright/test";
  * tables' golden, one after another, each from a new page, until the next
  * would pass PAGES, printed by Chromium as make pdf-fixtures prints them. It
  * stays under docling's 300 pages (DOCLING_SERVE_MAX_NUM_PAGES) and RoNote's
- * 25 MB, and fails if it doesn't. It is never committed: CI prints it.
+ * 25 MB, and fails if it doesn't. It is never committed: CI prints it, and
+ * smaller ones for docling's curve by page count (make prod-docling-curve).
  *
  *   node scripts/worst-pdf.ts OUT [PAGES] [REPO]    PAGES 298, REPO ../..
  */

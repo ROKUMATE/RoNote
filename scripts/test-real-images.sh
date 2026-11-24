@@ -51,7 +51,8 @@ chmod +x "$bin/podman"
 
 # The runner: the services UNITS names, none restarted unless RESTARTS names
 # it; podman inspect knows two containers a script ran, by their IDs, and
-# logs each call to INSPECTED.
+# logs each call to INSPECTED, as convert-check does, which converts any PDF
+# but one saying timeout or broken.
 cat >"$work/runner.sh" <<'FAKE'
 #!/bin/sh
 case $* in
@@ -65,6 +66,12 @@ case $* in
                         bbbb) echo 'ronote-drill-postgres docker.io/pgvector/pgvector:pg17@sha256:0b' ;;
                         *) echo "Error: no such object: $last" >&2; exit 125 ;;
                       esac ;;
+  *"convert-check"*) printf '%s\n' "$*" >>"$INSPECTED"
+                     case $(cat) in
+                       *timeout*) echo 'worker: convert-check: docling: pdf_conversion_timeout: document timeout exceeded' >&2; exit 1 ;;
+                       *broken*) echo 'worker: convert-check: docling: unavailable: docling submit answered 502' >&2; exit 1 ;;
+                       *) echo 'convert-check: ok' ;;
+                     esac ;;
   *"system df"*) printf 'TYPE  TOTAL  ACTIVE  SIZE  RECLAIMABLE\nImages  9  9  7.1GB  0B (0%%)\n' ;;
 esac
 FAKE
@@ -127,16 +134,16 @@ case $err in
   *) result 'an inspect error is not called a missing arm64 build' ok ;;
 esac
 
-# samples LINE...: a samples file of KEY PEAK ANON FILE LIMIT OOM-KILLS lines:
+# samples LINE...: a samples file of KEY PEAK ANON FILE LIMIT OOM-KILLS SWAP lines:
 # docling's two samples, 2048 MiB peak, 1200 anon, 800 file of 4096; the api
 # within 1 GiB; a backup's restic in its 512 MiB; and a network's cgroup.
 samples() {
   {
-    printf 'ronote-docling 1073741824 805306368 268435456 4294967296 0\n'
-    printf 'ronote-docling 2147483648 1258291200 838860800 4294967296 0\n'
-    printf 'ronote-api 104857600 52428800 10485760 1073741824 0\n'
-    printf 'restic 50331648 41943040 1048576 536870912 0\n'
-    printf 'ronote-edge-network 4096 4096 0 0 0\n'
+    printf 'ronote-docling 1073741824 805306368 268435456 4294967296 0 0\n'
+    printf 'ronote-docling 2147483648 1258291200 838860800 4294967296 0 0\n'
+    printf 'ronote-api 104857600 52428800 10485760 1073741824 0 0\n'
+    printf 'restic 50331648 41943040 1048576 536870912 0 0\n'
+    printf 'ronote-edge-network 4096 4096 0 0 0 0\n'
     for line; do printf '%s\n' "$line"; done
   } >"$work/samples"
 }
@@ -145,11 +152,11 @@ samples
 run "memory $work/samples"
 if [ "$status" -eq 0 ] && [ -z "$err" ]; then result 'containers within their limits pass' ok; else result 'containers within their limits pass' "exit $status: $err"; fi
 case $out in
-  *"| ronote-api | 100 MiB | 50 MiB | 10 MiB | 1024 MiB | 9% | 4% | ok |"*"| ronote-docling | 2048 MiB | 1200 MiB | 800 MiB | 4096 MiB | 50% | 29% | ok |"*) result 'the table splits the peak into anon and file' ok ;;
+  *"| ronote-api | 100 MiB | 50 MiB | 10 MiB | 0 MiB | 1024 MiB | 9% | 4% | ok |"*"| ronote-docling | 2048 MiB | 1200 MiB | 800 MiB | 0 MiB | 4096 MiB | 50% | 29% | ok |"*) result 'the table splits the peak into anon and file' ok ;;
   *) result 'the table splits the peak into anon and file' "said: $out" ;;
 esac
 case $out in
-  *"| restic | 48 MiB | 40 MiB | 1 MiB | 512 MiB | 9% | 7% | ok |"*) result "a backup's container has its row" ok ;;
+  *"| restic | 48 MiB | 40 MiB | 1 MiB | 0 MiB | 512 MiB | 9% | 7% | ok |"*) result "a backup's container has its row" ok ;;
   *) result "a backup's container has its row" "said: $out" ;;
 esac
 case $out in *"edge-network"*) result 'only containers are listed' "said: $out" ;; *) result 'only containers are listed' ok ;; esac
@@ -158,7 +165,7 @@ case $out in
   *) result "podman system df follows, as ronote" "said: $out" ;;
 esac
 
-samples 'ronote-docling 4294967296 4194304000 0 4294967296 1'
+samples 'ronote-docling 4294967296 4194304000 0 4294967296 1 0'
 run "memory $work/samples"
 case $status:$err:$out in
   1:*"ronote-docling was killed for memory at its 4096 MiB limit"*:*"**OOM-killed**"*"Options"*"Always Free's A1 allowance is 2 OCPUs and 12 GB"*) result 'an OOM-killed docling fails, with options' ok ;;
@@ -176,18 +183,26 @@ case $status:$err in
   *) result 'a unit that restarted fails' "exit $status: $err" ;;
 esac
 
-samples 'ronote-docling 3600000000 3500000000 100000000 4294967296 0'
+samples 'ronote-docling 3600000000 3500000000 100000000 4294967296 0 0'
 run "memory $work/samples"
 case $status:$out in
   0:*"| 81% | anon near its limit |"*) result 'anon over 80% is flagged, not failed' ok ;;
   *) result 'anon over 80% is flagged, not failed' "exit $status: $out" ;;
 esac
 
-samples 'ronote-docling 4000000000 2000000000 2000000000 4294967296 0'
+samples 'ronote-docling 4000000000 2000000000 2000000000 4294967296 0 0'
 run "memory $work/samples"
 case $out in
   *"| 93% | 46% | ok |"*) result 'a peak of file cache alone is no warning' ok ;;
   *) result 'a peak of file cache alone is no warning' "said: $out" ;;
+esac
+
+# At its limit, with what didn't fit in swap: flagged, not failed.
+samples 'ronote-docling 4294967296 4199546880 7340032 4294967296 0 1073741824'
+run "memory $work/samples"
+case $status:$out in
+  0:*"| ronote-docling | 4096 MiB | 4005 MiB | 800 MiB | 1024 MiB | 4096 MiB | 100% | 97% | **swapped** |"*) result 'a container that swapped is flagged, with how much' ok ;;
+  *) result 'a container that swapped is flagged, with how much' "exit $status: $out" ;;
 esac
 
 samples
@@ -224,6 +239,8 @@ printf '1000\n' >"$api/libpod-payload-0123/memory.peak"
 printf 'anon 600\nfile 300\nkernel 50\n' >"$api/libpod-payload-0123/memory.stat"
 printf 'low 0\noom 0\noom_kill 0\n' >"$api/libpod-payload-0123/memory.events"
 printf '2147483648\n' >"$api/libpod-payload-0123/memory.max"
+printf '200\n' >"$api/libpod-payload-0123/memory.swap.peak"
+printf '100\n' >"$api/libpod-payload-0123/memory.swap.current"
 for d in libpod-aaaa.scope libpod-cccc.scope; do
   printf '5000\n' >"$cg/user.slice/$d/memory.peak"
   printf 'anon 4000\nfile 100\n' >"$cg/user.slice/$d/memory.stat"
@@ -233,18 +250,60 @@ done
 rm -f "$work/s" "$work/s.names" "$INSPECTED"
 run "sample $work/s 0" RONOTE_USER_CGROUP="$cg"
 run "sample $work/s 0" RONOTE_USER_CGROUP="$cg"
-want='restic 5000 4000 100 536870912 2
-ronote-api 1000 600 300 2147483648 0'
+want='restic 5000 4000 100 536870912 2 0
+ronote-api 1000 600 300 2147483648 0 200'
 if [ "$status" -eq 0 ] && [ "$(sort -u "$work/s")" = "$want" ] && [ "$(sort "$work/s" | uniq -c | awk '{ print $1 }' | sort -u)" = 2 ]; then
-  result "each sample has each container's peak, anon, file, limit and OOM kills" ok
+  result "each sample has each container's peak, anon, file, limit, OOM kills and swap" ok
 else
-  result "each sample has each container's peak, anon, file, limit and OOM kills" "exit $status $err: $(cat "$work/s")"
+  result "each sample has each container's peak, anon, file, limit, OOM kills and swap" "exit $status $err: $(cat "$work/s")"
 fi
 if [ "$(grep -c aaaa "$INSPECTED")" = 1 ] && [ "$(cat "$work/s.names")" = 'aaaa restic' ]; then
   result "a script's container is named once, by its image" ok
 else
   result "a script's container is named once, by its image" "inspected: $(cat "$INSPECTED"); names: $(cat "$work/s.names")"
 fi
+
+# The curve: docling's own cgroup, with what it holds while it converts.
+dcg=$work/curve-cg
+dl=$dcg/app.slice/ronote-docling.service/libpod-payload-0456
+mkdir -p "$dl"
+printf 'anon 1073741824\nfile 4096\n' >"$dl/memory.stat"
+printf '268435456\n' >"$dl/memory.swap.current"
+printf '4294967296\n' >"$dl/memory.max"
+for n in 30 60 120; do printf '%%PDF-1.7 %s pages\n' "$n" >"$work/curve-$n.pdf"; done
+rm -f "$INSPECTED"
+run "curve 30 $work/curve-30.pdf 60 $work/curve-60.pdf 120 $work/curve-120.pdf" RONOTE_USER_CGROUP="$dcg"
+case $status:$out in
+  0:*"| 30 | 0 s | 0% | 1024 MiB | 25% | 256 MiB | ok |"*"| 60 |"*"| ok |"*"| 120 |"*"| ok |"*) result 'each size converts once, with its time, anon and swap' ok ;;
+  *) result 'each size converts once, with its time, anon and swap' "exit $status $err: $out" ;;
+esac
+if [ "$(grep -c '^podman exec -i ronote-worker /ronote convert-check$' "$INSPECTED")" = 3 ]; then
+  result "through the worker's own client, in its container" ok
+else
+  result "through the worker's own client, in its container" "calls: $(cat "$INSPECTED")"
+fi
+
+printf '%%PDF-1.7 timeout\n' >"$work/curve-60.pdf"
+rm -f "$INSPECTED"
+run "curve 30 $work/curve-30.pdf 60 $work/curve-60.pdf 120 $work/curve-120.pdf" RONOTE_USER_CGROUP="$dcg"
+case $status:$out in
+  0:*"| 60 |"*"| **timed out** |"*"| 120 | - |"*"skipped: 60 pages ran into the timeout"*) result 'a timeout is a result, and the larger sizes are skipped' ok ;;
+  *) result 'a timeout is a result, and the larger sizes are skipped' "exit $status $err: $out" ;;
+esac
+if [ "$(grep -c convert-check "$INSPECTED")" = 2 ]; then result 'nothing larger is sent' ok; else result 'nothing larger is sent' "calls: $(cat "$INSPECTED")"; fi
+
+printf '%%PDF-1.7 broken\n' >"$work/curve-30.pdf"
+run "curve 30 $work/curve-30.pdf" RONOTE_USER_CGROUP="$dcg"
+case $status:$err in
+  1:*"docling failed on 30 pages"*"docling submit answered 502"*) result 'any other failure fails, with its reason' ok ;;
+  *) result 'any other failure fails, with its reason' "exit $status: $err" ;;
+esac
+
+run "curve 30 $work/curve-30.pdf" RONOTE_USER_CGROUP="$work/nowhere"
+case $status:$err in
+  1:*"no docling container"*) result 'no docling to measure fails' ok ;;
+  *) result 'no docling to measure fails' "exit $status: $err" ;;
+esac
 
 printf '%s passed, %s failed\n' "$passed" "$failed"
 [ "$failed" -eq 0 ]

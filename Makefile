@@ -367,7 +367,7 @@ prod-pasta-check: ## After the install: every unit stopped and started, the repr
 # the log, keeping the command's exit; make ci-summary puts them in the
 # job's summary, and the job uploads the directory. report FILE,COMMAND.
 REPORTS = bin/reports
-ARM_REPORTS = arm64-images.md worst-pdf.md memory.md ollama-settings.md
+ARM_REPORTS = arm64-images.md docling-curve.md worst-pdf.md memory.md ollama-settings.md
 report = mkdir -p $(REPORTS); status=0; $(2) >$(REPORTS)/$(1) || status=$$?; cat $(REPORTS)/$(1); exit $$status
 
 # The worst PDF the units accept (apps/web/scripts/worst-pdf.ts), printed
@@ -381,6 +381,13 @@ prod-worst-pdf: | bin ## Print the worst PDF the units accept ($(WORST_PAGES) pa
 	status=0; RONOTE_SMOKE_SPEC=worst RONOTE_WORST_PDF=$(CURDIR)/$(WORST_PDF) RONOTE_WORST_PAGES=$(WORST_PAGES) RONOTE_WORST_REPORT=$(CURDIR)/$(REPORTS)/worst-pdf.md \
 		RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts || status=$$?; \
 		cat $(REPORTS)/worst-pdf.md 2>/dev/null; exit $$status
+
+# The page counts docling is timed at, each a PDF printed as the worst one is.
+CURVE_PAGES = 30 60 120
+
+prod-docling-curve: | bin ## Docling's time, anon and swap for PDFs of $(CURVE_PAGES) pages, each converted once by the worker's own client with no retries, into bin/reports/docling-curve.md and the log (make prod-real first; sudo)
+	for n in $(CURVE_PAGES); do $(WEB) exec node scripts/worst-pdf.ts $(CURDIR)/bin/curve-$$n.pdf $$n ../.. || exit 1; done
+	@$(call report,docling-curve.md,sudo sh scripts/real-images.sh curve $(foreach n,$(CURVE_PAGES),$(n) bin/curve-$(n).pdf))
 
 prod-memory-sampler: | bin ## Start sampling the memory of ronote's containers every second into bin/memory-samples, in the background, until make prod-memory (sudo)
 	sudo rm -f bin/memory-samples bin/memory-samples.names bin/memory-samples.pid
@@ -439,4 +446,4 @@ prod-check-config: ## Check the example production config with the api image; a 
 .PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images prod-real prod-real-smoke prod-worst-pdf prod-memory-sampler prod-ollama-settings ci-summary prod-pasta-evidence prod-pasta-check prod-memory prod-arm64-images ci-clear-environment prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config
+.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images prod-real prod-real-smoke prod-docling-curve prod-worst-pdf prod-memory-sampler prod-ollama-settings ci-summary prod-pasta-evidence prod-pasta-check prod-memory prod-arm64-images ci-clear-environment prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config

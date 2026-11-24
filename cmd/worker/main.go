@@ -6,12 +6,15 @@
 //	worker healthcheck              fail unless a running worker's database answered lately
 //	worker check-config [--offline] check the configuration, and the blob store's
 //	                                bucket unless --offline, starting nothing
+//	worker convert-check            convert the PDF on stdin once, with the
+//	                                import's docling client and no retries
 package main
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
@@ -58,6 +61,13 @@ func main() {
 		"healthcheck": cli.NoArgs(func() error {
 			return health.Fresh(heartbeatFile, heartbeatStale, time.Now())
 		}),
+		"convert-check": cli.NoArgs(func() error {
+			cfg, err := config.Load(os.Getenv)
+			if err != nil {
+				return err
+			}
+			return convertCheck(context.Background(), newConverter(cfg), os.Stdin, os.Stdout)
+		}),
 	})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "worker:", err)
@@ -98,13 +108,7 @@ func run() error {
 	worker := importer.NewWorker(st, fetcher, cfg.SourceTTL, logger)
 	queue.Handle(importer.Kind, worker.Handle, importer.JobOptions)
 	blobs := s3blob.New(s3blob.Config(cfg.Blob))
-	converter := &docling.Client{
-		Docling:   docling.Service{URL: cfg.PDF.DoclingURL, Key: cfg.PDF.DoclingKey},
-		PDFText:   docling.Service{URL: cfg.PDF.TextURL, Key: cfg.PDF.TextKey},
-		HTTP:      &http.Client{Timeout: 2 * time.Minute},
-		PollEvery: time.Second,
-	}
-	queue.Handle(importer.PDFKind, importer.NewPDFWorker(st, blobs, converter, docling.ServeVersion, logger).Handle, importer.PDFJobOptions)
+	queue.Handle(importer.PDFKind, importer.NewPDFWorker(st, blobs, newConverter(cfg), docling.ServeVersion, logger).Handle, importer.PDFJobOptions)
 	cleaner := importer.NewBlobs(st, blobs, queue, logger)
 	queue.Handle(importer.DeleteBlobsKind, cleaner.HandleDelete, importer.BlobJobOptions)
 	queue.Handle(importer.SweepBlobsKind, cleaner.HandleSweep, importer.BlobJobOptions)
@@ -140,4 +144,35 @@ func run() error {
 	}
 	logger.Info("worker stopped")
 	return nil
+}
+
+// newConverter is the docling and pdftext client PDF imports use; docling's
+// own document timeout applies.
+func newConverter(cfg config.Config) *docling.Client {
+	return &docling.Client{
+		Docling:   docling.Service{URL: cfg.PDF.DoclingURL, Key: cfg.PDF.DoclingKey},
+		PDFText:   docling.Service{URL: cfg.PDF.TextURL, Key: cfg.PDF.TextKey},
+		HTTP:      &http.Client{Timeout: 2 * time.Minute},
+		PollEvery: time.Second,
+	}
+}
+
+// convertCheck has docling convert the PDF read from in once, as an import
+// does but with no job around it, so nothing retries: make
+// prod-docling-curve times it by page count (scripts/real-images.sh). It
+// prints "convert-check: ok"; a PDF docling refuses or gives up on is an
+// error naming its code, such as pdf_conversion_timeout.
+func convertCheck(ctx context.Context, c *docling.Client, in io.Reader, out io.Writer) error {
+	pdf, err := io.ReadAll(io.LimitReader(in, importer.MaxPDFBytes+1))
+	if err != nil {
+		return err
+	}
+	if len(pdf) > importer.MaxPDFBytes {
+		return fmt.Errorf("convert-check: the PDF is over %d bytes", importer.MaxPDFBytes)
+	}
+	if _, err := c.Convert(ctx, pdf, "convert-check.pdf"); err != nil {
+		return fmt.Errorf("convert-check: %w", err)
+	}
+	_, err = fmt.Fprintln(out, "convert-check: ok")
+	return err
 }

@@ -354,7 +354,7 @@ prod-real: prod-config | bin ## Install the units with the real docling and Olla
 	$(BOOTSTRAP) $(CI_REAL_DROPINS)
 	$(after_install)
 
-prod-real-smoke: ## Import a PDF through the real docling and search it with the real embedder, through Caddy (make prod-real first)
+prod-real-smoke: | bin ## Import a PDF through the real docling and search it with the real embedder, through Caddy (make prod-real first)
 	RONOTE_SMOKE_SPEC=real RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
 
 prod-pasta-evidence: ## Before bootstrap.sh on a CI runner: passt's version, pasta's AppArmor signal rules, the reproducer and the kernel's denials; never fails
@@ -405,7 +405,7 @@ restore-drill: ## Run the restore drill now, as its weekly timer does, on a host
 watch-now: ## Run the health watch now, as its 5-minute timer does, on a host install.sh set up (sudo); its alerts go to ntfy, or say they would
 	sudo sh deploy/run-now.sh ronote-watch.service
 
-prod-smoke: ## Run the smoke suite through Caddy against installed units (make prod-ci first)
+prod-smoke: | bin ## Run the smoke suite through Caddy against installed units (make prod-ci first)
 	RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts
 
 # check-config on deploy/ronote.env.example, with stand-ins for its secrets,

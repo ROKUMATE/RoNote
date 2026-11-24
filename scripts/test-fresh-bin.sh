@@ -8,7 +8,9 @@
 set -u
 
 repo=$(cd "$(dirname "$0")/.." && pwd)
-work=$(mktemp -d "${TMPDIR:-/tmp}/fresh-bin-test.XXXXXX")
+# Resolved as make's $(CURDIR) is (macOS's TMPDIR is under a symlink), so
+# its absolute paths into bin/ are recognised.
+work=$(cd "$(mktemp -d "${TMPDIR:-/tmp}/fresh-bin-test.XXXXXX")" && pwd -P)
 trap 'rm -rf "$work"' EXIT
 fresh=$work/repo
 mkdir "$fresh"

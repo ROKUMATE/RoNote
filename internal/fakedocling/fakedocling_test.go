@@ -32,7 +32,7 @@ var outcomes = map[string]string{
 	"encrypted.pdf":  docling.CodePasswordProtected,
 	"image-only.pdf": docling.CodeScanned,
 	"pages-301.pdf":  docling.CodeTooManyPages,
-	"timeout.pdf":    "unavailable",
+	"timeout.pdf":    docling.CodeTimeout,
 }
 
 // pdfs are the fixtures docling and pdftext see.

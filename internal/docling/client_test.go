@@ -67,9 +67,9 @@ func TestConvert(t *testing.T) {
 	}{
 		{name: "success", result: answer(200, `{"status": "success", "document": {"json_content": `+doc+`}, "errors": []}`)},
 		{
-			name:    "docling's own timeout is worth another try",
-			result:  answer(200, `{"status": "partial_success", "document": {"json_content": `+doc+`}, "errors": [{"error_message": "document timeout exceeded", "category": "timeout"}]}`),
-			wantErr: ErrUnavailable,
+			name:     "docling's own timeout is final: the same PDF on the same CPUs times out again",
+			result:   answer(200, `{"status": "partial_success", "document": {"json_content": `+doc+`}, "errors": [{"error_message": "document timeout exceeded", "category": "timeout"}]}`),
+			wantCode: CodeTimeout,
 		},
 		{
 			name:     "over the page limit",

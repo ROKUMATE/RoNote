@@ -21,6 +21,7 @@ const (
 	CodeTooManyPages      = "pdf_too_many_pages"
 	CodeScanned           = "scanned_pdf_unsupported"
 	CodeFailed            = "pdf_conversion_failed"
+	CodeTimeout           = "pdf_conversion_timeout"
 )
 
 // MaxPages is the most pages a PDF may have.
@@ -30,8 +31,9 @@ const MaxPages = 300
 // stack runs its image, and extractions record it.
 const ServeVersion = "1.38.2"
 
-// ErrUnavailable wraps errors retrying may get past: timeouts, 5xx and
-// network errors, from docling or pdftext.
+// ErrUnavailable wraps errors retrying may get past: HTTP timeouts, 5xx and
+// network errors, from docling or pdftext. Docling's own document timeout
+// is not one: the same PDF on the same CPUs meets it again.
 var ErrUnavailable = errors.New("docling: unavailable")
 
 // RefusedError is a PDF docling or pdftext can't convert, whatever the
@@ -157,7 +159,7 @@ var options = map[string][]string{
 }
 
 // Convert submits pdf to docling, polls until it is done, and returns its
-// document. Docling's timeouts are ErrUnavailable; a PDF it refuses is a
+// document. A PDF it refuses, or gives up on at its document timeout, is a
 // *RefusedError.
 func (c *Client) Convert(ctx context.Context, pdf []byte, filename string) (*Document, error) {
 	var t task
@@ -192,13 +194,14 @@ func (c *Client) Convert(ctx context.Context, pdf []byte, filename string) (*Doc
 	return r.document()
 }
 
-// document sorts docling's result: timeouts are worth another try, its page
-// limit and anything else it fails on are not. The API refuses files over
-// the size limit before docling sees them.
+// document sorts docling's result: its timeout, its page limit and anything
+// else it fails on are final. Another try would only wait as long again,
+// with every other PDF import behind it (one conversion worker). The API
+// refuses files over the size limit before docling sees them.
 func (r *result) document() (*Document, error) {
 	for _, e := range r.Errors {
 		if e.Category == "timeout" {
-			return nil, fmt.Errorf("%w: docling: %s", ErrUnavailable, e.Message)
+			return nil, &RefusedError{Code: CodeTimeout, Reason: e.Message}
 		}
 	}
 	for _, e := range r.Errors {

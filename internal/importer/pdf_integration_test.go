@@ -287,9 +287,11 @@ func TestPDFImportFailures(t *testing.T) {
 		{marker: "broken", code: docling.CodeFailed, calls: []string{"inspect broken"}},
 		{marker: "scan", code: docling.CodeScanned, calls: []string{"inspect scan"}},
 		{marker: "pages301", code: docling.CodeTooManyPages, calls: []string{"inspect pages301"}},
-		// Unavailable is retried: every attempt calls again.
+		// Unavailable is retried: every attempt calls again. Docling's own
+		// timeout is not: the PDF would time out again, with every other
+		// import waiting behind it.
 		{marker: "down", code: codeUnavailable, calls: []string{"inspect down", "inspect down", "inspect down"}},
-		{marker: "timeout", code: codeUnavailable, calls: []string{"inspect timeout", "convert timeout", "inspect timeout", "convert timeout", "inspect timeout", "convert timeout"}},
+		{marker: "timeout", code: docling.CodeTimeout, calls: []string{"inspect timeout", "convert timeout"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.marker, func(t *testing.T) {

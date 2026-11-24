@@ -286,6 +286,7 @@ const (
 	ImportErrorCodeNetworkError             ImportErrorCode = "network_error"
 	ImportErrorCodeNotFound                 ImportErrorCode = "not_found"
 	ImportErrorCodePdfConversionFailed      ImportErrorCode = "pdf_conversion_failed"
+	ImportErrorCodePdfConversionTimeout     ImportErrorCode = "pdf_conversion_timeout"
 	ImportErrorCodePdfConversionUnavailable ImportErrorCode = "pdf_conversion_unavailable"
 	ImportErrorCodePdfPasswordProtected     ImportErrorCode = "pdf_password_protected"
 	ImportErrorCodePdfTooManyPages          ImportErrorCode = "pdf_too_many_pages"
@@ -319,6 +320,8 @@ func (e ImportErrorCode) Valid() bool {
 	case ImportErrorCodeNotFound:
 		return true
 	case ImportErrorCodePdfConversionFailed:
+		return true
+	case ImportErrorCodePdfConversionTimeout:
 		return true
 	case ImportErrorCodePdfConversionUnavailable:
 		return true

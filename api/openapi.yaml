@@ -1337,6 +1337,7 @@ components:
         - scanned_pdf_unsupported
         - pdf_conversion_failed
         - pdf_conversion_unavailable
+        - pdf_conversion_timeout
         - internal_error
     Import:
       type: object

@@ -31,6 +31,7 @@ export const importErrorMessages: Record<ImportErrorCode, string> = {
   scanned_pdf_unsupported: "That PDF is scanned pages without text, which RoNote can't read yet.",
   pdf_conversion_failed: "RoNote couldn't read that PDF.",
   pdf_conversion_unavailable: "RoNote's PDF reader isn't answering, so try again later.",
+  pdf_conversion_timeout: "That PDF took too long to convert, so try one with fewer pages.",
   internal_error: "Something went wrong on RoNote's side. Try again.",
 };
 

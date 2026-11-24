@@ -582,7 +582,7 @@ export interface components {
          * @description Why an import failed; set when its status is failed.
          * @enum {string}
          */
-        ImportErrorCode: "invalid_url" | "blocked_address" | "disallowed_by_robots" | "too_large" | "unsupported_type" | "too_many_redirects" | "not_found" | "http_error" | "extract_failed" | "timeout" | "rate_limited" | "upstream_error" | "robots_unavailable" | "network_error" | "pdf_password_protected" | "pdf_too_many_pages" | "scanned_pdf_unsupported" | "pdf_conversion_failed" | "pdf_conversion_unavailable" | "internal_error";
+        ImportErrorCode: "invalid_url" | "blocked_address" | "disallowed_by_robots" | "too_large" | "unsupported_type" | "too_many_redirects" | "not_found" | "http_error" | "extract_failed" | "timeout" | "rate_limited" | "upstream_error" | "robots_unavailable" | "network_error" | "pdf_password_protected" | "pdf_too_many_pages" | "scanned_pdf_unsupported" | "pdf_conversion_failed" | "pdf_conversion_unavailable" | "pdf_conversion_timeout" | "internal_error";
         /** @description An import of a web page (kind web: requested_url and canonical_url) or of an uploaded PDF (kind pdf: filename). */
         Import: {
             /** Format: uuid */

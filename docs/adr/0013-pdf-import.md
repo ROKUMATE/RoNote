@@ -60,8 +60,8 @@ From P18 on, students import PDFs as well as pages: textbook chapters and lectur
 - **Worker.** Kind `import_pdf` on the jobs port (ADR 0009), 2 at a time, 10 minutes an attempt: read the blob, submit it to docling, poll, fetch, read the code boxes' lines from pdftext, map, then the final transaction of ADR 0005 (source, snapshot, extraction, document, `done`). A redelivered job for a finished import does nothing.
 - **Errors.**
   - At upload, synchronous: `not_a_pdf` (no `%PDF-`), `pdf_too_large`.
-  - Permanent, from docling's answer: `pdf_password_protected`, `pdf_too_many_pages`, `scanned_pdf_unsupported` (pages but no text), `pdf_conversion_failed` (anything else docling refuses).
-  - Transient: docling timeouts, 5xx and network errors, 3 attempts in all; then `pdf_conversion_unavailable`.
+  - Permanent, from docling's answer: `pdf_password_protected`, `pdf_too_many_pages`, `scanned_pdf_unsupported` (pages but no text), `pdf_conversion_failed` (anything else docling refuses), `pdf_conversion_timeout` (docling gave up at its document timeout: the same PDF on the same CPUs would again, and with one conversion worker every other PDF import waits behind each try).
+  - Transient: HTTP timeouts, 5xx and network errors, 3 attempts in all; then `pdf_conversion_unavailable`.
   - docling's error wording is matched to these codes. Its recorded answers to hostile fixtures pin the matching, so an upgrade that changes the wording fails tests rather than misreporting.
 - **Deletion.** Deleting a PDF document deletes its source, and the blob in a job enqueued in the same transaction; deleting an account enqueues the deletion of `pdf/<owner>/`. A sweep at worker start and daily deletes any blob under `pdf/` that no snapshot or recent import references. Deleting a missing blob succeeds, so every step can run twice.
 - **Tests never call docling.** `make pdf-record` records docling's and pdftext's answers for each fixture; `cmd/fakedocling` (dev and test only) replays them over both APIs, keyed by the file's sha256. CI and the end-to-end tests run against it and SeaweedFS, and never pull the docling image.

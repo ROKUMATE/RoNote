@@ -1,5 +1,5 @@
-// Command fakeembed serves a deterministic embedder over OpenAI's
-// /v1/embeddings, for dev and the end-to-end tests
+// Command fakeembed serves a deterministic embedder over Ollama's
+// /api/embed, for dev and the end-to-end tests
 // (docs/adr/0011-retrieval.md), like cmd/fakeidp: they use the real client
 // and need no model. It listens on RONOTE_FAKEEMBED_ADDR.
 package main

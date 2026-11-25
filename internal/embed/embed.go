@@ -1,6 +1,7 @@
 // Package embed turns text into vectors for search
-// (docs/adr/0011-retrieval.md): an OpenAI-compatible HTTP client, Ollama in
-// dev, and a deterministic fake for tests.
+// (docs/adr/0011-retrieval.md): a client of Ollama's native API, which
+// refuses an input over the model's context, and a deterministic fake for
+// tests.
 package embed
 
 import (

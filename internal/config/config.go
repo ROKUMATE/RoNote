@@ -96,14 +96,14 @@ var (
 // The embedder by default: Ollama on this machine, with the pinned model
 // (docs/adr/0011-retrieval.md).
 const (
-	DefaultEmbedURL   = "http://127.0.0.1:11434/v1"
+	DefaultEmbedURL   = "http://127.0.0.1:11434"
 	DefaultEmbedModel = "qwen3-embedding:0.6b"
 )
 
-// Embed is an OpenAI-compatible embeddings API and the model to ask it for
+// Embed is Ollama's embeddings API and the model to ask it for
 // (docs/adr/0011-retrieval.md).
 type Embed struct {
-	// URL is the API root, such as http://127.0.0.1:11434/v1 for Ollama.
+	// URL is Ollama's address, such as http://127.0.0.1:11434.
 	URL   string
 	Model string
 }
@@ -232,7 +232,7 @@ func Load(getenv func(string) string) (Config, error) {
 		URL:   strings.TrimSuffix(withDefault(getenv("RONOTE_EMBED_URL"), DefaultEmbedURL), "/"),
 		Model: withDefault(getenv("RONOTE_EMBED_MODEL"), DefaultEmbedModel),
 	}
-	check("RONOTE_EMBED_URL", validateHTTPURL(embed.URL))
+	check("RONOTE_EMBED_URL", validateEmbedURL(embed.URL))
 	chat, chatErrs := parseChat(getenv, env)
 	errs = append(errs, chatErrs...)
 	blobStore, pdf, pdfErrs := parsePDF(getenv, env)
@@ -364,6 +364,19 @@ func validateHTTPURL(s string) error {
 	u, err := url.Parse(s)
 	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
 		return fmt.Errorf("%q is not an http or https URL", s)
+	}
+	return nil
+}
+
+// validateEmbedURL accepts Ollama's own address. One ending in /v1 is its
+// OpenAI-compatible API, which cuts an input over the model's context
+// without a word; the client calls the native /api/embed, which refuses it.
+func validateEmbedURL(s string) error {
+	if err := validateHTTPURL(s); err != nil {
+		return err
+	}
+	if strings.HasSuffix(s, "/v1") {
+		return fmt.Errorf("%q ends in /v1; give Ollama's own address, such as %s: RoNote calls its native /api/embed", s, DefaultEmbedURL)
 	}
 	return nil
 }

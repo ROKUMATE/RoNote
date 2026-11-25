@@ -592,6 +592,8 @@ export interface components {
             requested_url?: string;
             canonical_url?: string;
             filename?: string;
+            /** @description A PDF import's page count, once pdftext has read the file, even when it was refused for it (pdf_too_many_pages). */
+            pdf_pages?: number;
             status: components["schemas"]["ImportStatus"];
             error_code?: components["schemas"]["ImportErrorCode"];
             /**
@@ -621,6 +623,8 @@ export interface components {
         ImportEvent: {
             status: components["schemas"]["ImportStatus"];
             error_code?: components["schemas"]["ImportErrorCode"];
+            /** @description The PDF's page count, as on Import. */
+            pdf_pages?: number;
             /** Format: uuid */
             document_id?: string;
         };

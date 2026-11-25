@@ -1,6 +1,12 @@
 import { ApiError } from "./client";
 import type { ChatErrorCode, ErrorCode, ImportErrorCode, SignInErrorCode } from "./schema";
 
+/**
+ * The most pages a PDF may have: the server's docling.MaxPages, which a Go
+ * test holds this to (deploy/units_test.go).
+ */
+export const maxPdfPages = 100;
+
 /** Why signing in failed, one plain sentence per code. */
 export const signInErrorMessages: Record<SignInErrorCode, string> = {
   denied: "GitHub didn't sign you in. Try again.",
@@ -27,7 +33,7 @@ export const importErrorMessages: Record<ImportErrorCode, string> = {
   robots_unavailable: "The site couldn't say whether RoNote may fetch its pages. Try again later.",
   network_error: "RoNote couldn't connect to the site.",
   pdf_password_protected: "That PDF needs a password, so RoNote can't open it.",
-  pdf_too_many_pages: "That PDF has more than 300 pages, the most RoNote imports.",
+  pdf_too_many_pages: `That PDF has more than ${maxPdfPages} pages, the most RoNote imports.`,
   scanned_pdf_unsupported: "That PDF is scanned pages without text, which RoNote can't read yet.",
   pdf_conversion_failed: "RoNote couldn't read that PDF.",
   pdf_conversion_unavailable: "RoNote's PDF reader isn't answering, so try again later.",
@@ -76,6 +82,11 @@ export const requestErrorMessages: Record<ErrorCode, string> = {
   conversation_busy: "An answer is still being written here. Wait for it, or stop it.",
   internal_error: "Something went wrong on RoNote's side. Try again.",
 };
+
+/** Why a PDF of pages pages was refused. */
+export function tooManyPagesMessage(pages: number): string {
+  return `That PDF has ${pages} pages, and RoNote imports at most ${maxPdfPages}.`;
+}
 
 /** The API did not answer, or something else answered for it. */
 const unreachableMessage = "RoNote's server isn't answering. Try again in a moment.";

@@ -99,13 +99,14 @@ jobs:
         run: make prod-real-smoke
       # From here each step runs whatever failed before it, unless the run
       # was cancelled: each measures something of its own.
-      # Docling's time, anon and swap at 30, 60 and 120 pages, each once
-      # with no retries, against its 540 s.
-      - name: Convert 30, 60 and 120 pages through docling
+      # Docling's time, anon and swap at 25, 50 and 100 pages (the cap),
+      # each once with no retries, against its 540 s.
+      - name: Convert 25, 50 and 100 pages through docling
         if: ${{ !cancelled() }}
         run: make prod-docling-curve
-      # The worst PDF the units accept, about 300 pages of code and tables,
-      # timed against docling's 540 s, with searches all the while.
+      # The worst PDF the units accept, 100 pages of code and tables (the
+      # cap), timed against docling's 540 s, with searches all the while; it
+      # must pass.
       - name: Import the worst accepted PDF, searching meanwhile
         if: ${{ !cancelled() }}
         run: make prod-worst-pdf

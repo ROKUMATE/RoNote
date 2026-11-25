@@ -107,7 +107,7 @@ func apply(ctx context.Context, backend Backend, owner uuid.UUID, imp store.Impo
 	if ev.OwnerID != owner {
 		return imp, nil
 	}
-	imp.Status, imp.ErrorCode, imp.DocumentID = store.ImportStatus(ev.Status), ev.ErrorCode, ev.DocumentID
+	imp.Status, imp.ErrorCode, imp.DocumentID, imp.PDFPages = store.ImportStatus(ev.Status), ev.ErrorCode, ev.DocumentID, ev.PDFPages
 	return imp, nil
 }
 
@@ -120,6 +120,9 @@ func send(w http.ResponseWriter, rc *http.ResponseController, imp store.Import) 
 	}
 	if imp.DocumentID != uuid.Nil {
 		ev.DocumentID = &imp.DocumentID
+	}
+	if imp.PDFPages > 0 {
+		ev.PdfPages = &imp.PDFPages
 	}
 	return writeEvent(w, rc, "status", ev)
 }

@@ -9,6 +9,8 @@ export interface TrackedImport {
   status: ImportStatus;
   errorCode?: ImportErrorCode;
   documentId?: string;
+  /** A PDF's page count, once pdftext has read it. */
+  pdfPages?: number;
   /** The event stream gave up before the import finished. */
   lost: boolean;
 }
@@ -45,6 +47,7 @@ export function tracked(imp: Import): TrackedImport {
       status: imp.status,
       ...(imp.error_code ? { error_code: imp.error_code } : {}),
       ...(imp.document_id ? { document_id: imp.document_id } : {}),
+      ...(imp.pdf_pages ? { pdf_pages: imp.pdf_pages } : {}),
     },
   );
 }
@@ -63,6 +66,7 @@ export function applyEvent(state: TrackedImport, event: ImportEvent): TrackedImp
     status: event.status,
     ...(event.error_code ? { errorCode: event.error_code } : {}),
     ...(event.document_id ? { documentId: event.document_id } : {}),
+    ...(event.pdf_pages ? { pdfPages: event.pdf_pages } : {}),
   };
 }
 

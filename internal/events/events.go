@@ -36,6 +36,7 @@ type Event struct {
 	Status     string    `json:"status"`
 	ErrorCode  string    `json:"error_code"`
 	DocumentID uuid.UUID `json:"document_id"`
+	PDFPages   int       `json:"pdf_pages"`
 	// Resync is set when the listening connection was replaced: changes may
 	// have been missed, so the import should be read again.
 	Resync bool `json:"-"`

@@ -24,8 +24,11 @@ const (
 	CodeTimeout           = "pdf_conversion_timeout"
 )
 
-// MaxPages is the most pages a PDF may have.
-const MaxPages = 300
+// MaxPages is the most pages a PDF may have: what docling converts in time
+// on the production host, with room to spare (docs/adr/0013-pdf-import.md).
+// Docling's own DOCLING_SERVE_MAX_NUM_PAGES and the web app's message say
+// the same (deploy/units_test.go).
+const MaxPages = 100
 
 // ServeVersion is the docling-serve release RoNote is pinned to; the dev
 // stack runs its image, and extractions record it.
@@ -71,7 +74,9 @@ type Inspection struct {
 }
 
 // Inspect opens pdf with pdftext. A password-protected or unreadable PDF,
-// one over MaxPages, or one without a text layer is a *RefusedError.
+// one over MaxPages, or one without a text layer is a *RefusedError; a
+// refusal for what pdftext found comes with it, so its page count can be
+// shown.
 func (c *Client) Inspect(ctx context.Context, pdf []byte) (Inspection, error) {
 	var found struct {
 		Inspection
@@ -89,9 +94,9 @@ func (c *Client) Inspect(ctx context.Context, pdf []byte) (Inspection, error) {
 	case status != http.StatusOK:
 		return Inspection{}, fmt.Errorf("%w: pdftext inspect answered %d", ErrUnavailable, status)
 	case found.Pages > MaxPages:
-		return Inspection{}, &RefusedError{Code: CodeTooManyPages, Reason: fmt.Sprintf("%d pages", found.Pages)}
+		return found.Inspection, &RefusedError{Code: CodeTooManyPages, Reason: fmt.Sprintf("%d pages, over %d", found.Pages, MaxPages)}
 	case found.Pages > 0 && found.Chars == 0:
-		return Inspection{}, &RefusedError{Code: CodeScanned, Reason: "no text layer"}
+		return found.Inspection, &RefusedError{Code: CodeScanned, Reason: "no text layer"}
 	}
 	return found.Inspection, nil
 }

@@ -18,7 +18,9 @@ type Embedded struct {
 }
 
 // EmbedCached embeds texts through st's cache, shared across users: only
-// texts it lacks go to e, and what comes back is kept for next time.
+// texts it lacks go to e, embed.BatchSize at a time, and each batch is kept
+// as it comes back, so an attempt cut short (an index job's timeout) leaves
+// what it finished for the retry.
 func EmbedCached(ctx context.Context, st *store.Store, e embed.Embedder, texts []string) (Embedded, error) {
 	hashes := make([][32]byte, len(texts))
 	keys := make([][]byte, 0, len(texts))
@@ -48,21 +50,22 @@ func EmbedCached(ctx context.Context, st *store.Store, e embed.Embedder, texts [
 			missingHashes = append(missingHashes, h)
 		}
 	}
-	if len(missing) > 0 {
-		vecs, err := e.Embed(ctx, missing)
+	for start := 0; start < len(missing); start += embed.BatchSize {
+		end := min(start+embed.BatchSize, len(missing))
+		vecs, err := e.Embed(ctx, missing[start:end])
 		if err != nil {
 			return Embedded{}, err
 		}
-		if len(vecs) != len(missing) {
-			return Embedded{}, fmt.Errorf("embedder gave %d vectors for %d texts", len(vecs), len(missing))
+		if len(vecs) != end-start {
+			return Embedded{}, fmt.Errorf("embedder gave %d vectors for %d texts", len(vecs), end-start)
 		}
 		for i, v := range vecs {
-			if err := st.CacheEmbedding(ctx, e.Model(), missingHashes[i][:], v); err != nil {
+			if err := st.CacheEmbedding(ctx, e.Model(), missingHashes[start+i][:], v); err != nil {
 				return Embedded{}, err
 			}
-			found[missingHashes[i]] = v
+			found[missingHashes[start+i]] = v
 		}
-		out.Sent = len(missing)
+		out.Sent = end
 	}
 	for i, h := range hashes {
 		out.Vectors[i] = found[h]

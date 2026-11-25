@@ -10,8 +10,9 @@ import (
 	"strings"
 )
 
-// batchSize is how many texts one request carries.
-const batchSize = 32
+// BatchSize is how many texts one request carries; the search package's
+// cache keeps each batch as it comes back.
+const BatchSize = 32
 
 // maxResponse bounds one response: 32 vectors of 1024 numbers as JSON.
 const maxResponse = 4 << 20
@@ -37,11 +38,11 @@ func NewClient(url, model string) *Client {
 // Model names the client's model.
 func (c *Client) Model() string { return c.model }
 
-// Embed embeds texts, batchSize at a time. A 4xx answer is ErrRejected.
+// Embed embeds texts, BatchSize at a time. A 4xx answer is ErrRejected.
 func (c *Client) Embed(ctx context.Context, texts []string) ([][]float32, error) {
 	out := make([][]float32, 0, len(texts))
-	for start := 0; start < len(texts); start += batchSize {
-		batch, err := c.embed(ctx, texts[start:min(start+batchSize, len(texts))])
+	for start := 0; start < len(texts); start += BatchSize {
+		batch, err := c.embed(ctx, texts[start:min(start+BatchSize, len(texts))])
 		if err != nil {
 			return nil, err
 		}

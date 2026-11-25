@@ -9,34 +9,32 @@ trap 'rm -rf "$work"' EXIT
 passed=0
 failed=0
 
-# The fake: the last argument is the URL. /models prints MODELS and
-# /api/tags prints TAGS; an empty variable is a failed request.
+# The fake: the last argument is the URL. /api/tags prints TAGS; an empty
+# variable is a failed request.
 bin=$work/bin
 mkdir -p "$bin"
 cat >"$bin/curl" <<'FAKE'
 #!/bin/sh
 for last; do :; done
 case $last in
-  */models) [ -n "$MODELS" ] && printf '%s' "$MODELS" ;;
   */api/tags) [ -n "$TAGS" ] && printf '%s' "$TAGS" ;;
   *) exit 7 ;;
 esac
 FAKE
 chmod +x "$bin/curl"
 
-listed='{"object":"list","data":[{"id":"qwen3-embedding:0.6b","object":"model"}]}'
 tags() {
   printf '{"models":[{"name":"other:1b","digest":"0000"},{"name":"qwen3-embedding:0.6b","model":"qwen3-embedding:0.6b","digest":"%s","details":{"format":"gguf"}}]}' "$1"
 }
 
-# expect NAME MODEL MODELS TAGS STATUS TEXT...: the check exits with STATUS
-# and prints every TEXT.
+# expect NAME MODEL TAGS STATUS TEXT...: the check exits with STATUS and
+# prints every TEXT.
 expect() {
   name=$1
-  RONOTE_EMBED_MODEL=$2 MODELS=$3 TAGS=$4 PATH="$bin:$PATH" sh "$scripts/embed-check.sh" >"$work/out" 2>&1
+  RONOTE_EMBED_MODEL=$2 TAGS=$3 PATH="$bin:$PATH" sh "$scripts/embed-check.sh" >"$work/out" 2>&1
   status=$?
-  want=$5
-  shift 5
+  want=$4
+  shift 4
   out=$(cat "$work/out")
   missing=
   for text in "$@"; do
@@ -55,13 +53,12 @@ expect() {
   fi
 }
 
-export RONOTE_EMBED_URL=http://127.0.0.1:11434/v1
-expect 'pinned model pulled' qwen3-embedding:0.6b "$listed" "$(tags ac6da0dfba84a81fdbfb)" 0 'answers at'
-expect 'nothing answers' qwen3-embedding:0.6b '' '' 1 'no embedder answers' 'ollama serve'
-expect 'model not pulled' qwen3-embedding:0.6b '{"data":[]}' '' 1 "doesn't serve qwen3-embedding:0.6b" 'ollama pull qwen3-embedding:0.6b'
-expect 'another build pulled' qwen3-embedding:0.6b "$listed" "$(tags 1234567890ab)" 1 'not the pinned ac6da0dfba84' 'ollama pull'
-expect 'not Ollama: no digest to check' qwen3-embedding:0.6b "$listed" '' 0 'answers at'
-expect 'another model, no pin' fake-words '{"data":[{"id":"fake-words"}]}' '' 0 'answers at'
+export RONOTE_EMBED_URL=http://127.0.0.1:11434
+expect 'pinned model pulled' qwen3-embedding:0.6b "$(tags ac6da0dfba84a81fdbfb)" 0 'answers at'
+expect 'nothing answers' qwen3-embedding:0.6b '' 1 'no embedder answers' 'ollama serve'
+expect 'model not pulled' qwen3-embedding:0.6b '{"models":[]}' 1 "doesn't serve qwen3-embedding:0.6b" 'ollama pull qwen3-embedding:0.6b'
+expect 'another build pulled' qwen3-embedding:0.6b "$(tags 1234567890ab)" 1 'not the pinned ac6da0dfba84' 'ollama pull'
+expect 'another model, no pin' fake-words '{"models":[{"name":"fake-words","model":"fake-words"}]}' 0 'answers at'
 
 printf '%s passed, %s failed\n' "$passed" "$failed"
 [ "$failed" -eq 0 ]

@@ -21,7 +21,7 @@ Where things live, in full. AGENTS.md keeps the short version.
 | `internal/importer/` | the import pipeline: the job handlers that fetch and extract a page or convert a PDF, and store a document; the service the API enqueues imports and uploads with; blob deletion and the daily sweep of leftover blobs |
 | `internal/jobs/` | the jobs port: enqueue in the caller's transaction, deliver at least once (docs/adr/0009-jobs-port.md); `riverjobs` runs it on River and is the only package that imports River, `memjobs` in memory for unit tests, `jobstest` is the suite both pass |
 | `internal/search/` | retrieval: chunking documents and notes, indexing them on the jobs port, hybrid search (docs/adr/0011-retrieval.md) |
-| `internal/embed/` | embedders: the OpenAI-compatible client, a deterministic fake, and the eval's replay of recorded vectors |
+| `internal/embed/` | embedders: Ollama's client (`/api/embed`, truncate off), a deterministic fake, and the eval's replay of recorded vectors |
 | `internal/chat/` | chat over a library (docs/adr/0012-chat.md): the `Model` port, the service that grounds, streams, validates citations, budgets and saves answers, and the `search_library` tool |
 | `internal/chat/anthropic/` | the port's adapter to Anthropic's Messages API; the only package that imports the SDK (depguard); `testdata/` holds its streams and request goldens |
 | `internal/fakellm/` | the fake Messages API `cmd/fakellm` serves: the subset chat uses, answering deterministically from the search results it is sent |

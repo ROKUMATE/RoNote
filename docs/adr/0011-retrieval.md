@@ -1,6 +1,6 @@
 # 0011: Retrieval
 
-Accepted, 2026-11-12
+Accepted, 2026-11-12. Amended 2026-11-25: the client calls Ollama's native API, not the OpenAI-compatible one.
 
 ## Context
 
@@ -16,7 +16,7 @@ From P16 on, students search their whole library, and from P17 they chat over it
   - A highlight with a note is a chunk of its own, kind `note`, linked to its block: its input is the breadcrumb, the highlighted words and the note.
   - Lists, callouts, quotes, tables and tabs are read as text, nested code included; a tabs block's code stays whole.
 - **Embeddings.** One `Embedder` interface at the package boundary, with three implementations:
-  - an OpenAI-compatible HTTP client (`/v1/embeddings`), Ollama in dev now, TEI or a hosted service later by config (`RONOTE_EMBED_URL`, `RONOTE_EMBED_MODEL`);
+  - an HTTP client of Ollama's native `/api/embed`, with `truncate: false` (`RONOTE_EMBED_URL`, Ollama's own address, and `RONOTE_EMBED_MODEL`). It first called the OpenAI-compatible `/v1/embeddings`, so that TEI or a hosted service could replace Ollama by config. But Ollama 0.40.16's `/v1/embeddings` takes no `truncate`, and cuts an input over the model's context without a word: the chunk was embedded as if whole, and searching it found the cut text. The native API with truncate off refuses such an input with a 400, and the document's index job fails for good with Ollama's message (`embed.ErrRejected`). Replacing Ollama now means another client: the cost of failing loudly. Config refuses a URL ending in `/v1`, saying so;
   - a deterministic fake for unit tests, and `cmd/fakeembed`, the same fake served over HTTP for the end-to-end tests, like `cmd/fakeidp`, dev and test only;
   - a replay embedder, which reads vectors recorded for the eval and fails on any text it has none for.
 - **The model: Qwen3-Embedding-0.6B,** Ollama tag `qwen3-embedding:0.6b`, pinned to digest `ac6da0dfba84` (Q8_0, 1024 dimensions, unit-normalised, 32k context). `make doctor` checks it is pulled.

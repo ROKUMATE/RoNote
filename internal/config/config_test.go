@@ -72,7 +72,7 @@ var github = GitHub{
 }
 
 // embedDefault is the default embedder: Ollama's, with the pinned model.
-var embedDefault = Embed{URL: "http://127.0.0.1:11434/v1", Model: "qwen3-embedding:0.6b"}
+var embedDefault = Embed{URL: "http://127.0.0.1:11434", Model: "qwen3-embedding:0.6b"}
 
 // limits are the default limits.
 var limits = Limits{ImportsPerDay: 60, Documents: 500, APIPerMinute: 120, AuthPerMinute: 20, ChatMessagesPerDay: 50, ChatTokensPerDay: 400_000}
@@ -388,11 +388,11 @@ func TestLoad(t *testing.T) {
 		},
 		{
 			name: "another embedder",
-			env:  validEnv(map[string]string{"RONOTE_EMBED_URL": "http://127.0.0.1:18093/v1/", "RONOTE_EMBED_MODEL": "fake-words"}),
+			env:  validEnv(map[string]string{"RONOTE_EMBED_URL": "http://127.0.0.1:18093/", "RONOTE_EMBED_MODEL": "fake-words"}),
 			want: Config{
 				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
 				PublicURL: "https://ronote.test", GitHub: github, Limits: limits,
-				Embed: Embed{URL: "http://127.0.0.1:18093/v1", Model: "fake-words"}, Chat: chatDefault,
+				Embed: Embed{URL: "http://127.0.0.1:18093", Model: "fake-words"}, Chat: chatDefault,
 			},
 		},
 		{
@@ -465,6 +465,13 @@ func TestLoad(t *testing.T) {
 			name:    "a kill switch that isn't a boolean",
 			env:     validEnv(map[string]string{"RONOTE_CHAT_ENABLED": "maybe"}),
 			wantErr: []string{`RONOTE_CHAT_ENABLED: "maybe" is not true or false`},
+		},
+		{
+			// The client calls Ollama's native /api/embed, which can refuse
+			// an input over the context; /v1 would silently cut it.
+			name:    "an embedder URL of the OpenAI-compatible API",
+			env:     validEnv(map[string]string{"RONOTE_EMBED_URL": "http://127.0.0.1:11434/v1"}),
+			wantErr: []string{`RONOTE_EMBED_URL: "http://127.0.0.1:11434/v1" ends in /v1; give Ollama's own address, such as http://127.0.0.1:11434: RoNote calls its native /api/embed`},
 		},
 		{
 			name:    "an embedder URL that isn't one",

@@ -40,6 +40,7 @@ entry when a phase settles it; add one when a phase leaves something open.
 - Chat: the panel lists the 30 latest conversations, with no paging yet.
 - Chat: a citation chip focused while its answer streams loses focus when the saved answer replaces the streamed one.
 - Chat answers in one model's words; Haiku 5.5 may think within its 1,024 output tokens at effort low, which could cut a long answer short (`max_tokens`). All 80 of the chat eval's answers finished.
+- Search: one chunk over Ollama's 4096-token context fails its whole document's index job for good (ADR 0011), so that document isn't searchable at all; the chunker's 6,000-character cap keeps text over about 1.5 characters a token within it. Skipping, or splitting, the one chunk would be finer.
 - Search: identifiers, errors and how-to questions are at recall@10 1.0 on the eval; paraphrases (0.85) and questions across two documents (0.90) are where it misses. The eval's 80 queries were written by the agent; 20 are marked for review.
 - The fake embedder (`cmd/fakeembed`) matches by shared words, so end-to-end tests check the plumbing of search by meaning, not its quality; `make eval` checks that.
 - A search result lands on its chunk's first block; a result whose words are further into the chunk lands a little above them.

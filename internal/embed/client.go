@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"sort"
 	"strings"
 )
 
@@ -17,10 +16,12 @@ const batchSize = 32
 // maxResponse bounds one response: 32 vectors of 1024 numbers as JSON.
 const maxResponse = 4 << 20
 
-// Client embeds through an OpenAI-compatible /embeddings endpoint: Ollama,
-// TEI, or a hosted service.
+// Client embeds through Ollama's native /api/embed, with truncate false:
+// an input over the model's context is refused (a 400, so ErrRejected)
+// rather than cut and embedded as if whole, which Ollama's OpenAI-compatible
+// /v1/embeddings would do without a word (docs/adr/0011-retrieval.md).
 type Client struct {
-	// URL is the API root, such as http://127.0.0.1:11434/v1.
+	// URL is Ollama's address, such as http://127.0.0.1:11434.
 	URL   string
 	model string
 	// HTTP makes the calls; nil means http.DefaultClient. Callers bound
@@ -50,11 +51,11 @@ func (c *Client) Embed(ctx context.Context, texts []string) ([][]float32, error)
 }
 
 func (c *Client) embed(ctx context.Context, texts []string) ([][]float32, error) {
-	body, err := json.Marshal(map[string]any{"model": c.model, "input": texts})
+	body, err := json.Marshal(map[string]any{"model": c.model, "input": texts, "truncate": false})
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.URL+"/embeddings", bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.URL+"/api/embed", bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -79,28 +80,23 @@ func (c *Client) embed(ctx context.Context, texts []string) ([][]float32, error)
 	case res.StatusCode != http.StatusOK:
 		return nil, fmt.Errorf("embed: %d %s", res.StatusCode, firstLine(data))
 	}
+	// Ollama answers the vectors in the inputs' order.
 	var parsed struct {
-		Data []struct {
-			Index     int       `json:"index"`
-			Embedding []float32 `json:"embedding"`
-		} `json:"data"`
+		Embeddings [][]float32 `json:"embeddings"`
 	}
 	if err := json.Unmarshal(data, &parsed); err != nil {
 		return nil, fmt.Errorf("embed: %w", err)
 	}
-	if len(parsed.Data) != len(texts) {
-		return nil, fmt.Errorf("embed: %d vectors for %d texts", len(parsed.Data), len(texts))
+	if len(parsed.Embeddings) != len(texts) {
+		return nil, fmt.Errorf("embed: %d vectors for %d texts", len(parsed.Embeddings), len(texts))
 	}
-	sort.Slice(parsed.Data, func(i, j int) bool { return parsed.Data[i].Index < parsed.Data[j].Index })
-	out := make([][]float32, len(texts))
-	for i, d := range parsed.Data {
-		if len(d.Embedding) != Dims {
+	for _, v := range parsed.Embeddings {
+		if len(v) != Dims {
 			// The configured model isn't one this schema can store.
-			return nil, fmt.Errorf("%w: model %s gives %d dimensions, want %d", ErrRejected, c.model, len(d.Embedding), Dims)
+			return nil, fmt.Errorf("%w: model %s gives %d dimensions, want %d", ErrRejected, c.model, len(v), Dims)
 		}
-		out[i] = d.Embedding
 	}
-	return out, nil
+	return parsed.Embeddings, nil
 }
 
 func firstLine(data []byte) string {

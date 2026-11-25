@@ -1,6 +1,7 @@
 package embed
 
 import (
+	"encoding/json"
 	"errors"
 	"math"
 	"net/http"
@@ -28,7 +29,7 @@ func TestClientAgainstFakeServer(t *testing.T) {
 	t.Parallel()
 	srv := httptest.NewServer(FakeServer())
 	t.Cleanup(srv.Close)
-	c := clientFor(srv, srv.URL+"/v1/", "qwen3-embedding:0.6b")
+	c := clientFor(srv, srv.URL+"/", "qwen3-embedding:0.6b")
 	texts := make([]string, batchSize+5) // two requests
 	for i := range texts {
 		texts[i] = strings.Repeat("word ", i+1)
@@ -56,6 +57,40 @@ func TestClientAgainstFakeServer(t *testing.T) {
 	}
 }
 
+// TestClientAsksOllamaNotToTruncate checks the request: Ollama's native
+// /api/embed, with truncate false, so an input over the context fails
+// instead of being cut and embedded as if whole.
+func TestClientAsksOllamaNotToTruncate(t *testing.T) {
+	t.Parallel()
+	var got struct {
+		Model    string   `json:"model"`
+		Input    []string `json:"input"`
+		Truncate *bool    `json:"truncate"`
+	}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost || r.URL.Path != "/api/embed" {
+			http.Error(w, "not here", http.StatusNotFound)
+			return
+		}
+		if err := json.NewDecoder(r.Body).Decode(&got); err != nil {
+			t.Error(err)
+		}
+		_, _ = w.Write([]byte(`{"embeddings":[` + vectorJSON(Dims) + `]}`))
+	}))
+	t.Cleanup(srv.Close)
+	if _, err := clientFor(srv, srv.URL, "qwen3-embedding:0.6b").Embed(t.Context(), []string{"x"}); err != nil {
+		t.Fatal(err)
+	}
+	if got.Model != "qwen3-embedding:0.6b" || len(got.Input) != 1 || got.Truncate == nil || *got.Truncate {
+		t.Errorf("request = %+v, want the model, one input and truncate false", got)
+	}
+}
+
+// vectorJSON is a JSON vector of n numbers.
+func vectorJSON(n int) string {
+	return "[" + strings.TrimSuffix(strings.Repeat("0.1,", n), ",") + "]"
+}
+
 func TestClientErrors(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -70,11 +105,16 @@ func TestClientErrors(t *testing.T) {
 			http.Error(w, "overloaded", http.StatusServiceUnavailable)
 		}},
 		{name: "the wrong dimensions are a rejection", handler: func(w http.ResponseWriter, _ *http.Request) {
-			_, _ = w.Write([]byte(`{"data":[{"index":0,"embedding":[0.1,0.2]}]}`))
+			_, _ = w.Write([]byte(`{"embeddings":[[0.1,0.2]]}`))
 		}, rejected: true},
 		{name: "too few vectors", handler: func(w http.ResponseWriter, _ *http.Request) {
-			_, _ = w.Write([]byte(`{"data":[]}`))
+			_, _ = w.Write([]byte(`{"embeddings":[]}`))
 		}},
+		// Ollama's answer to an input over the model's context, with
+		// truncate false: refused for good, not cut and embedded.
+		{name: "an input over the context is a rejection", handler: func(w http.ResponseWriter, _ *http.Request) {
+			http.Error(w, `{"error":"the input length exceeds the context length"}`, http.StatusBadRequest)
+		}, rejected: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

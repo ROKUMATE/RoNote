@@ -4,41 +4,65 @@ The project's state, in at most 80 lines and 6 KB (`make lint` checks). Rewrite 
 
 ## Current milestone
 
-P19a, the production topology (ADR 0014), proven in CI, with no real server yet.
-- **One host, rootless Podman, Quadlet** (`deploy/quadlet/`): caddy, api, worker, a one-shot migrate, postgres, ollama, docling, pdftext, seaweedfs, under a lingering `ronote` user. Only Caddy publishes ports (80, 443); data and converters are internal networks. Every unit is read-only, unprivileged, limited and health-checked (`deploy/units_test.go`). Secrets are podman secrets; `deploy/install.sh` makes them and installs everything.
-- **Caddy** (`deploy/caddy/Caddyfile`, baked into the web image) serves the app and the runner on two domains from `ronote.env`, each with its own headers. Only the JavaScript worker's script gets `'unsafe-eval'`; Pyodide is precompressed under a versioned path, cached as immutable.
-- **Images** (`deploy/images/`): api 23.9 MB and worker 18.4 MB (distroless), web 94.3 MB (Caddy and the static files). A `v*` tag pushes amd64 and arm64 to ghcr.io with build provenance. `/healthz` shows the version.
-- **One build for any domains.** The app and the runner read their origins from meta tags that Caddy fills (`RONOTE_PUBLIC_URL`, `RONOTE_RUNNER_URL`). `boot.js` replaces the inline script and ProseMirror's styles are a stylesheet, so the app's CSP allows no inline code.
-- **App:**
-  - `RONOTE_TRUSTED_PROXIES` for `X-Forwarded-For`;
-  - `RONOTE_CHAT_DAILY_USD` caps chat for all users per UTC day (`chat_spend_cap_reached`);
-  - `api|worker check-config` (a same-site runner fails);
-  - `api migrate`, and a refusal to start on a newer schema;
-  - markers are counted only in unsourced replies.
-- **Proof:** the CI job `smoke` (`make prod-ci`, `prod-check-config`, `prod-smoke`) installs the real units with the fakes by drop-ins, and runs Playwright through Caddy at `ronote.test` and `ronote-run.test`. `make prod-local` does the same in the podman VM; it passed 8 of 8, and giving the runner the app's CSP failed it.
-- **Before this, P18.3:** chat says "not in your library" with a tool, and an answer citing nothing is `unsourced`.
+P19b done: operations for one real host (ADR 0015), proven in CI, with no host yet. Going live is the operator's, by `docs/runbook.md`.
+- **Host:** Oracle's A1, 2 OCPUs and 12 GB (the whole Always Free allowance), Ubuntu 26.04 aarch64. `deploy/bootstrap.sh` sets it up:
+  - Podman, with pasta's AppArmor rule (`deploy/pasta-apparmor.sh`, upstream's unmerged patch);
+  - a 2 GiB swap file;
+  - SSH by key alone, and 80 and 443 open;
+  - the deploy user;
+  - then `install.sh`.
+- **Deploys:** a `v*` tag builds the images for amd64 and arm64 and waits for approval in `production`. It then deploys the runner to Cloudflare Pages, and `ronote-deploy` pins the images by digest, migrates, checks health, and rolls back by itself on failure.
+- **Data:** PDFs in Oracle Object Storage. restic backs up to R2, nightly (the database) and weekly (the PDFs), with a weekly restore drill.
+- **Alerts:** ntfy, for a disk over 80%, a unit down for 5 minutes, the certificate within 14 days, the chat spend cap, and failed backups, drills or deploys.
+- **Measured limits:**
+  - PDFs at most 100 pages, refused after pdftext's inspection with the page count shown. Docling runs at about 1.87 s a page on arm64 (ADR 0013, ARM run 45578157125).
+  - Docling's timeout is final (`pdf_conversion_timeout`), not retried.
+  - Ollama is pinned to a 4096-token context and one model kept loaded, with anon 1.1 of its 2 GiB.
+  - Embeddings go through Ollama's native `/api/embed` with truncate off, so an overlong chunk fails its document's index job instead of being cut (ADR 0011).
+- **Proof:**
+  - The smoke job, on `ubuntu-26.04` and `-arm`, bootstraps the runner and installs the units with the fakes. It also proves the AppArmor rule (every unit stopped and started) and the swap file.
+  - The weekly `arm-real` job runs the real docling and Ollama:
+    - the curve at 25, 50 and 100 pages, and the worst PDF at the cap, with searches meanwhile;
+    - a backup and the restore drill;
+    - each container's peak, anon, file and swap.
+
+    Its reports go to the log and the artifact `arm-real-reports`.
+- **Tooling:**
+  - Renovate: weekly grouped PRs, digests pinned, one-line commits.
+  - `make web-e2e` on its own compose project, `ronote-e2e`.
+  - Tests never use Go's shared HTTP transport (`internal/httpguard`).
+  - Checks that every target makes `bin/` first in a fresh checkout, and that every `docs/*.md` a file names exists.
 
 ## What exists
 
-- **Go** (`cmd/api`, `cmd/worker`, dev tools in `cmd/`, `internal/*`): a spec-first API (`api/openapi.yaml`) behind GitHub sign-in; hybrid search over each library and chat over it; an import pipeline on the jobs port for pages (fetch with SSRF guard and robots.txt, extract to IR with framework adapters) and PDFs (docling and pdftext), documents per owner. Event streams come from Postgres LISTEN/NOTIFY; editing keeps source blocks locked; highlights and notes.
+- **Go** (`cmd/api`, `cmd/worker`, dev tools in `cmd/`, `internal/*`): a spec-first API (`api/openapi.yaml`) behind GitHub sign-in; hybrid search over each library and chat over it; an import pipeline on the jobs port for pages (fetch with SSRF guard and robots.txt, extract to IR with framework adapters) and PDFs (docling and pdftext), documents per owner. Event streams come from Postgres LISTEN/NOTIFY; editing keeps source blocks locked; highlights and notes. `worker convert-check` converts one PDF with the import's client, for measuring.
 - **Web** (`apps/web`):
   - the library, and an import dialog for pages and PDFs with live progress;
   - the document reader and editor (Tiptap), with same-domain links that import on click, and PDF page links;
   - code highlighting and language choice, highlights and notes, and code that runs in the browser;
   - the search palette and the chat panel.
-- **Runner** (`apps/web/runner`): its own origin, Pyodide and JavaScript workers, a versioned message protocol.
-- **Quality:** golden fixtures and live checks for the extractor, recorded docling fixtures with goldens and the PDF verbatim report, integration tests on testcontainers (Postgres, SeaweedFS), Playwright and axe end to end against fake sign-in, embedder, model and docling, CI on every push and pull request; the search eval in CI.
-- **Dev stack:** `make dev-up` (Postgres, SeaweedFS with its bucket), `make dev-up-docling` (the real docling and pdftext); `make doctor` checks them.
-- **Production:** `deploy/` holds the images, the Quadlet units, the Caddyfile and `install.sh`. CI's `smoke` job and `make prod-local` run them with the fakes (ADR 0014).
+- **Runner** (`apps/web/runner`): its own origin (Cloudflare Pages in production), Pyodide and JavaScript workers, a versioned message protocol.
+- **Quality:** golden fixtures and live checks for the extractor, recorded docling fixtures with goldens and the PDF verbatim report, integration tests on testcontainers, Playwright and axe end to end against the fakes, CI on every push and pull request, the search eval in CI.
+- **Dev stack:** `make dev-up` (Postgres, SeaweedFS), `make dev-up-docling` (the real docling and pdftext); `make doctor` checks them.
+- **Production:** `deploy/` holds the images, the Quadlet units, the Caddyfile, `bootstrap.sh`, `install.sh`, `ronote-deploy`, the backups and the alerts (ADR 0014, ADR 0015).
 - **ADRs:**
   - 0001 stack, 0002 verbatim source, 0003 commits;
   - 0004 IR and links, 0005 import pipeline, 0006 editor and DocContent;
   - 0007 annotations, 0008 in-browser code execution, 0009 the jobs port;
-  - 0010 sign-in and sessions, 0011 retrieval, 0012 chat, 0013 PDF import, 0014 production topology.
+  - 0010 sign-in and sessions, 0011 retrieval, 0012 chat, 0013 PDF import;
+  - 0014 production topology, 0015 operations.
 
 ## Next step
 
-P19b: a real host. Push to see the smoke job on GitHub's runner, then install from a release tag with real domains, GitHub's OAuth app and Let's Encrypt; prove docling's limits and Ollama's model there; set up backups; turn chat on by env. Still open: the model refusing in text instead of calling the tool (docs/open-questions.md).
+Go live by `docs/runbook.md`.
+- **Before the instance:** the domain, Cloudflare, ntfy, the OAuth app, chat, and the `production` environment.
+- **The instance:** create it (100 GB boot volume), bootstrap it, and tag the first release.
+- **First-release checks:**
+  - a 100-page PDF through `worker convert-check`, against CI's 187 s and 2.85 GiB;
+  - Let's Encrypt, real client IPs, and the runner's headers;
+  - the first backup and drill.
+- **Then:** install the Renovate app on this repo.
+- **Still open:** whether the ghcr.io packages are public, and the model refusing in text instead of calling its tool (docs/open-questions.md).
 
 ## Quarantined tests
 

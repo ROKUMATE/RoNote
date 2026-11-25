@@ -185,6 +185,7 @@ func newSignInRig(t *testing.T, secure bool, accounts Accounts) *signInRig {
 			ClientID: "id", ClientSecret: "secret",
 			AuthorizeURL: rig.idp.URL + "/login/oauth/authorize", TokenURL: rig.idp.URL + "/login/oauth/access_token",
 			APIURL: rig.idp.URL, RedirectURL: "http://app.test/api/v1/auth/github/callback",
+			Client: rig.idp.Client(),
 		},
 		Backend:  &fakeBackend{},
 		Cookies:  rig.cookies,
@@ -237,7 +238,8 @@ func (rig *signInRig) atProvider(t *testing.T, to *url.URL, user int64) url.Valu
 		t.Fatal(err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	client := &http.Client{CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
+	client := *rig.idp.Client()
+	client.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
 	res, err := client.Do(req)
 	if err != nil {
 		t.Fatal(err)
@@ -395,7 +397,7 @@ func TestSignInWithGitHubDown(t *testing.T) {
 	back := rig.atProvider(t, to, idpAda.ID)
 	rig.h = New(Options{
 		Logger: discardLogger, DB: dbUp,
-		GitHub:  auth.GitHub{ClientID: "id", ClientSecret: "secret", TokenURL: down.URL, APIURL: down.URL},
+		GitHub:  auth.GitHub{ClientID: "id", ClientSecret: "secret", TokenURL: down.URL, APIURL: down.URL, Client: down.Client()},
 		Cookies: rig.cookies, Accounts: rig.fake,
 	})
 

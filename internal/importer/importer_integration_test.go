@@ -24,6 +24,7 @@ import (
 	"github.com/rokumate/ronote/internal/blob/memblob"
 	"github.com/rokumate/ronote/internal/doccontent"
 	"github.com/rokumate/ronote/internal/fetch"
+	"github.com/rokumate/ronote/internal/httpguard"
 	"github.com/rokumate/ronote/internal/jobs"
 	"github.com/rokumate/ronote/internal/jobs/riverjobs"
 	"github.com/rokumate/ronote/internal/pgtest"
@@ -32,7 +33,10 @@ import (
 
 var testDB *pgtest.DB
 
+// Every request goes through a client of the test's own: the shared default
+// transport refuses (internal/httpguard).
 func TestMain(m *testing.M) {
+	httpguard.Off()
 	pgtest.Main(m, &testDB)
 }
 

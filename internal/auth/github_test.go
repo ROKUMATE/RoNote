@@ -28,6 +28,7 @@ func newGitHub(t *testing.T) GitHub {
 		ClientID: "id", ClientSecret: "secret",
 		AuthorizeURL: idp.URL + "/login/oauth/authorize", TokenURL: idp.URL + "/login/oauth/access_token",
 		APIURL: idp.URL, RedirectURL: "http://app.test/api/v1/auth/github/callback",
+		Client: idp.Client(),
 	}
 }
 
@@ -41,7 +42,8 @@ func signInAt(t *testing.T, g GitHub, f Flow, user int64) string {
 	}
 	form := auth.Query()
 	form.Set("user", strconv.FormatInt(user, 10))
-	client := &http.Client{CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
+	client := *g.Client
+	client.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
 	req, err := http.NewRequestWithContext(t.Context(), http.MethodPost, g.AuthorizeURL, strings.NewReader(form.Encode()))
 	if err != nil {
 		t.Fatal(err)
@@ -150,7 +152,7 @@ func TestGitHubUnavailable(t *testing.T) {
 			t.Parallel()
 			srv := httptest.NewServer(tt.handler)
 			t.Cleanup(srv.Close)
-			g := GitHub{TokenURL: srv.URL, APIURL: srv.URL}
+			g := GitHub{TokenURL: srv.URL, APIURL: srv.URL, Client: srv.Client()}
 			if _, err := g.Exchange(t.Context(), "code", NewFlow("/", time.Now())); !errors.Is(err, ErrUnavailable) {
 				t.Errorf("Exchange() = %v, want ErrUnavailable", err)
 			}

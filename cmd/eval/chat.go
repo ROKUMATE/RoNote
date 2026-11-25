@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log/slog"
 	"math"
+	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -174,7 +175,7 @@ func chatEval(ctx context.Context, st *store.Store, owner uuid.UUID, replay embe
 	live := embed.NewClient(envOr("RONOTE_EMBED_URL", config.DefaultEmbedURL), replay.Model())
 	svc, err := chat.NewService(chat.Options{
 		Store: st, Searcher: search.NewSearcher(st, replayOrLive{replay: replay, live: live}, discard),
-		Model: anthropic.New(modelURL, key, model), ModelName: model, Enabled: true,
+		Model: anthropic.New(modelURL, key, model, http.DefaultClient), ModelName: model, Enabled: true,
 		Limits: chat.Limits{MessagesPerDay: math.MaxInt32, TokensPerDay: math.MaxInt32}, Logger: discard,
 	})
 	if err != nil {

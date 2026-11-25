@@ -30,7 +30,7 @@ func TestClientAgainstFakeServer(t *testing.T) {
 	srv := httptest.NewServer(FakeServer())
 	t.Cleanup(srv.Close)
 	c := clientFor(srv, srv.URL+"/", "qwen3-embedding:0.6b")
-	texts := make([]string, BatchSize+5) // two requests
+	texts := make([]string, BatchSize+5) // more than one request
 	for i := range texts {
 		texts[i] = strings.Repeat("word ", i+1)
 	}

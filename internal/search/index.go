@@ -19,9 +19,14 @@ import (
 // JobKind is the job kind that indexes a document.
 const JobKind = "index_document"
 
-// JobOptions are index_document's: a failed embedder is retried with the
-// adapter's backoff, a few minutes in all.
-var JobOptions = jobs.Options{MaxAttempts: 6, Concurrency: 2, Timeout: 2 * time.Minute}
+// JobOptions are index_document's (docs/adr/0011-retrieval.md):
+//   - one at a time, as Ollama embeds one text at a time: a second job adds
+//     no throughput;
+//   - 30 minutes an attempt: a 100-page PDF's 192 chunks at 1.9 s each on
+//     CI's arm64 runner, on a host four times slower, is 24 minutes. Each
+//     chunk is cached as it comes back, so a timeout costs the one in flight;
+//   - a failed embedder retried with the adapter's backoff.
+var JobOptions = jobs.Options{MaxAttempts: 6, Concurrency: 1, Timeout: 30 * time.Minute}
 
 // collapse is how long an index job waits, so a burst of edits makes one.
 const collapse = 5 * time.Second

@@ -10,9 +10,12 @@ import (
 	"strings"
 )
 
-// BatchSize is how many texts one request carries; the search package's
-// cache keeps each batch as it comes back.
-const BatchSize = 32
+// BatchSize is how many texts one request carries: one. Ollama embeds one
+// text at a time on the host's CPUs, about 1.9 s for a chunk on CI's arm64
+// runner, so a bigger batch only holds its slot longer without going faster;
+// and the search package's cache keeps each text as it comes back, so a cut
+// attempt loses only the one in flight (docs/adr/0011-retrieval.md).
+const BatchSize = 1
 
 // maxResponse bounds one response: 32 vectors of 1024 numbers as JSON.
 const maxResponse = 4 << 20

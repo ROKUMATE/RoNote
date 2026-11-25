@@ -780,13 +780,16 @@ type Import struct {
 	DocumentID *openapi_types.UUID `json:"document_id,omitempty"`
 
 	// ErrorCode Why an import failed; set when its status is failed.
-	ErrorCode    *ImportErrorCode   `json:"error_code,omitempty"`
-	Filename     *string            `json:"filename,omitempty"`
-	ID           openapi_types.UUID `json:"id"`
-	Kind         ImportKind         `json:"kind"`
-	RequestedURL *string            `json:"requested_url,omitempty"`
-	Status       ImportStatus       `json:"status"`
-	UpdatedAt    time.Time          `json:"updated_at"`
+	ErrorCode *ImportErrorCode   `json:"error_code,omitempty"`
+	Filename  *string            `json:"filename,omitempty"`
+	ID        openapi_types.UUID `json:"id"`
+	Kind      ImportKind         `json:"kind"`
+
+	// PdfPages A PDF import's page count, once pdftext has read the file, even when it was refused for it (pdf_too_many_pages).
+	PdfPages     *int         `json:"pdf_pages,omitempty"`
+	RequestedURL *string      `json:"requested_url,omitempty"`
+	Status       ImportStatus `json:"status"`
+	UpdatedAt    time.Time    `json:"updated_at"`
 }
 
 // ImportKind defines model for Import.Kind.
@@ -801,7 +804,10 @@ type ImportEvent struct {
 
 	// ErrorCode Why an import failed; set when its status is failed.
 	ErrorCode *ImportErrorCode `json:"error_code,omitempty"`
-	Status    ImportStatus     `json:"status"`
+
+	// PdfPages The PDF's page count, as on Import.
+	PdfPages *int         `json:"pdf_pages,omitempty"`
+	Status   ImportStatus `json:"status"`
 }
 
 // ImportResponse defines model for ImportResponse.

@@ -15,6 +15,7 @@ import (
 	"testing"
 
 	"github.com/rokumate/ronote/internal/chat"
+	"github.com/rokumate/ronote/internal/docling"
 )
 
 // unit is a Quadlet file's keys, by section, each with every value given.
@@ -422,6 +423,38 @@ func TestOllamaIsPinnedToOneModelAndItsContext(t *testing.T) {
 	for k, v := range want {
 		if env[k] != v {
 			t.Errorf("ronote-ollama.container: %s = %q, want %q", k, env[k], v)
+		}
+	}
+}
+
+// The page cap is docling.MaxPages, checked by the worker after pdftext's
+// inspection; docling's own limit, in production and in dev, and the web
+// app's message say the same number (docs/adr/0013-pdf-import.md).
+func TestThePageCapIsOneNumber(t *testing.T) {
+	t.Parallel()
+	want := strconv.Itoa(docling.MaxPages)
+	var unit string
+	for _, line := range readUnit(t, "quadlet/ronote-docling.container").container("Environment") {
+		for _, kv := range strings.Fields(line) {
+			if v, ok := strings.CutPrefix(kv, "DOCLING_SERVE_MAX_NUM_PAGES="); ok {
+				unit = v
+			}
+		}
+	}
+	if unit != want {
+		t.Errorf("ronote-docling.container: DOCLING_SERVE_MAX_NUM_PAGES = %q, want docling.MaxPages, %s", unit, want)
+	}
+	for path, pattern := range map[string]string{
+		"compose.dev.yml":                 `DOCLING_SERVE_MAX_NUM_PAGES: "(\d+)"`,
+		"../apps/web/src/api/messages.ts": `export const maxPdfPages = (\d+);`,
+	} {
+		data, err := os.ReadFile(path) //nolint:gosec // the repo's own files
+		if err != nil {
+			t.Fatal(err)
+		}
+		m := regexp.MustCompile(pattern).FindSubmatch(data)
+		if m == nil || string(m[1]) != want {
+			t.Errorf("%s: %s gives %q, want docling.MaxPages, %s", path, pattern, m, want)
 		}
 	}
 }

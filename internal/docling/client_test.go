@@ -155,9 +155,11 @@ func TestInspect(t *testing.T) {
 		{name: "a PDF with text", answer: answer(200, `{"pages": 3, "chars": 900}`), want: Inspection{Pages: 3, Chars: 900}},
 		{name: "a password", answer: answer(422, `{"error": "password"}`), wantCode: CodePasswordProtected},
 		{name: "unreadable", answer: answer(422, `{"error": "unreadable"}`), wantCode: CodeFailed},
-		{name: "301 pages", answer: answer(200, `{"pages": 301, "chars": 2300}`), wantCode: CodeTooManyPages},
-		{name: "300 pages", answer: answer(200, `{"pages": 300, "chars": 2300}`), want: Inspection{Pages: 300, Chars: 2300}},
-		{name: "a scan", answer: answer(200, `{"pages": 2, "chars": 0}`), wantCode: CodeScanned},
+		// A refusal from what pdftext found comes with it: the import shows
+		// the page count.
+		{name: "one page over the cap", answer: answer(200, `{"pages": 101, "chars": 2300}`), want: Inspection{Pages: 101, Chars: 2300}, wantCode: CodeTooManyPages},
+		{name: "at the cap", answer: answer(200, `{"pages": 100, "chars": 2300}`), want: Inspection{Pages: 100, Chars: 2300}},
+		{name: "a scan", answer: answer(200, `{"pages": 2, "chars": 0}`), want: Inspection{Pages: 2}, wantCode: CodeScanned},
 		{name: "pdftext down", answer: answer(502, ``), wantErr: ErrUnavailable},
 	}
 	for _, tt := range tests {
@@ -170,8 +172,10 @@ func TestInspect(t *testing.T) {
 				t.Errorf("Inspect() = %v, want %v", err, tt.wantErr)
 			case tt.wantCode != "" && refusedCode(err) != tt.wantCode:
 				t.Errorf("Inspect() = %v, want refused with %s", err, tt.wantCode)
-			case tt.wantErr == nil && tt.wantCode == "" && (err != nil || got != tt.want):
-				t.Errorf("Inspect() = %+v, %v; want %+v", got, err, tt.want)
+			case tt.wantErr == nil && tt.wantCode == "" && err != nil:
+				t.Errorf("Inspect() = %v, want %+v", err, tt.want)
+			case got != tt.want:
+				t.Errorf("Inspect() = %+v, want %+v", got, tt.want)
 			}
 		})
 	}

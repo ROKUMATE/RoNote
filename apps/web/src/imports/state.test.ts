@@ -30,6 +30,21 @@ describe("a PDF import", () => {
     updated_at: "2026-11-03T09:00:00Z",
   });
 
+  test("keeps its page count, from the import or an event", () => {
+    const refused = { status: "failed", error_code: "pdf_too_many_pages", pdf_pages: 298 } as const;
+    expect(applyEvent(pdf, refused).pdfPages).toBe(298);
+    expect(
+      tracked({
+        id: "imp-3",
+        kind: "pdf",
+        filename: "Book.pdf",
+        created_at: "2026-11-03T09:00:00Z",
+        updated_at: "2026-11-03T09:00:00Z",
+        ...refused,
+      }).pdfPages,
+    ).toBe(298);
+  });
+
   test("is named by its file, and converts where a page is fetched", () => {
     expect(pdf.name).toBe("Lecture 3.pdf");
     expect(stepsOf("pdf")).toEqual(["queued", "converting", "extracting", "done"]);

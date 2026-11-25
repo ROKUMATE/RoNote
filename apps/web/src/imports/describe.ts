@@ -1,4 +1,4 @@
-import { importErrorMessages, lostMessage } from "../api/messages";
+import { importErrorMessages, lostMessage, tooManyPagesMessage } from "../api/messages";
 import type { Step, TrackedImport } from "./state";
 
 export const stepLabels: Record<Step, string> = {
@@ -11,6 +11,9 @@ export const stepLabels: Record<Step, string> = {
 
 /** Why an import ended without a document, or undefined if it has not. */
 export function endingMessage(state: TrackedImport): string | undefined {
-  if (state.status === "failed") return importErrorMessages[state.errorCode ?? "internal_error"];
-  return state.lost ? lostMessage : undefined;
+  if (state.status !== "failed") return state.lost ? lostMessage : undefined;
+  if (state.errorCode === "pdf_too_many_pages" && state.pdfPages) {
+    return tooManyPagesMessage(state.pdfPages);
+  }
+  return importErrorMessages[state.errorCode ?? "internal_error"];
 }

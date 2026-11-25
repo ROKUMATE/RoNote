@@ -49,7 +49,8 @@ entry when a phase settles it; add one when a phase leaves something open.
 - PDFs: a document set wholly in a monospace font would map to code throughout; no fixture is.
 - PDFs: slides lay notes over code; where they share a box, the note comes out among the code's lines (MIT 6.0001 lecture 3).
 - PDFs: code language comes from the picker; docling's code enrichment would guess it with a model, at CPU cost, and its text would be generated. Off.
-- PDFs: conversion takes about 1 s a page on 2 CPUs: a 300-page book is five minutes, inside the 10-minute attempt. Two run at once.
+- PDFs: conversion takes about 1.87 s a page on GitHub's arm64 runner, hence the 100-page cap (ADR 0013). A longer book could be converted in page ranges, each a docling task within the timeout, and joined; not built.
+- PDFs: an OOM-killed docling answers like a dropped connection, so the import retries it as a network error, three attempts in all, rather than failing it as too large.
 - Chat: a turn that ends with no text and no tool call (Haiku 5.5 once did, with its tools turned off, which the last call no longer does) is saved as unsourced and shows "No sources" with nothing above it.
 - Production (ADR 0014): CI and `make prod-local` run the units with the fakes, so these are unproven until a real host: docling in 4 GB with one worker, and on a read-only root; Ollama's model pull and its digest check (`--skip-model` there); pasta keeping clients' addresses (the smoke suite connects from the host itself); Let's Encrypt certificates (Caddy issues its own for `.test`).
 - The CI smoke job has run only in the podman machine's VM (Fedora CoreOS, systemd 259): GitHub's ubuntu-26.04 runner's podman, Quadlet and a lingering user under `sudo` first meet it when this branch is pushed.

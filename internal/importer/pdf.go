@@ -284,10 +284,17 @@ type converted struct {
 	layer map[string][]docling.Line
 }
 
-// convert inspects the PDF, has docling convert it, and reads its code,
-// prose and pictures from the text layer.
+// convert inspects the PDF, keeping its page count on the import, even one
+// refused for it, has docling convert it, and reads its code, prose and
+// pictures from the text layer.
 func (w *PDFWorker) convert(ctx context.Context, imp store.Import, pdf []byte) (converted, error) {
-	if _, err := w.client.Inspect(ctx, pdf); err != nil {
+	inspection, err := w.client.Inspect(ctx, pdf)
+	if inspection.Pages > 0 {
+		if err := w.store.SetImportPDFPages(ctx, imp.OwnerID, imp.ID, inspection.Pages); err != nil {
+			return converted{}, err
+		}
+	}
+	if err != nil {
 		return converted{}, err
 	}
 	doc, err := w.client.Convert(ctx, pdf, imp.Filename)

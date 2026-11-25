@@ -36,7 +36,8 @@ const (
 var JobOptions = jobs.Options{MaxAttempts: maxAttempts, Concurrency: 4, Timeout: 60 * time.Second}
 
 // PDFJobOptions say how PDF imports run: three attempts, two at a time, as
-// docling converts two at once, and ten minutes each, for 300 pages on CPU.
+// docling converts two at once, and ten minutes each: the page cap,
+// docling.MaxPages, converts in about three on the A1 (ADR 0013).
 var PDFJobOptions = jobs.Options{MaxAttempts: maxAttempts, Concurrency: 2, Timeout: 10 * time.Minute}
 
 // Kinds are the kinds Service enqueues, with their options: the API, which

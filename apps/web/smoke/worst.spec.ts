@@ -4,8 +4,8 @@ import { expect, type Page, test } from "@playwright/test";
 import type { components } from "../src/api/schema";
 
 /*
- * The worst PDF the units accept (scripts/worst-pdf.ts, about 300 pages of
- * code and tables), imported through the real docling and Ollama
+ * The worst PDF the units accept (scripts/worst-pdf.ts: as many pages of
+ * code and tables as the cap, docling.MaxPages), imported through the real docling and Ollama
  * (.github/workflows/arm-real.yml). It times each step of the import against
  * docling's 540-second document timeout, and searches all the while, so
  * Ollama embeds queries while it embeds the import's batches. What it

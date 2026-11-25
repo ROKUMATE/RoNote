@@ -49,7 +49,7 @@ services:
     image: quay.io/docling-project/docling-serve-cpu:v1.38.2@sha256:7a480a1604fa3b42efeddc7db9527690d9f9bc903226136013e2bfe6b1a4dfb0
     environment:
       DOCLING_SERVE_API_KEY: ronote-dev-docling
-      DOCLING_SERVE_MAX_NUM_PAGES: "300"
+      DOCLING_SERVE_MAX_NUM_PAGES: "100"
       DOCLING_SERVE_MAX_FILE_SIZE: "26214400"
       DOCLING_SERVE_MAX_DOCUMENT_TIMEOUT: "540"
       DOCLING_SERVE_SINGLE_USE_RESULTS: "true"

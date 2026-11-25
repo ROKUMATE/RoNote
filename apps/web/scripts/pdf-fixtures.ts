@@ -55,7 +55,7 @@ try {
     await print(page, html, `${name}.pdf`);
   }
 
-  // Docling refuses this one by page count.
+  // Over the page cap: refused at inspection, before docling sees it.
   const many = Array.from(
     { length: 301 },
     (_, i) => `<p style="break-after: page">Page ${i + 1}</p>`,

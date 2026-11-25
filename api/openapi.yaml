@@ -1358,6 +1358,12 @@ components:
           type: string
         filename:
           type: string
+        pdf_pages:
+          type: integer
+          minimum: 1
+          description: >-
+            A PDF import's page count, once pdftext has read the file, even
+            when it was refused for it (pdf_too_many_pages).
         status:
           $ref: "#/components/schemas/ImportStatus"
         error_code:
@@ -1402,6 +1408,10 @@ components:
           $ref: "#/components/schemas/ImportStatus"
         error_code:
           $ref: "#/components/schemas/ImportErrorCode"
+        pdf_pages:
+          type: integer
+          minimum: 1
+          description: The PDF's page count, as on Import.
         document_id:
           type: string
           format: uuid

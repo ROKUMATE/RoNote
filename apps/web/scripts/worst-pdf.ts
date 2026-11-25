@@ -6,20 +6,19 @@ import { chromium, type Page } from "@playwright/test";
  * Prints the worst PDF the units accept (.github/workflows/arm-real.yml): the
  * PDF fixtures' golden pages, with their code blocks and tables, and the
  * tables' golden, one after another, each from a new page, until the next
- * would pass PAGES, printed by Chromium as make pdf-fixtures prints them. It
- * stays under docling's 300 pages (DOCLING_SERVE_MAX_NUM_PAGES) and RoNote's
- * 25 MB, and fails if it doesn't. It is never committed: CI prints it, and
- * smaller ones for docling's curve by page count (make prod-docling-curve).
+ * would pass PAGES, printed by Chromium as make pdf-fixtures prints them:
+ * make prod-worst-pdf gives the page cap (docling.MaxPages), and make
+ * prod-docling-curve smaller counts. It stays within PAGES and RoNote's
+ * 25 MB, and fails if it doesn't. It is never committed: CI prints it.
  *
- *   node scripts/worst-pdf.ts OUT [PAGES] [REPO]    PAGES 298, REPO ../..
+ *   node scripts/worst-pdf.ts OUT PAGES [REPO]    REPO ../..
  */
 
-const [out, pagesArg = "298", repo = "../.."] = process.argv.slice(2);
-if (!out) {
-  throw new Error("usage: node scripts/worst-pdf.ts OUT [PAGES] [REPO]");
+const [out, pagesArg, repo = "../.."] = process.argv.slice(2);
+if (!out || !pagesArg) {
+  throw new Error("usage: node scripts/worst-pdf.ts OUT PAGES [REPO]");
 }
 const target = Number(pagesArg);
-const maxPages = 300;
 const maxBytes = 25 << 20;
 
 const golden = join(repo, "testdata", "golden");
@@ -87,9 +86,9 @@ try {
   console.log(
     `worst-pdf: ${out}: ${pages} pages, ${(bytes / 1048576).toFixed(1)} MiB, from ${chosen.length} golden pages (${sections.map((s) => `${s.name} ${s.pages}`).join(", ")})`,
   );
-  if (pages > maxPages || bytes > maxBytes || pages < target - 10) {
+  if (pages > target || bytes > maxBytes || pages < target - 10) {
     throw new Error(
-      `worst-pdf: ${pages} pages and ${bytes} bytes; want ${target - 10} to ${maxPages} pages and at most ${maxBytes} bytes`,
+      `worst-pdf: ${pages} pages and ${bytes} bytes; want ${target - 10} to ${target} pages and at most ${maxBytes} bytes`,
     );
   }
 } finally {

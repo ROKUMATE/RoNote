@@ -371,9 +371,9 @@ ARM_REPORTS = arm64-images.md docling-curve.md worst-pdf.md memory.md ollama-set
 report = mkdir -p $(REPORTS); status=0; $(2) >$(REPORTS)/$(1) || status=$$?; cat $(REPORTS)/$(1); exit $$status
 
 # The worst PDF the units accept (apps/web/scripts/worst-pdf.ts), printed
-# here, never committed.
+# here, never committed: as many pages as the cap, docling.MaxPages.
 WORST_PDF = bin/worst.pdf
-WORST_PAGES = 298
+WORST_PAGES := $(shell sed -n 's/^const MaxPages = //p' internal/docling/client.go)
 
 prod-worst-pdf: | bin ## Print the worst PDF the units accept ($(WORST_PAGES) pages of code and tables) and import it through Caddy, timing each step and searching meanwhile, into bin/reports/worst-pdf.md and the log (make prod-real first)
 	rm -f $(REPORTS)/worst-pdf.md && mkdir -p $(REPORTS)
@@ -382,8 +382,9 @@ prod-worst-pdf: | bin ## Print the worst PDF the units accept ($(WORST_PAGES) pa
 		RONOTE_SMOKE_CA=$(CURDIR)/$(SMOKE_CA) $(WEB) exec playwright test --config playwright.smoke.config.ts || status=$$?; \
 		cat $(REPORTS)/worst-pdf.md 2>/dev/null; exit $$status
 
-# The page counts docling is timed at, each a PDF printed as the worst one is.
-CURVE_PAGES = 30 60 120
+# The page counts docling is timed at, each a PDF printed as the worst one
+# is, up to the cap.
+CURVE_PAGES = 25 50 $(WORST_PAGES)
 
 prod-docling-curve: | bin ## Docling's time, anon and swap for PDFs of $(CURVE_PAGES) pages, each converted once by the worker's own client with no retries, into bin/reports/docling-curve.md and the log (make prod-real first; sudo)
 	for n in $(CURVE_PAGES); do $(WEB) exec node scripts/worst-pdf.ts $(CURDIR)/bin/curve-$$n.pdf $$n ../.. || exit 1; done

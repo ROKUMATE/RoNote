@@ -48,7 +48,10 @@ type Import struct {
 	// Filename and PDFSHA256, the file's hex SHA-256, are a PDF import's.
 	Filename  string
 	PDFSHA256 string
-	Status    ImportStatus
+	// PDFPages is the page count pdftext read in a PDF import's file, once
+	// it has; 0 before.
+	PDFPages int
+	Status   ImportStatus
 	// ErrorCode is set when Status is failed.
 	ErrorCode string
 	// DocumentID is set when Status is done, unless the document has since
@@ -67,6 +70,7 @@ func importFrom(row sqlcdb.Import) Import {
 		CanonicalURL: row.CanonicalURL.String,
 		Filename:     row.Filename.String,
 		PDFSHA256:    row.PDFSHA256.String,
+		PDFPages:     int(row.PdfPages.Int32),
 		Status:       ImportStatus(row.Status),
 		ErrorCode:    row.ErrorCode.String,
 		DocumentID:   row.DocumentID.UUID,
@@ -145,6 +149,16 @@ func (s *Store) FailImport(ctx context.Context, owner, id uuid.UUID, code string
 		return Import{}, mapErr("fail import", err)
 	}
 	return importFrom(row), nil
+}
+
+// SetImportPDFPages records the page count pdftext read in owner's PDF
+// import id.
+func (s *Store) SetImportPDFPages(ctx context.Context, owner, id uuid.UUID, pages int) error {
+	err := s.q.SetImportPDFPages(ctx, sqlcdb.SetImportPDFPagesParams{OwnerID: owner, ID: id, PdfPages: pgtype.Int4{Int32: int32(pages), Valid: true}}) //nolint:gosec // a page count, far below 2^31
+	if err != nil {
+		return mapErr("set import pdf pages", err)
+	}
+	return nil
 }
 
 // LatestImportForDocument returns owner's most recent import that produced

@@ -345,6 +345,9 @@ func importJSON(imp store.Import) gen.Import {
 	}
 	if imp.Kind == store.ImportPDF {
 		out.Filename = &imp.Filename
+		if imp.PDFPages > 0 {
+			out.PdfPages = &imp.PDFPages
+		}
 	} else {
 		out.RequestedURL, out.CanonicalURL = &imp.RequestedURL, &imp.CanonicalURL
 	}

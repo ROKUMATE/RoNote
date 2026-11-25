@@ -31,6 +31,12 @@ WHERE owner_id = sqlc.arg(owner_id) AND id = sqlc.arg(id)
   AND (status NOT IN ('done', 'failed') OR (status = 'done' AND document_id = sqlc.arg(document_id)))
 RETURNING *;
 
+-- name: SetImportPDFPages :exec
+-- Records the page count pdftext read in a PDF import's file.
+UPDATE imports
+SET pdf_pages = sqlc.arg(pdf_pages), updated_at = now()
+WHERE owner_id = sqlc.arg(owner_id) AND id = sqlc.arg(id);
+
 -- name: FailImport :one
 -- Marks an import that has not finished as failed with a stable error code.
 UPDATE imports

@@ -49,7 +49,7 @@ const createImport = `-- name: CreateImport :one
 
 INSERT INTO imports (owner_id, requested_url, canonical_url)
 VALUES ($1, $2::text, $3::text)
-RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
+RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256, pdf_pages
 `
 
 type CreateImportParams struct {
@@ -75,6 +75,7 @@ func (q *Queries) CreateImport(ctx context.Context, arg CreateImportParams) (Imp
 		&i.Kind,
 		&i.Filename,
 		&i.PDFSHA256,
+		&i.PdfPages,
 	)
 	return i, err
 }
@@ -82,7 +83,7 @@ func (q *Queries) CreateImport(ctx context.Context, arg CreateImportParams) (Imp
 const createPDFImport = `-- name: CreatePDFImport :one
 INSERT INTO imports (owner_id, kind, filename, pdf_sha256)
 VALUES ($1, 'pdf', $2::text, $3::text)
-RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
+RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256, pdf_pages
 `
 
 type CreatePDFImportParams struct {
@@ -107,6 +108,7 @@ func (q *Queries) CreatePDFImport(ctx context.Context, arg CreatePDFImportParams
 		&i.Kind,
 		&i.Filename,
 		&i.PDFSHA256,
+		&i.PdfPages,
 	)
 	return i, err
 }
@@ -115,7 +117,7 @@ const failImport = `-- name: FailImport :one
 UPDATE imports
 SET status = 'failed', error_code = $1, updated_at = now()
 WHERE owner_id = $2 AND id = $3 AND status NOT IN ('done', 'failed')
-RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
+RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256, pdf_pages
 `
 
 type FailImportParams struct {
@@ -141,6 +143,7 @@ func (q *Queries) FailImport(ctx context.Context, arg FailImportParams) (Import,
 		&i.Kind,
 		&i.Filename,
 		&i.PDFSHA256,
+		&i.PdfPages,
 	)
 	return i, err
 }
@@ -150,7 +153,7 @@ UPDATE imports
 SET status = 'done', document_id = $1, updated_at = now()
 WHERE owner_id = $2 AND id = $3
   AND (status NOT IN ('done', 'failed') OR (status = 'done' AND document_id = $1))
-RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
+RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256, pdf_pages
 `
 
 type FinishImportParams struct {
@@ -177,12 +180,13 @@ func (q *Queries) FinishImport(ctx context.Context, arg FinishImportParams) (Imp
 		&i.Kind,
 		&i.Filename,
 		&i.PDFSHA256,
+		&i.PdfPages,
 	)
 	return i, err
 }
 
 const getImport = `-- name: GetImport :one
-SELECT id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
+SELECT id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256, pdf_pages
 FROM imports
 WHERE owner_id = $1 AND id = $2
 `
@@ -208,12 +212,13 @@ func (q *Queries) GetImport(ctx context.Context, arg GetImportParams) (Import, e
 		&i.Kind,
 		&i.Filename,
 		&i.PDFSHA256,
+		&i.PdfPages,
 	)
 	return i, err
 }
 
 const latestImportForDocument = `-- name: LatestImportForDocument :one
-SELECT id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
+SELECT id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256, pdf_pages
 FROM imports
 WHERE owner_id = $1 AND document_id = $2
 ORDER BY created_at DESC, id DESC
@@ -241,6 +246,7 @@ func (q *Queries) LatestImportForDocument(ctx context.Context, arg LatestImportF
 		&i.Kind,
 		&i.Filename,
 		&i.PDFSHA256,
+		&i.PdfPages,
 	)
 	return i, err
 }
@@ -288,11 +294,29 @@ func (q *Queries) QuotaUsage(ctx context.Context, arg QuotaUsageParams) (QuotaUs
 	return i, err
 }
 
+const setImportPDFPages = `-- name: SetImportPDFPages :exec
+UPDATE imports
+SET pdf_pages = $1, updated_at = now()
+WHERE owner_id = $2 AND id = $3
+`
+
+type SetImportPDFPagesParams struct {
+	PdfPages pgtype.Int4
+	OwnerID  uuid.UUID
+	ID       uuid.UUID
+}
+
+// Records the page count pdftext read in a PDF import's file.
+func (q *Queries) SetImportPDFPages(ctx context.Context, arg SetImportPDFPagesParams) error {
+	_, err := q.db.Exec(ctx, setImportPDFPages, arg.PdfPages, arg.OwnerID, arg.ID)
+	return err
+}
+
 const setImportStatus = `-- name: SetImportStatus :one
 UPDATE imports
 SET status = $1, updated_at = now()
 WHERE owner_id = $2 AND id = $3 AND status NOT IN ('done', 'failed')
-RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256
+RETURNING id, owner_id, requested_url, canonical_url, status, error_code, document_id, created_at, updated_at, kind, filename, pdf_sha256, pdf_pages
 `
 
 type SetImportStatusParams struct {
@@ -318,6 +342,7 @@ func (q *Queries) SetImportStatus(ctx context.Context, arg SetImportStatusParams
 		&i.Kind,
 		&i.Filename,
 		&i.PDFSHA256,
+		&i.PdfPages,
 	)
 	return i, err
 }

@@ -108,8 +108,8 @@ func (f *fakeConverter) serve(w http.ResponseWriter, r *http.Request) {
 			reply(422, `{"error": "unreadable"}`)
 		case "scan":
 			reply(200, `{"pages": 2, "chars": 0}`)
-		case "pages301":
-			reply(200, `{"pages": 301, "chars": 2300}`)
+		case "pages101":
+			reply(200, `{"pages": 101, "chars": 2300}`)
 		case "down":
 			reply(503, `{}`)
 		default:
@@ -278,20 +278,24 @@ func TestPDFImport(t *testing.T) {
 }
 
 func TestPDFImportFailures(t *testing.T) {
+	// pages is the page count the import keeps: pdftext's, whenever it
+	// read the PDF, refused or not.
 	tests := []struct {
 		marker string
 		code   string
 		calls  []string
+		pages  int
 	}{
 		{marker: "password", code: docling.CodePasswordProtected, calls: []string{"inspect password"}},
 		{marker: "broken", code: docling.CodeFailed, calls: []string{"inspect broken"}},
-		{marker: "scan", code: docling.CodeScanned, calls: []string{"inspect scan"}},
-		{marker: "pages301", code: docling.CodeTooManyPages, calls: []string{"inspect pages301"}},
+		{marker: "scan", code: docling.CodeScanned, calls: []string{"inspect scan"}, pages: 2},
+		// Over the cap, refused before docling sees it.
+		{marker: "pages101", code: docling.CodeTooManyPages, calls: []string{"inspect pages101"}, pages: 101},
 		// Unavailable is retried: every attempt calls again. Docling's own
 		// timeout is not: the PDF would time out again, with every other
 		// import waiting behind it.
 		{marker: "down", code: codeUnavailable, calls: []string{"inspect down", "inspect down", "inspect down"}},
-		{marker: "timeout", code: docling.CodeTimeout, calls: []string{"inspect timeout", "convert timeout"}},
+		{marker: "timeout", code: docling.CodeTimeout, calls: []string{"inspect timeout", "convert timeout"}, pages: 2},
 	}
 	for _, tt := range tests {
 		t.Run(tt.marker, func(t *testing.T) {
@@ -302,6 +306,9 @@ func TestPDFImportFailures(t *testing.T) {
 			}
 			if got := h.converter.called(); !slices.Equal(got, tt.calls) {
 				t.Errorf("calls = %v, want %v", got, tt.calls)
+			}
+			if imp.PDFPages != tt.pages {
+				t.Errorf("import kept %d pages, want %d", imp.PDFPages, tt.pages)
 			}
 		})
 	}

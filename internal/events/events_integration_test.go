@@ -5,6 +5,7 @@ package events
 import (
 	"context"
 	"log/slog"
+	"strings"
 	"testing"
 	"time"
 
@@ -119,4 +120,55 @@ func finishWithDocument(t *testing.T, s *store.Store, owner store.User, imp stor
 		t.Fatal(err)
 	}
 	return doc
+}
+
+// TestARefusedPDFsEventCarriesItsPages fails a PDF import over the page cap
+// as the worker does, and its event says how many pages it has.
+func TestARefusedPDFsEventCarriesItsPages(t *testing.T) {
+	db := pgtest.New(t)
+	ctx := t.Context()
+	s := store.New(db.Pool)
+	ada, err := s.CreateUser(ctx, "ada@example.com", "Ada")
+	if err != nil {
+		t.Fatal(err)
+	}
+	imp, err := s.CreatePDFImport(ctx, ada.ID, "Book.pdf", strings.Repeat("ab", 32))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	b := NewBroker()
+	listenCtx, stopListening := context.WithCancel(ctx)
+	stopped := make(chan struct{})
+	go func() {
+		defer close(stopped)
+		b.Listen(listenCtx, db.Pool, slog.New(slog.DiscardHandler))
+	}()
+	t.Cleanup(func() { stopListening(); <-stopped })
+	// The resync a placeholder gets once LISTEN is in place says it is ready.
+	ready, cancelReady := b.Subscribe(uuid.Nil)
+	select {
+	case <-ready:
+	case <-time.After(10 * time.Second):
+		t.Fatal("the listener did not start")
+	}
+	cancelReady()
+	updates, unsubscribe := b.Subscribe(imp.ID)
+	defer unsubscribe()
+
+	if err := s.SetImportPDFPages(ctx, ada.ID, imp.ID, 101); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.FailImport(ctx, ada.ID, imp.ID, "pdf_too_many_pages"); err != nil {
+		t.Fatal(err)
+	}
+	want := Event{ImportID: imp.ID, OwnerID: ada.ID, Status: "failed", ErrorCode: "pdf_too_many_pages", PDFPages: 101}
+	select {
+	case got := <-updates:
+		if got != want {
+			t.Errorf("event = %+v, want %+v", got, want)
+		}
+	case <-time.After(10 * time.Second):
+		t.Fatal("no failed event")
+	}
 }

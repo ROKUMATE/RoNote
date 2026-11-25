@@ -1,6 +1,6 @@
 # 0013: Printed PDF import
 
-Accepted, 2026-11-15.
+Accepted, 2026-11-15. Amended 2026-11-25: at most 100 pages, measured on arm64; docling's timeout is final.
 
 ## Context
 
@@ -9,12 +9,12 @@ From P18 on, students import PDFs as well as pages: textbook chapters and lectur
 ## Decision
 
 - **Scope: digital-born PDFs**, with a text layer. A PDF without one (a scan) fails with `scanned_pdf_unsupported`; OCR is a later phase.
-- **Limits.** At most 25 MB and 300 pages, starting with `%PDF-`. A password-protected PDF fails with `pdf_password_protected`. A PDF counts toward the daily import quota like a page (ADR 0010).
+- **Limits.** At most 25 MB and 100 pages (`docling.MaxPages`), starting with `%PDF-`. A PDF over the cap is refused right after pdftext's inspection, before docling sees it, with `pdf_too_many_pages`; the import keeps its page count (`pdf_pages`), so the message gives both numbers. A password-protected PDF fails with `pdf_password_protected`. A PDF counts toward the daily import quota like a page (ADR 0010).
 - **Parsing: docling-serve,** the CPU image `quay.io/docling-project/docling-serve-cpu:v1.38.2`, pinned by digest (`sha256:7a480a16…`).
   - 1.38.2, not the 1.21.x first named: it was the latest release, five months newer, with the same async API.
   - Async API only: submit (`POST /v1/convert/file/async`, one file), poll (`GET /v1/status/poll/{task_id}`), fetch (`GET /v1/result/{task_id}`), with `X-Api-Key`.
   - Options: `to_formats` `json` only, `do_ocr` false, `include_images` false, `image_export_mode` `placeholder`, `do_pdf_heading_hierarchy` true (so section headers carry levels), `abort_on_error` true. Code enrichment stays off, so code has no language and the language picker applies (ADR 0006).
-  - The container has no network egress (an internal network; the image carries its default models), CPU and memory limits, and an API key. `DOCLING_SERVE_MAX_NUM_PAGES` (300), `MAX_FILE_SIZE` (25 MB) and `MAX_DOCUMENT_TIMEOUT` bound each document; results are single use.
+  - The container has no network egress (an internal network; the image carries its default models), CPU and memory limits, and an API key. `DOCLING_SERVE_MAX_NUM_PAGES` (100, the same cap: `deploy/units_test.go` holds the unit, the dev stack and the web app's message to `docling.MaxPages`), `MAX_FILE_SIZE` (25 MB) and `MAX_DOCUMENT_TIMEOUT` bound each document; results are single use.
   - RoNote never parses PDF bytes itself beyond the magic check. Page count, encryption and missing text are learned from docling's answer.
 - **Code comes from the text layer, through pdftext.** Real docling 1.38.2 joins a code block's lines with spaces, drops its indentation and adds spaces before commas, on all three PDF backends and in its Markdown too, so no code from it would run. Its layout model also calls some code prose (a one-line `cd`), finds none in a framed terminal, and draws a code box around a prose label (`Filename:`, `Result:`). The text layer is better: it keeps the line breaks, indentation survives as glyph positions (Chrome prints leading spaces as a gap, not as characters), and each glyph names its font.
   - `deploy/pdftext/pdftext.py` is a small HTTP service run from the docling image, which has pypdfium2, and as sandboxed: no egress, the same limits, its own API key. It takes the PDF and the boxes of docling's code, prose and pictures, and answers each box's lines, each marked monospace or not.
@@ -65,6 +65,16 @@ From P18 on, students import PDFs as well as pages: textbook chapters and lectur
   - docling's error wording is matched to these codes. Its recorded answers to hostile fixtures pin the matching, so an upgrade that changes the wording fails tests rather than misreporting.
 - **Deletion.** Deleting a PDF document deletes its source, and the blob in a job enqueued in the same transaction; deleting an account enqueues the deletion of `pdf/<owner>/`. A sweep at worker start and daily deletes any blob under `pdf/` that no snapshot or recent import references. Deleting a missing blob succeeds, so every step can run twice.
 - **Tests never call docling.** `make pdf-record` records docling's and pdftext's answers for each fixture; `cmd/fakedocling` (dev and test only) replays them over both APIs, keyed by the file's sha256. CI and the end-to-end tests run against it and SeaweedFS, and never pull the docling image.
+- **The page cap, measured.** ARM run 45578157125 (GitHub's `ubuntu-26.04-arm`, docling under its production 4 GiB and 2 CPUs) converted PDFs of the fixtures' pages, code and tables, once each with no retries (`make prod-docling-curve`):
+
+  | pages | time | anon | swap |
+  |---|---|---|---|
+  | 30 | 56 s | 2063 MiB | 0 |
+  | 60 | 111 s | 2476 MiB | 0 |
+  | 120 | 225 s | 3036 MiB | 0 |
+  | 298 | timed out at 545 s | 3959 MiB | 16 MiB |
+
+  Time is linear at about 1.87 s a page (298 pages predicts 557 s), so the timeout was the page count, not swapping. The cap is the largest count whose time is at most half of docling's 540 s and whose anon is at most 75% of its 4 GiB: 100 pages, between two measured points (about 187 s, 35%, and 2850 MiB, 70%). 120 sits on the memory line, measured on one kind of PDF. The margin covers the A1's Ampere Altra cores being slower than the runner's and docling sharing the host's 2 OCPUs in production: at half the speed, 100 pages still finish inside 540 s. A bigger PDF converted in page ranges is an open question.
 
 ## Consequences
 

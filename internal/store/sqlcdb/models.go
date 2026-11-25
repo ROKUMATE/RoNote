@@ -37,6 +37,7 @@ type Import struct {
 	Kind         string
 	Filename     pgtype.Text
 	PDFSHA256    pgtype.Text
+	PdfPages     pgtype.Int4
 }
 
 type User struct {

@@ -56,3 +56,6 @@ entry when a phase settles it; add one when a phase leaves something open.
 - The CI smoke job has run only in the podman machine's VM (Fedora CoreOS, systemd 259): GitHub's ubuntu-26.04 runner's podman, Quadlet and a lingering user under `sudo` first meet it when this branch is pushed.
 - Chat's daily spending cap counts answers when they finish, so answers already being written can take a day past it by what they cost (a few tenths of a cent each).
 - The smoke suite signs in as `RONOTE_ENV=test` (staging and prod refuse the fake sign-in), so it never sees `__Host-` cookies; `check-config` and config's tests cover them.
+- Go-live (docs/runbook.md): the host pulls the release's images from ghcr.io anonymously, so `ronote-api`, `ronote-worker` and `ronote-web` must be public packages; the alternative is a read-only token as a podman login on the host. Not decided.
+- Go-live: rotating the Postgres password and the restic password are commands in the runbook, not a script; `install.sh` only makes secrets that are missing. Old releases' images are removed by hand when the disk alert says so.
+- Go-live: the runner's Pages site and the host's release roll back separately: `ronote-deploy` doesn't touch Pages.

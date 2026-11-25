@@ -48,6 +48,7 @@ hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the docto
 	sh scripts/test-pasta-apparmor.sh
 	sh scripts/test-host-swap.sh
 	sh scripts/test-fresh-bin.sh
+	sh scripts/test-doc-paths.sh
 
 check-commits: ## Check commit messages in RANGE (in CI the event sets the range)
 	@range='$(RANGE)'; [ -n "$$range" ] || range=$$(sh scripts/commit-range.sh) || exit 1; \

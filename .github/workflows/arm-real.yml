@@ -27,6 +27,7 @@ on:
       - deploy/quadlet/ronote-docling.container
       - deploy/quadlet/ronote-pdftext.container
       - deploy/quadlet/ronote-ollama.container
+      - deploy/quadlet/ronote-ollama-query.container
       - scripts/real-images.sh
       - apps/web/smoke/real.spec.ts
       - apps/web/smoke/worst.spec.ts

@@ -54,6 +54,9 @@ test("the worst accepted PDF converts within docling's timeout and is found", as
   const seconds = (at: number) => Math.round((at - started) / 1000);
   const entered = new Map<string, number>();
   const searches = { count: 0, degraded: 0, slowest: 0 };
+  // Those made while the document indexes, from done until it is found: the
+  // embedder is busiest then (docs/adr/0011-retrieval.md).
+  const indexing = { count: 0, degraded: 0, slowest: 0 };
   let last: Progress = { status: "uploading" };
   let found: number | undefined;
 
@@ -64,10 +67,13 @@ test("the worst accepted PDF converts within docling's timeout and is found", as
       `/api/v1/search?q=${encodeURIComponent(q)}${scope}`,
     );
     expect(status, `search for ${q}`).toBe(200);
-    searches.count++;
-    searches.slowest = Math.max(searches.slowest, ms);
-    if (body.degraded) {
-      searches.degraded++;
+    const tallies = entered.has("done") && found === undefined ? [searches, indexing] : [searches];
+    for (const tally of tallies) {
+      tally.count++;
+      tally.slowest = Math.max(tally.slowest, ms);
+      if (body.degraded) {
+        tally.degraded++;
+      }
     }
     return body;
   };
@@ -111,6 +117,8 @@ test("the worst accepted PDF converts within docling's timeout and is found", as
       `| upload, until found | ${found === undefined ? "-" : `${seconds(found)} s`} |`,
       "",
       `${searches.count} searches meanwhile, ${searches.degraded} degraded (Ollama not answering); the slowest took ${(searches.slowest / 1000).toFixed(1)} s.`,
+      "",
+      `While it indexed: ${indexing.count} searches, ${indexing.degraded} degraded; the slowest took ${(indexing.slowest / 1000).toFixed(1)} s, against search's 2 s for a query's embedding.`,
       "",
     ];
     writeFileSync(report ?? "", lines.join("\n"));

@@ -3,6 +3,9 @@
 package search
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"math"
 	"slices"
 	"testing"
@@ -38,5 +41,50 @@ func TestEmbedCached(t *testing.T) {
 		if math.Abs(float64(x-want[i])) > 1e-3 {
 			t.Fatalf("cached beta[%d] = %v, want %v", i, x, want[i])
 		}
+	}
+}
+
+// timesOut cancels its attempt's context as its call after the kth starts,
+// as an index job's timeout would in the middle of a batch.
+type timesOut struct {
+	counting
+	k      int
+	calls  int
+	cancel context.CancelFunc
+}
+
+func (e *timesOut) Embed(ctx context.Context, texts []string) ([][]float32, error) {
+	e.calls++
+	if e.calls > e.k {
+		e.cancel()
+		return nil, ctx.Err()
+	}
+	return e.counting.Embed(ctx, texts)
+}
+
+// TestEmbedCachedKeepsEachBatch: an attempt cut short keeps the batches it
+// finished, so the retry sends only the rest.
+func TestEmbedCachedKeepsEachBatch(t *testing.T) {
+	testDB.Reset(t)
+	st := store.New(testDB.Pool)
+	const k = 2
+	texts := make([]string, k*embed.BatchSize+3)
+	for i := range texts {
+		texts[i] = fmt.Sprintf("text %d", i)
+	}
+
+	ctx, cancel := context.WithCancel(t.Context())
+	cut := &timesOut{k: k, cancel: cancel}
+	if _, err := EmbedCached(ctx, st, cut, texts); !errors.Is(err, context.Canceled) {
+		t.Fatalf("the cut attempt = %v, want context.Canceled", err)
+	}
+
+	e := &counting{}
+	again, err := EmbedCached(t.Context(), st, e, texts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.Hits != k*embed.BatchSize || !slices.Equal(e.sent, texts[k*embed.BatchSize:]) {
+		t.Errorf("the retry: %d hits, sent %q; want the first %d kept and only the rest sent", again.Hits, e.sent, k*embed.BatchSize)
 	}
 }

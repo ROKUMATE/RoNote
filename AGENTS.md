@@ -32,33 +32,16 @@ Read `docs/agents/repo-layout.md` when looking for where something lives. Create
 | `make setup` | point git at `.githooks`; once per clone |
 | `make check` | `lint`, `test`, `test-perf`, `hooks-test`, `units-check`: CI's fast jobs. Run before pushing |
 | `make lint` | `lint-go`, `lint-web`, `lint-docs` |
-| `make lint-go` / `lint-web` | golangci-lint, deadcode, tidy, actionlint / Biome, tsc, knip |
-| `make lint-docs` | CONTEXT.md and AGENTS.md within their sizes |
 | `make test` | `test-go` (with `-race`) and `test-web` (Vitest) |
-| `make test-perf` | timing tests alone (`perf` tag, one package at a time) |
 | `make test-integration` | unit and integration tests on testcontainers |
-| `make eval` / `eval-record` | the retrieval eval on recorded vectors, gated on `baseline.json` / re-record them through the model |
-| `make eval-review` / `eval-chat` | the eval's queries marked for review / through the real chat model (costs cents) |
-| `make test-perf-search` | search timing over large libraries; local only |
-| `make test-live` | extract the live pages and check the RAG tutorial; network, never CI |
-| `make hooks-test` | test the commit hook, the scripts and pdftext |
-| `make check-commits RANGE=main..HEAD` | check each commit message in strict mode |
 | `make web-dev` | app on `127.0.0.1:5173`, the runner on `localhost:5174`, the fake sign-in and chat model |
-| `make web-build` | production build and bundle budgets |
 | `make web-e2e` | Playwright and axe on a full stack of their own, never the dev one |
-| `make run-api` / `run-worker` | the API on `127.0.0.1:8080` / the job worker |
-| `make run-idp` / `run-llm` / `run-docling` | the fake sign-in on `:8090` / chat model on `:8094` / docling and pdftext on `:5001`, `:5002` (`web-dev` starts all) |
-| `make pdf-fixtures` / `pdf-record` | print the PDF fixtures / record real docling's answers, goldens and the verbatim report |
-| `make stop` | end what the `run-*` targets and `web-dev` started |
-| `make dev-up` / `dev-down` | start / stop the dev stack (Postgres, SeaweedFS); `dev-up-docling` adds the real docling |
-| `make doctor` | check the VM's clock, the embedding model, the blob store, docling and pdftext |
-| `make images` / `units-check` / `prod-ci` / `prod-local` / `prod-smoke` | the production images, Quadlet's dry run on the units, the units with the fakes on this host / in the podman VM, the smoke suite through Caddy (docs/adr/0014-production-topology.md) |
-| `make runner-pages` / `runner-deploy` / `deploy-host` / `backup-now` / `restore-drill` / `watch-now` | the runner's Pages site and the release's deploys; backups, the drill and the health watch on an installed host (docs/adr/0015-operations.md) |
 | `make generate` / `check-generated` | regenerate sqlc and OpenAPI output / fail if stale |
 | `make migrate-up` / `migrate-new name=...` | apply / create goose migrations |
-| `make extract url=...` | print one page's IR |
+| `make dev-up` / `dev-down` | start / stop the dev stack (Postgres, SeaweedFS); `dev-up-docling` adds the real docling |
+| `make stop` | end what the `run-*` targets and `web-dev` started |
 
-Read `docs/agents/commands.md` for every target and what it runs in full, and `docs/agents/containers.md` when touching the local stack, containers or `.env.dev`.
+Every other target: `docs/agents/commands.md`. Read `docs/agents/containers.md` when touching the local stack, containers or `.env.dev`.
 
 ## Commits
 

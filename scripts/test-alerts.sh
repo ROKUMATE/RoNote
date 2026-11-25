@@ -128,6 +128,9 @@ watch
 watch API_LOG='{"level":"WARN","msg":"chat spend cap reached","day":"2026-11-21","cap_usd":0.2}'
 alerts 1 'the spend cap in the api log alerts'
 
+watch API_LOG='{"level":"ERROR","msg":"embedders serve different models","index":"http://ronote-ollama:11434","query":"http://ronote-ollama-query:11434"}'
+alerts 1 "the embedders' mismatch in the api log alerts"
+
 leaked=false
 for text in "$(cat "$SENT")" "$out"; do
   case $text in *"$TOPIC"*) leaked=true ;; esac

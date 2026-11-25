@@ -201,6 +201,22 @@ Conventions:
 
 ## Day 2
 
+**The units**, each a Quadlet unit of the `ronote` user (`deploy/quadlet/`), with its memory limit and the peak ARM run 45606851983 measured (`make prod-memory`; ADR 0014):
+
+| unit | does | limit | measured peak |
+|---|---|---|---|
+| `ronote-caddy` | serves the app, with Let's Encrypt | 128 MB | 56 MiB |
+| `ronote-api` | the HTTP API | 256 MB | 11 MiB |
+| `ronote-worker` | imports and indexing | 512 MB | 20 MiB |
+| `ronote-migrate` | migrations, once per start | 128 MB | 19 MiB |
+| `ronote-postgres` | the database | 1 GB | 135 MiB |
+| `ronote-ollama` | embeds documents, a chunk at a time | 2 GB | 1,762 MiB (anon 1,170) |
+| `ronote-ollama-query` | embeds searches' queries, from `ronote-ollama`'s volume, read-only | 1.5 GB | not yet measured |
+| `ronote-docling` | converts PDFs | 4 GB | 3,144 MiB at the 100-page cap |
+| `ronote-pdftext` | reads PDFs' text layers | 256 MB | 72 MiB |
+
+`ronote-ollama-query` starts after `ronote-ollama`, and the api after both. The api checks that both serve the model with one digest; until they have both answered, and for good if they differ, search is by words alone, and a mismatch alerts.
+
 **Deploying a release.** Tag it (`git tag -s $TAG && git push origin $TAG`), then approve the Deploy job. `ronote-deploy` pins the images, migrates, restarts the units and waits until each is healthy and `/healthz` names the tag. If anything fails, it goes back to the previous release by itself and alerts "deploying $TAG failed". By hand, on the host: `sudo ronote-deploy $TAG`.
 
 **Rolling back.** Migrations are expand/contract, so the previous release runs on the migrated schema (ADR 0015):
@@ -285,6 +301,7 @@ journald keeps at most 1 GB.
 | the disk is N% full | the root volume is over 80% (the watch's threshold, ADR 0015) | `as-ronote podman system df` and `as-ronote podman images`: remove releases' images older than `/var/lib/ronote/deploy/previous`'s with `as-ronote podman rmi`, keeping that one for a rollback; or grow the boot volume |
 | `<unit>` is down | a unit not active, or its container unhealthy, for 5 minutes | read its journal; `as-ronote systemctl --user status <unit>` |
 | `<domain>`'s certificate expires within 14 days | Caddy hasn't renewed it | `as-ronote journalctl --user -u ronote-caddy`: usually DNS or port 80 |
+| search is by words alone: the embedders serve different models | `ronote-ollama` and `ronote-ollama-query` don't list the model with one digest, or one lacks it; search has no meaning half until the api restarts | `as-ronote journalctl --user -u ronote-api` names both; check both read the one volume, then restart the api |
 | chat reached today's spend cap | `RONOTE_CHAT_DAILY_USD` is spent; chat is off for everyone until midnight UTC | nothing, or raise the cap and restart the api |
 | backup-db failed, backup-pdfs failed | a nightly or weekly backup failed | `as-ronote journalctl --user -u 'ronote-backup@*' --since -1d`; then run it again |
 | restore-drill failed | the weekly drill's restore, schema check, counts or search failed | its journal; the backups may not restore |

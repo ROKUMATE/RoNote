@@ -121,7 +121,7 @@
         "docker.io/ollama/ollama"
       ],
       "prBodyNotes": [
-        "Before merging Ollama: the ARM job by hand (`arm-real.yml`), for its memory under the 2 GiB limit and its start log (`make prod-ollama-settings`) still showing the pinned context, one model and keep-alive."
+        "Before merging Ollama: the ARM job by hand (`arm-real.yml`), for both instances' memory under their limits and their start logs (`make prod-ollama-settings`) still showing the pinned context, one model and keep-alive, and `ronote-ollama-query` still serving `ronote-ollama`'s volume read-only, whose layout the new version may change (ADR 0011)."
       ]
     },
     {

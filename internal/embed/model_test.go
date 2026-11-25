@@ -1,0 +1,158 @@
+package embed
+
+import (
+	"errors"
+	"log/slog"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"sync/atomic"
+	"testing"
+	"time"
+)
+
+// ollama serves /api/tags listing model with digest, or nothing for "".
+func ollama(t *testing.T, model, digest string) *httptest.Server {
+	t.Helper()
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/tags" {
+			http.NotFound(w, r)
+			return
+		}
+		if model == "" {
+			_, _ = w.Write([]byte(`{"models":[]}`))
+			return
+		}
+		_, _ = w.Write([]byte(`{"models":[{"name":"other:1b","digest":"0000"},{"name":"` + model + `","digest":"` + digest + `"}]}`))
+	}))
+	t.Cleanup(srv.Close)
+	return srv
+}
+
+func TestSameModel(t *testing.T) {
+	t.Parallel()
+	const model = "qwen3-embedding:0.6b"
+	pinned := ollama(t, model, "ac6da0dfba84")
+	twin := ollama(t, model, "ac6da0dfba84")
+	other := ollama(t, model, "1234567890ab")
+	without := ollama(t, "", "")
+	down := httptest.NewServer(http.NotFoundHandler())
+	down.Close()
+	client := pinned.Client()
+
+	tests := []struct {
+		name           string
+		a, b           string
+		ok, notAnswers bool
+		says           string
+	}{
+		{name: "one digest", a: pinned.URL, b: twin.URL, ok: true},
+		{name: "two digests", a: pinned.URL, b: other.URL, says: "different models"},
+		{name: "the model missing", a: pinned.URL, b: without.URL, says: "doesn't serve " + model},
+		{name: "one not answering", a: pinned.URL, b: down.URL, notAnswers: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			err := SameModel(t.Context(), client, tt.a, tt.b, model)
+			switch {
+			case tt.ok && err != nil:
+				t.Fatalf("SameModel() = %v, want nil", err)
+			case tt.ok:
+			case err == nil:
+				t.Fatal("SameModel() = nil, want an error")
+			case errors.Is(err, ErrNotAnswering) != tt.notAnswers:
+				t.Errorf("SameModel() = %v; not answering %v, want %v", err, errors.Is(err, ErrNotAnswering), tt.notAnswers)
+			case !strings.Contains(err.Error(), tt.says):
+				t.Errorf("SameModel() = %v, want it to say %q", err, tt.says)
+			}
+		})
+	}
+}
+
+// switchable serves /api/tags listing model with digest once on is true,
+// and 503 before.
+func switchable(t *testing.T, model, digest string, on *atomic.Bool) *httptest.Server {
+	t.Helper()
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		if !on.Load() {
+			http.Error(w, "starting", http.StatusServiceUnavailable)
+			return
+		}
+		_, _ = w.Write([]byte(`{"models":[{"name":"` + model + `","digest":"` + digest + `"}]}`))
+	}))
+	t.Cleanup(srv.Close)
+	return srv
+}
+
+func TestChecked(t *testing.T) {
+	t.Parallel()
+	const model = "qwen3-embedding:0.6b"
+	pinned := ollama(t, model, "ac6da0dfba84")
+	twin := ollama(t, model, "ac6da0dfba84")
+	other := ollama(t, model, "1234567890ab")
+	without := ollama(t, "", "")
+	client := pinned.Client()
+
+	// checked is a Checked over the fake embedder, logging into its buffer.
+	checked := func(index, query string) (*Checked, *strings.Builder) {
+		var log strings.Builder
+		return NewChecked(Fake{}, client, index, query, model, slog.New(slog.NewTextHandler(&log, nil))), &log
+	}
+
+	t.Run("one address for both is not checked", func(t *testing.T) {
+		t.Parallel()
+		c, _ := checked("http://127.0.0.1:9", "http://127.0.0.1:9")
+		if _, err := c.Embed(t.Context(), []string{"x"}); err != nil {
+			t.Errorf("Embed() = %v, want vectors", err)
+		}
+	})
+	t.Run("one digest embeds", func(t *testing.T) {
+		t.Parallel()
+		c, _ := checked(pinned.URL, twin.URL)
+		if _, err := c.Embed(t.Context(), []string{"x"}); err != nil {
+			t.Errorf("Embed() = %v, want vectors", err)
+		}
+	})
+	for name, query := range map[string]string{"two digests": other.URL, "the model missing": without.URL} {
+		t.Run(name+" turns the vector half off, logged once", func(t *testing.T) {
+			t.Parallel()
+			c, log := checked(pinned.URL, query)
+			for range 2 {
+				if _, err := c.Embed(t.Context(), []string{"x"}); !errors.Is(err, ErrModelMismatch) {
+					t.Fatalf("Embed() = %v, want ErrModelMismatch", err)
+				}
+			}
+			if n := strings.Count(log.String(), ModelMismatch); n != 1 {
+				t.Errorf("logged %q %d times, want once: %s", ModelMismatch, n, log.String())
+			}
+			if !strings.Contains(log.String(), "level=ERROR") {
+				t.Errorf("logged %s, want an error", log.String())
+			}
+		})
+	}
+	t.Run("one not answering yet: off until both answer, then on", func(t *testing.T) {
+		t.Parallel()
+		var on atomic.Bool
+		late := switchable(t, model, "ac6da0dfba84", &on)
+		c, log := checked(pinned.URL, late.URL)
+		if _, err := c.Embed(t.Context(), []string{"x"}); !errors.Is(err, ErrUnchecked) {
+			t.Fatalf("Embed() before it answers = %v, want ErrUnchecked", err)
+		}
+		on.Store(true)
+		if _, err := c.Embed(t.Context(), []string{"x"}); err != nil {
+			t.Errorf("Embed() once it answers = %v, want vectors", err)
+		}
+		if strings.Contains(log.String(), ModelMismatch) {
+			t.Errorf("logged a mismatch: %s", log.String())
+		}
+	})
+	t.Run("the watch decides without a search", func(t *testing.T) {
+		t.Parallel()
+		c, log := checked(pinned.URL, other.URL)
+		c.Watch(t.Context(), 10*time.Millisecond)
+		if !strings.Contains(log.String(), ModelMismatch) {
+			t.Errorf("the watch logged %q, want the mismatch", log.String())
+		}
+	})
+}

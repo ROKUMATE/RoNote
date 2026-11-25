@@ -103,9 +103,14 @@ const (
 // Embed is Ollama's embeddings API and the model to ask it for
 // (docs/adr/0011-retrieval.md).
 type Embed struct {
-	// URL is Ollama's address, such as http://127.0.0.1:11434.
-	URL   string
-	Model string
+	// URL is Ollama's address, such as http://127.0.0.1:11434: the one that
+	// indexes documents.
+	URL string
+	// QueryURL is the Ollama that embeds searches' queries: one of its own
+	// in a deployment, so a query never waits behind indexing; dev and test
+	// may share URL's.
+	QueryURL string
+	Model    string
 }
 
 // The model chat answers with by default (docs/adr/0012-chat.md).
@@ -233,6 +238,15 @@ func Load(getenv func(string) string) (Config, error) {
 		Model: withDefault(getenv("RONOTE_EMBED_MODEL"), DefaultEmbedModel),
 	}
 	check("RONOTE_EMBED_URL", validateEmbedURL(embed.URL))
+	embed.QueryURL = strings.TrimSuffix(getenv("RONOTE_EMBED_QUERY_URL"), "/")
+	switch {
+	case embed.QueryURL == "" && env.Deployed():
+		errs = append(errs, errors.New("RONOTE_EMBED_QUERY_URL: not set; staging and prod set it"))
+	case embed.QueryURL == "":
+		embed.QueryURL = embed.URL
+	default:
+		check("RONOTE_EMBED_QUERY_URL", validateEmbedURL(embed.QueryURL))
+	}
 	chat, chatErrs := parseChat(getenv, env)
 	errs = append(errs, chatErrs...)
 	blobStore, pdf, pdfErrs := parsePDF(getenv, env)

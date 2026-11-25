@@ -64,5 +64,5 @@ check() {
 }
 
 check fakes '' ci ci-fakes
-check real 'ronote-ollama.service ronote-docling.service ronote-pdftext.service' ci real
+check real 'ronote-ollama.service ronote-ollama-query.service ronote-docling.service ronote-pdftext.service' ci real
 printf 'units-check: Quadlet %s converts every unit, with the fakes and with the real images\n' "$("$quadlet" -version)"

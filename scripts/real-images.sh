@@ -19,8 +19,8 @@
 #                                       killed for memory, or a unit that
 #                                       restarted, fails it
 #   sudo sh scripts/real-images.sh ollama
-#                                       the settings Ollama logged as it
-#                                       started and loaded the model
+#                                       the settings both Ollamas logged as
+#                                       they started and loaded the model
 #   sudo sh scripts/real-images.sh curve PAGES FILE [PAGES FILE...]
 #                                       docling's time, anon and swap for
 #                                       each PDF, converted once; a timeout
@@ -319,13 +319,16 @@ curve() {
 # ollama: what Ollama logged as it started (its settings) and loaded the
 # model (its context, its parallel sequences, its caches).
 ollama() {
-	say "### Ollama's settings, as it logged them"
-	say ""
-	say '```'
-	as_user journalctl --user -b --no-pager -o cat -u ronote-ollama.service |
-		grep -E 'server config|OLLAMA_|ctx|parallel|n_seq|kv|KV|keep|loaded|offload|memory|starting runner|load_tensors|context' |
-		cut -c1-1000 | head -n 80
-	say '```'
+	for unit in ronote-ollama ronote-ollama-query; do
+		say "### $unit's settings, as it logged them"
+		say ""
+		say '```'
+		as_user journalctl --user -b --no-pager -o cat -u "$unit.service" |
+			grep -E 'server config|OLLAMA_|ctx|parallel|n_seq|kv|KV|keep|loaded|offload|memory|starting runner|load_tensors|context|level=(WARN|ERROR)' |
+			cut -c1-1000 | head -n 80
+		say '```'
+		say ""
+	done
 }
 
 case ${1:-} in

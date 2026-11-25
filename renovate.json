@@ -1,0 +1,146 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Weekly grouped pull requests, digests pinned, nothing merged by itself, one-line commits the commit check accepts (docs/adr/0015-operations.md, docs/adr/0003-commit-convention.md). Never bumped: the embedding model (a change invalidates every vector and the eval's baseline) and the chat model's ID, pinned where no manager reads them. scripts/test_renovate.py checks this file.",
+  "extends": [
+    "config:recommended"
+  ],
+  "timezone": "Etc/UTC",
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "automerge": false,
+  "pinDigests": true,
+  "minimumReleaseAge": "14 days",
+  "prConcurrentLimit": 3,
+  "dependencyDashboard": true,
+  "vulnerabilityAlerts": {
+    "enabled": false
+  },
+  "semanticCommits": "disabled",
+  "commitMessagePrefix": "Build:",
+  "commitMessageAction": "Bump",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "to {{newVersion}}",
+  "commitMessageSuffix": "",
+  "commitMessageLowerCase": "never",
+  "commitBody": null,
+  "group": {
+    "commitMessageTopic": "{{{groupName}}}",
+    "commitMessageExtra": ""
+  },
+  "pin": {
+    "commitMessageAction": "Bump"
+  },
+  "pinDigest": {
+    "commitMessageAction": "Bump",
+    "commitMessageTopic": "{{depName}}",
+    "commitMessageExtra": "to {{newVersion}}"
+  },
+  "digest": {
+    "commitMessageTopic": "{{depName}}",
+    "commitMessageExtra": "to {{newVersion}}"
+  },
+  "rollback": {
+    "commitMessageAction": "Bump"
+  },
+  "replacement": {
+    "commitMessageAction": "Bump"
+  },
+  "lockFileMaintenance": {
+    "enabled": false
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Digest-pinned images Renovate's own managers don't read: the Quadlet units' Image= lines, the backups' images (CI's list names local tags, which it skips, as CI follows deploy/backup/images), and the integration tests' Postgres and SeaweedFS.",
+      "managerFilePatterns": [
+        "/^deploy/quadlet/.+\\.container$/",
+        "/^deploy/backup/images$/",
+        "/^deploy/quadlet/ci/config/backup\\.images$/",
+        "/^internal/pgtest/pgtest\\.go$/",
+        "/^internal/s3test/s3test\\.go$/"
+      ],
+      "matchStrings": [
+        "(?<depName>[a-z0-9][a-z0-9.-]*(?:/[a-z0-9._-]+)+):(?<currentValue>[A-Za-z0-9][A-Za-z0-9._-]*)@(?<currentDigest>sha256:[a-f0-9]{64})"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Go modules, one pull request a week.",
+      "matchManagers": [
+        "gomod"
+      ],
+      "groupName": "Go modules"
+    },
+    {
+      "description": "The web app's and the Pages deploy's npm packages.",
+      "matchManagers": [
+        "npm"
+      ],
+      "groupName": "web dependencies"
+    },
+    {
+      "description": "Actions, pinned to commit SHAs with their versions in comments.",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchDepTypes": [
+        "action"
+      ],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "Every image in one pull request: deploy/units_test.go needs compose, the units and the Go constants to change together (TestImagesMatchCompose).",
+      "matchDatasources": [
+        "docker"
+      ],
+      "groupName": "container images"
+    },
+    {
+      "description": "No Postgres majors: pgvector's tag carries Postgres's major as -pgNN, which stays.",
+      "matchPackageNames": [
+        "pgvector/pgvector",
+        "docker.io/pgvector/pgvector"
+      ],
+      "allowedVersions": "/-pg18-/"
+    },
+    {
+      "description": "docling may bump, with what to run again.",
+      "matchPackageNames": [
+        "quay.io/docling-project/docling-serve-cpu"
+      ],
+      "prBodyNotes": [
+        "Before merging docling: `make dev-up-docling` then `make pdf-record` (every PDF fixture's answers, the goldens and the verbatim report), and the ARM job by hand (`arm-real.yml`): docling's curve by page count against the 100-page cap (ADR 0013)."
+      ]
+    },
+    {
+      "description": "Ollama may bump, with what to run again.",
+      "matchPackageNames": [
+        "docker.io/ollama/ollama"
+      ],
+      "prBodyNotes": [
+        "Before merging Ollama: the ARM job by hand (`arm-real.yml`), for its memory under the 2 GiB limit and its start log (`make prod-ollama-settings`) still showing the pinned context, one model and keep-alive."
+      ]
+    },
+    {
+      "description": "Pyodide may bump, with what to run again.",
+      "matchPackageNames": [
+        "pyodide"
+      ],
+      "prBodyNotes": [
+        "Before merging Pyodide: `make web-e2e`, whose runner tests run Python in it, and `make web-build` (its bundle budgets; Pyodide is precompressed under a versioned path)."
+      ]
+    },
+    {
+      "description": "River may bump, with what to run again.",
+      "matchPackageNames": [
+        "/^github\\.com/riverqueue/river/"
+      ],
+      "prBodyNotes": [
+        "Before merging River: `make river-migration` for any new migration of River's, added through goose (ADR 0009), then `make test-integration`."
+      ]
+    }
+  ]
+}

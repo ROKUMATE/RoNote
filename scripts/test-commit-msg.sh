@@ -125,6 +125,9 @@ rejects 'git merge message with body' "Merge branch 'p02'
 Resolve conflicts" 'expected 1 line'
 
 strict_accepts 'valid line' 'Feat: Add page importer'
+# Renovate's two forms (renovate.json, scripts/test_renovate.py).
+strict_accepts 'Renovate: one dependency' 'Build: Bump quay.io/docling-project/docling-serve-cpu to v1.39.0'
+strict_accepts 'Renovate: a group' 'Build: Bump container images'
 strict_accepts 'trailing blank lines' 'Feat: Add page importer
 
 '

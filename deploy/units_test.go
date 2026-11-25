@@ -16,6 +16,8 @@ import (
 
 	"github.com/rokumate/ronote/internal/chat"
 	"github.com/rokumate/ronote/internal/docling"
+	"github.com/rokumate/ronote/internal/embed"
+	"github.com/rokumate/ronote/internal/search"
 )
 
 // unit is a Quadlet file's keys, by section, each with every value given.
@@ -276,8 +278,8 @@ func TestHealthChecksNeedNoQuotingQuadletMangles(t *testing.T) {
 func TestUnitsFitTheHost(t *testing.T) {
 	t.Parallel()
 	budget := map[string]int{
-		"ronote-caddy": 128, "ronote-api": 512, "ronote-worker": 512, "ronote-postgres": 2048,
-		"ronote-ollama": 2048, "ronote-docling": 4096, "ronote-pdftext": 512,
+		"ronote-caddy": 128, "ronote-api": 256, "ronote-worker": 512, "ronote-postgres": 1024,
+		"ronote-ollama": 2048, "ronote-ollama-query": 1536, "ronote-docling": 4096, "ronote-pdftext": 256,
 	}
 	limit := regexp.MustCompile(`--memory=(\d+)([mg]) --cpus=([\d.]+)`)
 	total := 0
@@ -376,6 +378,19 @@ func TestTheWatcherMatchesTheSpendCapLine(t *testing.T) {
 	}
 }
 
+// The api logs embed.ModelMismatch when its embedders serve different
+// models; the watcher alerts on it, so the two must name it alike.
+func TestTheWatcherMatchesTheEmbeddersMismatchLine(t *testing.T) {
+	t.Parallel()
+	watch, err := os.ReadFile("alerts/watch.sh")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(watch), "grep -q '"+embed.ModelMismatch+"'") {
+		t.Errorf("alerts/watch.sh doesn't match %q, which the api logs", embed.ModelMismatch)
+	}
+}
+
 // The real images' layer must outrank the shared drop-in: Quadlet applies
 // drop-ins by file name, whichever directory they are in, so a file that
 // sorts before ronote-.container.d/start.conf loses its Pull and its start
@@ -383,8 +398,8 @@ func TestTheWatcherMatchesTheSpendCapLine(t *testing.T) {
 func TestTheRealLayerSortsAfterTheSharedDropIn(t *testing.T) {
 	t.Parallel()
 	paths := glob(t, "quadlet/real/ronote-*.container.d/*.conf")
-	if len(paths) != 3 {
-		t.Errorf("the real layer has %d drop-ins, want ollama's, docling's and pdftext's", len(paths))
+	if len(paths) != 4 {
+		t.Errorf("the real layer has %d drop-ins, want the two Ollamas', docling's and pdftext's", len(paths))
 	}
 	for _, path := range paths {
 		if name := filepath.Base(path); name <= "start.conf" {
@@ -456,5 +471,48 @@ func TestThePageCapIsOneNumber(t *testing.T) {
 		if m == nil || string(m[1]) != want {
 			t.Errorf("%s: %s gives %q, want docling.MaxPages, %s", path, pattern, m, want)
 		}
+	}
+}
+
+// The query embedder is the embedder's twin: the same image and the same
+// model, read from its volume, so a query's vector and documents' are made
+// by the identical model; a context that takes the longest query; one slot,
+// kept loaded; started after the embedder, which lays the volume out, and
+// before the api, which checks both serve one digest.
+func TestTheQueryEmbedderIsTheEmbeddersTwin(t *testing.T) {
+	t.Parallel()
+	main := readUnit(t, "quadlet/ronote-ollama.container")
+	query := readUnit(t, "quadlet/ronote-ollama-query.container")
+	if !slices.Equal(query.container("Image"), main.container("Image")) {
+		t.Errorf("Image = %q, want ronote-ollama's %q", query.container("Image"), main.container("Image"))
+	}
+	if !slices.Equal(query.container("Volume"), []string{"ronote-ollama.volume:/root/.ollama:ro"}) {
+		t.Errorf("Volume = %q, want ronote-ollama's volume, read-only", query.container("Volume"))
+	}
+	env := map[string]string{}
+	for _, line := range query.container("Environment") {
+		for _, kv := range strings.Fields(line) {
+			k, v, _ := strings.Cut(kv, "=")
+			env[k] = v
+		}
+	}
+	want := map[string]string{
+		"OLLAMA_CONTEXT_LENGTH":    strconv.Itoa(search.QueryContext),
+		"OLLAMA_NUM_PARALLEL":      "1",
+		"OLLAMA_MAX_LOADED_MODELS": "1",
+		"OLLAMA_KEEP_ALIVE":        "-1",
+		"OLLAMA_NOPRUNE":           "1",
+	}
+	for k, v := range want {
+		if env[k] != v {
+			t.Errorf("ronote-ollama-query.container: %s = %q, want %q", k, env[k], v)
+		}
+	}
+	if !slices.Contains(strings.Fields(strings.Join(query["Unit"]["After"], " ")), "ronote-ollama.service") {
+		t.Error("ronote-ollama-query starts in any order; want After=ronote-ollama.service")
+	}
+	api := readUnit(t, "quadlet/ronote-api.container")
+	if !slices.Contains(strings.Fields(strings.Join(api["Unit"]["After"], " ")), "ronote-ollama-query.service") {
+		t.Error("ronote-api starts in any order; want it after ronote-ollama-query.service")
 	}
 }

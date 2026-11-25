@@ -38,6 +38,7 @@ const backend = env({
   RONOTE_GITHUB_API_URL: stack.idp,
   // The real HTTP client, against a fake model.
   RONOTE_EMBED_URL: stack.embed,
+  RONOTE_EMBED_QUERY_URL: stack.embed,
   RONOTE_EMBED_MODEL: "fake-words",
   // The real adapter, against the fake model: no test calls Anthropic.
   RONOTE_DOCLING_URL: stack.docling,
@@ -147,6 +148,7 @@ export default defineConfig({
         ...backend,
         RONOTE_HTTP_ADDR: new URL(stack.apiDegraded).host,
         RONOTE_EMBED_URL: "http://127.0.0.1:9",
+        RONOTE_EMBED_QUERY_URL: "http://127.0.0.1:9",
       },
       url: `${stack.apiDegraded}/readyz`,
       reuseExistingServer: false,

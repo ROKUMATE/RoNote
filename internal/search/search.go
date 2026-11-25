@@ -17,7 +17,17 @@ import (
 // embedded without one.
 const QueryPrefix = "Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: "
 
-// Search limits (docs/adr/0011-retrieval.md).
+// The query embedder (docs/adr/0011-retrieval.md): its context in tokens,
+// its unit's OLLAMA_CONTEXT_LENGTH (deploy/units_test.go), which the longest
+// query takes with QueryPrefix, whose length in the pinned model's tokens is
+// measured.
+const (
+	QueryContext      = 2048
+	queryPrefixTokens = 21
+)
+
+// Search limits (docs/adr/0011-retrieval.md). MaxQuery is in characters,
+// and chat's first search is the student's question cut to it.
 const (
 	MaxQuery     = 500
 	MaxLimit     = 50

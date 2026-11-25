@@ -5,7 +5,8 @@
 #   the disk is over 80% full;
 #   a unit isn't active, or its container is unhealthy, for 5 minutes;
 #   the app's certificate expires within 14 days;
-#   the api logged that chat reached its daily spend cap.
+#   the api logged that chat reached its daily spend cap;
+#   the api logged that its two embedders serve different models.
 #
 # Each condition alerts once, then again a day later while it lasts; one
 # that clears is forgotten, so it alerts afresh if it comes back.
@@ -68,10 +69,18 @@ condition certificate "$expiring" 0 "$host's certificate expires within 14 days"
 
 # The api logs it once a UTC day (chat.SpendCapReached); what it logged
 # since the last look, so one day's line is one alert.
+# It also logs, once, when the two embedders serve different models
+# (embed.ModelMismatch), and searches by words alone until it restarts.
 checked=$(cat "$state/cap.checked" 2>/dev/null || printf '%s' "$now")
+api_log=$(journalctl --user -u ronote-api.service --since "@$checked" --no-pager -o cat 2>/dev/null)
 capped=false
-if journalctl --user -u ronote-api.service --since "@$checked" --no-pager -o cat 2>/dev/null | grep -q 'chat spend cap reached'; then
+if printf '%s\n' "$api_log" | grep -q 'chat spend cap reached'; then
 	capped=true
+fi
+differ=false
+if printf '%s\n' "$api_log" | grep -q 'embedders serve different models'; then
+	differ=true
 fi
 printf '%s' "$now" >"$state/cap.checked"
 condition spend-cap "$capped" 0 "chat reached today's spend cap" "Chat is off for everyone until midnight UTC; RONOTE_CHAT_DAILY_USD sets the cap."
+condition embedders "$differ" 0 "search is by words alone: the embedders serve different models" "ronote-ollama and ronote-ollama-query must list the model with one digest: journalctl --user -u ronote-api says which."

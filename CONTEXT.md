@@ -17,7 +17,8 @@ P19b done: operations for one real host (ADR 0015), proven in CI, with no host y
 - **Measured limits:**
   - PDFs at most 100 pages, refused after pdftext's inspection with the page count shown. Docling runs at about 1.87 s a page on arm64 (ADR 0013, ARM run 45578157125).
   - Docling's timeout is final (`pdf_conversion_timeout`), not retried.
-  - Ollama is pinned to a 4096-token context and one model kept loaded, with anon 1.1 of its 2 GiB.
+  - Ollama is pinned to a 4096-token context and one model kept loaded, with anon 1.1 of its 2 GiB. It indexes a chunk at a time (about 1.9 s each on arm64), one job at a time, caching each chunk.
+  - Searches embed on a second Ollama, `ronote-ollama-query`: the same model from the first's volume read-only, a 2048-token context, which a 500-character query fits, so a query never waits behind indexing. Until both instances are seen to serve one digest, and for good on a mismatch, which alerts, search is by words alone (ADR 0011).
   - Embeddings go through Ollama's native `/api/embed` with truncate off, so an overlong chunk fails its document's index job instead of being cut (ADR 0011).
 - **Proof:**
   - The smoke job, on `ubuntu-26.04` and `-arm`, bootstraps the runner and installs the units with the fakes. It also proves the AppArmor rule (every unit stopped and started) and the swap file.

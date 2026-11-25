@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ronote
       POSTGRES_DB: ronote
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:${RONOTE_PG_PORT:-5432}:5432"
     volumes:
       # Postgres 18 images keep data under /var/lib/postgresql/18/docker.
       - pgdata:/var/lib/postgresql
@@ -28,7 +28,7 @@ services:
     # disk than a dev machine's VM has, and then nothing can be written.
     command: ["server", "-s3", "-s3.config=/etc/seaweedfs/s3.json", "-dir=/data", "-master.volumeSizeLimitMB=64", "-volume.max=64"]
     ports:
-      - "127.0.0.1:8333:8333"
+      - "127.0.0.1:${RONOTE_S3_PORT:-8333}:8333"
     volumes:
       - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
       - blobdata:/data

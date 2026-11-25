@@ -14,8 +14,22 @@ COMPOSE := sh scripts/container.sh compose
 GOOSE := go tool goose -dir migrations postgres "$$RONOTE_DATABASE_URL"
 db_url_required = test -n "$$RONOTE_DATABASE_URL" || { echo "RONOTE_DATABASE_URL is not set; copy .env.example to .env.dev" >&2; exit 1; }
 WEB := pnpm --dir apps/web
-# The end-to-end tests' own database, recreated by every make web-e2e.
-E2E_DATABASE_URL ?= postgres://ronote:ronote@127.0.0.1:5432/ronote_e2e?sslmode=disable
+# The end-to-end tests' stack: in CI, the job's Postgres and SeaweedFS
+# services; locally, a compose project of its own on ports of its own, so
+# a run never touches the developer's stack (AGENTS.md). Its database is
+# recreated by every make web-e2e.
+E2E_PROJECT = ronote-e2e
+ifdef CI
+E2E_PG_PORT ?= 5432
+E2E_S3_PORT ?= 8333
+E2E_STACK =
+else
+E2E_PG_PORT ?= 55432
+E2E_S3_PORT ?= 58333
+E2E_STACK = e2e-stack-up
+endif
+E2E_DATABASE_URL ?= postgres://ronote:ronote@127.0.0.1:$(E2E_PG_PORT)/ronote_e2e?sslmode=disable
+E2E_COMPOSE = RONOTE_PG_PORT=$(E2E_PG_PORT) RONOTE_S3_PORT=$(E2E_S3_PORT) $(COMPOSE) -p $(E2E_PROJECT)
 GENERATED := internal/store/sqlcdb internal/httpapi/gen apps/web/src/api/schema.d.ts deploy/caddy/runner.caddy
 node_required = want=$$(cat .nvmrc); have=$$(node --version 2>/dev/null); [ "$$have" = "v$$want" ] || \
 	{ echo "Node $$want is required (.nvmrc), found $${have:-none}. With nvm: nvm install && nvm use" >&2; exit 1; }
@@ -149,6 +163,12 @@ dev-up-docling: ## Start the dev stack with the real docling and pdftext, sandbo
 	@[ -f .env.dev ] || { cp .env.example .env.dev; echo "make dev-up-docling: created .env.dev from .env.example"; }
 	$(COMPOSE) --profile docling up -d --wait
 
+e2e-stack-up: ## Start the end-to-end tests' own Postgres and SeaweedFS: compose project ronote-e2e, on 127.0.0.1:55432 and :58333
+	$(E2E_COMPOSE) up -d --wait
+
+e2e-stack-down: ## Stop the end-to-end tests' stack and remove its data; the dev stack is untouched
+	$(E2E_COMPOSE) down -v
+
 dev-down: stop ## Stop the dev processes and the dev stack, docling included; the data volumes are kept
 	$(COMPOSE) --profile docling down
 
@@ -270,11 +290,11 @@ runner-deploy: ## Deploy apps/web/dist-pages to Cloudflare Pages (release only: 
 	pnpm install --frozen-lockfile --dir deploy/pages
 	pnpm --dir deploy/pages run pages
 
-web-e2e: | bin ## Run web end-to-end tests against the full stack (Playwright, Chromium); locally needs make dev-up
+web-e2e: $(E2E_STACK) | bin ## Run web end-to-end tests against the full stack (Playwright, Chromium); locally on their own stack (make e2e-stack-up), never the dev stack
 	@$(node_required)
-	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" sh scripts/e2e-db.sh
+	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" RONOTE_E2E_PROJECT=$(E2E_PROJECT) sh scripts/e2e-db.sh
 	go build -o bin/e2e/ ./cmd/api ./cmd/worker ./cmd/fakeidp ./cmd/fakeembed ./cmd/fakellm ./cmd/fakedocling
-	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" $(WEB) e2e
+	RONOTE_E2E_DATABASE_URL="$(E2E_DATABASE_URL)" RONOTE_E2E_BLOB_ENDPOINT=http://127.0.0.1:$(E2E_S3_PORT) $(WEB) e2e
 
 # Images (deploy/images, docs/adr/0014-production-topology.md): VERSION is
 # stamped into the binaries; the local images are tagged IMAGE_TAG, under
@@ -446,7 +466,7 @@ prod-check-config: ## Check the example production config with the api image; a 
 	! $(CHECK_CONFIG) -e RONOTE_RUNNER_URL=https://run.ronote.example.me ghcr.io/rokumate/ronote-api:$(IMAGE_TAG) check-config --offline
 
 .PHONY: help setup hooks-test check-commits tools check test test-go test-perf test-web run-api run-worker run-idp run-llm run-docling pdf-fixtures pdf-record extract lint lint-go lint-web fmt
-.PHONY: doctor stop dev-up dev-up-docling dev-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
+.PHONY: doctor stop dev-up dev-up-docling dev-down e2e-stack-up e2e-stack-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
 .PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images prod-real prod-real-smoke prod-docling-curve prod-worst-pdf prod-memory-sampler prod-ollama-settings ci-summary prod-pasta-evidence prod-pasta-check prod-memory prod-arm64-images ci-clear-environment prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config

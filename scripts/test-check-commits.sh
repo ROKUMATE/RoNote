@@ -64,6 +64,11 @@ root=$(commit 'Chore: Start')
 commit 'Feat: Add page importer' >/dev/null
 commit 'Fix: Retry slow fetches' >/dev/null
 expect 'all good' 0 "$root..HEAD" 'ok (2 commits'
+# Renovate's two forms (renovate.json, scripts/test_renovate.py).
+renovated=$(git_ rev-parse --short HEAD)
+commit 'Build: Bump quay.io/docling-project/docling-serve-cpu to v1.39.0' >/dev/null
+commit 'Build: Bump container images' >/dev/null
+expect "Renovate's commits" 0 "$renovated..HEAD" 'ok (2 commits'
 expect 'unknown range' 2 'nope..HEAD'
 
 good=$(git_ rev-parse --short HEAD)

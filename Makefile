@@ -31,6 +31,7 @@ setup: ## Install the commit hook and rebase on pull
 hooks-test: ## Test the commit message hook, scripts/check-commits.sh, the doctor checks, run/stop, pdftext's arithmetic the installer's environment check and failure report, the backups, the alerts, ronote-deploy bootstrap's firewall, AppArmor rule and swap, every target making bin/ in a fresh checkout, the real-image reports and the failure journals
 	PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s deploy/pdftext -t deploy/pdftext
 	sh scripts/test-commit-msg.sh
+	PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_renovate.py
 	sh scripts/test-check-commits.sh
 	sh scripts/test-container-clock.sh
 	sh scripts/test-embed-check.sh

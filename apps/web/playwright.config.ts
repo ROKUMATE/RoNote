@@ -44,8 +44,8 @@ const backend = env({
   RONOTE_DOCLING_API_KEY: "ronote-e2e-docling",
   RONOTE_PDFTEXT_URL: stack.pdftext,
   RONOTE_PDFTEXT_API_KEY: "ronote-e2e-pdftext",
-  // The dev stack's SeaweedFS (make dev-up; CI starts it too).
-  RONOTE_BLOB_ENDPOINT: "http://127.0.0.1:8333",
+  // The tests' own SeaweedFS (make e2e-stack-up; CI's service).
+  RONOTE_BLOB_ENDPOINT: process.env.RONOTE_E2E_BLOB_ENDPOINT ?? "http://127.0.0.1:8333",
   RONOTE_BLOB_BUCKET: "ronote",
   RONOTE_CHAT_ENABLED: "true",
   RONOTE_CHAT_URL: stack.llm,

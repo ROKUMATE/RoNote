@@ -140,7 +140,8 @@ func healthcheck(args []string) error {
 	if len(args) != 1 {
 		return errors.New("want one argument, the URL of /healthz")
 	}
-	return health.Get(context.Background(), args[0], healthcheckTimeout)
+	// Its own process: the default client is no one else's.
+	return health.Get(context.Background(), http.DefaultClient, args[0], healthcheckTimeout)
 }
 
 func run() error {
@@ -186,7 +187,7 @@ func run() error {
 	searcher := search.NewSearcher(st, embed.NewClient(cfg.Embed.URL, cfg.Embed.Model), logger)
 	chats, err := chat.NewService(chat.Options{
 		Store: st, Searcher: searcher,
-		Model:     anthropic.New(cfg.Chat.URL, cfg.Chat.APIKey, cfg.Chat.Model),
+		Model:     anthropic.New(cfg.Chat.URL, cfg.Chat.APIKey, cfg.Chat.Model, http.DefaultClient),
 		ModelName: cfg.Chat.Model, Enabled: cfg.Chat.Enabled,
 		Limits: chat.Limits{
 			MessagesPerDay: cfg.Limits.ChatMessagesPerDay, TokensPerDay: cfg.Limits.ChatTokensPerDay,

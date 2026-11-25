@@ -26,11 +26,12 @@ type Model struct {
 	model  string
 }
 
-// New returns a Model that calls model at url with key. RoNote's own config
-// names all three: nothing is read from the environment.
-func New(url, key, model string) *Model {
+// New returns a Model that calls model at url with key, through client.
+// RoNote's own config names all three: nothing is read from the
+// environment.
+func New(url, key, model string, client *http.Client) *Model {
 	return &Model{
-		client: sdk.NewClient(option.WithoutEnvironmentDefaults(), option.WithBaseURL(url), option.WithAPIKey(key)),
+		client: sdk.NewClient(option.WithoutEnvironmentDefaults(), option.WithBaseURL(url), option.WithAPIKey(key), option.WithHTTPClient(client)),
 		model:  model,
 	}
 }

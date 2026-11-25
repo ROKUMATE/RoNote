@@ -104,7 +104,7 @@ func replay(t *testing.T, stream string) *Model {
 		_, _ = w.Write(events)
 	}))
 	t.Cleanup(srv.Close)
-	return New(srv.URL, key, model)
+	return New(srv.URL, key, model, srv.Client())
 }
 
 // golden compares the request body with testdata/requests/<name>.json, or
@@ -148,6 +148,10 @@ func golden(t *testing.T, name string, body []byte) {
 	}
 }
 
+// recordClient reaches Anthropic's API with -record, through a transport
+// of its own: the shared default refuses in tests (internal/httpguard).
+var recordClient = &http.Client{Transport: &http.Transport{Proxy: http.ProxyFromEnvironment}}
+
 // proxy sends the request on to Anthropic and records the answer.
 func proxy(t *testing.T, w http.ResponseWriter, r *http.Request, body []byte, file string) {
 	t.Helper()
@@ -161,7 +165,7 @@ func proxy(t *testing.T, w http.ResponseWriter, r *http.Request, body []byte, fi
 	// the gzipped body, and record that; without it, Go asks for gzip
 	// itself and records the events as they decode.
 	req.Header.Del("Accept-Encoding")
-	res, err := http.DefaultClient.Do(req) //nolint:gosec // only ever Anthropic's API, with -record
+	res, err := recordClient.Do(req) //nolint:gosec // only ever Anthropic's API, with -record
 	if err != nil {
 		t.Error(err)
 		return
@@ -352,7 +356,7 @@ func TestErrors(t *testing.T) {
 			_, _ = io.WriteString(w, body)
 		}))
 		defer srv.Close()
-		_, err := New(srv.URL, "", model).Stream(t.Context(), ask("q", channels), func(chat.Event) {})
+		_, err := New(srv.URL, "", model, srv.Client()).Stream(t.Context(), ask("q", channels), func(chat.Event) {})
 		return err
 	}
 	overloaded, err := os.ReadFile("testdata/streams/overloaded.sse")
@@ -389,7 +393,7 @@ func TestErrors(t *testing.T) {
 func TestAgainstTheFakeModel(t *testing.T) {
 	srv := httptest.NewServer(fakellm.Handler())
 	t.Cleanup(srv.Close)
-	m := New(srv.URL, "", model)
+	m := New(srv.URL, "", model, srv.Client())
 	first := ask("Search for semaphore", channels)
 	reply, err := m.Stream(t.Context(), first, func(chat.Event) {})
 	if err != nil {

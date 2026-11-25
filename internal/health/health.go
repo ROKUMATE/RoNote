@@ -47,15 +47,15 @@ func Fresh(path string, maxAge time.Duration, now time.Time) error {
 	return nil
 }
 
-// Get fails unless url answers 200 within timeout.
-func Get(ctx context.Context, url string, timeout time.Duration) error {
+// Get fails unless url answers client 200 within timeout.
+func Get(ctx context.Context, client *http.Client, url string, timeout time.Duration) error {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, http.NoBody)
 	if err != nil {
 		return err
 	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return err
 	}

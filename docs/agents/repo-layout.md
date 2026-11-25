@@ -28,6 +28,7 @@ Where things live, in full. AGENTS.md keeps the short version.
 | `internal/docling/` | PDF to IR: the part of docling's JSON RoNote reads, and the mapping to IR with code text from pdftext (docs/adr/0013-pdf-import.md) |
 | `internal/blob/` | the blob port, file storage for PDFs (docs/adr/0013-pdf-import.md): `s3blob` adapts any S3-compatible store and is the only package that imports the AWS SDK (depguard), `memblob` in memory for unit tests, `blobtest` the suite both pass |
 | `internal/s3test/` | a throwaway SeaweedFS for integration tests, like `internal/pgtest` |
+| `internal/httpguard/` | makes `http.DefaultTransport` refuse in tests: each package whose tests start servers calls `httpguard.Off` from its `TestMain` |
 | `internal/devserver/` | runs a dev stand-in until it is interrupted |
 | `internal/ratelimit/` | per-key fixed-window counting, in memory, for the API's rate limits |
 | `testdata/retrieval/` | the eval's corpus, queries, recorded vectors and baseline, with `SOURCES.md` |

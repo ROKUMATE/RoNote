@@ -17,11 +17,18 @@ func dot(a, b []float32) float64 {
 	return s
 }
 
+// clientFor is a Client for model at url, through srv's own HTTP client.
+func clientFor(srv *httptest.Server, url, model string) *Client {
+	c := NewClient(url, model)
+	c.HTTP = srv.Client()
+	return c
+}
+
 func TestClientAgainstFakeServer(t *testing.T) {
 	t.Parallel()
 	srv := httptest.NewServer(FakeServer())
 	t.Cleanup(srv.Close)
-	c := NewClient(srv.URL+"/v1/", "qwen3-embedding:0.6b")
+	c := clientFor(srv, srv.URL+"/v1/", "qwen3-embedding:0.6b")
 	texts := make([]string, batchSize+5) // two requests
 	for i := range texts {
 		texts[i] = strings.Repeat("word ", i+1)
@@ -74,7 +81,7 @@ func TestClientErrors(t *testing.T) {
 			t.Parallel()
 			srv := httptest.NewServer(tt.handler)
 			t.Cleanup(srv.Close)
-			_, err := NewClient(srv.URL, "m").Embed(t.Context(), []string{"x"})
+			_, err := clientFor(srv, srv.URL, "m").Embed(t.Context(), []string{"x"})
 			if err == nil {
 				t.Fatal("want an error")
 			}
@@ -90,7 +97,7 @@ func TestClientUnreachable(t *testing.T) {
 	srv := httptest.NewServer(http.NotFoundHandler())
 	url := srv.URL
 	srv.Close()
-	_, err := NewClient(url, "m").Embed(t.Context(), []string{"x"})
+	_, err := clientFor(srv, url, "m").Embed(t.Context(), []string{"x"})
 	if err == nil || errors.Is(err, ErrRejected) {
 		t.Errorf("err = %v, want a transient error", err)
 	}

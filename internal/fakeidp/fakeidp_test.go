@@ -75,8 +75,13 @@ func send(t *testing.T, client *http.Client, method, target string, form url.Val
 	return reply{status: res.StatusCode, header: res.Header, body: data}
 }
 
-// noRedirects is a client that reports redirects instead of following them.
-var noRedirects = &http.Client{CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
+// noRedirects is srv's own client, reporting redirects instead of following
+// them.
+func noRedirects(srv *httptest.Server) *http.Client {
+	c := *srv.Client()
+	c.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
+	return &c
+}
 
 // choose submits the sign-in page as a person would and returns where the
 // provider sends the browser back to.
@@ -89,7 +94,7 @@ func choose(t *testing.T, srv *httptest.Server, button url.Values) *url.URL {
 	for k, v := range button {
 		form[k] = v
 	}
-	res := send(t, noRedirects, http.MethodPost, srv.URL+"/login/oauth/authorize", form, "")
+	res := send(t, noRedirects(srv), http.MethodPost, srv.URL+"/login/oauth/authorize", form, "")
 	if res.status != http.StatusFound {
 		t.Fatalf("authorize = %d, want 302", res.status)
 	}
@@ -105,7 +110,7 @@ func choose(t *testing.T, srv *httptest.Server, button url.Values) *url.URL {
 
 func exchange(t *testing.T, srv *httptest.Server, code, verifier string) map[string]string {
 	t.Helper()
-	res := send(t, http.DefaultClient, http.MethodPost, srv.URL+"/login/oauth/access_token", url.Values{
+	res := send(t, srv.Client(), http.MethodPost, srv.URL+"/login/oauth/access_token", url.Values{
 		"client_id": {"id"}, "client_secret": {"secret"}, "code": {code},
 		"redirect_uri": {redirectURI}, "code_verifier": {verifier},
 	}, "")
@@ -118,7 +123,7 @@ func exchange(t *testing.T, srv *httptest.Server, code, verifier string) map[str
 
 func get(t *testing.T, srv *httptest.Server, path, token string, v any) int {
 	t.Helper()
-	res := send(t, http.DefaultClient, http.MethodGet, srv.URL+path, nil, token)
+	res := send(t, srv.Client(), http.MethodGet, srv.URL+path, nil, token)
 	if res.status == http.StatusOK {
 		if err := json.Unmarshal(res.body, v); err != nil {
 			t.Fatal(err)
@@ -200,7 +205,7 @@ func TestAuthorizePage(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			res := send(t, http.DefaultClient, http.MethodGet, srv.URL+"/login/oauth/authorize?"+tt.query, nil, "")
+			res := send(t, srv.Client(), http.MethodGet, srv.URL+"/login/oauth/authorize?"+tt.query, nil, "")
 			page := res.body
 			if res.status != tt.status {
 				t.Fatalf("status = %d, want %d", res.status, tt.status)
@@ -227,7 +232,7 @@ func register(t *testing.T, srv *httptest.Server, body string) (int, User) {
 		t.Fatal(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	res, err := http.DefaultClient.Do(req)
+	res, err := srv.Client().Do(req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -260,7 +265,7 @@ func TestRegisteredUsersSignIn(t *testing.T) {
 		t.Errorf("two registered users share id %d", grace.ID)
 	}
 
-	page := send(t, http.DefaultClient, http.MethodGet, srv.URL+"/login/oauth/authorize?client_id=id&redirect_uri=http%3A%2F%2Fapp.test%2Fcallback&state=s&code_challenge=c&code_challenge_method=S256", nil, "")
+	page := send(t, srv.Client(), http.MethodGet, srv.URL+"/login/oauth/authorize?client_id=id&redirect_uri=http%3A%2F%2Fapp.test%2Fcallback&state=s&code_challenge=c&code_challenge_method=S256", nil, "")
 	if !strings.Contains(string(page.body), "Sign in as grace") || !strings.Contains(string(page.body), "Sign in as ada") {
 		t.Errorf("sign-in page lacks the registered user or the listed one:\n%s", page.body)
 	}

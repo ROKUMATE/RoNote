@@ -73,13 +73,13 @@ func TestGet(t *testing.T) {
 		}
 	}))
 	t.Cleanup(srv.Close)
-	if err := Get(t.Context(), srv.URL+"/healthz", time.Second); err != nil {
+	if err := Get(t.Context(), srv.Client(), srv.URL+"/healthz", time.Second); err != nil {
 		t.Errorf("Get /healthz: %v", err)
 	}
-	if err := Get(t.Context(), srv.URL+"/other", time.Second); err == nil {
+	if err := Get(t.Context(), srv.Client(), srv.URL+"/other", time.Second); err == nil {
 		t.Error("Get passed a 503")
 	}
-	if err := Get(t.Context(), "http://127.0.0.1:1/healthz", time.Second); err == nil {
+	if err := Get(t.Context(), srv.Client(), "http://127.0.0.1:1/healthz", time.Second); err == nil {
 		t.Error("Get passed with nothing listening")
 	}
 }

@@ -205,8 +205,12 @@ func (c *capture) get(route string) *fakedocling.Answer {
 	return c.answers[route]
 }
 
+// recordTransport reaches the real docling and pdftext with -record: the
+// shared default refuses in tests (internal/httpguard).
+var recordTransport = &http.Transport{}
+
 func (c *capture) RoundTrip(r *http.Request) (*http.Response, error) {
-	resp, err := http.DefaultTransport.RoundTrip(r)
+	resp, err := recordTransport.RoundTrip(r)
 	if err != nil {
 		return nil, err
 	}

@@ -73,19 +73,30 @@ test("the worst accepted PDF converts within docling's timeout and is found", as
   };
 
   const write = () => {
-    const span = (from: string, to: string) => {
-      const a = entered.get(from);
-      const b = entered.get(to);
-      return a === undefined || b === undefined ? "-" : `${seconds(b) - seconds(a)} s`;
+    // A step ends when a poll first saw any later status, or the failure: a
+    // status can come and go between two polls, as extracting usually does.
+    const order = ["queued", "converting", "extracting", "done"];
+    const ended = (step: string) => {
+      const later = [...order.slice(order.indexOf(step) + 1), "failed"];
+      const seen = later.flatMap((s) => entered.get(s) ?? []);
+      return seen.length > 0 ? Math.min(...seen) : undefined;
     };
-    const converting = entered.get("converting");
-    // Converting ends at extracting, or at the failure when that came first.
-    const failedConverting = !entered.has("extracting") && entered.has("failed");
-    const converted = entered.get("extracting") ?? entered.get("failed");
-    const convertSeconds =
-      converting !== undefined && converted !== undefined
-        ? seconds(converted) - seconds(converting)
-        : undefined;
+    const took = (step: string) => {
+      const start = entered.get(step);
+      const end = ended(step);
+      if (start === undefined) {
+        return end === undefined ? undefined : 0;
+      }
+      return end === undefined ? undefined : seconds(end) - seconds(start);
+    };
+    const span = (step: string) => {
+      const s = took(step);
+      if (s === undefined) return "-";
+      return entered.has(step) ? `${s} s` : "under 2 s: no poll saw it";
+    };
+    const convertSeconds = took("converting");
+    const failedConverting =
+      !entered.has("extracting") && !entered.has("done") && entered.has("failed");
     const lines = [
       "### The worst accepted PDF",
       "",
@@ -93,9 +104,9 @@ test("the worst accepted PDF converts within docling's timeout and is found", as
       "",
       "| step | time |",
       "|---|---|",
-      `| queued, until converting | ${span("queued", "converting")} |`,
+      `| queued, until converting | ${span("queued")} |`,
       `| converting: pdftext's inspection, docling, pdftext's lines | ${convertSeconds === undefined ? "-" : `${convertSeconds} s${failedConverting ? ", then failed" : ""}, ${Math.round((convertSeconds * 100) / documentTimeout)}% of docling's ${documentTimeout} s`} |`,
-      `| extracting, until done | ${span("extracting", "done")} |`,
+      `| extracting, until done | ${span("extracting")} |`,
       `| done, until found by search (indexed) | ${found === undefined || entered.get("done") === undefined ? "-" : `${seconds(found) - seconds(entered.get("done") ?? 0)} s`} |`,
       `| upload, until found | ${found === undefined ? "-" : `${seconds(found)} s`} |`,
       "",

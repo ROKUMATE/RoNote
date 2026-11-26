@@ -371,6 +371,9 @@ prod-ci: prod-config | bin ## Bootstrap this Ubuntu 26.04 host and install the p
 ci-clear-environment: ## On a CI runner: remove the runner's per-user XDG_* lines from /etc/environment before installing (sudo)
 	sh scripts/ci-clear-environment.sh
 
+ci-limit-cpus: ## On a CI runner, before installing: put every user's slice, ronote's with it, on 2 CPUs, as on Oracle's host (sudo)
+	sh scripts/ci-limit-cpus.sh
+
 prod-real: prod-config | bin ## Install the units with the real docling and Ollama images on this Ubuntu 26.04 host (sudo): minutes of pulling
 	grep -v '^RONOTE_EMBED_MODEL=' $(PROD_CONFIG)/ronote.env > $(PROD_CONFIG)/ronote.env.real && mv $(PROD_CONFIG)/ronote.env.real $(PROD_CONFIG)/ronote.env
 	$(BOOTSTRAP) $(CI_REAL_DROPINS)
@@ -469,4 +472,4 @@ prod-check-config: ## Check the example production config with the api image; a 
 .PHONY: doctor stop dev-up dev-up-docling dev-down e2e-stack-up e2e-stack-down dev-logs db-shell migrate-up migrate-down migrate-status migrate-new river-migration sqlc
 .PHONY: generate check-generated check-go-version ci-cache-keys
 .PHONY: test-integration eval eval-record eval-review eval-chat test-perf-search test-live test-clean web-install web-deps web-browsers check-node-version
-.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images prod-real prod-real-smoke prod-docling-curve prod-worst-pdf prod-memory-sampler prod-ollama-settings ci-summary prod-pasta-evidence prod-pasta-check prod-memory prod-arm64-images ci-clear-environment prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config
+.PHONY: web-dev web-build runner-pages runner-deploy deploy-host web-e2e images ci-limit-cpus prod-real prod-real-smoke prod-docling-curve prod-worst-pdf prod-memory-sampler prod-ollama-settings ci-summary prod-pasta-evidence prod-pasta-check prod-memory prod-arm64-images ci-clear-environment prod-journals backup-now restore-drill watch-now units-check prod-config prod-ci prod-local prod-smoke prod-check-config

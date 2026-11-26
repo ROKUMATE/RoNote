@@ -79,6 +79,10 @@ jobs:
         run: make units-check
       - name: Clear the runner's per-user variables before installing the units
         run: make ci-clear-environment
+      # Oracle's host has 2 cores in all; the runner has 4. Every
+      # measurement after this runs on 2, as the memory report shows.
+      - name: Run ronote's units on 2 CPUs, as on Oracle's host
+        run: make ci-limit-cpus
       # Docling's image is about 5 GB: the disk is what is likeliest to run out.
       - name: Show the disk and memory before the pulls
         run: |

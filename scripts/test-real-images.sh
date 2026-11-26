@@ -161,6 +161,17 @@ case $out in
 esac
 case $out in *"edge-network"*) result 'only containers are listed' "said: $out" ;; *) result 'only containers are listed' ok ;; esac
 case $out in
+  *"ronote's units ran on CPUs unknown"*) result "a slice it can't read says so" ok ;;
+  *) result "a slice it can't read says so" "said: $out" ;;
+esac
+mkdir -p "$work/slice/user@1001.service"
+printf '0-1\n' >"$work/slice/cpuset.cpus.effective"
+run "memory $work/samples" RONOTE_USER_CGROUP="$work/slice/user@1001.service"
+case $out in
+  *"ronote's units ran on CPUs 0-1 (its slice's cpuset.cpus.effective)."*) result "the report says which CPUs ronote's slice had" ok ;;
+  *) result "the report says which CPUs ronote's slice had" "said: $out" ;;
+esac
+case $out in
   *'```'*"Images  9  9  7.1GB"*'```'*) result "podman system df follows, as ronote" ok ;;
   *) result "podman system df follows, as ronote" "said: $out" ;;
 esac

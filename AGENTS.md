@@ -87,6 +87,7 @@ Every other target: `docs/agents/commands.md`. Read `docs/agents/containers.md` 
 - Extractor changes: `go test ./internal/extract -update` rewrites the goldens; review that diff like code. `TestCodeIsVerbatim` and `TestGoldenHasNoJunk` stay green, and `FuzzExtract` runs 60s before committing.
 - Web: Vitest and Testing Library; Playwright with axe, zero violations in light and dark. No screenshot assertions.
 - Never stop, remove or `compose down` the developer's dev stack, nor release its port forwards: a test stack runs under its own compose project name and ports.
+- Never copy the working tree into a container or the VM: build contexts and mounts only, `.containerignore` respected.
 - Load for a reproduction: at most half the cores in busy loops, each under `timeout 600` and killed by a trap on exit or failure; check free memory first, and none while swap is over half full; kill every load process before reporting.
 - A test that must stop running is quarantined, never deleted: `test.fixme`, `test.skip` or `t.Skip`, with `Quarantined: #N` naming its issue. Every phase summary lists the quarantined tests.
 

@@ -61,4 +61,3 @@ entry when a phase settles it; add one when a phase leaves something open.
 - Go-live: the runner's Pages site and the host's release roll back separately: `ronote-deploy` doesn't touch Pages.
 - The query embedder reads `ronote-ollama`'s volume read-only, which Ollama 0.40.16 serves once a writable instance has laid it out. An Ollama bump that changes that layout reaches `ronote-ollama-query` only after `ronote-ollama` has migrated it, and if it can't serve the old layout read-only, it fails its health check until then.
 - Ollama's `/api/tags` digest for a model can change when 0.40.16 migrates a model pulled by an older Ollama (`manifests-v2`): a copy reported `d84267e5df12` for the files a fresh pull reports as `ac6da0dfba84`, the pin `install.sh` checks. A host whose model came from an older Ollama could fail that check after upgrading.
-- `ronote-ollama-query`'s 1.5 GB limit is an estimate (ADR 0014) until the weekly ARM job measures its peak.

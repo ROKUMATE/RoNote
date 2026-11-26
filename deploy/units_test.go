@@ -278,8 +278,8 @@ func TestHealthChecksNeedNoQuotingQuadletMangles(t *testing.T) {
 func TestUnitsFitTheHost(t *testing.T) {
 	t.Parallel()
 	budget := map[string]int{
-		"ronote-caddy": 128, "ronote-api": 256, "ronote-worker": 512, "ronote-postgres": 1024,
-		"ronote-ollama": 2048, "ronote-ollama-query": 1536, "ronote-docling": 4096, "ronote-pdftext": 256,
+		"ronote-caddy": 128, "ronote-api": 256, "ronote-worker": 256, "ronote-postgres": 1024,
+		"ronote-ollama": 2048, "ronote-ollama-query": 1792, "ronote-docling": 4096, "ronote-pdftext": 256,
 	}
 	limit := regexp.MustCompile(`--memory=(\d+)([mg]) --cpus=([\d.]+)`)
 	total := 0

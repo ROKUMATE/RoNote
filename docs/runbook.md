@@ -207,11 +207,11 @@ Conventions:
 |---|---|---|---|---|
 | `ronote-caddy` | serves the app, with Let's Encrypt | 128 MB | 56 MiB | 1000 |
 | `ronote-api` | the HTTP API | 256 MB | 11 MiB | 1000 |
-| `ronote-worker` | imports and indexing | 512 MB | 20 MiB | 50 |
+| `ronote-worker` | imports and indexing | 256 MB | 20 MiB | 50 |
 | `ronote-migrate` | migrations, once per start | 128 MB | 19 MiB | 100 |
 | `ronote-postgres` | the database | 1 GB | 135 MiB | 1000 |
 | `ronote-ollama` | embeds documents, a chunk at a time | 2 GB | 1,762 MiB (anon 1,170) | 50 |
-| `ronote-ollama-query` | embeds searches' queries, from `ronote-ollama`'s volume, read-only | 1.5 GB | not yet measured | 1000 |
+| `ronote-ollama-query` | embeds searches' queries, from `ronote-ollama`'s volume, read-only | 1.75 GB | 1,512 MiB (anon 898, its model's file pages 614) | 1000 |
 | `ronote-docling` | converts PDFs | 4 GB | 3,144 MiB at the 100-page cap | 50 |
 | `ronote-pdftext` | reads PDFs' text layers | 256 MB | 72 MiB | 50 |
 

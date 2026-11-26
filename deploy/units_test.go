@@ -516,3 +516,43 @@ func TestTheQueryEmbedderIsTheEmbeddersTwin(t *testing.T) {
 		t.Error("ronote-api starts in any order; want it after ronote-ollama-query.service")
 	}
 }
+
+// Under contention a search goes first: the interactive units outweigh
+// batch work by CPU weight on their services, whose cgroups the containers
+// run in (Quadlet's --cgroups=split), and are siblings in ronote's app.slice;
+// the containers the backups, the drill and the model pull run sit in
+// ronote's user.slice, which yields too. Weights only: no unit gets a new
+// hard CPU limit (ADR 0014).
+func TestInteractiveUnitsGoFirst(t *testing.T) {
+	t.Parallel()
+	weights := map[string]string{
+		"ronote-caddy": "1000", "ronote-api": "1000", "ronote-ollama-query": "1000", "ronote-postgres": "1000",
+		"ronote-docling": "50", "ronote-ollama": "50", "ronote-worker": "50", "ronote-pdftext": "50",
+	}
+	for _, path := range glob(t, "quadlet/*.container") {
+		u := readUnit(t, path)
+		if slices.Equal(u["Service"]["Type"], []string{"oneshot"}) {
+			continue
+		}
+		name := strings.TrimSuffix(filepath.Base(path), ".container")
+		want, ok := weights[name]
+		if !ok {
+			t.Errorf("%s is neither interactive nor batch work: give it a CPU weight here", name)
+			continue
+		}
+		if got := u["Service"]["CPUWeight"]; !slices.Equal(got, []string{want}) {
+			t.Errorf("%s: CPUWeight = %q, want %s", path, got, want)
+		}
+	}
+	slice := readUnit(t, "backup/user.slice.d/50-ronote-batch.conf")
+	if got := slice["Slice"]["CPUWeight"]; !slices.Equal(got, []string{"50"}) {
+		t.Errorf("ronote's user.slice: CPUWeight = %q, want 50", got)
+	}
+	install, err := os.ReadFile("install.sh")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(install), "backup/user.slice.d/50-ronote-batch.conf") {
+		t.Error("install.sh doesn't install ronote's user.slice drop-in")
+	}
+}

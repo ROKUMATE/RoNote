@@ -178,6 +178,9 @@ install -o "$user" -g "$user" -m 600 "$here/backup/lib.sh" "$here/backup/backup.
 install -o "$user" -g "$user" -m 600 "$here/alerts/alert.sh" "$here/alerts/watch.sh" "$lib"/
 install -o "$user" -g "$user" -m 600 "$here"/backup/ronote-*.service "$here"/backup/ronote-*.timer \
 	"$here"/alerts/ronote-*.service "$here"/alerts/ronote-*.timer "$userunits"/
+# The containers those run, in ronote's user.slice, yield to the units.
+install -d -o "$user" -g "$user" -m 700 "$userunits/user.slice.d"
+install -o "$user" -g "$user" -m 600 "$here/backup/user.slice.d/50-ronote-batch.conf" "$userunits/user.slice.d/"
 
 # The journal keeps at most 1 GB, every user's included.
 install -d /etc/systemd/journald.conf.d

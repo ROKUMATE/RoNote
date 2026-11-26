@@ -34,6 +34,9 @@ HealthStartPeriod=30s
 Notify=healthy
 
 [Service]
+# Interactive: under contention it goes first (CPU weight 1000 against
+# batch work's 50; docs/adr/0014-production-topology.md).
+CPUWeight=1000
 Restart=always
 TimeoutStartSec=900
 

@@ -129,31 +129,33 @@ bytes() {
 	echo "$n"
 }
 
-# record KEY DIR: one sample line, KEY PEAK ANON FILE LIMIT OOM-KILLS SWAP,
-# from the cgroup DIR; swap is its peak, or what it holds now where the
-# kernel keeps no peak.
+# record KEY DIR WEIGHED: one sample line, KEY PEAK ANON FILE LIMIT
+# OOM-KILLS SWAP CPU-WEIGHT, from the cgroup DIR; swap is its peak, or what
+# it holds now where the kernel keeps no peak; the CPU weight is WEIGHED's,
+# the cgroup that competes for the CPUs with its siblings.
 record() {
 	peak=$(bytes "$2/memory.peak")
 	[ "$peak" -gt 0 ] || peak=$(bytes "$2/memory.current")
 	swap=$(bytes "$2/memory.swap.peak")
 	now=$(bytes "$2/memory.swap.current")
 	[ "$now" -le "$swap" ] || swap=$now
-	printf '%s %s %s %s %s %s %s\n' "$1" "$peak" "$(value "$2/memory.stat" anon)" "$(value "$2/memory.stat" file)" \
-		"$(bytes "$2/memory.max")" "$(value "$2/memory.events" oom_kill)" "$swap"
+	printf '%s %s %s %s %s %s %s %s\n' "$1" "$peak" "$(value "$2/memory.stat" anon)" "$(value "$2/memory.stat" file)" \
+		"$(bytes "$2/memory.max")" "$(value "$2/memory.events" oom_kill)" "$swap" "$(bytes "$3/cpu.weight")"
 }
 
 # sample_once FILE: each unit's container, by its own cgroup under its
 # service's (Quadlet's libpod-payload-*, where its limit is: the service's
-# also holds podman's own start), and each container a script ran (the
-# backups and the drill, in scopes of their own), named once by its
-# container's name if that is ronote's, else by its image.
+# also holds podman's own start), with the service's CPU weight, and each
+# container a script ran (the backups and the drill, in scopes of their own
+# in ronote's user.slice), with that slice's, named once by its container's
+# name if that is ronote's, else by its image.
 sample_once() {
 	out=$1
 	base=$(user_cgroup)
 	[ -d "$base" ] || return 0
 	find "$base" -type d -name 'ronote-*.service' | while read -r dir; do
 		for payload in "$dir"/libpod-payload-*; do
-			[ ! -d "$payload" ] || record "$(basename "$dir" .service)" "$payload" >>"$out"
+			[ ! -d "$payload" ] || record "$(basename "$dir" .service)" "$payload" "$dir" >>"$out"
 		done
 	done
 	find "$base" -type d -name 'libpod-*.scope' | while read -r dir; do
@@ -169,7 +171,7 @@ sample_once() {
 			esac
 			printf '%s %s\n' "$id" "$key" >>"$out.names"
 		fi
-		record "$key" "$dir" >>"$out"
+		record "$key" "$dir" "$(dirname "$dir")" >>"$out"
 	done
 }
 
@@ -193,20 +195,20 @@ memory() {
 	say ""
 	say "ronote's units ran on CPUs $(cat "$(dirname "$(user_cgroup)")/cpuset.cpus.effective" 2>/dev/null || echo unknown) (its slice's cpuset.cpus.effective)."
 	say ""
-	say "Peak is the kernel's high-water mark for the container's own cgroup; anon (what it allocated) and file (page cache, such as model files read) are the largest of the samples taken every second, as the kernel keeps no split of the peak; swap is the most it had swapped out."
+	say "Peak is the kernel's high-water mark for the container's own cgroup; anon (what it allocated) and file (page cache, such as model files read) are the largest of the samples taken every second, as the kernel keeps no split of the peak; swap is the most it had swapped out. CPU weight is cpu.weight of the cgroup that competes for the CPUs: a unit's service (the container's parent), or ronote's user.slice for a script's container."
 	say ""
-	say "| container | peak | anon | file | swap | limit | peak of limit | anon of limit | state |"
-	say "|---|---|---|---|---|---|---|---|---|"
+	say "| container | peak | anon | file | swap | limit | peak of limit | anon of limit | CPU weight | state |"
+	say "|---|---|---|---|---|---|---|---|---|---|"
 	[ -s "$file" ] || fail "no samples in $file: was the sampler running?"
 	rows=$(awk '
 		{ k = $1; seen[k] = 1
 		  if ($2 > peak[k]) peak[k] = $2; if ($3 > anon[k]) anon[k] = $3; if ($4 > file[k]) file[k] = $4
-		  if ($5 > limit[k]) limit[k] = $5; if ($6 > oom[k]) oom[k] = $6; if ($7 > swap[k]) swap[k] = $7 }
-		END { for (k in seen) print k, peak[k] + 0, anon[k] + 0, file[k] + 0, limit[k] + 0, oom[k] + 0, swap[k] + 0 }
+		  if ($5 > limit[k]) limit[k] = $5; if ($6 > oom[k]) oom[k] = $6; if ($7 > swap[k]) swap[k] = $7; weight[k] = $8 }
+		END { for (k in seen) print k, peak[k] + 0, anon[k] + 0, file[k] + 0, limit[k] + 0, oom[k] + 0, swap[k] + 0, weight[k] + 0 }
 	' "$file" 2>/dev/null | sort)
 	units=$(as_user systemctl --user list-units --all --plain --no-legend 'ronote-*.service' | awk '{ print $1 }')
 	printf '%s\n' "$rows" | {
-		while read -r name peak anon file limit oom swap; do
+		while read -r name peak anon file limit oom swap weight; do
 			[ -n "$name" ] || continue
 			case $name in *-network | *-volume) continue ;; esac
 			restarts=0
@@ -231,7 +233,7 @@ memory() {
 			elif [ "$limit" -gt 0 ] && [ $((anon * 100 / limit)) -ge 80 ]; then
 				state="anon near its limit"
 			fi
-			say "| $name | $(mib "$peak") MiB | $(mib "$anon") MiB | $(mib "$file") MiB | $(mib "$swap") MiB | $(mib "$limit") MiB | $of_limit | $anon_of_limit | $state |"
+			say "| $name | $(mib "$peak") MiB | $(mib "$anon") MiB | $(mib "$file") MiB | $(mib "$swap") MiB | $(mib "$limit") MiB | $of_limit | $anon_of_limit | $weight | $state |"
 		done
 		[ "$failed" = false ]
 	} || failed=true

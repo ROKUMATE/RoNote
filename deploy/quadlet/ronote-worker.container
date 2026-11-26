@@ -34,6 +34,9 @@ HealthInterval=30s
 HealthStartPeriod=60s
 
 [Service]
+# Batch work: under contention it yields to the interactive units (CPU
+# weight 50 against their 1000; docs/adr/0014-production-topology.md).
+CPUWeight=50
 Restart=always
 TimeoutStartSec=900
 

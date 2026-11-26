@@ -31,6 +31,11 @@ type Client struct {
 	// HTTP makes the calls; nil means http.DefaultClient. Callers bound
 	// each call with their context.
 	HTTP *http.Client
+	// Threads, when set, is the CPU threads Ollama runs the model on, sent
+	// with every request (options.num_thread): Ollama otherwise takes one
+	// per core of the machine, not of the cgroup it runs in, and loads the
+	// model again for a request with other options.
+	Threads int
 }
 
 // NewClient returns a Client for model at url.
@@ -55,7 +60,11 @@ func (c *Client) Embed(ctx context.Context, texts []string) ([][]float32, error)
 }
 
 func (c *Client) embed(ctx context.Context, texts []string) ([][]float32, error) {
-	body, err := json.Marshal(map[string]any{"model": c.model, "input": texts, "truncate": false})
+	payload := map[string]any{"model": c.model, "input": texts, "truncate": false}
+	if c.Threads > 0 {
+		payload["options"] = map[string]any{"num_thread": c.Threads}
+	}
+	body, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}

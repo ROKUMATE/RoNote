@@ -19,11 +19,11 @@ P19b done: operations for one real host (ADR 0015), proven in CI on 2 CPUs, as o
   - Docling's timeout is final (`pdf_conversion_timeout`), not retried.
   - Ollama is pinned to a 4096-token context and one model kept loaded, with anon 1.1 of its 2 GiB. It indexes a chunk at a time (about 1.9 s each on arm64), one job at a time, caching each chunk.
   - Searches embed on a second Ollama, `ronote-ollama-query` (1.75 GB, its model kept resident): the same model from the first's volume read-only, a 2048-token context, so a query never waits behind indexing. Until both serve one digest, and on a mismatch, which alerts, search is by words alone. Embedding is Ollama's native `/api/embed` with truncate off (ADR 0011).
-  - CPU weights, not limits: caddy, the api, the query Ollama and Postgres 1000; docling, the indexing Ollama, the worker, pdftext and the backups 50 (ADR 0014).
+  - CPU weights, not limits: caddy, the api, the query Ollama and Postgres 1000; docling, the indexing Ollama, the worker, pdftext and the backups 50. Threads: query 2, indexing 1, docling 2; the api loads the query model, never a search (ADR 0014).
 - **Proof:**
   - The smoke job, on `ubuntu-26.04` and `-arm`, bootstraps the runner and installs the units with the fakes. It also proves the AppArmor rule (every unit stopped and started) and the swap file.
   - The weekly `arm-real` job runs the real docling and Ollama on 2 CPUs (`make ci-limit-cpus`):
-    - the curve at 25, 50 and 100 pages, and the worst PDF at the cap, with searches meanwhile: none degraded, the slowest under 1.5 s;
+    - the curve at 25, 50 and 100 pages, and the worst PDF at the cap, with searches meanwhile: none degraded, the slowest under 1.5 s, converting within 270 s;
     - a backup and the restore drill;
     - each container's peak, anon, file, swap and CPU weight.
 
@@ -31,7 +31,7 @@ P19b done: operations for one real host (ADR 0015), proven in CI on 2 CPUs, as o
 - **Tooling:**
   - Renovate: weekly grouped PRs, digests pinned, one-line commits.
   - `make web-e2e` on its own compose project, `ronote-e2e`.
-  - Tests never use Go's shared HTTP transport (`internal/httpguard`); checks that every target makes `bin/` first in a fresh checkout, and that every `docs/*.md` a file names exists.
+  - Tests never use Go's shared HTTP transport (`internal/httpguard`); checks that every target makes `bin/` first, and every named `docs/*.md` exists.
 
 ## What exists
 

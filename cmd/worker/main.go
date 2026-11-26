@@ -112,7 +112,9 @@ func run() error {
 	cleaner := importer.NewBlobs(st, blobs, queue, logger)
 	queue.Handle(importer.DeleteBlobsKind, cleaner.HandleDelete, importer.BlobJobOptions)
 	queue.Handle(importer.SweepBlobsKind, cleaner.HandleSweep, importer.BlobJobOptions)
-	indexer := search.NewIndexer(st, embed.NewClient(cfg.Embed.URL, cfg.Embed.Model), logger)
+	embedder := embed.NewClient(cfg.Embed.URL, cfg.Embed.Model)
+	embedder.Threads = cfg.Embed.Threads
+	indexer := search.NewIndexer(st, embedder, logger)
 	queue.Handle(search.JobKind, indexer.Handle, search.JobOptions)
 	logger.Info("worker started", "kinds", []string{importer.Kind, importer.PDFKind, importer.DeleteBlobsKind, importer.SweepBlobsKind, search.JobKind},
 		"env", cfg.Env, "version", version.Version, "source_ttl", cfg.SourceTTL.String(), "embed_model", cfg.Embed.Model)

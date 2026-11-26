@@ -72,6 +72,8 @@ case $* in
                        *broken*) echo 'worker: convert-check: docling: unavailable: docling submit answered 502' >&2; exit 1 ;;
                        *) echo 'convert-check: ok' ;;
                      esac ;;
+  *"journalctl"*"ronote-ollama.service"*) printf 'cmn  common_param: system_info: n_threads = 4 (n_threads_batch = 4) / 4 | CPU\ncmn  common_param: system_info: n_threads = 1 (n_threads_batch = 1) / 4 | CPU\n' ;;
+  *"exec ronote-docling python"*) echo 2 ;;
   *"system df"*) printf 'TYPE  TOTAL  ACTIVE  SIZE  RECLAIMABLE\nImages  9  9  7.1GB  0B (0%%)\n' ;;
 esac
 FAKE
@@ -143,6 +145,7 @@ samples() {
     printf 'ronote-docling 1073741824 805306368 268435456 4294967296 0 0 50\n'
     printf 'ronote-docling 2147483648 1258291200 838860800 4294967296 0 0 50\n'
     printf 'ronote-api 104857600 52428800 10485760 1073741824 0 0 1000\n'
+    printf 'ronote-ollama 1048576000 943718400 104857600 2147483648 0 0 50\n'
     printf 'restic 50331648 41943040 1048576 536870912 0 0 50\n'
     printf 'ronote-edge-network 4096 4096 0 0 0 0 100\n'
     for line; do printf '%s\n' "$line"; done
@@ -153,11 +156,11 @@ samples
 run "memory $work/samples"
 if [ "$status" -eq 0 ] && [ -z "$err" ]; then result 'containers within their limits pass' ok; else result 'containers within their limits pass' "exit $status: $err"; fi
 case $out in
-  *"| ronote-api | 100 MiB | 50 MiB | 10 MiB | 0 MiB | 1024 MiB | 9% | 4% | 1000 | ok |"*"| ronote-docling | 2048 MiB | 1200 MiB | 800 MiB | 0 MiB | 4096 MiB | 50% | 29% | 50 | ok |"*) result 'the table splits the peak into anon and file' ok ;;
+  *"| ronote-api | 100 MiB | 50 MiB | 10 MiB | 0 MiB | 1024 MiB | 9% | 4% | 1000 | - | ok |"*"| ronote-docling | 2048 MiB | 1200 MiB | 800 MiB | 0 MiB | 4096 MiB | 50% | 29% | 50 | 2 | ok |"*"| ronote-ollama | 1000 MiB | 900 MiB | 100 MiB | 0 MiB | 2048 MiB | 48% | 43% | 50 | 1 | ok |"*) result 'the table splits the peak into anon and file' ok ;;
   *) result 'the table splits the peak into anon and file' "said: $out" ;;
 esac
 case $out in
-  *"| restic | 48 MiB | 40 MiB | 1 MiB | 0 MiB | 512 MiB | 9% | 7% | 50 | ok |"*) result "a backup's container has its row" ok ;;
+  *"| restic | 48 MiB | 40 MiB | 1 MiB | 0 MiB | 512 MiB | 9% | 7% | 50 | - | ok |"*) result "a backup's container has its row" ok ;;
   *) result "a backup's container has its row" "said: $out" ;;
 esac
 case $out in *"edge-network"*) result 'only containers are listed' "said: $out" ;; *) result 'only containers are listed' ok ;; esac
@@ -198,14 +201,14 @@ esac
 samples 'ronote-docling 3600000000 3500000000 100000000 4294967296 0 0 50'
 run "memory $work/samples"
 case $status:$out in
-  0:*"| 81% | 50 | anon near its limit |"*) result 'anon over 80% is flagged, not failed' ok ;;
+  0:*"| 81% | 50 | 2 | anon near its limit |"*) result 'anon over 80% is flagged, not failed' ok ;;
   *) result 'anon over 80% is flagged, not failed' "exit $status: $out" ;;
 esac
 
 samples 'ronote-docling 4000000000 2000000000 2000000000 4294967296 0 0 50'
 run "memory $work/samples"
 case $out in
-  *"| 93% | 46% | 50 | ok |"*) result 'a peak of file cache alone is no warning' ok ;;
+  *"| 93% | 46% | 50 | 2 | ok |"*) result 'a peak of file cache alone is no warning' ok ;;
   *) result 'a peak of file cache alone is no warning' "said: $out" ;;
 esac
 
@@ -213,7 +216,7 @@ esac
 samples 'ronote-docling 4294967296 4199546880 7340032 4294967296 0 1073741824 50'
 run "memory $work/samples"
 case $status:$out in
-  0:*"| ronote-docling | 4096 MiB | 4005 MiB | 800 MiB | 1024 MiB | 4096 MiB | 100% | 97% | 50 | **swapped** |"*) result 'a container that swapped is flagged, with how much' ok ;;
+  0:*"| ronote-docling | 4096 MiB | 4005 MiB | 800 MiB | 1024 MiB | 4096 MiB | 100% | 97% | 50 | 2 | **swapped** |"*) result 'a container that swapped is flagged, with how much' ok ;;
   *) result 'a container that swapped is flagged, with how much' "exit $status: $out" ;;
 esac
 

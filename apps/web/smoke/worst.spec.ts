@@ -59,6 +59,8 @@ test("the worst accepted PDF converts within docling's timeout and is found", as
   const indexing = { count: 0, degraded: 0, slowest: 0 };
   let last: Progress = { status: "uploading" };
   let found: number | undefined;
+  // The conversion's time, as the report gives it.
+  let converted: number | undefined;
 
   const search = async (q: string, documentID?: string) => {
     const scope = documentID ? `&document_id=${documentID}` : "";
@@ -101,6 +103,7 @@ test("the worst accepted PDF converts within docling's timeout and is found", as
       return entered.has(step) ? `${s} s` : "under 2 s: no poll saw it";
     };
     const convertSeconds = took("converting");
+    converted = convertSeconds;
     const failedConverting =
       !entered.has("extracting") && !entered.has("done") && entered.has("failed");
     const lines = [
@@ -173,4 +176,7 @@ test("the worst accepted PDF converts within docling's timeout and is found", as
   // On 2 CPUs, as on Oracle's host, with the document indexing: 25% short of
   // the 2 s a query's embedding may take before search degrades.
   expect(indexing.slowest, "the slowest search while it indexed, in ms").toBeLessThan(1500);
+  // Under the searches' load, half of docling's 540 s, which leaves the
+  // A1's slower cores room (ADR 0013).
+  expect(converted, "the conversion under search load, in seconds").toBeLessThanOrEqual(270);
 });

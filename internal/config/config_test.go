@@ -468,6 +468,22 @@ func TestLoad(t *testing.T) {
 			wantErr: []string{`RONOTE_CHAT_ENABLED: "maybe" is not true or false`},
 		},
 		{
+			// Ollama's threads go with every request; the host's 2 cores
+			// are shared by the two embedders and docling.
+			name: "the embedders' threads",
+			env:  validEnv(map[string]string{"RONOTE_EMBED_THREADS": "1", "RONOTE_EMBED_QUERY_THREADS": "2"}),
+			want: Config{
+				Env: EnvDev, HTTPAddr: "127.0.0.1:8080", LogLevel: slog.LevelInfo, DatabaseURL: testDatabaseURL, SourceTTL: day,
+				PublicURL: "https://ronote.test", GitHub: github, Limits: limits,
+				Embed: Embed{URL: embedDefault.URL, QueryURL: embedDefault.QueryURL, Model: embedDefault.Model, Threads: 1, QueryThreads: 2}, Chat: chatDefault,
+			},
+		},
+		{
+			name:    "threads that aren't a number",
+			env:     validEnv(map[string]string{"RONOTE_EMBED_QUERY_THREADS": "two"}),
+			wantErr: []string{`RONOTE_EMBED_QUERY_THREADS: "two" is not a whole number of at least 1`},
+		},
+		{
 			// Searches embed their queries on an Ollama of their own, which a
 			// deployment names; dev may share the indexing one.
 			name:    "prod without a query embedder",

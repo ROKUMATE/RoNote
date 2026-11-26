@@ -86,6 +86,36 @@ func TestClientAsksOllamaNotToTruncate(t *testing.T) {
 	}
 }
 
+// TestClientSendsItsThreads: Ollama's threads are a request option, and a
+// runner loaded with other options is loaded again, so a client with
+// Threads sends them on every request, and one without sends none.
+func TestClientSendsItsThreads(t *testing.T) {
+	t.Parallel()
+	for _, threads := range []int{0, 2} {
+		var got struct {
+			Options map[string]any `json:"options"`
+		}
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if err := json.NewDecoder(r.Body).Decode(&got); err != nil {
+				t.Error(err)
+			}
+			_, _ = w.Write([]byte(`{"embeddings":[` + vectorJSON(Dims) + `]}`))
+		}))
+		c := clientFor(srv, srv.URL, "m")
+		c.Threads = threads
+		if _, err := c.Embed(t.Context(), []string{"x"}); err != nil {
+			t.Fatal(err)
+		}
+		srv.Close()
+		switch {
+		case threads == 0 && got.Options != nil:
+			t.Errorf("no threads: options = %v, want none", got.Options)
+		case threads > 0 && got.Options["num_thread"] != float64(threads):
+			t.Errorf("%d threads: options = %v, want num_thread %d", threads, got.Options, threads)
+		}
+	}
+}
+
 // vectorJSON is a JSON vector of n numbers.
 func vectorJSON(n int) string {
 	return "[" + strings.TrimSuffix(strings.Repeat("0.1,", n), ",") + "]"

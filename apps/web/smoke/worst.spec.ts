@@ -170,4 +170,7 @@ test("the worst accepted PDF converts within docling's timeout and is found", as
     write();
   }
   expect(searches.degraded, "every search had Ollama's answer").toBe(0);
+  // On 2 CPUs, as on Oracle's host, with the document indexing: 25% short of
+  // the 2 s a query's embedding may take before search degrades.
+  expect(indexing.slowest, "the slowest search while it indexed, in ms").toBeLessThan(1500);
 });

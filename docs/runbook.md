@@ -203,19 +203,19 @@ Conventions:
 
 **The units**, each a Quadlet unit of the `ronote` user (`deploy/quadlet/`), with its memory limit and the peak ARM run 45606851983 measured (`make prod-memory`; ADR 0014):
 
-| unit | does | limit | measured peak |
-|---|---|---|---|
-| `ronote-caddy` | serves the app, with Let's Encrypt | 128 MB | 56 MiB |
-| `ronote-api` | the HTTP API | 256 MB | 11 MiB |
-| `ronote-worker` | imports and indexing | 512 MB | 20 MiB |
-| `ronote-migrate` | migrations, once per start | 128 MB | 19 MiB |
-| `ronote-postgres` | the database | 1 GB | 135 MiB |
-| `ronote-ollama` | embeds documents, a chunk at a time | 2 GB | 1,762 MiB (anon 1,170) |
-| `ronote-ollama-query` | embeds searches' queries, from `ronote-ollama`'s volume, read-only | 1.5 GB | not yet measured |
-| `ronote-docling` | converts PDFs | 4 GB | 3,144 MiB at the 100-page cap |
-| `ronote-pdftext` | reads PDFs' text layers | 256 MB | 72 MiB |
+| unit | does | limit | measured peak | CPU weight |
+|---|---|---|---|---|
+| `ronote-caddy` | serves the app, with Let's Encrypt | 128 MB | 56 MiB | 1000 |
+| `ronote-api` | the HTTP API | 256 MB | 11 MiB | 1000 |
+| `ronote-worker` | imports and indexing | 512 MB | 20 MiB | 50 |
+| `ronote-migrate` | migrations, once per start | 128 MB | 19 MiB | 100 |
+| `ronote-postgres` | the database | 1 GB | 135 MiB | 1000 |
+| `ronote-ollama` | embeds documents, a chunk at a time | 2 GB | 1,762 MiB (anon 1,170) | 50 |
+| `ronote-ollama-query` | embeds searches' queries, from `ronote-ollama`'s volume, read-only | 1.5 GB | not yet measured | 1000 |
+| `ronote-docling` | converts PDFs | 4 GB | 3,144 MiB at the 100-page cap | 50 |
+| `ronote-pdftext` | reads PDFs' text layers | 256 MB | 72 MiB | 50 |
 
-`ronote-ollama-query` starts after `ronote-ollama`, and the api after both. The api checks that both serve the model with one digest; until they have both answered, and for good if they differ, search is by words alone, and a mismatch alerts.
+Under contention the units with weight 1000 go first, so a search's embedding isn't held up by an import; the backups' and the drill's containers yield too (ADR 0014). `ronote-ollama-query` starts after `ronote-ollama`, and the api after both. The api checks that both serve the model with one digest; until they have both answered, and for good if they differ, search is by words alone, and a mismatch alerts.
 
 **Deploying a release.** Tag it (`git tag -s $TAG && git push origin $TAG`), then approve the Deploy job. `ronote-deploy` pins the images, migrates, restarts the units and waits until each is healthy and `/healthz` names the tag. If anything fails, it goes back to the previous release by itself and alerts "deploying $TAG failed". By hand, on the host: `sudo ronote-deploy $TAG`.
 

@@ -134,16 +134,17 @@ case $err in
   *) result 'an inspect error is not called a missing arm64 build' ok ;;
 esac
 
-# samples LINE...: a samples file of KEY PEAK ANON FILE LIMIT OOM-KILLS SWAP lines:
+# samples LINE...: a samples file of KEY PEAK ANON FILE LIMIT OOM-KILLS SWAP
+# CPU-WEIGHT lines:
 # docling's two samples, 2048 MiB peak, 1200 anon, 800 file of 4096; the api
 # within 1 GiB; a backup's restic in its 512 MiB; and a network's cgroup.
 samples() {
   {
-    printf 'ronote-docling 1073741824 805306368 268435456 4294967296 0 0\n'
-    printf 'ronote-docling 2147483648 1258291200 838860800 4294967296 0 0\n'
-    printf 'ronote-api 104857600 52428800 10485760 1073741824 0 0\n'
-    printf 'restic 50331648 41943040 1048576 536870912 0 0\n'
-    printf 'ronote-edge-network 4096 4096 0 0 0 0\n'
+    printf 'ronote-docling 1073741824 805306368 268435456 4294967296 0 0 50\n'
+    printf 'ronote-docling 2147483648 1258291200 838860800 4294967296 0 0 50\n'
+    printf 'ronote-api 104857600 52428800 10485760 1073741824 0 0 1000\n'
+    printf 'restic 50331648 41943040 1048576 536870912 0 0 50\n'
+    printf 'ronote-edge-network 4096 4096 0 0 0 0 100\n'
     for line; do printf '%s\n' "$line"; done
   } >"$work/samples"
 }
@@ -152,11 +153,11 @@ samples
 run "memory $work/samples"
 if [ "$status" -eq 0 ] && [ -z "$err" ]; then result 'containers within their limits pass' ok; else result 'containers within their limits pass' "exit $status: $err"; fi
 case $out in
-  *"| ronote-api | 100 MiB | 50 MiB | 10 MiB | 0 MiB | 1024 MiB | 9% | 4% | ok |"*"| ronote-docling | 2048 MiB | 1200 MiB | 800 MiB | 0 MiB | 4096 MiB | 50% | 29% | ok |"*) result 'the table splits the peak into anon and file' ok ;;
+  *"| ronote-api | 100 MiB | 50 MiB | 10 MiB | 0 MiB | 1024 MiB | 9% | 4% | 1000 | ok |"*"| ronote-docling | 2048 MiB | 1200 MiB | 800 MiB | 0 MiB | 4096 MiB | 50% | 29% | 50 | ok |"*) result 'the table splits the peak into anon and file' ok ;;
   *) result 'the table splits the peak into anon and file' "said: $out" ;;
 esac
 case $out in
-  *"| restic | 48 MiB | 40 MiB | 1 MiB | 0 MiB | 512 MiB | 9% | 7% | ok |"*) result "a backup's container has its row" ok ;;
+  *"| restic | 48 MiB | 40 MiB | 1 MiB | 0 MiB | 512 MiB | 9% | 7% | 50 | ok |"*) result "a backup's container has its row" ok ;;
   *) result "a backup's container has its row" "said: $out" ;;
 esac
 case $out in *"edge-network"*) result 'only containers are listed' "said: $out" ;; *) result 'only containers are listed' ok ;; esac
@@ -176,7 +177,7 @@ case $out in
   *) result "podman system df follows, as ronote" "said: $out" ;;
 esac
 
-samples 'ronote-docling 4294967296 4194304000 0 4294967296 1 0'
+samples 'ronote-docling 4294967296 4194304000 0 4294967296 1 0 50'
 run "memory $work/samples"
 case $status:$err:$out in
   1:*"ronote-docling was killed for memory at its 4096 MiB limit"*:*"**OOM-killed**"*"Options"*"Always Free's A1 allowance is 2 OCPUs and 12 GB"*) result 'an OOM-killed docling fails, with options' ok ;;
@@ -194,25 +195,25 @@ case $status:$err in
   *) result 'a unit that restarted fails' "exit $status: $err" ;;
 esac
 
-samples 'ronote-docling 3600000000 3500000000 100000000 4294967296 0 0'
+samples 'ronote-docling 3600000000 3500000000 100000000 4294967296 0 0 50'
 run "memory $work/samples"
 case $status:$out in
-  0:*"| 81% | anon near its limit |"*) result 'anon over 80% is flagged, not failed' ok ;;
+  0:*"| 81% | 50 | anon near its limit |"*) result 'anon over 80% is flagged, not failed' ok ;;
   *) result 'anon over 80% is flagged, not failed' "exit $status: $out" ;;
 esac
 
-samples 'ronote-docling 4000000000 2000000000 2000000000 4294967296 0 0'
+samples 'ronote-docling 4000000000 2000000000 2000000000 4294967296 0 0 50'
 run "memory $work/samples"
 case $out in
-  *"| 93% | 46% | ok |"*) result 'a peak of file cache alone is no warning' ok ;;
+  *"| 93% | 46% | 50 | ok |"*) result 'a peak of file cache alone is no warning' ok ;;
   *) result 'a peak of file cache alone is no warning' "said: $out" ;;
 esac
 
 # At its limit, with what didn't fit in swap: flagged, not failed.
-samples 'ronote-docling 4294967296 4199546880 7340032 4294967296 0 1073741824'
+samples 'ronote-docling 4294967296 4199546880 7340032 4294967296 0 1073741824 50'
 run "memory $work/samples"
 case $status:$out in
-  0:*"| ronote-docling | 4096 MiB | 4005 MiB | 800 MiB | 1024 MiB | 4096 MiB | 100% | 97% | **swapped** |"*) result 'a container that swapped is flagged, with how much' ok ;;
+  0:*"| ronote-docling | 4096 MiB | 4005 MiB | 800 MiB | 1024 MiB | 4096 MiB | 100% | 97% | 50 | **swapped** |"*) result 'a container that swapped is flagged, with how much' ok ;;
   *) result 'a container that swapped is flagged, with how much' "exit $status: $out" ;;
 esac
 
@@ -246,6 +247,8 @@ api=$cg/app.slice/ronote-api.service
 printf '9999\n' >"$api/memory.peak"
 printf 'anon 9999\nfile 9999\n' >"$api/memory.stat"
 printf 'max\n' >"$api/memory.max"
+printf '1000\n' >"$api/cpu.weight"
+printf '50\n' >"$cg/user.slice/cpu.weight"
 printf '1000\n' >"$api/libpod-payload-0123/memory.peak"
 printf 'anon 600\nfile 300\nkernel 50\n' >"$api/libpod-payload-0123/memory.stat"
 printf 'low 0\noom 0\noom_kill 0\n' >"$api/libpod-payload-0123/memory.events"
@@ -261,12 +264,12 @@ done
 rm -f "$work/s" "$work/s.names" "$INSPECTED"
 run "sample $work/s 0" RONOTE_USER_CGROUP="$cg"
 run "sample $work/s 0" RONOTE_USER_CGROUP="$cg"
-want='restic 5000 4000 100 536870912 2 0
-ronote-api 1000 600 300 2147483648 0 200'
+want='restic 5000 4000 100 536870912 2 0 50
+ronote-api 1000 600 300 2147483648 0 200 1000'
 if [ "$status" -eq 0 ] && [ "$(sort -u "$work/s")" = "$want" ] && [ "$(sort "$work/s" | uniq -c | awk '{ print $1 }' | sort -u)" = 2 ]; then
-  result "each sample has each container's peak, anon, file, limit, OOM kills and swap" ok
+  result "each sample has each container's peak, anon, file, limit, OOM kills, swap and CPU weight" ok
 else
-  result "each sample has each container's peak, anon, file, limit, OOM kills and swap" "exit $status $err: $(cat "$work/s")"
+  result "each sample has each container's peak, anon, file, limit, OOM kills, swap and CPU weight" "exit $status $err: $(cat "$work/s")"
 fi
 if [ "$(grep -c aaaa "$INSPECTED")" = 1 ] && [ "$(cat "$work/s.names")" = 'aaaa restic' ]; then
   result "a script's container is named once, by its image" ok

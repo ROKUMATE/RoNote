@@ -80,30 +80,48 @@ var ErrUnchecked = errors.New("embed: the embedders' model isn't confirmed yet")
 // or that lacks it.
 var ErrModelMismatch = errors.New("embed: " + ModelMismatch)
 
-// Checked is the query embedder as search uses it (docs/adr/0011-retrieval.md):
-// it embeds only once both Ollamas have been seen to serve the model with
-// one digest, as a query's vector is compared with documents'. Until then
-// it refuses, so search gives word matches alone, as when Ollama is down,
-// and tries again on the next query; on a mismatch or a missing model it
-// logs ModelMismatch once and stays off until the api restarts. Nothing is
-// checked when both are one address. The api never refuses to start over
-// it.
+// ErrCold is a query embedder whose model isn't loaded: a search never
+// loads it, as a load takes longer than a query may wait, and the query's
+// timeout would abort it (docs/adr/0011-retrieval.md).
+var ErrCold = errors.New("embed: the query embedder's model isn't loaded yet")
+
+// warmTimeout bounds one load of the query embedder's model, which on 2
+// busy cores takes far longer than a query may wait.
+const warmTimeout = 10 * time.Minute
+
+// Checked is the query embedder as search uses it (docs/adr/0011-retrieval.md).
+// It embeds only once both Ollamas have been seen to serve the model with
+// one digest, as a query's vector is compared with documents', and once
+// the model is loaded. Until then it refuses, so search gives word matches
+// alone, as when Ollama is down, and sends the embedder nothing: Ollama
+// loads a model on the first request for it, and a search's 2 s would
+// abort a load that takes longer, every search starting it over. Watch
+// does the loading, with no such hurry, and does it again when a search
+// times out. On a mismatch or a missing model it logs ModelMismatch once
+// and stays off until the api restarts. Nothing is compared when both are
+// one address. The api never refuses to start over it.
 type Checked struct {
 	Embedder
 	client          *http.Client
 	indexURL, model string
 	queryURL        string
 	logger          *slog.Logger
+	// cold wakes Watch when a search finds the model not answering in time.
+	cold chan struct{}
 
 	mu       sync.Mutex
 	decided  bool
 	mismatch error
+	warm     bool
 }
 
 // NewChecked wraps e, the query embedder at queryURL, against the indexing
 // one at indexURL, both serving model.
 func NewChecked(e Embedder, client *http.Client, indexURL, queryURL, model string, logger *slog.Logger) *Checked {
-	return &Checked{Embedder: e, client: client, indexURL: indexURL, queryURL: queryURL, model: model, logger: logger, decided: indexURL == queryURL}
+	return &Checked{
+		Embedder: e, client: client, indexURL: indexURL, queryURL: queryURL, model: model, logger: logger,
+		decided: indexURL == queryURL, cold: make(chan struct{}, 1),
+	}
 }
 
 // Check compares the two Ollamas' digests unless that is decided: nil once
@@ -130,23 +148,75 @@ func (c *Checked) Check(ctx context.Context) error {
 	return c.mismatch
 }
 
-// Embed embeds texts once the model is confirmed.
+// Warm loads the query embedder's model, with the embedder's own options,
+// as a search's would be, so Ollama keeps the runner it loads, within
+// warmTimeout.
+func (c *Checked) Warm(ctx context.Context) error {
+	if err := c.Check(ctx); err != nil {
+		return err
+	}
+	ctx, cancel := context.WithTimeout(ctx, warmTimeout)
+	defer cancel()
+	start := time.Now()
+	if _, err := c.Embedder.Embed(ctx, []string{"warm"}); err != nil {
+		return fmt.Errorf("embed: warming the query embedder: %w", err)
+	}
+	c.mu.Lock()
+	c.warm = true
+	c.mu.Unlock()
+	c.logger.InfoContext(ctx, "query embedder warm", "took_ms", time.Since(start).Milliseconds())
+	return nil
+}
+
+// Embed embeds texts once the model is confirmed and loaded. A search
+// that runs out of time leaves it cold, for Watch to load again.
 func (c *Checked) Embed(ctx context.Context, texts []string) ([][]float32, error) {
 	if err := c.Check(ctx); err != nil {
 		return nil, err
 	}
-	return c.Embedder.Embed(ctx, texts)
+	c.mu.Lock()
+	warm := c.warm
+	c.mu.Unlock()
+	if !warm {
+		return nil, ErrCold
+	}
+	vecs, err := c.Embedder.Embed(ctx, texts)
+	if err != nil && ctx.Err() != nil {
+		c.mu.Lock()
+		c.warm = false
+		c.mu.Unlock()
+		select {
+		case c.cold <- struct{}{}:
+		default:
+		}
+	}
+	return vecs, err
 }
 
-// Watch checks every interval until it can decide, so a mismatch is logged,
-// and alerted on, without waiting for a search.
+// Watch runs for the api's life: it checks every interval until it can
+// decide, so a mismatch is logged, and alerted on, without waiting for a
+// search; then it warms the model, and warms it again whenever a search
+// finds it cold.
 func (c *Checked) Watch(ctx context.Context, interval time.Duration) {
 	for {
 		attempt, cancel := context.WithTimeout(ctx, interval)
 		err := c.Check(attempt)
 		cancel()
-		if !errors.Is(err, ErrUnchecked) {
+		switch {
+		case errors.Is(err, ErrUnchecked):
+		case err != nil:
 			return
+		default:
+			if err := c.Warm(ctx); err != nil {
+				c.logger.WarnContext(ctx, "the query embedder didn't warm; trying again", "error", err.Error())
+				break
+			}
+			select {
+			case <-ctx.Done():
+				return
+			case <-c.cold:
+				continue
+			}
 		}
 		select {
 		case <-ctx.Done():

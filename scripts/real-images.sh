@@ -191,6 +191,8 @@ memory() {
 	fi
 	say "### Peak memory of each container"
 	say ""
+	say "ronote's units ran on CPUs $(cat "$(dirname "$(user_cgroup)")/cpuset.cpus.effective" 2>/dev/null || echo unknown) (its slice's cpuset.cpus.effective)."
+	say ""
 	say "Peak is the kernel's high-water mark for the container's own cgroup; anon (what it allocated) and file (page cache, such as model files read) are the largest of the samples taken every second, as the kernel keeps no split of the peak; swap is the most it had swapped out."
 	say ""
 	say "| container | peak | anon | file | swap | limit | peak of limit | anon of limit | state |"
@@ -250,7 +252,8 @@ docling_timeout=540
 
 # user_cgroup: ronote's systemd user manager's cgroup, where its units are.
 user_cgroup() {
-	echo "${RONOTE_USER_CGROUP:-/sys/fs/cgroup/user.slice/user-$(id -u ronote).slice/user@$(id -u ronote).service}"
+	uid=$(id -u ronote 2>/dev/null)
+	echo "${RONOTE_USER_CGROUP:-/sys/fs/cgroup/user.slice/user-$uid.slice/user@$uid.service}"
 }
 
 # curve PAGES FILE...: each PDF converted once, smallest first, on the one

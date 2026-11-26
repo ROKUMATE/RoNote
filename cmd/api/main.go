@@ -187,7 +187,9 @@ func run() error {
 	// Queries go to the query embedder, so they never wait behind indexing,
 	// once it is seen to serve the indexing one's model: until then, and for
 	// good on a mismatch, search is by words alone; nothing else waits on it.
-	queries := embed.NewChecked(embed.NewClient(cfg.Embed.QueryURL, cfg.Embed.Model), http.DefaultClient, cfg.Embed.URL, cfg.Embed.QueryURL, cfg.Embed.Model, logger)
+	queryEmbedder := embed.NewClient(cfg.Embed.QueryURL, cfg.Embed.Model)
+	queryEmbedder.Threads = cfg.Embed.QueryThreads
+	queries := embed.NewChecked(queryEmbedder, http.DefaultClient, cfg.Embed.URL, cfg.Embed.QueryURL, cfg.Embed.Model, logger)
 	go queries.Watch(ctx, embedderCheckEvery)
 	searcher := search.NewSearcher(st, queries, logger)
 	chats, err := chat.NewService(chat.Options{

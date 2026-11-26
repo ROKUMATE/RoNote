@@ -185,6 +185,23 @@ sample() {
 	done
 }
 
+# threads NAME: the CPU threads container NAME computes on, as it says: each
+# Ollama's llama-server logs them as it loads the model, and docling's torch
+# is asked; "-" for the rest, or when it can't tell.
+threads() {
+	n=
+	case $1 in
+	ronote-ollama | ronote-ollama-query)
+		n=$(as_user journalctl --user -b --no-pager -o cat -u "$1.service" 2>/dev/null |
+			sed -n 's/.*system_info: n_threads = \([0-9]*\).*/\1/p' | tail -n 1)
+		;;
+	ronote-docling)
+		n=$(as_user podman exec ronote-docling python -c 'import torch; print(torch.get_num_threads())' 2>/dev/null)
+		;;
+	esac
+	echo "${n:--}"
+}
+
 memory() {
 	file=${1:?the samples file}
 	if [ -f "$file.pid" ]; then
@@ -195,10 +212,10 @@ memory() {
 	say ""
 	say "ronote's units ran on CPUs $(cat "$(dirname "$(user_cgroup)")/cpuset.cpus.effective" 2>/dev/null || echo unknown) (its slice's cpuset.cpus.effective)."
 	say ""
-	say "Peak is the kernel's high-water mark for the container's own cgroup; anon (what it allocated) and file (page cache, such as model files read) are the largest of the samples taken every second, as the kernel keeps no split of the peak; swap is the most it had swapped out. CPU weight is cpu.weight of the cgroup that competes for the CPUs: a unit's service (the container's parent), or ronote's user.slice for a script's container."
+	say "Peak is the kernel's high-water mark for the container's own cgroup; anon (what it allocated) and file (page cache, such as model files read) are the largest of the samples taken every second, as the kernel keeps no split of the peak; swap is the most it had swapped out. CPU weight is cpu.weight of the cgroup that competes for the CPUs: a unit's service (the container's parent), or ronote's user.slice for a script's container. Threads are what each Ollama's llama-server last logged (system_info's n_threads), and torch's in docling."
 	say ""
-	say "| container | peak | anon | file | swap | limit | peak of limit | anon of limit | CPU weight | state |"
-	say "|---|---|---|---|---|---|---|---|---|---|"
+	say "| container | peak | anon | file | swap | limit | peak of limit | anon of limit | CPU weight | threads | state |"
+	say "|---|---|---|---|---|---|---|---|---|---|---|"
 	[ -s "$file" ] || fail "no samples in $file: was the sampler running?"
 	rows=$(awk '
 		{ k = $1; seen[k] = 1
@@ -233,7 +250,7 @@ memory() {
 			elif [ "$limit" -gt 0 ] && [ $((anon * 100 / limit)) -ge 80 ]; then
 				state="anon near its limit"
 			fi
-			say "| $name | $(mib "$peak") MiB | $(mib "$anon") MiB | $(mib "$file") MiB | $(mib "$swap") MiB | $(mib "$limit") MiB | $of_limit | $anon_of_limit | $weight | $state |"
+			say "| $name | $(mib "$peak") MiB | $(mib "$anon") MiB | $(mib "$file") MiB | $(mib "$swap") MiB | $(mib "$limit") MiB | $of_limit | $anon_of_limit | $weight | $(threads "$name") | $state |"
 		done
 		[ "$failed" = false ]
 	} || failed=true
@@ -329,7 +346,7 @@ ollama() {
 		say ""
 		say '```'
 		as_user journalctl --user -b --no-pager -o cat -u "$unit.service" |
-			grep -E 'server config|OLLAMA_|ctx|parallel|n_seq|kv|KV|keep|loaded|offload|memory|starting runner|load_tensors|context|level=(WARN|ERROR)' |
+			grep -E 'server config|OLLAMA_|system_info|n_threads|ctx|parallel|n_seq|kv|KV|keep|loaded|offload|memory|starting runner|load_tensors|context|level=(WARN|ERROR)' |
 			cut -c1-1000 | head -n 80
 		say '```'
 		say ""

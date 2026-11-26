@@ -111,6 +111,10 @@ type Embed struct {
 	// may share URL's.
 	QueryURL string
 	Model    string
+	// Threads and QueryThreads are the CPU threads each Ollama runs the
+	// model on, sent with every request; 0 leaves it to Ollama, which takes
+	// one per core of the machine, not of the cgroup (ADR 0014).
+	Threads, QueryThreads int
 }
 
 // The model chat answers with by default (docs/adr/0012-chat.md).
@@ -247,6 +251,11 @@ func Load(getenv func(string) string) (Config, error) {
 	default:
 		check("RONOTE_EMBED_QUERY_URL", validateEmbedURL(embed.QueryURL))
 	}
+	var threadsErr error
+	embed.Threads, threadsErr = parseLimit(getenv("RONOTE_EMBED_THREADS"), 0)
+	check("RONOTE_EMBED_THREADS", threadsErr)
+	embed.QueryThreads, threadsErr = parseLimit(getenv("RONOTE_EMBED_QUERY_THREADS"), 0)
+	check("RONOTE_EMBED_QUERY_THREADS", threadsErr)
 	chat, chatErrs := parseChat(getenv, env)
 	errs = append(errs, chatErrs...)
 	blobStore, pdf, pdfErrs := parsePDF(getenv, env)

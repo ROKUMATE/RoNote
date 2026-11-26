@@ -225,7 +225,7 @@ Conventions:
 | `ronote-docling` | converts PDFs | 4 GB | 3,144 MiB at the 100-page cap | 50 |
 | `ronote-pdftext` | reads PDFs' text layers | 256 MB | 72 MiB | 50 |
 
-Under contention the units with weight 1000 go first, so a search's embedding isn't held up by an import; the backups' and the drill's containers yield too (ADR 0014). `ronote-ollama-query` starts after `ronote-ollama`, and the api after both. The api checks that both serve the model with one digest; until they have both answered, and for good if they differ, search is by words alone, and a mismatch alerts.
+Threads: the query Ollama computes on 2, the indexing one on 1, docling on 2, the host's 2 cores (the memory report shows them). Under contention the units with weight 1000 go first, so a search's embedding isn't held up by an import; the backups' and the drill's containers yield too (ADR 0014). `ronote-ollama-query` starts after `ronote-ollama`, and the api after both. The api checks that both serve the model with one digest; until they have both answered, and for good if they differ, search is by words alone, and a mismatch alerts.
 
 **Deploying a release.** Tag it (`git tag -s $TAG && git push origin $TAG`), then approve the Deploy job. `ronote-deploy` pins the images, migrates, restarts the units and waits until each is healthy and `/healthz` names the tag. If anything fails, it goes back to the previous release by itself and alerts "deploying $TAG failed". By hand, on the host: `sudo ronote-deploy $TAG`.
 

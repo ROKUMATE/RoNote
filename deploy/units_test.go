@@ -556,3 +556,36 @@ func TestInteractiveUnitsGoFirst(t *testing.T) {
 		t.Error("install.sh doesn't install ronote's user.slice drop-in")
 	}
 }
+
+// Each Ollama and docling run on threads sized to the host's 2 cores, not
+// the machine's, which they would take left alone: a query on 2, indexing
+// on 1, which has nothing to wait for and yields at its CPU weight, and
+// docling on 2. Ollama's go with every request (RONOTE_EMBED_THREADS,
+// RONOTE_EMBED_QUERY_THREADS), docling's in its unit (ADR 0014).
+func TestThreadsFitTheHost(t *testing.T) {
+	t.Parallel()
+	want := map[string]string{"RONOTE_EMBED_THREADS": "1", "RONOTE_EMBED_QUERY_THREADS": "2"}
+	for _, path := range []string{"ronote.env.example", "quadlet/ci/config/ronote.env"} {
+		data, err := os.ReadFile(path) //nolint:gosec // the repo's own files
+		if err != nil {
+			t.Fatal(err)
+		}
+		for k, v := range want {
+			if m := regexp.MustCompile(`(?m)^` + k + `=(\S*)$`).FindSubmatch(data); m == nil || string(m[1]) != v {
+				t.Errorf("%s: %s = %q, want %s", path, k, m, v)
+			}
+		}
+	}
+	env := map[string]string{}
+	for _, line := range readUnit(t, "quadlet/ronote-docling.container").container("Environment") {
+		for _, kv := range strings.Fields(line) {
+			k, v, _ := strings.Cut(kv, "=")
+			env[k] = v
+		}
+	}
+	for _, k := range []string{"DOCLING_NUM_THREADS", "OMP_NUM_THREADS"} {
+		if env[k] != "2" {
+			t.Errorf("ronote-docling.container: %s = %q, want 2", k, env[k])
+		}
+	}
+}

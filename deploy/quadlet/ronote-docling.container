@@ -9,6 +9,10 @@ ContainerName=ronote-docling
 Image=quay.io/docling-project/docling-serve-cpu:v1.38.2@sha256:7a480a1604fa3b42efeddc7db9527690d9f9bc903226136013e2bfe6b1a4dfb0
 Network=ronote-converters.network
 Environment=DOCLING_SERVE_MAX_NUM_PAGES=100 DOCLING_SERVE_MAX_FILE_SIZE=26214400 DOCLING_SERVE_MAX_DOCUMENT_TIMEOUT=540 DOCLING_SERVE_SINGLE_USE_RESULTS=true DOCLING_SERVE_ENG_LOC_NUM_WORKERS=1 HF_HUB_OFFLINE=1
+# Two threads, the host's cores: docling reads DOCLING_NUM_THREADS, torch and
+# onnxruntime OMP_NUM_THREADS; left alone, each takes the machine's cores, not
+# the cgroup's (docs/adr/0014-production-topology.md).
+Environment=DOCLING_NUM_THREADS=2 OMP_NUM_THREADS=2
 Secret=ronote-docling-api-key,type=env,target=DOCLING_SERVE_API_KEY
 ReadOnly=true
 ReadOnlyTmpfs=true

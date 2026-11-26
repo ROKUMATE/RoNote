@@ -27,7 +27,7 @@ ReadOnly=true
 ReadOnlyTmpfs=true
 NoNewPrivileges=true
 DropCapability=ALL
-PodmanArgs=--memory=512m --cpus=1
+PodmanArgs=--memory=256m --cpus=1
 # A JSON array runs without a shell, which distroless has none of.
 HealthCmd=["/ronote", "healthcheck"]
 HealthInterval=30s

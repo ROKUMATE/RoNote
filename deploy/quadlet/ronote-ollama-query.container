@@ -6,7 +6,8 @@
 # pulled and laid out, which is why it starts after it. A context of 2048
 # (search.QueryContext), which the longest query, 500 characters, fits with
 # its prefix in any script; one model, one request at a time, kept loaded.
-# Its limit is provisional until the ARM job measures it (ADR 0014). The api
+# Its limit keeps its model resident: anon and the model file's pages, 1,512
+# MiB in ARM run 45626756022, are 84% of it (ADR 0014). The api
 # checks on its first answer that both serve the model with one digest, and
 # searches by words alone if they don't (deploy/units_test.go).
 
@@ -26,7 +27,7 @@ ReadOnly=true
 ReadOnlyTmpfs=true
 NoNewPrivileges=true
 DropCapability=ALL
-PodmanArgs=--memory=1536m --cpus=2
+PodmanArgs=--memory=1792m --cpus=2
 HealthCmd=ollama list
 HealthInterval=15s
 HealthStartPeriod=60s

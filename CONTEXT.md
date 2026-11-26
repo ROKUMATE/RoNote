@@ -4,7 +4,7 @@ The project's state, in at most 80 lines and 6 KB (`make lint` checks). Rewrite 
 
 ## Current milestone
 
-P19b done: operations for one real host (ADR 0015), proven in CI, with no host yet. Going live is the operator's, by `docs/runbook.md`.
+P19b done: operations for one real host (ADR 0015), proven in CI on 2 CPUs, as on that host, with no host yet. Going live is the operator's, by `docs/runbook.md`.
 - **Host:** Oracle's A1, 2 OCPUs and 12 GB (the whole Always Free allowance), Ubuntu 26.04 aarch64. `deploy/bootstrap.sh` sets it up:
   - Podman, with pasta's AppArmor rule (`deploy/pasta-apparmor.sh`, upstream's unmerged patch);
   - a 2 GiB swap file;
@@ -18,21 +18,20 @@ P19b done: operations for one real host (ADR 0015), proven in CI, with no host y
   - PDFs at most 100 pages, refused after pdftext's inspection with the page count shown. Docling runs at about 1.87 s a page on arm64 (ADR 0013, ARM run 45578157125).
   - Docling's timeout is final (`pdf_conversion_timeout`), not retried.
   - Ollama is pinned to a 4096-token context and one model kept loaded, with anon 1.1 of its 2 GiB. It indexes a chunk at a time (about 1.9 s each on arm64), one job at a time, caching each chunk.
-  - Searches embed on a second Ollama, `ronote-ollama-query`: the same model from the first's volume read-only, a 2048-token context, which a 500-character query fits, so a query never waits behind indexing. Until both instances are seen to serve one digest, and for good on a mismatch, which alerts, search is by words alone (ADR 0011).
-  - Embeddings go through Ollama's native `/api/embed` with truncate off, so an overlong chunk fails its document's index job instead of being cut (ADR 0011).
+  - Searches embed on a second Ollama, `ronote-ollama-query` (1.75 GB, its model kept resident): the same model from the first's volume read-only, a 2048-token context, so a query never waits behind indexing. Until both serve one digest, and on a mismatch, which alerts, search is by words alone. Embedding is Ollama's native `/api/embed` with truncate off (ADR 0011).
+  - CPU weights, not limits: caddy, the api, the query Ollama and Postgres 1000; docling, the indexing Ollama, the worker, pdftext and the backups 50 (ADR 0014).
 - **Proof:**
   - The smoke job, on `ubuntu-26.04` and `-arm`, bootstraps the runner and installs the units with the fakes. It also proves the AppArmor rule (every unit stopped and started) and the swap file.
-  - The weekly `arm-real` job runs the real docling and Ollama:
-    - the curve at 25, 50 and 100 pages, and the worst PDF at the cap, with searches meanwhile;
+  - The weekly `arm-real` job runs the real docling and Ollama on 2 CPUs (`make ci-limit-cpus`):
+    - the curve at 25, 50 and 100 pages, and the worst PDF at the cap, with searches meanwhile: none degraded, the slowest under 1.5 s;
     - a backup and the restore drill;
-    - each container's peak, anon, file and swap.
+    - each container's peak, anon, file, swap and CPU weight.
 
     Its reports go to the log and the artifact `arm-real-reports`.
 - **Tooling:**
   - Renovate: weekly grouped PRs, digests pinned, one-line commits.
   - `make web-e2e` on its own compose project, `ronote-e2e`.
-  - Tests never use Go's shared HTTP transport (`internal/httpguard`).
-  - Checks that every target makes `bin/` first in a fresh checkout, and that every `docs/*.md` a file names exists.
+  - Tests never use Go's shared HTTP transport (`internal/httpguard`); checks that every target makes `bin/` first in a fresh checkout, and that every `docs/*.md` a file names exists.
 
 ## What exists
 

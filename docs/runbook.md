@@ -186,6 +186,16 @@ Conventions:
    Compare the time with 187 s and the peak with about 2.85 GiB (3,060,000,000 bytes).
    - **The cap holds** if the time is under 540 s and the peak under 3 GiB.
    - **Lower the cap in a release** if the time is over 270 s, half of docling's timeout. Change `docling.MaxPages`, with docling's `DOCLING_SERVE_MAX_NUM_PAGES` and the web app's `maxPdfPages`; `deploy/units_test.go` fails until all three agree.
+
+   Then searches while it indexes, as the ARM job's worst-PDF test makes them on 2 CPUs. Import `book-100.pdf` in the app, and from its "Done" until a phrase of it is found, search every few seconds in the palette, in your library. Then, on the host:
+
+   ```sh
+   as-ronote journalctl --user -u ronote-api --since -20min -o cat | grep '"path":"/api/v1/search"' | grep -o '"duration_ms":[0-9.]*' | cut -d: -f2 | sort -n | tail -1   # the slowest, in ms
+   as-ronote journalctl --user -u ronote-api --since -20min -o cat | grep -c 'search by meaning unavailable'                                            # degraded: 0
+   ```
+
+   - **Compare** the slowest with the ARM job's report: its "While it indexed" line, the slowest search on 2 CPUs. The bar is under 1.5 s, 25% short of the 2 s after which a search degrades.
+   - **Over 1.5 s, or any degraded,** means the query Ollama doesn't get the CPU in time on the Altra cores: the CPU weights are in the units (ADR 0014).
 7. **The first backup, and a restore drill.** The timers run them nightly and weekly; the first ones run now, from the release that `ronote-deploy` unpacked:
 
    ```sh

@@ -1,6 +1,7 @@
 package embed
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -100,16 +101,22 @@ func TestChecked(t *testing.T) {
 		return NewChecked(Fake{}, client, index, query, model, slog.New(slog.NewTextHandler(&log, nil))), &log
 	}
 
-	t.Run("one address for both is not checked", func(t *testing.T) {
+	t.Run("one address for both is not checked, only warmed", func(t *testing.T) {
 		t.Parallel()
 		c, _ := checked("http://127.0.0.1:9", "http://127.0.0.1:9")
+		if err := c.Warm(t.Context()); err != nil {
+			t.Fatalf("Warm() = %v", err)
+		}
 		if _, err := c.Embed(t.Context(), []string{"x"}); err != nil {
 			t.Errorf("Embed() = %v, want vectors", err)
 		}
 	})
-	t.Run("one digest embeds", func(t *testing.T) {
+	t.Run("one digest embeds once warm", func(t *testing.T) {
 		t.Parallel()
 		c, _ := checked(pinned.URL, twin.URL)
+		if err := c.Warm(t.Context()); err != nil {
+			t.Fatalf("Warm() = %v", err)
+		}
 		if _, err := c.Embed(t.Context(), []string{"x"}); err != nil {
 			t.Errorf("Embed() = %v, want vectors", err)
 		}
@@ -140,6 +147,9 @@ func TestChecked(t *testing.T) {
 			t.Fatalf("Embed() before it answers = %v, want ErrUnchecked", err)
 		}
 		on.Store(true)
+		if err := c.Warm(t.Context()); err != nil {
+			t.Fatalf("Warm() once it answers = %v", err)
+		}
 		if _, err := c.Embed(t.Context(), []string{"x"}); err != nil {
 			t.Errorf("Embed() once it answers = %v, want vectors", err)
 		}
@@ -155,4 +165,88 @@ func TestChecked(t *testing.T) {
 			t.Errorf("the watch logged %q, want the mismatch", log.String())
 		}
 	})
+	t.Run("a search never loads the model: nothing is sent until it is warm", func(t *testing.T) {
+		t.Parallel()
+		inner := &slow{}
+		c := NewChecked(inner, client, pinned.URL, twin.URL, model, slog.New(slog.DiscardHandler))
+		if _, err := c.Embed(t.Context(), []string{"x"}); !errors.Is(err, ErrCold) {
+			t.Fatalf("Embed() before warming = %v, want ErrCold", err)
+		}
+		if n := inner.calls.Load(); n != 0 {
+			t.Fatalf("a search before warming sent %d requests, want none", n)
+		}
+		if err := c.Warm(t.Context()); err != nil || inner.calls.Load() != 1 {
+			t.Fatalf("Warm() = %v after %d requests, want one", err, inner.calls.Load())
+		}
+	})
+	t.Run("a search that times out leaves it cold until warmed again", func(t *testing.T) {
+		t.Parallel()
+		inner := &slow{}
+		c := NewChecked(inner, client, pinned.URL, twin.URL, model, slog.New(slog.DiscardHandler))
+		if err := c.Warm(t.Context()); err != nil {
+			t.Fatal(err)
+		}
+		inner.stall.Store(true)
+		ctx, cancel := context.WithTimeout(t.Context(), 20*time.Millisecond)
+		defer cancel()
+		if _, err := c.Embed(ctx, []string{"x"}); err == nil {
+			t.Fatal("Embed() past its deadline = nil, want an error")
+		}
+		inner.stall.Store(false)
+		before := inner.calls.Load()
+		if _, err := c.Embed(t.Context(), []string{"x"}); !errors.Is(err, ErrCold) || inner.calls.Load() != before {
+			t.Fatalf("Embed() after a timeout = %v with %d more requests, want ErrCold and none", err, inner.calls.Load()-before)
+		}
+		if err := c.Warm(t.Context()); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := c.Embed(t.Context(), []string{"x"}); err != nil {
+			t.Errorf("Embed() warmed again = %v, want vectors", err)
+		}
+	})
+	t.Run("the watch warms it at start, and again once it goes cold", func(t *testing.T) {
+		t.Parallel()
+		inner := &slow{}
+		c := NewChecked(inner, client, pinned.URL, twin.URL, model, slog.New(slog.DiscardHandler))
+		ctx, cancel := context.WithCancel(t.Context())
+		defer cancel()
+		go c.Watch(ctx, 5*time.Millisecond)
+		embeds := func() bool {
+			for range 200 {
+				if _, err := c.Embed(t.Context(), []string{"x"}); err == nil {
+					return true
+				}
+				time.Sleep(5 * time.Millisecond)
+			}
+			return false
+		}
+		if !embeds() {
+			t.Fatal("the watch never warmed it")
+		}
+		inner.stall.Store(true)
+		short, stop := context.WithTimeout(t.Context(), 20*time.Millisecond)
+		defer stop()
+		_, _ = c.Embed(short, []string{"x"})
+		inner.stall.Store(false)
+		if !embeds() {
+			t.Error("the watch never warmed it again after it went cold")
+		}
+	})
+}
+
+// slow is the fake embedder, counting its calls, that stalls until its
+// caller gives up while stall is set.
+type slow struct {
+	Fake
+	calls atomic.Int32
+	stall atomic.Bool
+}
+
+func (s *slow) Embed(ctx context.Context, texts []string) ([][]float32, error) {
+	s.calls.Add(1)
+	if s.stall.Load() {
+		<-ctx.Done()
+		return nil, ctx.Err()
+	}
+	return s.Fake.Embed(ctx, texts)
 }

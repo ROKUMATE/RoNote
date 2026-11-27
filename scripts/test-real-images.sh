@@ -212,6 +212,20 @@ case $out in
   *) result 'a peak of file cache alone is no warning' "said: $out" ;;
 esac
 
+# Swap under 1 MiB, which the table shows as 0 MiB, is no flag; 1 MiB is.
+samples 'ronote-docling 2147483648 1258291200 838860800 4294967296 0 1048575 50'
+run "memory $work/samples"
+case $status:$out in
+  0:*"| 0 MiB | 4096 MiB | 50% | 29% | 50 | 2 | ok |"*) result 'swap under 1 MiB is not flagged' ok ;;
+  *) result 'swap under 1 MiB is not flagged' "exit $status: $out" ;;
+esac
+samples 'ronote-docling 2147483648 1258291200 838860800 4294967296 0 1048576 50'
+run "memory $work/samples"
+case $status:$out in
+  0:*"| 1 MiB | 4096 MiB | 50% | 29% | 50 | 2 | **swapped** |"*) result 'swap from 1 MiB is flagged' ok ;;
+  *) result 'swap from 1 MiB is flagged' "exit $status: $out" ;;
+esac
+
 # At its limit, with what didn't fit in swap: flagged, not failed.
 samples 'ronote-docling 4294967296 4199546880 7340032 4294967296 0 1073741824 50'
 run "memory $work/samples"

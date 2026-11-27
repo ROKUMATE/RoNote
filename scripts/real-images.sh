@@ -212,7 +212,7 @@ memory() {
 	say ""
 	say "ronote's units ran on CPUs $(cat "$(dirname "$(user_cgroup)")/cpuset.cpus.effective" 2>/dev/null || echo unknown) (its slice's cpuset.cpus.effective)."
 	say ""
-	say "Peak is the kernel's high-water mark for the container's own cgroup; anon (what it allocated) and file (page cache, such as model files read) are the largest of the samples taken every second, as the kernel keeps no split of the peak; swap is the most it had swapped out. CPU weight is cpu.weight of the cgroup that competes for the CPUs: a unit's service (the container's parent), or ronote's user.slice for a script's container. Threads are what each Ollama's llama-server last logged (system_info's n_threads), and torch's in docling."
+	say "Peak is the kernel's high-water mark for the container's own cgroup; anon (what it allocated) and file (page cache, such as model files read) are the largest of the samples taken every second, as the kernel keeps no split of the peak; swap is the most it had swapped out, flagged from 1 MiB, as the kernel swaps out a few pages under any pressure. CPU weight is cpu.weight of the cgroup that competes for the CPUs: a unit's service (the container's parent), or ronote's user.slice for a script's container. Threads are what each Ollama's llama-server last logged (system_info's n_threads), and torch's in docling."
 	say ""
 	say "| container | peak | anon | file | swap | limit | peak of limit | anon of limit | CPU weight | threads | state |"
 	say "|---|---|---|---|---|---|---|---|---|---|---|"
@@ -245,7 +245,7 @@ memory() {
 			elif [ "${restarts:-0}" -gt 0 ]; then
 				state="**restarted $restarts times**"
 				fail "$name restarted $restarts times: it did not stay within its $(mib "$limit") MiB limit, or failed some other way (see its journal)"
-			elif [ "$swap" -gt 0 ]; then
+			elif [ "$swap" -ge 1048576 ]; then
 				state="**swapped**"
 			elif [ "$limit" -gt 0 ] && [ $((anon * 100 / limit)) -ge 80 ]; then
 				state="anon near its limit"

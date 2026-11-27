@@ -251,11 +251,17 @@ func Load(getenv func(string) string) (Config, error) {
 	default:
 		check("RONOTE_EMBED_QUERY_URL", validateEmbedURL(embed.QueryURL))
 	}
-	var threadsErr error
+	var threadsErr, queryThreadsErr error
 	embed.Threads, threadsErr = parseLimit(getenv("RONOTE_EMBED_THREADS"), 0)
 	check("RONOTE_EMBED_THREADS", threadsErr)
-	embed.QueryThreads, threadsErr = parseLimit(getenv("RONOTE_EMBED_QUERY_THREADS"), 0)
-	check("RONOTE_EMBED_QUERY_THREADS", threadsErr)
+	embed.QueryThreads, queryThreadsErr = parseLimit(getenv("RONOTE_EMBED_QUERY_THREADS"), 0)
+	check("RONOTE_EMBED_QUERY_THREADS", queryThreadsErr)
+	// Ollama loads the model again for a request with other options, so
+	// two clients of one Ollama sending two thread counts would reload it
+	// at every switch between indexing and a search.
+	if threadsErr == nil && queryThreadsErr == nil && embed.URL == embed.QueryURL && embed.Threads != embed.QueryThreads {
+		check("RONOTE_EMBED_QUERY_THREADS", fmt.Errorf("%d, but RONOTE_EMBED_THREADS is %d, and both embedders are the Ollama at %s", embed.QueryThreads, embed.Threads, embed.URL))
+	}
 	chat, chatErrs := parseChat(getenv, env)
 	errs = append(errs, chatErrs...)
 	blobStore, pdf, pdfErrs := parsePDF(getenv, env)
